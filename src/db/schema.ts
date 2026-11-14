@@ -122,11 +122,45 @@ export const consultationBookings = pgTable('consultation_bookings', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// 7. Sessioni temporali Dialogo Tarot (traccia i 5 minuti gratuiti e i pass a tempo lato server)
+export const dialogueSessions = pgTable('dialogue_sessions', {
+  id: serial('id').primaryKey(),
+  sessionKey: text('session_key').notNull().unique(),
+  userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
+  freeTrialStartedAt: timestamp('free_trial_started_at'),
+  freeTrialExpiresAt: timestamp('free_trial_expires_at'),
+  activePassExpiresAt: timestamp('active_pass_expires_at'),
+  activePackId: text('active_pack_id'),
+  interactionsCount: integer('interactions_count').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// 8. Acquisti pacchetti a tempo per il Dialogo Tarot
+export const dialoguePurchases = pgTable('dialogue_purchases', {
+  id: serial('id').primaryKey(),
+  dialogueSessionId: integer('dialogue_session_id')
+    .references(() => dialogueSessions.id, { onDelete: 'cascade' })
+    .notNull(),
+  userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
+  packId: text('pack_id').notNull(), // '15m' | '30m' | '60m'
+  durationMinutes: integer('duration_minutes').notNull(),
+  priceEur: integer('price_eur').notNull(),
+  stripePriceId: text('stripe_price_id').notNull(),
+  stripeSessionId: text('stripe_session_id'),
+  customerName: text('customer_name').default('').notNull(),
+  customerEmail: text('customer_email').default('').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Relazioni Drizzle
 export const usersRelations = relations(users, ({ many }) => ({
   purchases: many(coursePurchases),
   dispensaProgress: many(dispensaProgress),
   bookings: many(consultationBookings),
+  dialogueSessions: many(dialogueSessions),
+  dialoguePurchases: many(dialoguePurchases),
 }));
 
 export const coursesRelations = relations(courses, ({ many }) => ({
@@ -167,6 +201,25 @@ export const dispensaProgressRelations = relations(dispensaProgress, ({ one }) =
 export const consultationBookingsRelations = relations(consultationBookings, ({ one }) => ({
   user: one(users, {
     fields: [consultationBookings.userId],
+    references: [users.id],
+  }),
+}));
+
+export const dialogueSessionsRelations = relations(dialogueSessions, ({ one, many }) => ({
+  user: one(users, {
+    fields: [dialogueSessions.userId],
+    references: [users.id],
+  }),
+  purchases: many(dialoguePurchases),
+}));
+
+export const dialoguePurchasesRelations = relations(dialoguePurchases, ({ one }) => ({
+  session: one(dialogueSessions, {
+    fields: [dialoguePurchases.dialogueSessionId],
+    references: [dialogueSessions.id],
+  }),
+  user: one(users, {
+    fields: [dialoguePurchases.userId],
     references: [users.id],
   }),
 }));

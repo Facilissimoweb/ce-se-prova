@@ -100,6 +100,15 @@ export interface ReservedBookingItem {
   createdAt: string;
 }
 
+export interface ReservedDialoguePassItem {
+  id: number;
+  packId: DialoguePackId;
+  durationMinutes: number;
+  priceEur: number;
+  expiresAt: string;
+  createdAt: string;
+}
+
 export interface ReservedAreaOverview {
   user: {
     id: number;
@@ -110,6 +119,7 @@ export interface ReservedAreaOverview {
   };
   courses: ReservedCourseItem[];
   bookings: ReservedBookingItem[];
+  dialoguePasses?: ReservedDialoguePassItem[];
 }
 
 export interface CopyEntry {
@@ -130,6 +140,33 @@ export interface ConsultationTariff {
   focusLabel: string;
   includes: string[];
   recommended?: boolean;
+}
+
+export type DialoguePackId = '15m' | '30m' | '60m';
+
+export interface DialoguePack {
+  id: DialoguePackId;
+  title: string;
+  durationMinutes: number;
+  priceEur: number;
+  stripePriceIdAnnotation: string;
+  focusLabel: string;
+  description: string;
+  recommended?: boolean;
+}
+
+export type DialogueAccessMode = 'ready' | 'free_trial' | 'paid_pass' | 'expired';
+
+export interface DialogueAccessStatus {
+  sessionKey: string;
+  mode: DialogueAccessMode;
+  remainingSeconds: number;
+  freeTrialSecondsTotal: number;
+  freeTrialUsed: boolean;
+  activePackId: DialoguePackId | null;
+  expiresAtIso: string | null;
+  interactionsCount: number;
+  serverTimeIso: string;
 }
 
 export interface HolisticPathway {
@@ -186,11 +223,12 @@ export interface StripeCheckoutHandoffPayload {
   customerEmail: string;
   supabaseUserId: string;
   metadata: {
-    itemType?: 'consultation' | 'course';
+    itemType?: 'consultation' | 'course' | 'dialogue_pass';
     practitioner: string;
     tariffId?: string;
     courseId?: CourseId;
     courseTitle?: string;
+    packId?: DialoguePackId;
     durationMinutes?: number;
     scheduledDate?: string;
     scheduledTime?: string;

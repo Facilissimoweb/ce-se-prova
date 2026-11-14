@@ -6,11 +6,16 @@ import { createServer as createViteServer } from 'vite';
 import { requireAuth, optionalAuth, type AuthRequest } from './src/middleware/auth.ts';
 import {
   createConsultationBooking,
+  DIALOGUE_PACK_CATALOG,
   enrollUserInCourse,
+  getDialogueAccessStatus,
   getPublicCourseCatalog,
   getReservedAreaOverview,
+  recordDialogueInteraction,
+  unlockDialogueTimePack,
   updateDispensaProgress,
 } from './src/db/repository.ts';
+import type { DialoguePackId } from './src/types/handoff.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -208,6 +213,114 @@ async function startServer() {
           error instanceof Error
             ? error.message
             : 'Errore durante la registrazione della prenotazione.',
+      });
+    }
+  });
+
+  // 6. Dialogue Tarot: 5-Minute Free Trial + Timed Paid Pass Status
+  app.get('/api/dialogue/status', optionalAuth, async (req: AuthRequest, res) => {
+    try {
+      const sessionKey = String(req.query?.sessionKey || '').trim();
+      if (!sessionKey || sessionKey.length < 8) {
+        return res
+          .status(400)
+          .json({ error: 'Identificativo sessione dialogo mancante.' });
+      }
+
+      const status = await getDialogueAccessStatus({
+        sessionKey,
+        uid: req.user?.uid ?? null,
+        authEmail: req.user?.email ?? null,
+        authName: typeof req.user?.name === 'string' ? req.user.name : null,
+      });
+
+      res.json({ status });
+    } catch (error) {
+      res.status(500).json({
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Impossibile verificare il tempo residuo del dialogo.',
+      });
+    }
+  });
+
+  // 7. Dialogue Tarot: Authorize & Track Interaction (starts 5m trial on first action)
+  app.post('/api/dialogue/interact', optionalAuth, async (req: AuthRequest, res) => {
+    try {
+      const sessionKey = String(req.body?.sessionKey || '').trim();
+      if (!sessionKey || sessionKey.length < 8) {
+        return res
+          .status(400)
+          .json({ error: 'Identificativo sessione dialogo mancante.' });
+      }
+
+      const result = await recordDialogueInteraction({
+        sessionKey,
+        uid: req.user?.uid ?? null,
+        authEmail: req.user?.email ?? null,
+        authName: typeof req.user?.name === 'string' ? req.user.name : null,
+      });
+
+      if (!result.allowed) {
+        return res.status(402).json({
+          error:
+            'I 5 minuti gratuiti di prova sono terminati. Sblocca un pass a tempo per proseguire il dialogo.',
+          status: result.status,
+        });
+      }
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Errore durante la verifica della sessione dialogo.',
+      });
+    }
+  });
+
+  // 8. Dialogue Tarot: Unlock Prepaid Time Pass (15m / 30m / 60m)
+  app.post('/api/dialogue/unlock', optionalAuth, async (req: AuthRequest, res) => {
+    try {
+      const sessionKey = String(req.body?.sessionKey || '').trim();
+      const packId = String(req.body?.packId || '').trim() as DialoguePackId;
+      const customerName = String(req.body?.customerName || '').trim();
+      const customerEmail = String(req.body?.customerEmail || '').trim();
+
+      if (
+        !sessionKey ||
+        sessionKey.length < 8 ||
+        !(packId in DIALOGUE_PACK_CATALOG) ||
+        customerName.length < 2 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)
+      ) {
+        return res.status(400).json({
+          error: 'Inserisci nominativo, email valida e un pacchetto minuti valido.',
+        });
+      }
+
+      const result = await unlockDialogueTimePack({
+        sessionKey,
+        packId,
+        customerName,
+        customerEmail,
+        stripeSessionId: req.body?.stripeSessionId
+          ? String(req.body.stripeSessionId).trim()
+          : undefined,
+        uid: req.user?.uid ?? null,
+        authEmail: req.user?.email ?? null,
+        authName: typeof req.user?.name === 'string' ? req.user.name : null,
+      });
+
+      res.status(201).json(result);
+    } catch (error) {
+      res.status(500).json({
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Impossibile attivare il pass temporale.',
       });
     }
   });

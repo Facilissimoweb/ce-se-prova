@@ -927,6 +927,50 @@ export function ReservedAreaScreen({
               </p>
             </div>
           )}
+
+          {overview?.dialoguePasses && overview.dialoguePasses.length > 0 && (
+            <div className="space-y-4 pt-4">
+              <div className="flex items-center justify-between gap-4">
+                <h3 className="font-display text-lg text-[#F4F1EA]">
+                  Pass a Tempo Dialogo Tarot Acquistati
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => onNavigate('chat')}
+                  className="text-xs font-semibold text-[#D4AF37] hover:text-[#E6C65C] inline-flex items-center gap-1"
+                >
+                  Apri Dialogo Tarot
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {overview.dialoguePasses.map((pass) => {
+                  const isActive = new Date(pass.expiresAt).getTime() > Date.now();
+                  return (
+                    <article
+                      key={pass.id}
+                      className="glass-tier-1 rounded-xl p-4 space-y-2"
+                    >
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-semibold text-[#D4AF37] tabular-nums">
+                          Pass {pass.durationMinutes} min
+                        </span>
+                        <span className="text-[#E6C65C]">
+                          {isActive ? 'Attivo' : 'Concluso'}
+                        </span>
+                      </div>
+                      <p className="font-display text-base text-[#F4F1EA] tabular-nums">
+                        € {pass.priceEur}
+                      </p>
+                      <p className="text-xs text-[#A39B93] tabular-nums">
+                        Scadenza: {new Date(pass.expiresAt).toLocaleString('it-IT')}
+                      </p>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </section>
       )}
     </div>

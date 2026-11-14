@@ -4,10 +4,17 @@ import {
   consultationBookings,
   coursePurchases,
   courses,
+  dialoguePurchases,
+  dialogueSessions,
   dispensaProgress,
   dispense,
   users,
 } from './schema.ts';
+import type {
+  DialogueAccessMode,
+  DialogueAccessStatus,
+  DialoguePackId,
+} from '../types/handoff.ts';
 import { COURSE_SEED_CATALOG } from './seedData.ts';
 
 let seedPromise: Promise<void> | null = null;
@@ -231,6 +238,12 @@ export async function getReservedAreaOverview(
       .where(eq(consultationBookings.userId, dbUser.id))
       .orderBy(desc(consultationBookings.createdAt));
 
+    const userDialoguePasses = await db
+      .select()
+      .from(dialoguePurchases)
+      .where(eq(dialoguePurchases.userId, dbUser.id))
+      .orderBy(desc(dialoguePurchases.createdAt));
+
     return {
       user: {
         id: dbUser.id,
@@ -272,6 +285,14 @@ export async function getReservedAreaOverview(
         };
       }),
       bookings: userBookings,
+      dialoguePasses: userDialoguePasses.map((p) => ({
+        id: p.id,
+        packId: p.packId as DialoguePackId,
+        durationMinutes: p.durationMinutes,
+        priceEur: p.priceEur,
+        expiresAt: p.expiresAt.toISOString(),
+        createdAt: p.createdAt.toISOString(),
+      })),
     };
   } catch (error) {
     console.error('Failed to load reserved area overview:', error);
@@ -502,4 +523,272 @@ export async function createConsultationBooking(params: {
     console.error('Failed to create booking:', error);
     throw new Error('Impossibile registrare la prenotazione.', { cause: error });
   }
+}
+
+export const FREE_TRIAL_SECONDS = 300; // 5 minuti gratuiti
+
+export const DIALOGUE_PACK_CATALOG: Record<
+  DialoguePackId,
+  {
+    id: DialoguePackId;
+    title: string;
+    durationMinutes: number;
+    priceEur: number;
+    stripePriceId: string;
+  }
+> = {
+  '15m': {
+    id: '15m',
+    title: 'Pass Luce · 15 Minuti',
+    durationMinutes: 15,
+    priceEur: 14,
+    stripePriceId: 'STRIPE_PRICE_ID_DIALOGO_15M',
+  },
+  '30m': {
+    id: '30m',
+    title: 'Pass Cosmos · 30 Minuti',
+    durationMinutes: 30,
+    priceEur: 25,
+    stripePriceId: 'STRIPE_PRICE_ID_DIALOGO_30M',
+  },
+  '60m': {
+    id: '60m',
+    title: 'Pass Ciclo · 60 Minuti',
+    durationMinutes: 60,
+    priceEur: 45,
+    stripePriceId: 'STRIPE_PRICE_ID_DIALOGO_60M',
+  },
+};
+
+function computeDialogueStatus(
+  row: typeof dialogueSessions.$inferSelect,
+  now: Date
+): DialogueAccessStatus {
+  const nowMs = now.getTime();
+  const paidExpiryMs = row.activePassExpiresAt
+    ? row.activePassExpiresAt.getTime()
+    : 0;
+  const freeExpiryMs = row.freeTrialExpiresAt
+    ? row.freeTrialExpiresAt.getTime()
+    : 0;
+
+  let mode: DialogueAccessMode = 'ready';
+  let remainingSeconds = FREE_TRIAL_SECONDS;
+  let expiresAtIso: string | null = null;
+
+  if (paidExpiryMs > nowMs) {
+    mode = 'paid_pass';
+    remainingSeconds = Math.max(0, Math.ceil((paidExpiryMs - nowMs) / 1000));
+    expiresAtIso = row.activePassExpiresAt!.toISOString();
+  } else if (row.freeTrialStartedAt && row.freeTrialExpiresAt) {
+    if (freeExpiryMs > nowMs) {
+      mode = 'free_trial';
+      remainingSeconds = Math.max(0, Math.ceil((freeExpiryMs - nowMs) / 1000));
+      expiresAtIso = row.freeTrialExpiresAt.toISOString();
+    } else {
+      mode = 'expired';
+      remainingSeconds = 0;
+      expiresAtIso = row.freeTrialExpiresAt.toISOString();
+    }
+  }
+
+  return {
+    sessionKey: row.sessionKey,
+    mode,
+    remainingSeconds,
+    freeTrialSecondsTotal: FREE_TRIAL_SECONDS,
+    freeTrialUsed: Boolean(row.freeTrialStartedAt),
+    activePackId:
+      mode === 'paid_pass' ? ((row.activePackId as DialoguePackId) ?? null) : null,
+    expiresAtIso,
+    interactionsCount: row.interactionsCount,
+    serverTimeIso: now.toISOString(),
+  };
+}
+
+async function resolveOrCreateDialogueSession(params: {
+  sessionKey: string;
+  uid?: string | null;
+  authEmail?: string | null;
+  authName?: string | null;
+}) {
+  let dbUserId: number | null = null;
+  if (params.uid) {
+    const dbUser = await getOrCreateUser(
+      params.uid,
+      params.authEmail || '',
+      params.authName ?? null
+    );
+    dbUserId = dbUser.id;
+  }
+
+  // Se l'utente è autenticato, controlla prima se ha già una sessione legata al profilo
+  if (dbUserId) {
+    const userSessionRows = await db
+      .select()
+      .from(dialogueSessions)
+      .where(eq(dialogueSessions.userId, dbUserId))
+      .orderBy(desc(dialogueSessions.updatedAt))
+      .limit(1);
+
+    if (userSessionRows[0]) {
+      return { session: userSessionRows[0], dbUserId };
+    }
+  }
+
+  // Altrimenti cerca per sessionKey del browser
+  const existingByKey = await db
+    .select()
+    .from(dialogueSessions)
+    .where(eq(dialogueSessions.sessionKey, params.sessionKey))
+    .limit(1);
+
+  if (existingByKey[0]) {
+    if (dbUserId && !existingByKey[0].userId) {
+      const updated = await db
+        .update(dialogueSessions)
+        .set({ userId: dbUserId, updatedAt: new Date() })
+        .where(eq(dialogueSessions.id, existingByKey[0].id))
+        .returning();
+      return { session: updated[0], dbUserId };
+    }
+    return { session: existingByKey[0], dbUserId };
+  }
+
+  const created = await db
+    .insert(dialogueSessions)
+    .values({
+      sessionKey: params.sessionKey,
+      userId: dbUserId,
+      interactionsCount: 0,
+    })
+    .returning();
+
+  return { session: created[0], dbUserId };
+}
+
+export async function getDialogueAccessStatus(params: {
+  sessionKey: string;
+  uid?: string | null;
+  authEmail?: string | null;
+  authName?: string | null;
+}): Promise<DialogueAccessStatus> {
+  const { session } = await resolveOrCreateDialogueSession(params);
+  return computeDialogueStatus(session, new Date());
+}
+
+export async function recordDialogueInteraction(params: {
+  sessionKey: string;
+  uid?: string | null;
+  authEmail?: string | null;
+  authName?: string | null;
+}): Promise<{ allowed: boolean; status: DialogueAccessStatus }> {
+  const { session } = await resolveOrCreateDialogueSession(params);
+  const now = new Date();
+  const current = computeDialogueStatus(session, now);
+
+  if (current.mode === 'expired') {
+    return { allowed: false, status: current };
+  }
+
+  if (current.mode === 'ready') {
+    const trialExpires = new Date(now.getTime() + FREE_TRIAL_SECONDS * 1000);
+    const updatedRows = await db
+      .update(dialogueSessions)
+      .set({
+        freeTrialStartedAt: now,
+        freeTrialExpiresAt: trialExpires,
+        interactionsCount: session.interactionsCount + 1,
+        updatedAt: now,
+      })
+      .where(eq(dialogueSessions.id, session.id))
+      .returning();
+
+    const updated = updatedRows[0] ?? session;
+    return {
+      allowed: true,
+      status: computeDialogueStatus(updated, now),
+    };
+  }
+
+  const updatedRows = await db
+    .update(dialogueSessions)
+    .set({
+      interactionsCount: session.interactionsCount + 1,
+      updatedAt: now,
+    })
+    .where(eq(dialogueSessions.id, session.id))
+    .returning();
+
+  const updated = updatedRows[0] ?? session;
+  return {
+    allowed: true,
+    status: computeDialogueStatus(updated, now),
+  };
+}
+
+export async function unlockDialogueTimePack(params: {
+  sessionKey: string;
+  packId: DialoguePackId;
+  customerName: string;
+  customerEmail: string;
+  stripeSessionId?: string;
+  uid?: string | null;
+  authEmail?: string | null;
+  authName?: string | null;
+}): Promise<{
+  status: DialogueAccessStatus;
+  purchase: typeof dialoguePurchases.$inferSelect;
+}> {
+  const pack = DIALOGUE_PACK_CATALOG[params.packId];
+  if (!pack) {
+    throw new Error('Pacchetto temporale non valido.');
+  }
+
+  const { session, dbUserId } = await resolveOrCreateDialogueSession({
+    sessionKey: params.sessionKey,
+    uid: params.uid,
+    authEmail: params.authEmail,
+    authName: params.authName || params.customerName,
+  });
+
+  const now = new Date();
+  const baseMs =
+    session.activePassExpiresAt && session.activePassExpiresAt.getTime() > now.getTime()
+      ? session.activePassExpiresAt.getTime()
+      : now.getTime();
+  const newExpiresAt = new Date(baseMs + pack.durationMinutes * 60 * 1000);
+
+  const updatedSessionRows = await db
+    .update(dialogueSessions)
+    .set({
+      activePassExpiresAt: newExpiresAt,
+      activePackId: pack.id,
+      updatedAt: now,
+    })
+    .where(eq(dialogueSessions.id, session.id))
+    .returning();
+
+  const purchaseRows = await db
+    .insert(dialoguePurchases)
+    .values({
+      dialogueSessionId: session.id,
+      userId: dbUserId,
+      packId: pack.id,
+      durationMinutes: pack.durationMinutes,
+      priceEur: pack.priceEur,
+      stripePriceId: pack.stripePriceId,
+      stripeSessionId:
+        params.stripeSessionId || `cs_dialogue_${pack.id}_${Date.now()}`,
+      customerName: params.customerName,
+      customerEmail: params.customerEmail,
+      expiresAt: newExpiresAt,
+    })
+    .returning();
+
+  const updatedSession = updatedSessionRows[0] ?? session;
+  return {
+    status: computeDialogueStatus(updatedSession, now),
+    purchase: purchaseRows[0],
+  };
 }

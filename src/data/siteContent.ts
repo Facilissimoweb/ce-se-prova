@@ -3,6 +3,7 @@ import type {
   ChatMessage,
   ClientTestimonial,
   ConsultationTariff,
+  DialoguePack,
   DisciplinaryCredential,
   EducationalCourse,
   HolisticFaqItem,
@@ -218,12 +219,12 @@ export const siteContent = {
     },
     subtitle: {
       cmsKey: '[COPY: siteContent.chat.subtitle]',
-      liveText: 'Spazio di riflessione guidata · Bridge WhatsApp',
+      liveText: 'Spazio di riflessione guidata · 5 minuti gratuiti e pass a tempo',
     },
     whatsappBridgeNote: {
       cmsKey: '[COPY: siteContent.chat.whatsappNote]',
       liveText:
-        'Bridge WhatsApp: puoi proseguire questa riflessione direttamente sul canale WhatsApp dedicato di Maria Teresa Rogani.',
+        'Bridge WhatsApp: puoi proseguire questa riflessione in chiamata vocale dedicata o sul canale WhatsApp di Maria Teresa Rogani.',
     },
   },
   privacy: {
@@ -703,6 +704,40 @@ export const educationalCourses: EducationalCourse[] = [
 ];
 
 import { MAJOR_ARCANA } from './majorArcana';
+
+export const dialogueTimePacks: DialoguePack[] = [
+  {
+    id: '15m',
+    title: 'Pass Luce · 15 Minuti',
+    durationMinutes: 15,
+    priceEur: 14,
+    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_DIALOGO_15M',
+    focusLabel: 'Domanda mirata o stesa a 3 carte',
+    description:
+      'Quindici minuti continui di dialogo con tutti i 22 Arcani Maggiori per sciogliere un dubbio immediato.',
+  },
+  {
+    id: '30m',
+    title: 'Pass Cosmos · 30 Minuti',
+    durationMinutes: 30,
+    priceEur: 25,
+    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_DIALOGO_30M',
+    focusLabel: 'Consigliato · Esplorazione completa',
+    description:
+      'Mezz’ora di dialogo per confrontare più Arcani su amore, lavoro, scelte future e domande maieutiche.',
+    recommended: true,
+  },
+  {
+    id: '60m',
+    title: 'Pass Ciclo · 60 Minuti',
+    durationMinutes: 60,
+    priceEur: 45,
+    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_DIALOGO_60M',
+    focusLabel: 'Massima profondità senza fretta',
+    description:
+      'Un’ora intera di percorso interattivo con estrazioni multiple e rilettura estesa dei simboli.',
+  },
+];
 
 export const arcanoDelGiorno: ArcanaCard = MAJOR_ARCANA[9];
 
