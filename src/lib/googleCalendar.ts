@@ -227,7 +227,7 @@ export async function fetchGoogleBusySlotKeys(
           hour12: false,
         }).format(cursor)
       );
-      if (hour >= 9 && hour <= 22) {
+      if (hour >= 9 && hour <= 20) {
         keys.add(`${day}|${String(hour).padStart(2, '0')}:00`);
       }
     }

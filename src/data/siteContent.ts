@@ -146,7 +146,7 @@ export const siteContent = {
     subheading: {
       cmsKey: '[COPY: siteContent.consulti.subheading]',
       liveText:
-        'Tre durate calibrate per profondità differenti: online esclusivamente in chiamata vocale riservata, oppure in studio su appuntamento.',
+        'Tre durate calibrate per profondità differenti: online esclusivamente in chiamata vocale riservata, oppure di persona a Macerata su appuntamento.',
     },
     welcomeKicker: {
       cmsKey: '[COPY: siteContent.consulti.welcomeKicker]',
@@ -334,7 +334,7 @@ export const holisticPathways: HolisticPathway[] = [
     cmsKeyDesc: '[COPY: percorso.placeholder.2.desc]',
     description:
       'Confronto maieutico su passaggi professionali o relazionali complessi attraverso gli Arcani Maggiori.',
-    modality: 'Chiamata vocale o studio · 60 min',
+    modality: 'Chiamata vocale o di persona a Macerata · 60 min',
   },
   {
     index: '03',
@@ -391,7 +391,7 @@ export const holisticFaqs: HolisticFaqItem[] = [
     question: 'Come prepararsi a un consulto da 45, 60 o 90 minuti?',
     cmsKeyAnswer: '[COPY: faq.placeholder.4.answer]',
     answer:
-      'È sufficiente portare una o più domande chiare sul tuo percorso presente o sugli sviluppi futuri — in ambito professionale, creativo o relazionale. I consulti online avvengono esclusivamente in chiamata vocale riservata: dopo la prenotazione riceverai tutte le indicazioni per collegarti o l’indirizzo dello studio.',
+      'È sufficiente portare una o più domande chiare sul tuo percorso presente o sugli sviluppi futuri — in ambito professionale, creativo o relazionale. I consulti online avvengono esclusivamente in chiamata vocale riservata: dopo la prenotazione riceverai tutte le indicazioni per collegarti oppure l’indirizzo di Via Crispi 37 a Macerata per l’incontro di persona.',
   },
   {
     id: 'faq-5',
@@ -466,7 +466,7 @@ export const consultationTariffs: ConsultationTariff[] = [
     cmsKeyFocus: '[COPY: tariffa.placeholder.2.focus]',
     focusLabel: 'Consigliato · Analisi approfondita',
     includes: [
-      '60 minuti di sessione individuale in chiamata vocale o in studio',
+      '60 minuti di sessione individuale in chiamata vocale o di persona a Macerata',
       'Esplorazione combinata di Arcani Maggiori e Minori',
       'Mappa delle domande maieutiche per le settimane successive',
     ],
@@ -485,7 +485,7 @@ export const consultationTariffs: ConsultationTariff[] = [
     cmsKeyFocus: '[COPY: tariffa.placeholder.3.focus]',
     focusLabel: 'Ciclo annuale · Massima profondità',
     includes: [
-      '90 minuti di dialogo olistico in chiamata vocale o in studio',
+      '90 minuti di dialogo olistico in chiamata vocale o di persona a Macerata',
       'Stesa completa a dodici case simboliche o doppio confronto',
       'Follow-up scritto entro 48 ore tramite canale riservato',
     ],
@@ -759,9 +759,9 @@ export const initialChatMessages: ChatMessage[] = [
   },
 ];
 
-/** Fasce orarie pubbliche (allineate a HOUR_SLOTS server / v2). */
+/** Fasce orarie pubbliche (allineate a HOUR_SLOTS server: 09:00–20:00 Europe/Rome). */
 export const bookingTimeSlots = Array.from(
-  { length: 14 },
+  { length: 12 },
   (_, i) => `${String(i + 9).padStart(2, '0')}:00`
 );
 
@@ -791,7 +791,7 @@ export const handoffArchitectureSpec: {
     direction: 'outbound_bridge_and_inbound_webhook',
     webhookEndpoint: '/api/webhooks/whatsapp',
     deepLinkTemplate:
-      'https://wa.me/390000000000?text=Buongiorno%20Maria%20Teresa%2C%20vorrei%20informazioni%20per%20un%20consulto%20Tarot%20Italia.',
+      'https://wa.me/393791038253?text=Buongiorno%20Maria%20Teresa%2C%20vorrei%20informazioni%20per%20un%20consulto%20Tarot%20Italia.',
   },
   runtimeEnvVars: [
     'APP_URL',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Check, ChevronDown, Mail, MapPin, MessageCircle, Quote, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, Mail, MapPin, MessageCircle, Phone, Quote, ShieldCheck } from 'lucide-react';
 import type { ConsultationTariff, CourseId, ScreenId } from '../types/handoff';
 import {
   clientTestimonials,
@@ -13,6 +13,13 @@ import { ResilientImage } from '../components/ResilientImage';
 import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
 import { TarotEmblemLogo } from '../components/TarotEmblem';
 import { COURSE_SECTION_IMAGES, TARIFF_SECTION_IMAGES } from '../data/sectionImages';
+import {
+  SITE_ADDRESS,
+  SITE_EMAIL,
+  SITE_PHONE_DISPLAY,
+  SITE_PHONE_TEL,
+  whatsappHref,
+} from '../lib/siteContacts';
 import heroSanctuaryImg from '../assets/images/hero_tarot_sanctuary_1794651607080.jpg';
 import practitionerHandsImg from '../assets/images/percorsi_hands_tarot_1794651609400.jpg';
 
@@ -62,18 +69,18 @@ export function HomeScreen({
               <button
                 type="button"
                 onClick={() => onNavigate('consulti')}
-                className="px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap shrink-0 transition-all duration-150 hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+                className="cta-label px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 shrink-0 transition-all duration-150 hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
               >
                 Scegli il Consulto
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 shrink-0" />
               </button>
 
               <button
                 type="button"
                 onClick={() => onNavigate('chat')}
-                className="px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37]/5 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/12 hover:border-[#D4AF37] text-[#F4F1EA] text-sm font-medium inline-flex items-center gap-2 whitespace-nowrap shrink-0 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                className="cta-label px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37]/5 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/12 hover:border-[#D4AF37] text-[#F4F1EA] text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
               >
-                <MessageCircle className="w-4 h-4 text-[#D4AF37]" />
+                <MessageCircle className="w-4 h-4 text-[#D4AF37] shrink-0" />
                 Apri Dialogo Tarot
               </button>
             </div>
@@ -84,7 +91,7 @@ export function HomeScreen({
               <span aria-hidden="true" className="text-[#D4AF37]/60">·</span>
               <span>Sessioni riservate 45 / 60 / 90 min</span>
               <span aria-hidden="true" className="text-[#D4AF37]/60">·</span>
-              <span>Chiamata vocale online &amp; Studio</span>
+              <span>Chiamata vocale online &amp; di persona a Macerata</span>
             </div>
           </div>
 
@@ -120,15 +127,15 @@ export function HomeScreen({
         </div>
       </section>
 
-      {/* Atmospheric Studio Showcase — 16:9 Editorial Visual */}
-      <section aria-label="Atmosfera dello studio Tarot Italia">
+      {/* Atmospheric Showcase — 16:9 Editorial Visual */}
+      <section aria-label="Atmosfera di Tarot Italia">
         <figure className="relative rounded-2xl overflow-hidden border border-[#D4AF37]/20 glass-tier-1">
           <div className="aspect-[16/9] w-full overflow-hidden">
             <ResilientImage
               src={heroSanctuaryImg}
               alt="Tavolo di consultazione olistica con tarocchi bordati in oro, candela in ottone e ramo d'ulivo"
               className="w-full h-full object-cover"
-              fallbackLabel="Studio Tarot Italia · Maria Teresa Rogani"
+              fallbackLabel="Tarot Italia · Maria Teresa Rogani"
             />
           </div>
           <div
@@ -138,14 +145,14 @@ export function HomeScreen({
           <figcaption className="absolute bottom-0 left-0 right-0 p-5 md:p-8 flex flex-col sm:flex-row sm:items-end justify-between gap-2">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                Lo Studio · Atmosfera e Metodo
+                Atmosfera e Metodo
               </p>
               <p className="font-display text-base md:text-xl text-[#F4F1EA] mt-1">
                 Un dialogo riservato tra simboli archetipici, ascolto e previsione consapevole
               </p>
             </div>
-            <span className="text-xs text-[#A39B93] whitespace-nowrap shrink-0">
-              Chiamata vocale &amp; In studio
+            <span className="text-xs text-[#A39B93] shrink-0">
+              Chiamata vocale &amp; di persona a Macerata
             </span>
           </figcaption>
         </figure>
@@ -304,7 +311,7 @@ export function HomeScreen({
                   <button
                     type="button"
                     onClick={() => onSelectTariffAndBook(tariff.id)}
-                    className={`w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] ${
+                    className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] ${
                       tariff.recommended
                         ? 'bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)]'
                         : 'bg-[#D4AF37]/10 border border-[#D4AF37]/35 hover:bg-[#D4AF37] hover:text-[#12100E] text-[#F4F1EA]'
@@ -534,7 +541,7 @@ export function HomeScreen({
         </div>
       </section>
 
-      {/* Contact Dock & Quiet Studio Footer Block */}
+      {/* Contact Dock */}
       <section aria-labelledby="dock-heading" className="glass-tier-1 rounded-2xl p-6 md:p-8">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           <div className="md:col-span-5 flex items-center gap-4">
@@ -546,41 +553,46 @@ export function HomeScreen({
               <p className="text-xs text-[#A39B93] mt-0.5">
                 <CopyText entry={siteContent.brand.role} showKeys={showCmsKeys} />
               </p>
+              <p className="text-xs text-[#A39B93] mt-2 inline-flex items-start gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-[#D4AF37] shrink-0 mt-0.5" />
+                <span>{SITE_ADDRESS}</span>
+              </p>
             </div>
           </div>
 
           <div className="md:col-span-7 flex flex-wrap items-center md:justify-end gap-3">
             <a
-              href="https://wa.me/390000000000?text=Buongiorno%20Maria%20Teresa%2C%20vorrei%20richiedere%20un%20consulto."
+              href={whatsappHref(
+                'Buongiorno Maria Teresa, vorrei richiedere un consulto.'
+              )}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs md:text-sm font-medium text-[#F4F1EA] inline-flex items-center gap-2 whitespace-nowrap shrink-0 transition-colors"
+              className="cta-label px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs md:text-sm font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-2 shrink-0 transition-colors"
             >
-              <MessageCircle className="w-4 h-4 text-[#D4AF37]" />
-              WhatsApp Diretto
+              <MessageCircle className="w-4 h-4 text-[#D4AF37] shrink-0" />
+              WhatsApp
             </a>
             <a
-              href="mailto:studio@tarotitalia.it"
-              className="px-4 py-2.5 min-h-[44px] rounded-lg bg-[#12100E]/80 border border-[#D4AF37]/20 hover:border-[#D4AF37]/50 text-xs md:text-sm font-medium text-[#F4F1EA] inline-flex items-center gap-2 whitespace-nowrap shrink-0 transition-colors"
+              href={`tel:${SITE_PHONE_TEL}`}
+              className="cta-label px-4 py-2.5 min-h-[44px] rounded-lg bg-[#12100E]/80 border border-[#D4AF37]/20 hover:border-[#D4AF37]/50 text-xs md:text-sm font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-2 shrink-0 transition-colors"
             >
-              <Mail className="w-4 h-4 text-[#D4AF37]" />
-              studio@tarotitalia.it
+              <Phone className="w-4 h-4 text-[#D4AF37] shrink-0" />
+              {SITE_PHONE_DISPLAY}
+            </a>
+            <a
+              href={`mailto:${SITE_EMAIL}`}
+              className="cta-label px-4 py-2.5 min-h-[44px] rounded-lg bg-[#12100E]/80 border border-[#D4AF37]/20 hover:border-[#D4AF37]/50 text-xs md:text-sm font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-2 shrink-0 transition-colors"
+            >
+              <Mail className="w-4 h-4 text-[#D4AF37] shrink-0" />
+              {SITE_EMAIL}
             </a>
             <button
               type="button"
               onClick={onOpenPrivacy}
-              className="px-4 py-2.5 min-h-[44px] rounded-lg bg-[#12100E]/80 border border-[#A39B93]/25 hover:border-[#D4AF37] text-xs md:text-sm font-medium text-[#A39B93] hover:text-[#F4F1EA] inline-flex items-center gap-2 whitespace-nowrap shrink-0 transition-colors"
+              className="cta-label px-4 py-2.5 min-h-[44px] rounded-lg bg-[#12100E]/80 border border-[#A39B93]/25 hover:border-[#D4AF37] text-xs md:text-sm font-medium text-[#A39B93] hover:text-[#F4F1EA] inline-flex items-center justify-center gap-2 shrink-0 transition-colors"
             >
-              <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
+              <ShieldCheck className="w-4 h-4 text-[#D4AF37] shrink-0" />
               Privacy &amp; Cookie
-            </button>
-            <button
-              type="button"
-              onClick={onOpenHandoff}
-              className="px-4 py-2.5 min-h-[44px] rounded-lg bg-[#12100E]/80 border border-[#A39B93]/25 hover:border-[#D4AF37] text-xs md:text-sm font-medium text-[#A39B93] hover:text-[#F4F1EA] inline-flex items-center gap-2 whitespace-nowrap shrink-0 transition-colors"
-            >
-              <MapPin className="w-4 h-4 text-[#D4AF37]" />
-              Specifiche Handoff &amp; CMS
             </button>
           </div>
         </div>

@@ -7723,9 +7723,11 @@ function sessionModeLabel(mode, slot) {
 
 // src/lib/bookingSlots.ts
 var BOOKING_TIMEZONE = "Europe/Rome";
+var BOOKING_HOUR_START = 9;
+var BOOKING_HOUR_END = 20;
 var HOUR_SLOTS = Array.from(
-  { length: 14 },
-  (_, i) => `${String(i + 9).padStart(2, "0")}:00`
+  { length: BOOKING_HOUR_END - BOOKING_HOUR_START + 1 },
+  (_, i) => `${String(i + BOOKING_HOUR_START).padStart(2, "0")}:00`
 );
 function localIso(date2 = /* @__PURE__ */ new Date()) {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -8062,7 +8064,7 @@ async function fetchGoogleBusySlotKeys(fromIso, toIso) {
           hour12: false
         }).format(cursor)
       );
-      if (hour >= 9 && hour <= 22) {
+      if (hour >= 9 && hour <= 20) {
         keys.add(`${day}|${String(hour).padStart(2, "0")}:00`);
       }
     }

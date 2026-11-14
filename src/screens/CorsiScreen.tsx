@@ -24,6 +24,7 @@ import {
   isValidFullName,
   isValidPhone,
 } from '../lib/formValidation';
+import { whatsappHref } from '../lib/siteContacts';
 
 interface CorsiScreenProps {
   showCmsKeys: boolean;
@@ -299,7 +300,7 @@ export function CorsiScreen({
                 <button
                   type="button"
                   onClick={() => handleEnrollCourse(course.id)}
-                  className={`w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] ${
+                  className={`cta-label cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] ${
                     isSelected || course.recommended
                       ? 'bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)]'
                       : 'bg-[#D4AF37]/10 border border-[#D4AF37]/35 hover:bg-[#D4AF37] hover:text-[#12100E] text-[#F4F1EA]'
@@ -368,7 +369,7 @@ export function CorsiScreen({
                   role="tab"
                   aria-selected={current}
                   onClick={() => onChangeCourseId(c.id)}
-                  className={`px-3.5 py-2 min-h-[40px] rounded-lg text-xs font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
+                  className={`px-3.5 py-2 min-h-[40px] rounded-lg text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
                     current
                       ? 'bg-[#D4AF37] text-[#12100E] font-semibold'
                       : 'text-[#A39B93] hover:text-[#F4F1EA]'
@@ -683,7 +684,7 @@ export function CorsiScreen({
               <button
                 type="button"
                 onClick={onOpenChat}
-                className="px-4 py-2.5 min-h-[44px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs md:text-sm font-medium text-[#F4F1EA] whitespace-nowrap"
+                className="px-4 py-2.5 min-h-[44px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs md:text-sm font-medium text-[#F4F1EA]"
               >
                 Chiedi nel Dialogo Tarot
               </button>
@@ -691,7 +692,7 @@ export function CorsiScreen({
                 <button
                   type="button"
                   onClick={signInWithGoogle}
-                  className="px-4 py-2.5 min-h-[44px] rounded-lg border border-[#D4AF37]/40 bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-xs font-medium text-[#E6C65C] whitespace-nowrap"
+                  className="px-4 py-2.5 min-h-[44px] rounded-lg border border-[#D4AF37]/40 bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-xs font-medium text-[#E6C65C]"
                 >
                   Accedi con Google per Sbloccare
                 </button>
@@ -701,7 +702,7 @@ export function CorsiScreen({
             <button
               type="submit"
               disabled={enrolling}
-              className="px-6 py-3 min-h-[46px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+              className="cta-label px-6 py-3 min-h-[46px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
             >
               <CreditCard className="w-4 h-4" />
               {enrolling
@@ -740,20 +741,20 @@ export function CorsiScreen({
                 <button
                   type="button"
                   onClick={onOpenReservedArea}
-                  className="px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-xs font-semibold text-[#12100E] inline-flex items-center gap-2 whitespace-nowrap"
+                  className="cta-label px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-xs font-semibold text-[#12100E] inline-flex items-center gap-2"
                 >
                   Apri Area Riservata e Dispense
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <a
-                  href={`https://wa.me/390000000000?text=${encodeURIComponent(
+                  href={whatsappHref(
                     `Buongiorno Maria Teresa, desidero iscrivermi al percorso didattico "${activeCourse.title}" (€ ${activeCourse.priceEur}). Nome: ${fullName}, Email: ${email}.`
-                  )}`}
+                  )}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37]/12 border border-[#D4AF37]/35 hover:border-[#D4AF37] text-xs font-semibold text-[#F4F1EA] inline-flex items-center gap-2 whitespace-nowrap"
+                  className="cta-label px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37]/12 border border-[#D4AF37]/35 hover:border-[#D4AF37] text-xs font-semibold text-[#F4F1EA] inline-flex items-center justify-center gap-2"
                 >
-                  <MessageCircle className="w-4 h-4 text-[#D4AF37]" />
+                  <MessageCircle className="w-4 h-4 text-[#D4AF37] shrink-0" />
                   Invia Iscrizione su WhatsApp
                 </a>
               </div>

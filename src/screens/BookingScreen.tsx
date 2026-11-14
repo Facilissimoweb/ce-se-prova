@@ -291,7 +291,7 @@ export function BookingScreen({
               key={s.num}
               type="button"
               onClick={() => setStep(s.num)}
-              className={`min-h-[44px] px-3 py-2 rounded-lg text-xs md:text-sm font-medium whitespace-nowrap truncate transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
+              className={`cta-label min-h-[44px] px-2.5 sm:px-3 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
                 isActive
                   ? 'bg-[#D4AF37] text-[#12100E] font-semibold'
                   : isCompleted
@@ -383,7 +383,7 @@ export function BookingScreen({
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap transition-colors"
+                  className="px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 transition-colors"
                 >
                   Prosegui a Data e Ora
                   <ArrowRight className="w-4 h-4" />
@@ -477,7 +477,7 @@ export function BookingScreen({
                     {(
                       [
                         ['remote', 'Online · WhatsApp'],
-                        ['studio', 'In studio · Macerata'],
+                        ['studio', 'Di persona · Macerata'],
                       ] as const
                     ).map(([value, label]) => (
                       <button
@@ -503,19 +503,19 @@ export function BookingScreen({
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="px-5 py-3 min-h-[44px] rounded-lg border border-[#D4AF37]/30 text-sm font-medium text-[#F4F1EA] hover:border-[#D4AF37] inline-flex items-center gap-2 whitespace-nowrap"
+                  className="cta-label px-5 py-3 min-h-[44px] rounded-lg border border-[#D4AF37]/30 text-sm font-medium text-[#F4F1EA] hover:border-[#D4AF37] inline-flex items-center justify-center gap-2"
                 >
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="w-4 h-4 shrink-0" />
                   Indietro
                 </button>
                 <button
                   type="button"
                   disabled={openHours.length === 0}
                   onClick={() => setStep(3)}
-                  className="px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-50 text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap"
+                  className="cta-label px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-50 text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2"
                 >
                   Prosegui ai Dati
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 shrink-0" />
                 </button>
               </div>
             </div>
@@ -719,7 +719,7 @@ export function BookingScreen({
                     <button
                       type="button"
                       onClick={() => setStep(2)}
-                      className="px-5 py-3 min-h-[44px] rounded-lg border border-[#D4AF37]/30 text-sm font-medium text-[#F4F1EA] hover:border-[#D4AF37] inline-flex items-center gap-2 whitespace-nowrap"
+                      className="px-5 py-3 min-h-[44px] rounded-lg border border-[#D4AF37]/30 text-sm font-medium text-[#F4F1EA] hover:border-[#D4AF37] inline-flex items-center gap-2"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       Modifica Data
@@ -727,7 +727,7 @@ export function BookingScreen({
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="px-6 py-3 min-h-[46px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                      className="px-6 py-3 min-h-[46px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
                     >
                       <CreditCard className="w-4 h-4" />
                       {submitting

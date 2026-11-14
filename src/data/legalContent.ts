@@ -104,10 +104,10 @@ export const legalContent = {
       ],
     },
     vendita: {
-      sezione: "Termini e Condizioni",
-      titolo: "Termini e Condizioni",
-      intestazione: "www.tarotitalia.com • Termini e Condizioni",
-      leggi: "Leggi i Termini e Condizioni",
+      sezione: "Termini e condizioni di vendita",
+      titolo: "Termini e condizioni di vendita",
+      intestazione: "www.tarotitalia.com • Termini e condizioni di vendita",
+      leggi: "Leggi i Termini e condizioni di vendita",
       sezioni: [
         {
           id: "consulti",

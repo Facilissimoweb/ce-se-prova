@@ -1,14 +1,18 @@
 /**
- * Fasce orarie pubbliche (Europe/Rome), allineate a v2tarotitalia HOUR_SLOTS.
+ * Fasce orarie pubbliche (Europe/Rome).
  * Disponibilità = slot meno quelli già occupati in Postgres (+ optional Google FreeBusy).
  */
 
 export const BOOKING_TIMEZONE = 'Europe/Rome';
 
-/** Ore prenotabili: 09:00 → 22:00 inclusive. */
+/** Prima e ultima ora prenotabile (inclusive), Europe/Rome. */
+export const BOOKING_HOUR_START = 9;
+export const BOOKING_HOUR_END = 20;
+
+/** Ore prenotabili: 09:00 → 20:00 inclusive. */
 export const HOUR_SLOTS = Array.from(
-  { length: 14 },
-  (_, i) => `${String(i + 9).padStart(2, '0')}:00`
+  { length: BOOKING_HOUR_END - BOOKING_HOUR_START + 1 },
+  (_, i) => `${String(i + BOOKING_HOUR_START).padStart(2, '0')}:00`
 );
 
 export function localIso(date = new Date()): string {

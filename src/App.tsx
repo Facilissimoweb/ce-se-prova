@@ -169,81 +169,108 @@ export function App() {
           )}
         </main>
 
-        <footer className="border-t border-[#D4AF37]/15 py-6 relative z-10">
-          <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 flex flex-wrap items-center justify-between gap-4 text-xs text-[#A39B93]">
-            <p>
-              Tarot Italia · Maria Teresa Rogani, Operatore Olistico · Lettura del presente e del futuro
-            </p>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-              <button
-                type="button"
-                onClick={() => handleNavigate('chi-sono')}
-                className="hover:text-[#D4AF37] transition-colors"
-              >
-                Chi Sono
-              </button>
-              <button
-                type="button"
-                onClick={() => handleNavigate('area-riservata')}
-                className="hover:text-[#D4AF37] transition-colors"
-              >
-                Area Riservata
-              </button>
-              <button
-                type="button"
-                onClick={() => handleNavigate('privacy')}
-                className="hover:text-[#D4AF37] transition-colors"
-              >
-                {legalContent.privacy.sezione}
-              </button>
-              <a
-                href="/privacy.html"
-                className="hover:text-[#D4AF37] transition-colors"
-              >
-                Privacy (HTML)
-              </a>
-              <button
-                type="button"
-                onClick={() => handleNavigate('termini')}
-                className="hover:text-[#D4AF37] transition-colors"
-              >
-                {legalContent.vendita.sezione}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleNavigate('disclaimer')}
-                className="hover:text-[#D4AF37] transition-colors"
-              >
-                Disclaimer
-              </button>
-              <button
-                type="button"
-                onClick={() => setLegalNotice('tutela')}
-                className="hover:text-[#D4AF37] transition-colors"
-              >
-                {legalContent.tutela.kicker}
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsPrivacyOpen(true)}
-                className="hover:text-[#D4AF37] transition-colors"
-              >
-                Cookie
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowCmsKeys((prev) => !prev)}
-                className="hover:text-[#D4AF37] transition-colors"
-              >
-                {showCmsKeys ? 'Mostra Testi Live' : 'Ispeziona Chiavi [COPY]'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsHandoffOpen(true)}
-                className="hover:text-[#D4AF37] transition-colors"
-              >
-                Specifiche Handoff &amp; CMS
-              </button>
+        <footer className="border-t border-[#D4AF37]/15 py-8 relative z-10">
+          <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-5 text-xs text-[#A39B93]">
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div className="space-y-1.5 max-w-xl">
+                <p>
+                  Tarot Italia · Maria Teresa Rogani, Operatore Olistico · Lettura del presente e del futuro
+                </p>
+                <p>
+                  <a
+                    href="mailto:info@tarotitalia.com"
+                    className="hover:text-[#D4AF37] transition-colors"
+                  >
+                    info@tarotitalia.com
+                  </a>
+                  {' · '}
+                  <a
+                    href="tel:+393791038253"
+                    className="hover:text-[#D4AF37] transition-colors"
+                  >
+                    379 103 82 53
+                  </a>
+                </p>
+                <p>Via Crispi 37, 62100 Macerata</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:justify-end">
+                <button
+                  type="button"
+                  onClick={() => handleNavigate('chi-sono')}
+                  className="hover:text-[#D4AF37] transition-colors"
+                >
+                  Chi Sono
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleNavigate('area-riservata')}
+                  className="hover:text-[#D4AF37] transition-colors"
+                >
+                  Area Riservata
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleNavigate('disclaimer')}
+                  className="hover:text-[#D4AF37] transition-colors"
+                >
+                  Disclaimer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLegalNotice('tutela')}
+                  className="hover:text-[#D4AF37] transition-colors"
+                >
+                  {legalContent.tutela.kicker}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-[#D4AF37]/10 pt-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#A39B93]/85">
+                <button
+                  type="button"
+                  onClick={() => handleNavigate('privacy')}
+                  className="hover:text-[#D4AF37] transition-colors"
+                >
+                  {legalContent.privacy.sezione}
+                </button>
+                <span className="text-[#D4AF37]/30" aria-hidden>
+                  |
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleNavigate('termini')}
+                  className="hover:text-[#D4AF37] transition-colors"
+                >
+                  {legalContent.vendita.sezione}
+                </button>
+                <span className="text-[#D4AF37]/30" aria-hidden>
+                  |
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsPrivacyOpen(true)}
+                  className="hover:text-[#D4AF37] transition-colors"
+                >
+                  Cookie
+                </button>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCmsKeys((prev) => !prev)}
+                  className="hover:text-[#D4AF37] transition-colors"
+                >
+                  {showCmsKeys ? 'Mostra Testi Live' : 'Ispeziona Chiavi [COPY]'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsHandoffOpen(true)}
+                  className="hover:text-[#D4AF37] transition-colors"
+                >
+                  Specifiche Handoff &amp; CMS
+                </button>
+              </div>
             </div>
           </div>
         </footer>

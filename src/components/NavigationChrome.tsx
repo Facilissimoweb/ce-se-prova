@@ -15,6 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import type { ScreenId } from '../types/handoff';
+import { whatsappHref } from '../lib/siteContacts';
 import { TarotEmblemLogo } from './TarotEmblem';
 
 interface TopBarProps {
@@ -286,11 +287,13 @@ export function TopBar({
             <div className="space-y-4 pt-4 border-t border-[#D4AF37]/15">
               <div className="grid grid-cols-1 gap-2.5">
                 <a
-                  href="https://wa.me/390000000000?text=Buongiorno%20Maria%20Teresa%2C%20desidero%20informazioni%20su%20un%20consulto%20Tarot%20Italia."
+                  href={whatsappHref(
+                    'Buongiorno Maria Teresa, desidero informazioni su un consulto Tarot Italia.'
+                  )}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="min-h-[44px] px-4 py-2.5 rounded-lg bg-[#151311]/85 border border-[#D4AF37]/20 hover:border-[#D4AF37] text-xs font-medium text-[#F4F1EA] inline-flex items-center justify-between"
+                  className="cta-label min-h-[44px] px-4 py-2.5 rounded-lg bg-[#151311]/85 border border-[#D4AF37]/20 hover:border-[#D4AF37] text-xs font-medium text-[#F4F1EA] inline-flex items-center justify-between gap-2"
                 >
                   <span className="inline-flex items-center gap-2">
                     <PhoneCall className="w-4 h-4 text-[#D4AF37]" />
@@ -357,7 +360,7 @@ export function FloatingSideRail({
   return (
     <aside
       className="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 p-2 rounded-full glass-tier-2"
-      aria-label="Azioni rapide studio"
+      aria-label="Azioni rapide Tarot Italia"
     >
       <button
         type="button"
@@ -387,7 +390,9 @@ export function FloatingSideRail({
         <MessageCircle className="w-5 h-5" />
       </button>
       <a
-        href="https://wa.me/390000000000?text=Buongiorno%20Maria%20Teresa%2C%20desidero%20informazioni%20su%20un%20consulto%20Tarot%20Italia."
+        href={whatsappHref(
+          'Buongiorno Maria Teresa, desidero informazioni su un consulto Tarot Italia.'
+        )}
         target="_blank"
         rel="noopener noreferrer"
         title="Contatto rapido WhatsApp"
