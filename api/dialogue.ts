@@ -1,96 +1,93 @@
 /**
  * Dialogue group: status, checkout, confirm-stripe, unlock, interact.
  * Subpaths via vercel.json → /api/dialogue?__path=…
+ * Static imports so Vercel bundles src/.
  */
 import {
-  groupSubpath,
-  sendJson,
-  type EntryReq,
-  type EntryRes,
-} from '../src/server/vercelEntry.ts';
+  getDialogueStatus,
+  postDialogueCheckout,
+  postDialogueConfirmStripe,
+  postDialogueInteract,
+  postDialogueUnlock,
+} from '../src/server/routes/dialogue.ts';
+import {
+  ensureSchemaOnce,
+  methodNotAllowed,
+  optionalUser,
+  queryString,
+  readBodyObject,
+  requestOrigin,
+  sendApiResult,
+  type NodeLikeReq,
+  type NodeLikeRes,
+} from '../src/server/vercelAdapter.ts';
+import { groupSubpath, sendJson } from '../src/server/vercelEntry.ts';
 
 export const config = { runtime: 'nodejs', maxDuration: 30 };
 
-export default async function handler(req: EntryReq, res: EntryRes) {
+export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   try {
     const method = (req.method || 'GET').toUpperCase();
     const path = groupSubpath(req, 'dialogue');
-
-    const adapter = await import('../src/server/vercelAdapter.ts');
-    await adapter.ensureSchemaOnce();
+    await ensureSchemaOnce();
 
     if (path === 'status') {
-      if (method !== 'GET') return adapter.methodNotAllowed(res as never, ['GET']);
-      const { getDialogueStatus } = await import(
-        '../src/server/routes/dialogue.ts'
-      );
-      const user = await adapter.optionalUser(req as never);
-      return adapter.sendApiResult(
-        res as never,
+      if (method !== 'GET') return methodNotAllowed(res, ['GET']);
+      const user = await optionalUser(req);
+      return sendApiResult(
+        res,
         await getDialogueStatus({
           user,
-          sessionKey: adapter.queryString(req.query?.sessionKey),
+          sessionKey: queryString(req.query?.sessionKey),
         })
       );
     }
 
     if (path === 'interact') {
-      if (method !== 'POST') return adapter.methodNotAllowed(res as never, ['POST']);
-      const { postDialogueInteract } = await import(
-        '../src/server/routes/dialogue.ts'
-      );
-      const user = await adapter.optionalUser(req as never);
-      return adapter.sendApiResult(
-        res as never,
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const user = await optionalUser(req);
+      return sendApiResult(
+        res,
         await postDialogueInteract({
           user,
-          body: adapter.readBodyObject(req as never),
+          body: readBodyObject(req),
         })
       );
     }
 
     if (path === 'unlock') {
-      if (method !== 'POST') return adapter.methodNotAllowed(res as never, ['POST']);
-      const { postDialogueUnlock } = await import(
-        '../src/server/routes/dialogue.ts'
-      );
-      const user = await adapter.optionalUser(req as never);
-      return adapter.sendApiResult(
-        res as never,
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const user = await optionalUser(req);
+      return sendApiResult(
+        res,
         await postDialogueUnlock({
           user,
-          body: adapter.readBodyObject(req as never),
+          body: readBodyObject(req),
         })
       );
     }
 
     if (path === 'checkout') {
-      if (method !== 'POST') return adapter.methodNotAllowed(res as never, ['POST']);
-      const { postDialogueCheckout } = await import(
-        '../src/server/routes/dialogue.ts'
-      );
-      const user = await adapter.optionalUser(req as never);
-      return adapter.sendApiResult(
-        res as never,
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const user = await optionalUser(req);
+      return sendApiResult(
+        res,
         await postDialogueCheckout({
           user,
-          body: adapter.readBodyObject(req as never),
-          origin: adapter.requestOrigin(req as never),
+          body: readBodyObject(req),
+          origin: requestOrigin(req),
         })
       );
     }
 
     if (path === 'confirm-stripe') {
-      if (method !== 'POST') return adapter.methodNotAllowed(res as never, ['POST']);
-      const { postDialogueConfirmStripe } = await import(
-        '../src/server/routes/dialogue.ts'
-      );
-      const user = await adapter.optionalUser(req as never);
-      return adapter.sendApiResult(
-        res as never,
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const user = await optionalUser(req);
+      return sendApiResult(
+        res,
         await postDialogueConfirmStripe({
           user,
-          body: adapter.readBodyObject(req as never),
+          body: readBodyObject(req),
         })
       );
     }

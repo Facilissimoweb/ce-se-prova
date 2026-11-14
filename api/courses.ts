@@ -1,27 +1,26 @@
 /**
  * Courses group — GET /api/courses.
- * Lazy-imports shared server code so load failures return JSON detail, not FUNCTION_INVOCATION_FAILED.
+ * Static imports so Vercel bundles src/ (dynamic import() of .ts is not packaged).
  */
-import { sendJson, type EntryReq, type EntryRes } from '../src/server/vercelEntry.ts';
+import { getCourses } from '../src/server/routes/courses.ts';
+import {
+  ensureSchemaOnce,
+  methodNotAllowed,
+  sendApiResult,
+  type NodeLikeReq,
+  type NodeLikeRes,
+} from '../src/server/vercelAdapter.ts';
+import { sendJson } from '../src/server/vercelEntry.ts';
 
 export const config = { runtime: 'nodejs', maxDuration: 30 };
 
-export default async function handler(req: EntryReq, res: EntryRes) {
+export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   try {
     const method = (req.method || 'GET').toUpperCase();
+    if (method !== 'GET') return methodNotAllowed(res, ['GET']);
 
-    if (method !== 'GET') {
-      res.statusCode = 405;
-      res.setHeader('Allow', 'GET');
-      res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.end(JSON.stringify({ error: 'Metodo non consentito.' }));
-      return;
-    }
-
-    const adapter = await import('../src/server/vercelAdapter.ts');
-    await adapter.ensureSchemaOnce();
-    const { getCourses } = await import('../src/server/routes/courses.ts');
-    return adapter.sendApiResult(res as never, await getCourses());
+    await ensureSchemaOnce();
+    return sendApiResult(res, await getCourses());
   } catch (error) {
     console.error('api/courses handler failed:', error);
     return sendJson(res, 500, {

@@ -34,7 +34,7 @@ npm run lint     # tsc --noEmit
    - `FIREBASE_SERVICE_ACCOUNT_JSON`
    - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
    - `APP_URL` (URL pubblico, es. preview o `https://www.tarotitalia.com`)
-3. Deploy: SPA in `dist/` + **6** funzioni Serverless flat sotto `api/` (`health` zero-dep; gli altri lazy-importano `src/server/*`). Sotto-path via rewrite `?__path=` (Hobby non-Next non supporta catch-all multi-segment). URL frontend `/api/*` invariate. Piano Hobby: max 12 funzioni. La rewrite SPA **non** intercetta `/api` né `privacy.html`.
+3. Deploy: SPA in `dist/` + **6** funzioni Serverless flat sotto `api/` (`health` zero-dep; gli altri **static-import**ano `src/server/*` così Vercel li bundle-a — niente `import()` dinamico di `.ts`). Sotto-path via rewrite `?__path=` (Hobby non-Next non supporta catch-all multi-segment). URL frontend `/api/*` invariate. Piano Hobby: max 12 funzioni. La rewrite SPA **non** intercetta `/api` né `privacy.html`.
 4. Webhook Stripe: `https://<deployment>/api/stripe/webhook` (raw body; `bodyParser: false` su `api/stripe.ts`).
 5. Solo dopo smoke delle API: aggiungi il dominio custom (`www.tarotitalia.com`) — vedi docs cutover nel Project Context.
 
