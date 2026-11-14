@@ -1,4 +1,4 @@
-import { getPublicCourseCatalog } from '../../db/repository.ts';
+import { getPublicCourseCatalog } from '../../db/courseCatalog.ts';
 import { json, mapSafeError, type ApiResult } from '../http.ts';
 
 export async function getCourses(): Promise<ApiResult> {
