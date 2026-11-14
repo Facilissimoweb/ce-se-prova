@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Eye, EyeOff, Database, CreditCard, MessageSquare } from 'lucide-react';
+import { X, Eye, EyeOff, Database, CreditCard, MessageSquare, Server } from 'lucide-react';
 import { handoffArchitectureSpec } from '../data/siteContent';
 
 interface HandoffDrawerProps {
@@ -28,7 +28,7 @@ export function HandoffDrawer({
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-              Handoff Tecnico · Cursor / Vercel
+              Handoff Tecnico · Express / Postgres
             </p>
             <h2
               id="handoff-drawer-title"
@@ -49,7 +49,6 @@ export function HandoffDrawer({
 
         <div className="gold-divider" aria-hidden="true" />
 
-        {/* Live vs [COPY: ...] key toggle */}
         <div className="p-4 rounded-xl bg-[#12100E]/85 border border-[#D4AF37]/20 flex flex-col gap-3">
           <div className="flex items-center justify-between gap-3">
             <span className="text-sm font-semibold text-[#F4F1EA]">
@@ -85,26 +84,53 @@ export function HandoffDrawer({
           </p>
         </div>
 
-        {/* Supabase Auth annotation */}
         <section className="flex flex-col gap-2">
           <div className="flex items-center gap-2 text-[#D4AF37]">
             <Database className="w-4 h-4 shrink-0" />
             <h3 className="text-sm font-semibold uppercase tracking-[0.06em]">
-              Supabase Auth &amp; Database
+              Firebase Auth &amp; Postgres
             </h3>
           </div>
           <div className="p-4 rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/15 text-xs text-[#A39B93] space-y-2">
             <p className="text-[#F4F1EA]">
-              Strategia: <span className="font-mono text-[#E6C65C]">{handoffArchitectureSpec.supabase.strategy}</span>
+              Strategia:{' '}
+              <span className="font-mono text-[#E6C65C]">
+                {handoffArchitectureSpec.auth.strategy}
+              </span>
             </p>
             <p>
-              Tabelle previste: <span className="font-mono text-[#F4F1EA]">{handoffArchitectureSpec.supabase.tables.join(', ')}</span>
+              Tabelle Drizzle:{' '}
+              <span className="font-mono text-[#F4F1EA]">
+                {handoffArchitectureSpec.auth.tables.join(', ')}
+              </span>
             </p>
-            <p className="leading-relaxed">{handoffArchitectureSpec.supabase.rlsPolicyNote}</p>
+            <p className="leading-relaxed">
+              {handoffArchitectureSpec.auth.accessPolicyNote}
+            </p>
           </div>
         </section>
 
-        {/* Stripe Checkout annotation */}
+        <section className="flex flex-col gap-2">
+          <div className="flex items-center gap-2 text-[#D4AF37]">
+            <Server className="w-4 h-4 shrink-0" />
+            <h3 className="text-sm font-semibold uppercase tracking-[0.06em]">
+              Deploy
+            </h3>
+          </div>
+          <div className="p-4 rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/15 text-xs text-[#A39B93] space-y-2">
+            <p className="text-[#F4F1EA]">
+              Runtime ufficiale: Express (`server.ts`) con Vite in dev e static
+              `dist/` in produzione (`npm run build` + `npm start`).
+            </p>
+            <p className="leading-relaxed">
+              <code className="text-[#E6C65C]">vercel.json</code> copre solo la
+              SPA statica (rewrite → <code className="text-[#F4F1EA]">index.html</code>
+              ): non espone le API Express. Per un sito completo serve l’host Node
+              (es. Cloud Run / AI Studio), non un deploy Vercel solo-frontend.
+            </p>
+          </div>
+        </section>
+
         <section className="flex flex-col gap-2">
           <div className="flex items-center gap-2 text-[#D4AF37]">
             <CreditCard className="w-4 h-4 shrink-0" />
@@ -117,14 +143,14 @@ export function HandoffDrawer({
               Price IDs configurati: Consulti (45m, 60m, 90m), Pass Chat IA (5m € 3, 10m € 5, 15m € 7) e Corsi (Arcani Maggiori, Arcani Minori, Metodi di Stesura).
             </p>
             <p className="leading-relaxed">
-              Nessuna transazione simulata: i moduli Prenotazione e Corsi compilano il payload strutturato{' '}
+              I moduli Prenotazione e Corsi compilano il payload strutturato{' '}
               <code className="text-[#E6C65C]">StripeCheckoutHandoffPayload</code> pronto per la route server{' '}
-              <code className="text-[#F4F1EA]">/api/checkout/session</code>.
+              <code className="text-[#F4F1EA]">/api/checkout/session</code>. La verifica
+              pagamento Stripe reale resta un follow-up (vedi note refactor).
             </p>
           </div>
         </section>
 
-        {/* WhatsApp Webhook annotation */}
         <section className="flex flex-col gap-2">
           <div className="flex items-center gap-2 text-[#D4AF37]">
             <MessageSquare className="w-4 h-4 shrink-0" />
@@ -134,7 +160,10 @@ export function HandoffDrawer({
           </div>
           <div className="p-4 rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/15 text-xs text-[#A39B93] space-y-2">
             <p className="text-[#F4F1EA]">
-              Endpoint previsto: <span className="font-mono text-[#E6C65C]">{handoffArchitectureSpec.whatsapp.webhookEndpoint}</span>
+              Endpoint previsto:{' '}
+              <span className="font-mono text-[#E6C65C]">
+                {handoffArchitectureSpec.whatsapp.webhookEndpoint}
+              </span>
             </p>
             <p className="leading-relaxed">
               Bridge diretto attivo tramite deep-link WhatsApp dalla schermata Dialogo Tarot con contesto dell’Arcano estratto.
@@ -142,13 +171,12 @@ export function HandoffDrawer({
           </div>
         </section>
 
-        {/* Env Vars checklist */}
         <section className="flex flex-col gap-2">
           <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-[#A39B93]">
-            Variabili d&apos;ambiente Vercel
+            Variabili d&apos;ambiente runtime
           </h3>
           <ul className="p-4 rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/15 space-y-1.5 font-mono text-[11px] text-[#E6C65C]">
-            {handoffArchitectureSpec.stripeEnvVars.map((envVar) => (
+            {handoffArchitectureSpec.runtimeEnvVars.map((envVar) => (
               <li key={envVar}>{envVar}</li>
             ))}
           </ul>

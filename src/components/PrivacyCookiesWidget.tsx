@@ -191,7 +191,7 @@ export function PrivacyCookiesWidget({
                       Cookie Tecnici e Sessione
                     </p>
                     <p className="text-xs leading-relaxed text-[#A39B93]">
-                      Indispensabili per sicurezza, sessione Supabase Auth e memorizzazione della scelta sui cookie.
+                      Indispensabili per sicurezza, sessione Firebase Auth e memorizzazione della scelta sui cookie.
                     </p>
                   </div>
                   <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37] whitespace-nowrap shrink-0 mt-0.5 inline-flex items-center gap-1">

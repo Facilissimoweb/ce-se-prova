@@ -1,0 +1,72 @@
+import React from 'react';
+import { X } from 'lucide-react';
+import type { ArcanaCard } from '../../types/handoff';
+import { MAJOR_ARCANA } from '../../data/majorArcana';
+import { MajorArcanaArtwork } from '../MajorArcanaArtwork';
+
+interface DeckGalleryProps {
+  activeCardId: string;
+  hasActiveSpread: boolean;
+  onClose: () => void;
+  onSelectCard: (card: ArcanaCard) => void;
+}
+
+export function DeckGallery({
+  activeCardId,
+  hasActiveSpread,
+  onClose,
+  onSelectCard,
+}: DeckGalleryProps) {
+  return (
+    <section
+      aria-label="Galleria dei 22 Arcani Maggiori"
+      className="p-5 md:p-6 bg-[#100E0C]/90 border-b border-[#D4AF37]/20 space-y-4"
+    >
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+            Mazzo Completo · 0 – XXI
+          </p>
+          <h2 className="font-body font-semibold tracking-[-0.015em] text-base md:text-lg text-[#F4F1EA]">
+            Scegli un Arcano Maggiore con cui dialogare
+          </h2>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Chiudi galleria degli Arcani"
+          className="w-9 h-9 rounded-lg border border-[#D4AF37]/25 flex items-center justify-center text-[#A39B93] hover:text-[#F4F1EA] hover:border-[#D4AF37]"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-2.5">
+        {MAJOR_ARCANA.map((card) => {
+          const isSelected = activeCardId === card.id && !hasActiveSpread;
+          return (
+            <button
+              key={card.id}
+              type="button"
+              onClick={() => onSelectCard(card)}
+              className={`group rounded-xl p-1.5 border text-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
+                isSelected
+                  ? 'bg-[#D4AF37]/15 border-[#D4AF37] shadow-[0_0_16px_rgba(212,175,55,0.25)]'
+                  : 'bg-[#151311]/75 border-[#D4AF37]/15 hover:border-[#D4AF37]/60 hover:-translate-y-0.5'
+              }`}
+              title={`${card.numeral} · ${card.name}`}
+            >
+              <MajorArcanaArtwork
+                number={card.number}
+                numeral={card.numeral}
+                name={card.name}
+                compact
+                className="w-full h-auto rounded-lg"
+              />
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}

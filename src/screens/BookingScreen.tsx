@@ -4,8 +4,6 @@ import {
   ArrowRight,
   Calendar as CalendarIcon,
   Check,
-  ChevronLeft,
-  ChevronRight,
   Clock,
   CreditCard,
   Lock,
@@ -22,58 +20,25 @@ import {
   siteContent,
 } from '../data/siteContent';
 import { CopyText } from '../components/CopyText';
+import { BookingCalendar } from '../components/booking/BookingCalendar';
 import { useAuth } from '../context/AuthContext';
+import {
+  buildCalendarCells,
+  formatItalianDate,
+  getNextAvailableDate,
+  toIsoDate,
+} from '../lib/bookingCalendar';
+import {
+  isValidEmail,
+  isValidFullName,
+  isValidPhone,
+} from '../lib/formValidation';
 
 interface BookingScreenProps {
   showCmsKeys: boolean;
   selectedTariffId: ConsultationTariff['id'];
   onChangeTariffId: (id: ConsultationTariff['id']) => void;
   onOpenChat: () => void;
-}
-
-const WEEKDAYS_IT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
-const MONTHS_IT = [
-  'Gennaio',
-  'Febbraio',
-  'Marzo',
-  'Aprile',
-  'Maggio',
-  'Giugno',
-  'Luglio',
-  'Agosto',
-  'Settembre',
-  'Ottobre',
-  'Novembre',
-  'Dicembre',
-];
-
-function toIsoDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
-function getNextAvailableDate(): Date {
-  const candidate = new Date();
-  candidate.setHours(0, 0, 0, 0);
-  candidate.setDate(candidate.getDate() + 1);
-  // Skip Sunday (0)
-  while (candidate.getDay() === 0) {
-    candidate.setDate(candidate.getDate() + 1);
-  }
-  return candidate;
-}
-
-function formatItalianDate(iso: string): string {
-  const [y, m, d] = iso.split('-').map(Number);
-  const dt = new Date(y, (m || 1) - 1, d || 1);
-  return dt.toLocaleDateString('it-IT', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
 }
 
 export function BookingScreen({
@@ -131,31 +96,10 @@ export function BookingScreen({
     return t;
   }, []);
 
-  const calendarCells = useMemo(() => {
-    const year = calendarMonth.getFullYear();
-    const month = calendarMonth.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    // Monday = 0, Sunday = 6
-    const startOffset = (firstDay.getDay() + 6) % 7;
-
-    const cells: ({ day: number; iso: string; disabled: boolean } | null)[] = [];
-    for (let i = 0; i < startOffset; i++) {
-      cells.push(null);
-    }
-    for (let day = 1; day <= daysInMonth; day++) {
-      const current = new Date(year, month, day);
-      current.setHours(0, 0, 0, 0);
-      const isSunday = current.getDay() === 0;
-      const isPast = current.getTime() < todayZero.getTime();
-      cells.push({
-        day,
-        iso: toIsoDate(current),
-        disabled: isSunday || isPast,
-      });
-    }
-    return cells;
-  }, [calendarMonth, todayZero]);
+  const calendarCells = useMemo(
+    () => buildCalendarCells(calendarMonth, todayZero),
+    [calendarMonth, todayZero]
+  );
 
   const handleMonthShift = (delta: number) => {
     setCalendarMonth(
@@ -173,13 +117,13 @@ export function BookingScreen({
     e.preventDefault();
     const errors: Record<string, string> = {};
 
-    if (!draft.fullName.trim() || draft.fullName.trim().length < 2) {
+    if (!isValidFullName(draft.fullName)) {
       errors.fullName = 'Inserisci il tuo nome e cognome.';
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email.trim())) {
+    if (!isValidEmail(draft.email)) {
       errors.email = 'Inserisci un indirizzo email valido.';
     }
-    if (!draft.phoneWhatsApp.trim() || draft.phoneWhatsApp.trim().length < 7) {
+    if (!isValidPhone(draft.phoneWhatsApp)) {
       errors.phoneWhatsApp = 'Inserisci un recapito telefonico o WhatsApp.';
     }
     if (!draft.deontologyAccepted) {
@@ -228,7 +172,7 @@ export function BookingScreen({
       amountEur: activeTariff.priceEur,
       currency: 'EUR',
       customerEmail: draft.email.trim(),
-      supabaseUserId: user?.uid ?? '<AUTH_UID_FROM_SESSION>',
+      firebaseUserId: user?.uid ?? '<AUTH_UID_FROM_SESSION>',
       metadata: {
         itemType: 'consultation',
         practitioner: 'Maria Teresa Rogani',
@@ -389,71 +333,15 @@ export function BookingScreen({
                 </p>
               </div>
 
-              {/* Monthly Dark Glass Calendar */}
-              <div className="rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/20 p-4 md:p-6 space-y-5">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-display text-lg text-[#F4F1EA]">
-                    {MONTHS_IT[calendarMonth.getMonth()]} {calendarMonth.getFullYear()}
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleMonthShift(-1)}
-                      aria-label="Mese precedente"
-                      className="w-10 h-10 rounded-lg border border-[#D4AF37]/25 flex items-center justify-center text-[#F4F1EA] hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleMonthShift(1)}
-                      aria-label="Mese successivo"
-                      className="w-10 h-10 rounded-lg border border-[#D4AF37]/25 flex items-center justify-center text-[#F4F1EA] hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-7 gap-1.5 text-center">
-                  {WEEKDAYS_IT.map((wd) => (
-                    <div
-                      key={wd}
-                      className="py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#A39B93]"
-                    >
-                      {wd}
-                    </div>
-                  ))}
-
-                  {calendarCells.map((cell, idx) => {
-                    if (!cell) {
-                      return <div key={`empty-${idx}`} className="h-11" />;
-                    }
-                    const isSelected = draft.selectedDateIso === cell.iso;
-                    return (
-                      <button
-                        key={cell.iso}
-                        type="button"
-                        disabled={cell.disabled}
-                        onClick={() =>
-                          setDraft((prev) => ({ ...prev, selectedDateIso: cell.iso }))
-                        }
-                        aria-pressed={isSelected}
-                        aria-label={`Seleziona ${cell.iso}`}
-                        className={`h-11 rounded-lg text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
-                          cell.disabled
-                            ? 'text-[#A39B93]/30 cursor-not-allowed'
-                            : isSelected
-                              ? 'bg-[#D4AF37] text-[#12100E] font-bold shadow-[0_0_16px_rgba(212,175,55,0.28)]'
-                              : 'text-[#F4F1EA] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C]'
-                        }`}
-                      >
-                        {cell.day}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              <BookingCalendar
+                calendarMonth={calendarMonth}
+                calendarCells={calendarCells}
+                selectedDateIso={draft.selectedDateIso}
+                onMonthShift={handleMonthShift}
+                onSelectDate={(iso) =>
+                  setDraft((prev) => ({ ...prev, selectedDateIso: iso }))
+                }
+              />
 
               {/* Time Slot Picker */}
               <div className="space-y-3">
@@ -673,7 +561,7 @@ export function BookingScreen({
                   </div>
                   <p className="text-xs md:text-sm text-[#A39B93] leading-relaxed">
                     Nessuna transazione fittizia eseguita in questa anteprima: collegando la route server{' '}
-                    <code className="text-[#F4F1EA]">POST /api/checkout/session</code> con Supabase Auth e{' '}
+                    <code className="text-[#F4F1EA]">POST /api/checkout/session</code> con Firebase Auth e{' '}
                     <code className="text-[#E6C65C]">STRIPE_SECRET_KEY</code>, questo oggetto reindirizzerà al checkout Stripe reale.
                   </p>
                   <pre className="p-3.5 rounded-lg bg-[#151311] border border-[#D4AF37]/15 text-[11px] font-mono text-[#E6C65C] overflow-x-auto">
@@ -755,7 +643,7 @@ export function BookingScreen({
           </div>
 
           <p className="text-xs leading-relaxed text-[#A39B93]">
-            Modalità: Online esclusivamente in chiamata vocale riservata, oppure Studio su appuntamento. Autenticazione utente prevista tramite Supabase Auth.
+            Modalità: Online esclusivamente in chiamata vocale riservata, oppure Studio su appuntamento. Autenticazione utente tramite Firebase Auth; dati su Postgres.
           </p>
         </aside>
       </div>
