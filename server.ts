@@ -317,8 +317,8 @@ async function startServer() {
           course.stripePriceId || courseStripePriceAnnotation(course.slug);
         const checkout = await createCheckoutSession({
           customerEmail: email,
-          successUrl: `${baseUrl}/?course_stripe_session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${baseUrl}/?course_cancelled=true`,
+          successUrl: `${baseUrl}/area-riservata?course_stripe_session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${baseUrl}/area-riservata?checkout=cancel&item=course`,
           lineItem: checkoutLineItemFromCatalog({
             stripePriceIdAnnotation: priceAnnotation,
             priceEur: course.priceEur,
@@ -659,8 +659,8 @@ async function startServer() {
         const baseUrl = requestOrigin(req, PORT);
         const checkout = await createCheckoutSession({
           customerEmail,
-          successUrl: `${baseUrl}/?dialogue_stripe_session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${baseUrl}/?dialogue_cancelled=true`,
+          successUrl: `${baseUrl}/dialogo?dialogue_stripe_session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${baseUrl}/dialogo?checkout=cancel&item=dialogue`,
           lineItem: checkoutLineItemFromCatalog({
             stripePriceIdAnnotation: pack.stripePriceId,
             priceEur: pack.priceEur,

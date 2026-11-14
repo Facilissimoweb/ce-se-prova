@@ -17,6 +17,7 @@ import {
 import { initialChatMessages, siteContent } from '../data/siteContent';
 import { CopyText } from '../components/CopyText';
 import { TarotEmblemLogo } from '../components/TarotEmblem';
+import { CheckoutReturnBanner } from '../components/CheckoutReturnBanner';
 import { DialogueAccessBar } from '../components/chat/DialogueAccessBar';
 import { DeckGallery } from '../components/chat/DeckGallery';
 import { ActiveCardPanel } from '../components/chat/ActiveCardPanel';
@@ -197,6 +198,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
 
   return (
     <div className="pt-6 md:pt-10 pb-8 space-y-6">
+      <CheckoutReturnBanner variant="dialogue" />
       <div className="glass-tier-1 rounded-2xl overflow-hidden">
         <div className="px-5 md:px-6 py-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">

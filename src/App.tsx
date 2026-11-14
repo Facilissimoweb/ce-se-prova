@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import type { ConsultationTariff, CourseId, ScreenId } from './types/handoff';
 import { AuthProvider } from './context/AuthContext';
 import {
@@ -7,6 +7,7 @@ import {
 } from './components/NavigationChrome';
 import { HandoffDrawer } from './components/HandoffDrawer';
 import { PrivacyCookiesWidget } from './components/PrivacyCookiesWidget';
+import { LegalNotice, type LegalKind } from './components/LegalNotice';
 import { AmbientSanctuaryBackground } from './components/AmbientSanctuaryBackground';
 import { HomeScreen } from './screens/HomeScreen';
 import { ChiSonoScreen } from './screens/ChiSonoScreen';
@@ -15,9 +16,23 @@ import { CorsiScreen } from './screens/CorsiScreen';
 import { ReservedAreaScreen } from './screens/ReservedAreaScreen';
 import { BookingScreen } from './screens/BookingScreen';
 import { ChatScreen } from './screens/ChatScreen';
+import { PrivacyScreen } from './screens/PrivacyScreen';
+import { TerminiScreen } from './screens/TerminiScreen';
+import { DisclaimerScreen } from './screens/DisclaimerScreen';
+import { legalContent } from './data/legalContent';
+import {
+  bootstrapScreenFromLocation,
+  navigatePath,
+  pathForScreen,
+  screenFromPath,
+} from './lib/appPaths';
+
+const LEGAL_SCREENS: ScreenId[] = ['privacy', 'termini', 'disclaimer'];
 
 export function App() {
-  const [activeScreen, setActiveScreen] = useState<ScreenId>('home');
+  const [activeScreen, setActiveScreen] = useState<ScreenId>(() =>
+    bootstrapScreenFromLocation(window.location.pathname, window.location.search)
+  );
   const [selectedTariffId, setSelectedTariffId] =
     useState<ConsultationTariff['id']>('60m');
   const [selectedCourseId, setSelectedCourseId] =
@@ -25,11 +40,36 @@ export function App() {
   const [showCmsKeys, setShowCmsKeys] = useState(false);
   const [isHandoffOpen, setIsHandoffOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [legalNotice, setLegalNotice] = useState<LegalKind | null>(null);
 
-  const handleNavigate = (screen: ScreenId) => {
+  const handleNavigate = useCallback((screen: ScreenId) => {
     setActiveScreen(screen);
+    navigatePath(screen);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, []);
+
+  // Sync screen from URL on load / browser back-forward; rewrite legacy Stripe root returns.
+  useEffect(() => {
+    const syncFromLocation = () => {
+      const next = bootstrapScreenFromLocation(
+        window.location.pathname,
+        window.location.search
+      );
+      setActiveScreen(next);
+      const expected = pathForScreen(next);
+      if (
+        screenFromPath(window.location.pathname) !== next ||
+        window.location.pathname !== expected
+      ) {
+        const search = window.location.search;
+        window.history.replaceState({}, '', `${expected}${search}`);
+      }
+    };
+
+    syncFromLocation();
+    window.addEventListener('popstate', syncFromLocation);
+    return () => window.removeEventListener('popstate', syncFromLocation);
+  }, []);
 
   const handleSelectTariffAndBook = (tariffId: ConsultationTariff['id']) => {
     setSelectedTariffId(tariffId);
@@ -41,13 +81,15 @@ export function App() {
     handleNavigate('corsi');
   };
 
+  const isLegalScreen = LEGAL_SCREENS.includes(activeScreen);
+
   return (
     <AuthProvider>
       <div className="min-h-screen bg-[#12100E] text-[#F4F1EA] flex flex-col relative">
         <AmbientSanctuaryBackground />
 
         <TopBar
-          activeScreen={activeScreen}
+          activeScreen={isLegalScreen ? 'home' : activeScreen}
           onNavigate={handleNavigate}
           onOpenHandoff={() => setIsHandoffOpen(true)}
           onOpenPrivacy={() => setIsPrivacyOpen(true)}
@@ -113,9 +155,20 @@ export function App() {
               onBookConsult={() => handleNavigate('booking')}
             />
           )}
+
+          {activeScreen === 'privacy' && (
+            <PrivacyScreen onNavigate={handleNavigate} />
+          )}
+
+          {activeScreen === 'termini' && (
+            <TerminiScreen onNavigate={handleNavigate} />
+          )}
+
+          {activeScreen === 'disclaimer' && (
+            <DisclaimerScreen onNavigate={handleNavigate} />
+          )}
         </main>
 
-        {/* Quiet Editorial Footer */}
         <footer className="border-t border-[#D4AF37]/15 py-6 relative z-10">
           <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 flex flex-wrap items-center justify-between gap-4 text-xs text-[#A39B93]">
             <p>
@@ -138,10 +191,44 @@ export function App() {
               </button>
               <button
                 type="button"
+                onClick={() => handleNavigate('privacy')}
+                className="hover:text-[#D4AF37] transition-colors"
+              >
+                {legalContent.privacy.sezione}
+              </button>
+              <a
+                href="/privacy.html"
+                className="hover:text-[#D4AF37] transition-colors"
+              >
+                Privacy (HTML)
+              </a>
+              <button
+                type="button"
+                onClick={() => handleNavigate('termini')}
+                className="hover:text-[#D4AF37] transition-colors"
+              >
+                {legalContent.vendita.sezione}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNavigate('disclaimer')}
+                className="hover:text-[#D4AF37] transition-colors"
+              >
+                Disclaimer
+              </button>
+              <button
+                type="button"
+                onClick={() => setLegalNotice('tutela')}
+                className="hover:text-[#D4AF37] transition-colors"
+              >
+                {legalContent.tutela.kicker}
+              </button>
+              <button
+                type="button"
                 onClick={() => setIsPrivacyOpen(true)}
                 className="hover:text-[#D4AF37] transition-colors"
               >
-                Privacy &amp; Cookie
+                Cookie
               </button>
               <button
                 type="button"
@@ -181,6 +268,8 @@ export function App() {
           onOpenModal={() => setIsPrivacyOpen(true)}
           onCloseModal={() => setIsPrivacyOpen(false)}
         />
+
+        <LegalNotice kind={legalNotice} onClose={() => setLegalNotice(null)} />
       </div>
     </AuthProvider>
   );
