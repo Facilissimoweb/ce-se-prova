@@ -1,6 +1,6 @@
 /**
  * Runtime locale / host Node: Express serve API `/api/*` e, in produzione, i file statici in `dist/`.
- * Su Vercel le stesse route vivono in `api/*.ts` (serverless Node) condividendo `src/server/routes/*`.
+ * Su Vercel le stesse route vivono nel catch-all `api/[...path].ts` (serverless Node) condividendo `src/server/routes/*`.
  */
 import express from 'express';
 import { createServer as createHttpServer } from 'http';
