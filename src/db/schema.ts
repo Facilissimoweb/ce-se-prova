@@ -105,22 +105,39 @@ export const dispensaProgress = pgTable(
 );
 
 // 6. Prenotazioni Consulti (visibili nello storico dell'Area Riservata)
-export const consultationBookings = pgTable('consultation_bookings', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
-  tariffId: text('tariff_id').notNull(),
-  durationMinutes: integer('duration_minutes').notNull(),
-  priceEur: integer('price_eur').notNull(),
-  scheduledDate: text('scheduled_date').notNull(),
-  scheduledTime: text('scheduled_time').notNull(),
-  fullName: text('full_name').notNull(),
-  email: text('email').notNull(),
-  phoneWhatsapp: text('phone_whatsapp').notNull(),
-  sessionIntent: text('session_intent').default('').notNull(),
-  deontologyAccepted: boolean('deontology_accepted').notNull(),
-  status: text('status').notNull().default('confirmed'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+// status: pending_payment | confirmed | cancelled
+export const consultationBookings = pgTable(
+  'consultation_bookings',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id').references(() => users.id, {
+      onDelete: 'set null',
+    }),
+    tariffId: text('tariff_id').notNull(),
+    durationMinutes: integer('duration_minutes').notNull(),
+    priceEur: integer('price_eur').notNull(),
+    scheduledDate: text('scheduled_date').notNull(),
+    scheduledTime: text('scheduled_time').notNull(),
+    fullName: text('full_name').notNull(),
+    email: text('email').notNull(),
+    phoneWhatsapp: text('phone_whatsapp').notNull(),
+    sessionIntent: text('session_intent').default('').notNull(),
+    deontologyAccepted: boolean('deontology_accepted').notNull(),
+    mode: text('mode').notNull().default('remote'), // studio | remote
+    status: text('status').notNull().default('pending_payment'),
+    stripeSessionId: text('stripe_session_id'),
+    stripePaymentIntentId: text('stripe_payment_intent_id'),
+    googleCalendarEventId: text('google_calendar_event_id'),
+    paidAt: timestamp('paid_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex('consultation_bookings_stripe_session_idx').on(
+      table.stripeSessionId
+    ),
+  ]
+);
 
 // 7. Sessioni temporali Dialogo Tarot (traccia i 5 minuti gratuiti e i pass a tempo lato server)
 export const dialogueSessions = pgTable('dialogue_sessions', {

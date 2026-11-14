@@ -9,6 +9,9 @@ import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { requireAuth, optionalAuth, type AuthRequest } from './src/middleware/auth.ts';
 import {
+  attachStripeSessionToBooking,
+  cancelPendingBooking,
+  confirmConsultationBooking,
   createConsultationBooking,
   DIALOGUE_PACK_CATALOG,
   enrollUserInCourse,
@@ -16,10 +19,12 @@ import {
   getDialogueAccessStatus,
   getPublicCourseCatalog,
   getReservedAreaOverview,
+  listOccupiedSlots,
   recordDialogueInteraction,
   unlockDialogueTimePack,
   updateDispensaProgress,
 } from './src/db/repository.ts';
+import { ensureBookingSchema } from './src/db/ensureBookingSchema.ts';
 import type { DialoguePackId } from './src/types/handoff.ts';
 import {
   allowDirectUnlock,
@@ -33,6 +38,13 @@ import {
   courseStripePriceAnnotation,
   resolveBookingTariff,
 } from './src/lib/paymentCatalog.ts';
+import { resolveBookingMode, sessionModeLabel } from './src/lib/bookingRules.ts';
+import {
+  HOUR_SLOTS,
+  isValidDateIso,
+  isValidSlotFormat,
+  slotsForDate,
+} from './src/lib/bookingSlots.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,6 +57,9 @@ const SAFE_CLIENT_ERRORS = new Set([
   'Pacchetto temporale non valido.',
   'Pagamento Stripe richiesto per attivare il percorso.',
   'Pagamento Stripe richiesto per attivare il pass.',
+  'SLOT_TAKEN',
+  'Prenotazione non trovata.',
+  'Prenotazione annullata.',
 ]);
 
 function sendSafeError(
@@ -211,6 +226,34 @@ async function startServer() {
                   : undefined,
                 stripeSessionId: sessionObj.id,
               });
+            } else if (itemType === 'consultation') {
+              const bookingId = Number(meta.bookingId || 0);
+              if (bookingId || sessionObj.id) {
+                await confirmConsultationBooking({
+                  bookingId: bookingId || undefined,
+                  stripeSessionId: sessionObj.id,
+                  transactionId: sessionObj.id,
+                  amountCents:
+                    typeof sessionObj.amount_total === 'number'
+                      ? sessionObj.amount_total
+                      : null,
+                  customerEmail:
+                    meta.customerEmail || sessionObj.customer_email || null,
+                });
+              } else {
+                console.error('Webhook consultation: metadata incompleti', meta);
+              }
+            }
+          }
+        }
+
+        if (event.type === 'checkout.session.expired') {
+          const sessionObj = event.data.object;
+          const meta = sessionObj.metadata || {};
+          if (meta.itemType === 'consultation') {
+            const bookingId = Number(meta.bookingId || 0);
+            if (bookingId) {
+              await cancelPendingBooking(bookingId);
             }
           }
         }
@@ -458,7 +501,29 @@ async function startServer() {
     }
   );
 
-  // 5. Consultation Bookings — price/duration from server catalog only
+  // 5a. Availability — occupied slots (DB + optional Google FreeBusy)
+  app.get('/api/bookings/availability', async (req, res) => {
+    try {
+      const from = String(req.query?.from || '').trim();
+      const to = String(req.query?.to || '').trim();
+      if (!isValidDateIso(from) || !isValidDateIso(to) || from > to) {
+        return res.status(400).json({
+          error: 'Intervallo date non valido (from/to YYYY-MM-DD).',
+        });
+      }
+      const occupied = await listOccupiedSlots(from, to);
+      res.json({
+        from,
+        to,
+        hourSlots: HOUR_SLOTS,
+        occupied,
+      });
+    } catch (error) {
+      sendSafeError(res, error, 'Errore nel caricamento della disponibilità.');
+    }
+  });
+
+  // 5b. Consultation Bookings — catalog prices; Stripe gate + Zoho/Calendar on confirm
   app.post('/api/bookings', optionalAuth, async (req: AuthRequest, res) => {
     try {
       const tariffId = String(req.body?.tariffId || '').trim();
@@ -466,17 +531,22 @@ async function startServer() {
       const scheduledDate = String(req.body?.scheduledDate || '').trim();
       const scheduledTime = String(req.body?.scheduledTime || '').trim();
       const fullName = String(req.body?.fullName || '').trim();
-      const email = String(req.body?.email || '').trim();
+      const email = String(req.body?.email || req.user?.email || '').trim();
       const phoneWhatsApp = String(req.body?.phoneWhatsApp || '').trim();
       const sessionIntent = String(req.body?.sessionIntent || '').trim();
       const deontologyAccepted = Boolean(req.body?.deontologyAccepted);
+      const mode = resolveBookingMode(
+        String(req.body?.mode || 'remote'),
+        scheduledTime
+      );
 
       if (
         !tariff ||
-        !scheduledDate ||
-        !scheduledTime ||
+        !isValidDateIso(scheduledDate) ||
+        !isValidSlotFormat(scheduledTime) ||
         !fullName ||
         !email ||
+        !isValidEmail(email) ||
         !phoneWhatsApp ||
         !deontologyAccepted
       ) {
@@ -485,22 +555,188 @@ async function startServer() {
           .json({ error: 'Completa tutti i campi obbligatori della prenotazione.' });
       }
 
-      const booking = await createConsultationBooking({
-        uid: req.user?.uid ?? null,
-        authEmail: req.user?.email ?? null,
-        tariffId: tariff.id,
-        scheduledDate,
-        scheduledTime,
-        fullName,
-        email,
-        phoneWhatsApp,
-        sessionIntent,
-        deontologyAccepted,
-      });
+      if (!slotsForDate(scheduledDate).includes(scheduledTime)) {
+        return res.status(400).json({
+          error: 'Seleziona una fascia oraria ancora disponibile.',
+        });
+      }
 
-      res.status(201).json({ booking });
+      // Path A: confirm already-paid Checkout Session
+      const stripeSessionIdConfirm = String(
+        req.body?.stripeSessionId || ''
+      ).trim();
+      if (stripeSessionIdConfirm) {
+        if (!isStripeConfigured()) {
+          return res
+            .status(400)
+            .json({ error: 'Sessione Stripe non verificabile.' });
+        }
+        const paid = await assertCheckoutPaid(stripeSessionIdConfirm);
+        const meta = paid.metadata || {};
+        if (meta.itemType && meta.itemType !== 'consultation') {
+          return res.status(400).json({ error: 'Metadati pagamento incompleti.' });
+        }
+        const result = await confirmConsultationBooking({
+          bookingId: meta.bookingId ? Number(meta.bookingId) : undefined,
+          stripeSessionId: stripeSessionIdConfirm,
+          transactionId: paid.id,
+          amountCents:
+            typeof paid.amount_total === 'number' ? paid.amount_total : null,
+          customerEmail:
+            meta.customerEmail || paid.customer_email || email || null,
+        });
+        return res.status(200).json({ mode: 'confirmed', booking: result.booking });
+      }
+
+      // Path B: Stripe Checkout — hold slot as pending_payment
+      if (isStripeConfigured()) {
+        const booking = await createConsultationBooking({
+          uid: req.user?.uid ?? null,
+          authEmail: req.user?.email ?? null,
+          tariffId: tariff.id,
+          scheduledDate,
+          scheduledTime,
+          fullName,
+          email,
+          phoneWhatsApp,
+          sessionIntent,
+          deontologyAccepted,
+          mode,
+          status: 'pending_payment',
+        });
+
+        try {
+          const baseUrl = requestOrigin(req, PORT);
+          const checkout = await createCheckoutSession({
+            customerEmail: email,
+            successUrl: `${baseUrl}/prenota?booking_stripe_session_id={CHECKOUT_SESSION_ID}`,
+            cancelUrl: `${baseUrl}/prenota?checkout=cancel&item=consultation&booking=${booking.id}`,
+            lineItem: checkoutLineItemFromCatalog({
+              stripePriceIdAnnotation: tariff.stripePriceIdAnnotation,
+              priceEur: tariff.priceEur,
+              productName: `Tarot Italia · ${tariff.title}`,
+              productDescription: `${scheduledDate} · ${scheduledTime} · ${sessionModeLabel(mode, scheduledTime)}`,
+            }),
+            metadata: {
+              itemType: 'consultation',
+              bookingId: String(booking.id),
+              tariffId: tariff.id,
+              scheduledDate,
+              scheduledTime,
+              customerName: fullName,
+              customerEmail: email,
+              customerPhone: phoneWhatsApp,
+              firebaseUserId: req.user?.uid || '',
+              mode,
+            },
+          });
+
+          await attachStripeSessionToBooking(booking.id, checkout.id);
+
+          return res.status(200).json({
+            mode: 'stripe_redirect',
+            checkoutUrl: checkout.url,
+            stripeSessionId: checkout.id,
+            bookingId: booking.id,
+          });
+        } catch (error) {
+          await cancelPendingBooking(booking.id);
+          throw error;
+        }
+      }
+
+      // Path C: non-prod direct confirm + Zoho/Calendar fulfillment
+      if (allowDirectUnlock()) {
+        const booking = await createConsultationBooking({
+          uid: req.user?.uid ?? null,
+          authEmail: req.user?.email ?? null,
+          tariffId: tariff.id,
+          scheduledDate,
+          scheduledTime,
+          fullName,
+          email,
+          phoneWhatsApp,
+          sessionIntent,
+          deontologyAccepted,
+          mode,
+          status: 'pending_payment',
+          stripeSessionId: `cs_dev_consult_${Date.now()}`,
+        });
+        const result = await confirmConsultationBooking({
+          bookingId: booking.id,
+          stripeSessionId: booking.stripeSessionId || undefined,
+          transactionId: booking.stripeSessionId,
+          customerEmail: email,
+          amountCents: tariff.priceEur * 100,
+        });
+        return res.status(201).json({
+          mode: 'direct_unlock',
+          booking: result.booking,
+        });
+      }
+
+      return res.status(503).json({
+        error:
+          'Pagamenti Stripe non configurati. Imposta STRIPE_SECRET_KEY oppure, solo in sviluppo, ALLOW_DIRECT_UNLOCK=true.',
+      });
     } catch (error) {
-      sendSafeError(res, error, 'Errore durante la registrazione della prenotazione.');
+      const msg = error instanceof Error ? error.message : '';
+      if (msg === 'SLOT_TAKEN') {
+        return res.status(409).json({
+          error:
+            'Questo orario è appena stato riservato. Scegline un altro.',
+        });
+      }
+      if (msg === 'STRIPE_PAYMENT_NOT_PAID') {
+        return res
+          .status(402)
+          .json({ error: 'Pagamento Stripe non ancora confermato.' });
+      }
+      sendSafeError(
+        res,
+        error,
+        'Errore durante la registrazione della prenotazione.'
+      );
+    }
+  });
+
+  // 5c. Confirm consultation Stripe session after redirect
+  app.post('/api/bookings/confirm-stripe', optionalAuth, async (req: AuthRequest, res) => {
+    try {
+      const stripeSessionId = String(req.body?.stripeSessionId || '').trim();
+      if (!stripeSessionId || !isStripeConfigured()) {
+        return res
+          .status(400)
+          .json({ error: 'Sessione Stripe non verificabile.' });
+      }
+      const paid = await assertCheckoutPaid(stripeSessionId);
+      const meta = paid.metadata || {};
+      if (meta.itemType && meta.itemType !== 'consultation') {
+        return res.status(400).json({ error: 'Metadati pagamento incompleti.' });
+      }
+      const result = await confirmConsultationBooking({
+        bookingId: meta.bookingId ? Number(meta.bookingId) : undefined,
+        stripeSessionId,
+        transactionId: paid.id,
+        amountCents:
+          typeof paid.amount_total === 'number' ? paid.amount_total : null,
+        customerEmail:
+          meta.customerEmail ||
+          paid.customer_email ||
+          req.user?.email ||
+          null,
+      });
+      res.json({ mode: 'confirmed', booking: result.booking });
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : '';
+      if (msg === 'STRIPE_PAYMENT_NOT_PAID') {
+        return res
+          .status(402)
+          .json({ error: 'Pagamento Stripe non ancora confermato.' });
+      }
+      sendSafeError(res, error, 'Errore nella conferma della prenotazione.', {
+        notFound: 'non trovata',
+      });
     }
   });
 
@@ -764,6 +1000,12 @@ async function startServer() {
     app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
+  }
+
+  try {
+    await ensureBookingSchema();
+  } catch (error) {
+    console.error('ensureBookingSchema failed (non-fatal at boot):', error);
   }
 
   httpServer.listen(PORT, '0.0.0.0', () => {

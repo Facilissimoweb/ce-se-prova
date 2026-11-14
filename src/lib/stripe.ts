@@ -158,7 +158,12 @@ export async function assertCheckoutPaid(
 type StripeWebhookEvent = {
   id: string;
   type: string;
-  data: { object: StripeCheckoutSession & { object?: string } };
+  data: {
+    object: StripeCheckoutSession & {
+      object?: string;
+      metadata?: Record<string, string> | null;
+    };
+  };
 };
 
 /**
