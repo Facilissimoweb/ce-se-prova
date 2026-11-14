@@ -1,16 +1,16 @@
 /**
  * Courses group — GET /api/courses.
- * Static imports so Vercel bundles src/ (dynamic import() of .ts is not packaged).
+ * Bundled by scripts/bundle-api.mjs into api/*.js for Vercel.
  */
-import { getCourses } from '../src/server/routes/courses.ts';
+import { getCourses } from '../routes/courses.ts';
 import {
   ensureSchemaOnce,
   methodNotAllowed,
   sendApiResult,
   type NodeLikeReq,
   type NodeLikeRes,
-} from '../src/server/vercelAdapter.ts';
-import { sendJson } from '../src/server/vercelEntry.ts';
+} from '../vercelAdapter.ts';
+import { sendJson } from '../vercelEntry.ts';
 
 export const config = { runtime: 'nodejs', maxDuration: 30 };
 

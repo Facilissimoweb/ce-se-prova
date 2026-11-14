@@ -1,13 +1,13 @@
 /**
  * Bookings group: POST /api/bookings, availability, confirm-stripe.
  * Subpaths via vercel.json rewrite → /api/bookings?__path=…
- * Static imports so Vercel bundles src/.
+ * Bundled by scripts/bundle-api.mjs into api/*.js for Vercel.
  */
 import {
   getBookingsAvailability,
   postBooking,
   postBookingConfirmStripe,
-} from '../src/server/routes/bookings.ts';
+} from '../routes/bookings.ts';
 import {
   ensureSchemaOnce,
   methodNotAllowed,
@@ -18,8 +18,8 @@ import {
   sendApiResult,
   type NodeLikeReq,
   type NodeLikeRes,
-} from '../src/server/vercelAdapter.ts';
-import { groupSubpath, sendJson } from '../src/server/vercelEntry.ts';
+} from '../vercelAdapter.ts';
+import { groupSubpath, sendJson } from '../vercelEntry.ts';
 
 export const config = { runtime: 'nodejs', maxDuration: 30 };
 

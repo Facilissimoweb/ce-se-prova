@@ -6,3 +6,9 @@ coverage/
 *.log
 .env*
 !.env.example
+api/courses.js
+api/bookings.js
+api/stripe.js
+api/reserved.js
+api/dialogue.js
+api/index.js

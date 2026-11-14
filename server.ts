@@ -1,6 +1,6 @@
 /**
  * Runtime locale / host Node: Express serve API `/api/*` e, in produzione, i file statici in `dist/`.
- * Su Vercel le stesse route vivono in 6 funzioni `api/{health,courses,bookings,stripe,reserved,dialogue}.ts` condividendo `src/server/routes/*`.
+ * Su Vercel: `api/health.ts` + esbuild di `src/server/apiEntries/*` → `api/{courses,bookings,stripe,reserved,dialogue}.js`.
  */
 import express from 'express';
 import { createServer as createHttpServer } from 'http';
