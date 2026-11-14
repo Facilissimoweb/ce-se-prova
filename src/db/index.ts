@@ -4,6 +4,7 @@ import * as schema from './schema.ts';
 
 declare global {
   var _postgresPool: Pool | undefined;
+  var _ennamoDb: ReturnType<typeof drizzle<typeof schema>> | undefined;
 }
 
 function poolMax(): number {
@@ -52,6 +53,19 @@ export const createPool = () => {
   return global._postgresPool;
 };
 
-const pool = createPool();
+/** Lazy Drizzle client — avoid creating a Pool during module evaluation on cold start. */
+export function getDb() {
+  if (!global._ennamoDb) {
+    global._ennamoDb = drizzle(createPool(), { schema });
+  }
+  return global._ennamoDb;
+}
 
-export const db = drizzle(pool, { schema });
+/** Back-compat: existing call sites use `db`. Proxy so first touch creates the pool. */
+export const db = new Proxy({} as ReturnType<typeof getDb>, {
+  get(_target, prop, receiver) {
+    const real = getDb() as unknown as Record<PropertyKey, unknown>;
+    const value = Reflect.get(real, prop, receiver);
+    return typeof value === 'function' ? value.bind(real) : value;
+  },
+});

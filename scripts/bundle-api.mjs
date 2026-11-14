@@ -1,6 +1,6 @@
 /**
  * Bundle each Ennamo API group into api/<name>.js for Vercel.
- * Local .ts graph is inlined; node_modules stay external.
+ * Inline local + JS deps; keep native/heavy packages external (pg, firebase-admin).
  * api/health.ts stays as a zero-dep TypeScript entry (not bundled).
  */
 import * as esbuild from 'esbuild';
@@ -27,7 +27,15 @@ await esbuild.build({
   platform: 'node',
   target: 'node20',
   format: 'esm',
-  packages: 'external',
+  // Bundle pure JS deps into the function; leave native / huge SDKs on node_modules.
+  external: [
+    'pg',
+    'pg-native',
+    'firebase-admin',
+    'firebase-admin/*',
+    '@google-cloud/*',
+    'nodemailer',
+  ],
   sourcemap: false,
   logLevel: 'info',
   loader: {

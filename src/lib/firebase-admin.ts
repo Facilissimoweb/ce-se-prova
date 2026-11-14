@@ -1,5 +1,5 @@
-import { cert, getApps, initializeApp, type AppOptions } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
+import { cert, getApps, initializeApp, type AppOptions, type App } from 'firebase-admin/app';
+import { getAuth, type Auth } from 'firebase-admin/auth';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 function buildOptions(): AppOptions {
@@ -25,8 +25,23 @@ function buildOptions(): AppOptions {
   return { projectId: firebaseConfig.projectId };
 }
 
-if (!getApps().length) {
-  initializeApp(buildOptions());
+let app: App | undefined;
+let auth: Auth | undefined;
+
+function ensureApp(): App {
+  if (!app) {
+    app = getApps().length ? getApps()[0]! : initializeApp(buildOptions());
+  }
+  return app;
 }
 
-export const adminAuth = getAuth();
+/** Lazy Auth — do not initialize Firebase at module load (breaks light API bundles). */
+export const adminAuth: Auth = new Proxy({} as Auth, {
+  get(_target, prop, receiver) {
+    if (!auth) {
+      auth = getAuth(ensureApp());
+    }
+    const value = Reflect.get(auth as object, prop, receiver);
+    return typeof value === 'function' ? value.bind(auth) : value;
+  },
+});
