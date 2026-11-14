@@ -89,7 +89,7 @@ export function HomeScreen({
             <div className="pt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs md:text-[13px] text-[#A39B93]">
               <span>Lettura del presente e del futuro</span>
               <span aria-hidden="true" className="text-[#D4AF37]/60">·</span>
-              <span>Sessioni riservate 45 / 60 / 90 min</span>
+              <span>Sessioni riservate 20 / 45 / 60 / 90 min</span>
               <span aria-hidden="true" className="text-[#D4AF37]/60">·</span>
               <span>Chiamata vocale online &amp; di persona a Macerata</span>
             </div>
@@ -205,7 +205,7 @@ export function HomeScreen({
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2 max-w-2xl">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-              Sessioni Individuali · 45 / 60 / 90 Minuti
+              Sessioni Individuali · 20 / 45 / 60 / 90 Minuti
             </p>
             <h2 id="pathways-heading" className="font-body text-2xl md:text-[32px] md:leading-[40px] font-semibold tracking-[-0.02em] text-[#F4F1EA]">
               <CopyText entry={siteContent.home.pathwaysHeading} showKeys={showCmsKeys} />
@@ -223,7 +223,7 @@ export function HomeScreen({
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
           {consultationTariffs.map((tariff) => {
             const tariffImage = TARIFF_SECTION_IMAGES[tariff.id];
             return (

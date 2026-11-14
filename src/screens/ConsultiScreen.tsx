@@ -128,8 +128,11 @@ export function ConsultiScreen({
         </div>
       </section>
 
-      {/* 3 Dark Glass Tariff Cards */}
-      <section aria-label="Tariffe dei consulti" className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+      {/* Tariff cards: 20 / 45 / 60 / 90 */}
+      <section
+        aria-label="Tariffe dei consulti"
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch"
+      >
         {consultationTariffs.map((tariff) => {
           const isSelected = selectedTariffId === tariff.id;
           const tariffImage = TARIFF_SECTION_IMAGES[tariff.id];

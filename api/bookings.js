@@ -7676,6 +7676,13 @@ Nella sessione integrata da 90 minuti la Ruota delle 12 Case offre una bussola c
 
 // src/lib/paymentCatalog.ts
 var BOOKING_TARIFF_CATALOG = {
+  "20m": {
+    id: "20m",
+    title: "Consulto Breve",
+    durationMinutes: 20,
+    priceEur: 20,
+    stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_20M"
+  },
   "45m": {
     id: "45m",
     title: "Consulto Essenziale",
@@ -7699,7 +7706,7 @@ var BOOKING_TARIFF_CATALOG = {
   }
 };
 function resolveBookingTariff(tariffId) {
-  if (tariffId !== "45m" && tariffId !== "60m" && tariffId !== "90m") {
+  if (tariffId !== "20m" && tariffId !== "45m" && tariffId !== "60m" && tariffId !== "90m") {
     return null;
   }
   return BOOKING_TARIFF_CATALOG[tariffId];
@@ -7711,14 +7718,21 @@ function isEveningSlot(slot) {
   const hour = Number(String(slot).slice(0, 2));
   return Number.isFinite(hour) && hour >= EVENING_SLOT_HOUR;
 }
+function isSlotAllowedForMode(mode, slot) {
+  if (mode === "studio" && isEveningSlot(slot)) return false;
+  return true;
+}
 function resolveBookingMode(mode, slot) {
   if (isEveningSlot(slot)) return "remote";
   return mode === "studio" ? "studio" : "remote";
 }
 function sessionModeLabel(mode, slot) {
-  const resolved = resolveBookingMode(mode, slot);
-  const base = resolved === "remote" ? "Chiamata vocale WhatsApp" : "Dal vivo a Macerata";
-  return isEveningSlot(slot) ? `${base} \xB7 dalle 19:00 solo online` : base;
+  const resolved = slot != null ? resolveBookingMode(mode, slot) : mode === "studio" ? "studio" : "remote";
+  const base = resolved === "remote" ? "Online \xB7 chiamata vocale" : "Di persona a Macerata";
+  if (slot != null && isEveningSlot(slot) && mode === "studio") {
+    return `${base} \xB7 dalle 19:00 solo online`;
+  }
+  return base;
 }
 
 // src/lib/bookingSlots.ts
@@ -8663,15 +8677,18 @@ async function postBooking(params) {
     const phoneWhatsApp = String(body.phoneWhatsApp || "").trim();
     const sessionIntent = String(body.sessionIntent || "").trim();
     const deontologyAccepted = Boolean(body.deontologyAccepted);
-    const mode = resolveBookingMode(
-      String(body.mode || "remote"),
-      scheduledTime
-    );
+    const requestedMode = String(body.mode || "").trim() === "studio" ? "studio" : "remote";
     if (!tariff || !isValidDateIso(scheduledDate) || !isValidSlotFormat(scheduledTime) || !fullName || !email || !isValidEmail(email) || !phoneWhatsApp || !deontologyAccepted) {
       return json2(400, {
         error: "Completa tutti i campi obbligatori della prenotazione."
       });
     }
+    if (!isSlotAllowedForMode(requestedMode, scheduledTime)) {
+      return json2(400, {
+        error: "Di persona a Macerata \xE8 disponibile fino alle 18:00. Scegli un orario diurno o la modalit\xE0 online."
+      });
+    }
+    const mode = resolveBookingMode(requestedMode, scheduledTime);
     if (!slotsForDate(scheduledDate).includes(scheduledTime)) {
       return json2(400, {
         error: "Seleziona una fascia oraria ancora disponibile."
