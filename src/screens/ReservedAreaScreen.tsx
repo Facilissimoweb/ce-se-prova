@@ -1,93 +1,23 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import {
   ArrowRight,
-  BookOpen,
-  Calendar,
   Check,
   CheckCircle2,
   Clock,
   Download,
-  FileText,
   Lock,
   LogOut,
   Save,
-  ShieldCheck,
-  UserCheck,
 } from 'lucide-react';
-import type {
-  CourseId,
-  ReservedAreaOverview,
-  ReservedCourseItem,
-  ReservedUnlockedDispensa,
-  ScreenId,
-} from '../types/handoff';
+import type { CourseId, ScreenId } from '../types/handoff';
 import { useAuth } from '../context/AuthContext';
-import { TarotEmblemLogo } from '../components/TarotEmblem';
+import { FormattedDispensaBody } from '../components/reserved/FormattedDispensaBody';
+import { ReservedLoginGate } from '../components/reserved/ReservedLoginGate';
+import { useReservedArea } from '../hooks/useReservedArea';
 
 interface ReservedAreaScreenProps {
   onNavigate: (screen: ScreenId) => void;
   onSelectCourse: (courseId: CourseId) => void;
-}
-
-function renderInlineBold(text: string): React.ReactNode {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, idx) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return (
-        <strong key={idx} className="font-semibold text-[#F4F1EA]">
-          {part.slice(2, -2)}
-        </strong>
-      );
-    }
-    return <React.Fragment key={idx}>{part}</React.Fragment>;
-  });
-}
-
-function FormattedDispensaBody({ markdown }: { markdown: string }) {
-  const lines = markdown.split('\n');
-  return (
-    <div className="space-y-3 text-sm md:text-[15px] leading-relaxed text-[#E8e1dd]">
-      {lines.map((rawLine, idx) => {
-        const line = rawLine.trim();
-        if (!line) return <div key={idx} className="h-1" aria-hidden="true" />;
-        if (line.startsWith('## ')) {
-          return (
-            <h4
-              key={idx}
-              className="font-display text-lg md:text-xl text-[#D4AF37] pt-3 first:pt-0"
-            >
-              {line.slice(3)}
-            </h4>
-          );
-        }
-        if (line.startsWith('### ')) {
-          return (
-            <h5
-              key={idx}
-              className="font-body font-semibold text-base text-[#F4F1EA] pt-2"
-            >
-              {line.slice(4)}
-            </h5>
-          );
-        }
-        if (line.startsWith('- ') || /^\d+\.\s/.test(line)) {
-          const clean = line.startsWith('- ')
-            ? line.slice(2)
-            : line.replace(/^\d+\.\s/, '');
-          return (
-            <div key={idx} className="flex items-start gap-2.5 pl-2">
-              <span
-                className="text-[#D4AF37] mt-1.5 w-1.5 h-1.5 rounded-full bg-[#D4AF37] shrink-0"
-                aria-hidden="true"
-              />
-              <p>{renderInlineBold(clean)}</p>
-            </div>
-          );
-        }
-        return <p key={idx}>{renderInlineBold(line)}</p>;
-      })}
-    </div>
-  );
 }
 
 export function ReservedAreaScreen({
@@ -97,322 +27,55 @@ export function ReservedAreaScreen({
   const { user, loading: authLoading, authError, signInWithGoogle, logout, getIdToken } =
     useAuth();
 
-  const [overview, setOverview] = useState<ReservedAreaOverview | null>(null);
-  const [loadingData, setLoadingData] = useState(false);
-  const [dataError, setDataError] = useState<string | null>(null);
+  const area = useReservedArea({
+    user: user
+      ? { uid: user.uid, email: user.email, displayName: user.displayName }
+      : null,
+    getIdToken,
+  });
 
-  const [activeTab, setActiveTab] = useState<'dispense' | 'consulti'>('dispense');
-  const [activeCourseSlug, setActiveCourseSlug] =
-    useState<CourseId>('arcani-maggiori');
-  const [activeDispensaId, setActiveDispensaId] = useState<number | null>(null);
-
-  // Study notes & saving state
-  const [notesDraft, setNotesDraft] = useState('');
-  const [savingNotes, setSavingNotes] = useState(false);
-  const [notesFeedback, setNotesFeedback] = useState<string | null>(null);
-
-  // Quick unlock / purchase form for locked course
-  const [enrollName, setEnrollName] = useState('');
-  const [enrollPhone, setEnrollPhone] = useState('');
-  const [enrolling, setEnrolling] = useState(false);
-  const [enrollMessage, setEnrollMessage] = useState<string | null>(null);
-
-  const loadOverview = useCallback(async () => {
-    if (!user) return;
-    setLoadingData(true);
-    setDataError(null);
-    try {
-      const token = await getIdToken();
-      if (!token) {
-        setDataError('Sessione non disponibile. Riprova ad accedere.');
-        return;
-      }
-      const res = await fetch('/api/reserved/overview', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json.error || 'Impossibile caricare i contenuti riservati.');
-      }
-      setOverview(json as ReservedAreaOverview);
-      setEnrollName(
-        (prev) => prev || json.user?.displayName || user.displayName || ''
-      );
-      setEnrollPhone((prev) => prev || json.user?.phoneWhatsapp || '');
-    } catch (err) {
-      setDataError(
-        err instanceof Error
-          ? err.message
-          : 'Errore di caricamento dell’Area Riservata.'
-      );
-    } finally {
-      setLoadingData(false);
-    }
-  }, [user, getIdToken]);
-
-  useEffect(() => {
-    if (user) {
-      loadOverview();
-    } else {
-      setOverview(null);
-    }
-  }, [user, loadOverview]);
-
-  const activeCourse: ReservedCourseItem | null = useMemo(() => {
-    if (!overview) return null;
+  if (authLoading || !user) {
     return (
-      overview.courses.find((c) => c.slug === activeCourseSlug) ??
-      overview.courses[0] ??
-      null
-    );
-  }, [overview, activeCourseSlug]);
-
-  // Select first unlocked dispensa when switching course
-  useEffect(() => {
-    if (!activeCourse) {
-      setActiveDispensaId(null);
-      return;
-    }
-    if (activeCourse.isUnlocked && activeCourse.unlockedDispense.length > 0) {
-      const stillValid = activeCourse.unlockedDispense.some(
-        (d) => d.id === activeDispensaId
-      );
-      if (!stillValid) {
-        setActiveDispensaId(activeCourse.unlockedDispense[0].id);
-      }
-    } else {
-      setActiveDispensaId(null);
-    }
-  }, [activeCourse, activeDispensaId]);
-
-  const activeDispensa: ReservedUnlockedDispensa | null = useMemo(() => {
-    if (!activeCourse || !activeCourse.isUnlocked) return null;
-    return (
-      activeCourse.unlockedDispense.find((d) => d.id === activeDispensaId) ??
-      activeCourse.unlockedDispense[0] ??
-      null
-    );
-  }, [activeCourse, activeDispensaId]);
-
-  useEffect(() => {
-    setNotesDraft(activeDispensa?.personalNotes ?? '');
-    setNotesFeedback(null);
-  }, [activeDispensa?.id, activeDispensa?.personalNotes]);
-
-  const handleSaveProgress = async (
-    dispensa: ReservedUnlockedDispensa,
-    nextCompleted?: boolean
-  ) => {
-    setSavingNotes(true);
-    setNotesFeedback(null);
-    try {
-      const token = await getIdToken();
-      if (!token) throw new Error('Sessione scaduta.');
-      const res = await fetch(
-        `/api/reserved/dispense/${dispensa.id}/progress`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            completed:
-              typeof nextCompleted === 'boolean'
-                ? nextCompleted
-                : dispensa.completed,
-            personalNotes: notesDraft,
-          }),
-        }
-      );
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Salvataggio non riuscito.');
-
-      await loadOverview();
-      setNotesFeedback('Appunti e stato di avanzamento salvati.');
-    } catch (err) {
-      setNotesFeedback(
-        err instanceof Error ? err.message : 'Impossibile salvare al momento.'
-      );
-    } finally {
-      setSavingNotes(false);
-    }
-  };
-
-  const handleDownloadDispensa = (
-    courseTitle: string,
-    dispensa: ReservedUnlockedDispensa
-  ) => {
-    const fileContent = `# Tarot Italia · Maria Teresa Rogani\nPercorso: ${courseTitle}\nModulo ${dispensa.moduleNumber}: ${dispensa.title}\n${dispensa.subtitle}\n\nPunti Chiave:\n${dispensa.keyTakeaways.map((k) => `- ${k}`).join('\n')}\n\n${dispensa.contentMarkdown}\n`;
-    const blob = new Blob([fileContent], { type: 'text/markdown;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `tarot-italia-modulo-${dispensa.moduleNumber}-${dispensa.id}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const handleUnlockCourse = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!activeCourse) return;
-    setEnrolling(true);
-    setEnrollMessage(null);
-    try {
-      const token = await getIdToken();
-      if (!token) throw new Error('Sessione non valida.');
-      const res = await fetch('/api/reserved/enroll', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          courseSlug: activeCourse.slug,
-          customerName: enrollName.trim() || user?.displayName || user?.email || 'Corsista',
-          customerPhone: enrollPhone.trim() || undefined,
-        }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Attivazione non riuscita.');
-      await loadOverview();
-      setEnrollMessage(
-        `Percorso "${activeCourse.title}" attivato: tutte le dispense del corso sono ora accessibili.`
-      );
-    } catch (err) {
-      setEnrollMessage(
-        err instanceof Error ? err.message : 'Errore durante la registrazione.'
-      );
-    } finally {
-      setEnrolling(false);
-    }
-  };
-
-  const unlockedCount =
-    overview?.courses.filter((c) => c.isUnlocked).length ?? 0;
-  const completedDispenseCount =
-    overview?.courses.reduce(
-      (acc, c) => acc + c.unlockedDispense.filter((d) => d.completed).length,
-      0
-    ) ?? 0;
-  const totalDispenseCount =
-    overview?.courses.reduce((acc, c) => acc + c.dispenseCount, 0) ?? 12;
-
-  // 1. Unauthenticated / Loading Gate
-  if (authLoading) {
-    return (
-      <div className="pt-12 pb-16 flex justify-center">
-        <div className="glass-tier-1 rounded-2xl p-8 w-full max-w-lg text-center space-y-3">
-          <TarotEmblemLogo size={42} className="mx-auto" />
-          <p className="text-sm text-[#A39B93]">Verifica sessione in corso...</p>
-        </div>
-      </div>
+      <ReservedLoginGate
+        authLoading={authLoading}
+        authError={authError}
+        onSignIn={signInWithGoogle}
+        onNavigate={onNavigate}
+      />
     );
   }
 
-  if (!user) {
-    return (
-      <div className="pt-8 md:pt-14 pb-12 space-y-10">
-        <header className="space-y-3 max-w-2xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-            Spazio Personale Corsisti · Accesso Protetto
-          </p>
-          <h1 className="font-display text-[32px] leading-[40px] md:text-[44px] md:leading-[52px] tracking-[0.02em] text-[#F4F1EA]">
-            Area Riservata Tarot Italia
-          </h1>
-          <p className="text-sm md:text-base leading-relaxed text-[#A39B93]">
-            Accedi con il tuo account Google per consultare i percorsi formativi acquistati, scaricare le dispense formulate da Maria Teresa Rogani, salvare i tuoi appunti di studio e ritrovare i tuoi consulti.
-          </p>
-        </header>
+  const {
+    overview,
+    loadingData,
+    dataError,
+    loadOverview,
+    activeTab,
+    setActiveTab,
+    activeCourse,
+    activeDispensa,
+    setActiveCourseSlug,
+    setActiveDispensaId,
+    notesDraft,
+    setNotesDraft,
+    savingNotes,
+    notesFeedback,
+    setNotesFeedback,
+    enrollName,
+    setEnrollName,
+    enrollPhone,
+    setEnrollPhone,
+    enrolling,
+    enrollMessage,
+    setEnrollMessage,
+    handleSaveProgress,
+    handleDownloadDispensa,
+    handleUnlockCourse,
+    unlockedCount,
+    completedDispenseCount,
+    totalDispenseCount,
+  } = area;
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          <div className="lg:col-span-7 glass-tier-1 rounded-2xl p-6 md:p-8 flex flex-col justify-between gap-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 text-[#D4AF37]">
-                <Lock className="w-5 h-5 shrink-0" aria-hidden="true" />
-                <span className="text-xs font-semibold uppercase tracking-[0.08em]">
-                  Accesso Unico Sicuro
-                </span>
-              </div>
-              <h2 className="font-body font-semibold text-xl md:text-2xl tracking-[-0.02em] text-[#F4F1EA]">
-                Entra nella tua biblioteca simbolica personale
-              </h2>
-              <p className="text-sm leading-relaxed text-[#A39B93]">
-                Ogni dispensa dei percorsi <strong className="text-[#F4F1EA]">Arcani Maggiori</strong>,{' '}
-                <strong className="text-[#F4F1EA]">Arcani Minori</strong> e{' '}
-                <strong className="text-[#F4F1EA]">Metodi di Stesura</strong> è collegata in modo personale al tuo profilo protetto.
-              </p>
-
-              {authError && (
-                <div
-                  role="alert"
-                  className="p-3.5 rounded-xl bg-[#93000a]/30 border border-[#ffb4ab]/35 text-xs text-[#ffb4ab]"
-                >
-                  {authError}
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              <button
-                type="button"
-                onClick={signInWithGoogle}
-                className="px-6 py-3 min-h-[46px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center gap-2.5 whitespace-nowrap transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
-              >
-                <UserCheck className="w-4 h-4" />
-                Accedi con Google
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onNavigate('corsi')}
-                className="px-5 py-3 min-h-[46px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-sm font-medium text-[#F4F1EA] inline-flex items-center gap-2 whitespace-nowrap transition-colors"
-              >
-                Vedi i 3 Percorsi Didattici
-                <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
-              </button>
-            </div>
-          </div>
-
-          <aside className="lg:col-span-5 glass-tier-1 rounded-2xl p-6 md:p-8 space-y-5">
-            <h3 className="font-display text-lg text-[#F4F1EA]">
-              Cosa trovi dentro l&apos;Area Riservata
-            </h3>
-            <ul className="space-y-3.5 text-sm text-[#E8e1dd]">
-              <li className="flex items-start gap-3">
-                <BookOpen className="w-4 h-4 text-[#D4AF37] shrink-0 mt-1" />
-                <span>
-                  <strong className="text-[#F4F1EA]">12 Dispense Formulate</strong> suddivise nei tre pilastri del metodo Tarot Italia.
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <FileText className="w-4 h-4 text-[#D4AF37] shrink-0 mt-1" />
-                <span>
-                  <strong className="text-[#F4F1EA]">Quaderno Appunti</strong> personale salvato su ogni modulo studiato e completato.
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <Calendar className="w-4 h-4 text-[#D4AF37] shrink-0 mt-1" />
-                <span>
-                  <strong className="text-[#F4F1EA]">Storico Sessioni</strong> con date, orari e note dei consulti individuali prenotati.
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <ShieldCheck className="w-4 h-4 text-[#D4AF37] shrink-0 mt-1" />
-                <span>
-                  <strong className="text-[#F4F1EA]">Accesso Riservato</strong> vincolato al tuo indirizzo email verificato.
-                </span>
-              </li>
-            </ul>
-          </aside>
-        </div>
-      </div>
-    );
-  }
-
-  // 2. Authenticated Reserved Area View
   return (
     <div className="space-y-10 pt-6 md:pt-10 pb-10">
       {/* Header */}

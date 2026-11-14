@@ -344,7 +344,7 @@ export function ConsultiScreen({
               Handoff Pagamenti &amp; Auth
             </h3>
             <p className="text-xs md:text-sm leading-relaxed text-[#A39B93]">
-              Le tariffe selezionate pre-compilano la sessione Stripe Checkout e il record di prenotazione protetto da Supabase Auth RLS.
+              Le tariffe selezionate pre-compilano la sessione Stripe Checkout e il record di prenotazione protetto da Firebase Auth e persistito su Postgres.
             </p>
           </div>
         </div>

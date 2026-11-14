@@ -19,6 +19,11 @@ import { ResilientImage } from '../components/ResilientImage';
 import { COURSE_SECTION_IMAGES } from '../data/sectionImages';
 import { MinorArcanaSuitsPlate, SpreadGeometryExplorer } from '../components/CourseVisuals';
 import { useAuth } from '../context/AuthContext';
+import {
+  isValidEmail,
+  isValidFullName,
+  isValidPhone,
+} from '../lib/formValidation';
 
 interface CorsiScreenProps {
   showCmsKeys: boolean;
@@ -90,13 +95,13 @@ export function CorsiScreen({
     e.preventDefault();
     const errors: Record<string, string> = {};
 
-    if (!fullName.trim() || fullName.trim().length < 2) {
+    if (!isValidFullName(fullName)) {
       errors.fullName = 'Inserisci il tuo nome e cognome.';
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (!isValidEmail(email)) {
       errors.email = 'Inserisci un indirizzo email valido per ricevere l’accesso.';
     }
-    if (!phoneWhatsApp.trim() || phoneWhatsApp.trim().length < 7) {
+    if (!isValidPhone(phoneWhatsApp)) {
       errors.phoneWhatsApp = 'Inserisci un recapito telefonico o WhatsApp.';
     }
     if (!termsAccepted) {
@@ -115,7 +120,7 @@ export function CorsiScreen({
       amountEur: activeCourse.priceEur,
       currency: 'EUR',
       customerEmail: email.trim(),
-      supabaseUserId: user?.uid ?? '<AUTH_UID_FROM_SESSION>',
+      firebaseUserId: user?.uid ?? '<AUTH_UID_FROM_SESSION>',
       metadata: {
         itemType: 'course',
         practitioner: 'Maria Teresa Rogani',
@@ -491,7 +496,7 @@ export function CorsiScreen({
               Acquista il Percorso: {activeCourse.title}
             </h2>
             <p className="text-sm text-[#A39B93]">
-              Inserisci i tuoi dati per generare la sessione Stripe Checkout e attivare il tuo profilo corsista su Supabase Auth.
+              Inserisci i tuoi dati per generare la sessione Stripe Checkout e attivare il tuo profilo corsista (Firebase Auth + Postgres).
             </p>
           </div>
 

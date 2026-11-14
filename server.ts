@@ -1,3 +1,7 @@
+/**
+ * Runtime ufficiale: Express serve API `/api/*` e, in produzione, i file statici in `dist/`.
+ * `vercel.json` copre solo un deploy SPA statico (senza queste API) — vedi README.md.
+ */
 import express from 'express';
 import { createServer as createHttpServer } from 'http';
 import path from 'path';

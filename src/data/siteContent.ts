@@ -8,14 +8,14 @@ import type {
   EducationalCourse,
   HolisticFaqItem,
   HolisticPathway,
-  SupabaseAuthContract,
+  FirebaseAuthContract,
   WhatsAppWebhookContract,
 } from '../types/handoff';
 
 /**
  * Tarot Italia — Dizionario CMS & Copy Handoff
  * Ogni campo espone la propria chiave simbolica [COPY: ...] per sostituzione immediata
- * nel CMS (Supabase / Sanity / Markdown) o nel repository GitHub (Cursor / Vercel).
+ * nel CMS (Sanity / Markdown) o nel repository GitHub. Auth runtime: Firebase; dati: Postgres/Drizzle.
  */
 export const siteContent = {
   brand: {
@@ -193,7 +193,7 @@ export const siteContent = {
     checkoutNote: {
       cmsKey: '[COPY: siteContent.corsi.checkoutNote]',
       liveText:
-        'Accesso immediato all’area riservata dopo la conferma su Stripe Checkout (/api/checkout/session) con registrazione dell’iscrizione su Supabase Auth.',
+        'Accesso all’area riservata dopo conferma pagamento (Stripe Checkout /api/checkout/session) e registrazione dell’iscrizione su Postgres, protetta da Firebase Auth.',
     },
   },
   booking: {
@@ -209,7 +209,7 @@ export const siteContent = {
     stripeHandoffNote: {
       cmsKey: '[COPY: siteContent.booking.stripeNote]',
       liveText:
-        'Handoff Stripe Checkout: al conferma finale l’app genera il payload verso /api/checkout/session autenticato via Supabase Auth.',
+        'Handoff Stripe Checkout: al conferma finale l’app genera il payload verso /api/checkout/session autenticato via Firebase Auth (ID token) e persistenza su Postgres.',
     },
   },
   chat: {
@@ -762,16 +762,25 @@ export const initialChatMessages: ChatMessage[] = [
 export const bookingTimeSlots = ['09:30', '11:00', '14:30', '16:00', '18:00', '19:30'];
 
 export const handoffArchitectureSpec: {
-  supabase: SupabaseAuthContract;
+  auth: FirebaseAuthContract;
   whatsapp: WhatsAppWebhookContract;
-  stripeEnvVars: string[];
+  runtimeEnvVars: string[];
 } = {
-  supabase: {
-    provider: 'supabase_auth',
-    strategy: 'magic_link_or_otp',
-    tables: ['profiles', 'bookings', 'course_enrollments', 'consultation_notes'],
-    rlsPolicyNote:
-      'Row Level Security abilitata su profiles, bookings e course_enrollments (auth.uid() = user_id); accesso operatore tramite ruolo verificato.',
+  auth: {
+    provider: 'firebase_auth',
+    strategy: 'google_sign_in_id_token',
+    tables: [
+      'users',
+      'courses',
+      'dispense',
+      'course_purchases',
+      'dispensa_progress',
+      'bookings',
+      'dialogue_sessions',
+      'dialogue_purchases',
+    ],
+    accessPolicyNote:
+      'Le API riservate verificano il Firebase ID token con Admin SDK (requireAuth / optionalAuth). I dati applicativi vivono su Postgres tramite Drizzle; non c’è Supabase RLS.',
   },
   whatsapp: {
     provider: 'whatsapp_cloud_api',
@@ -780,11 +789,17 @@ export const handoffArchitectureSpec: {
     deepLinkTemplate:
       'https://wa.me/390000000000?text=Buongiorno%20Maria%20Teresa%2C%20vorrei%20informazioni%20per%20un%20consulto%20Tarot%20Italia.',
   },
-  stripeEnvVars: [
-    'NEXT_PUBLIC_SUPABASE_URL',
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  runtimeEnvVars: [
+    'APP_URL',
+    'SQL_HOST',
+    'SQL_DB_NAME',
+    'SQL_USER',
+    'SQL_PASSWORD',
     'STRIPE_SECRET_KEY',
     'STRIPE_WEBHOOK_SECRET',
+    'STRIPE_PRICE_ID_DIALOGO_5M',
+    'STRIPE_PRICE_ID_DIALOGO_10M',
+    'STRIPE_PRICE_ID_DIALOGO_15M',
     'WHATSAPP_VERIFY_TOKEN',
     'WHATSAPP_ACCESS_TOKEN',
   ],

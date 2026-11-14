@@ -221,7 +221,8 @@ export interface StripeCheckoutHandoffPayload {
   amountEur: number;
   currency: 'EUR';
   customerEmail: string;
-  supabaseUserId: string;
+  /** Firebase Auth UID (client session); not a payment proof. */
+  firebaseUserId: string;
   metadata: {
     itemType?: 'consultation' | 'course' | 'dialogue_pass';
     practitioner: string;
@@ -239,11 +240,12 @@ export interface StripeCheckoutHandoffPayload {
   cancelUrlPattern: string;
 }
 
-export interface SupabaseAuthContract {
-  provider: 'supabase_auth';
-  strategy: 'magic_link_or_otp';
+/** Contratto handoff allineato allo stack reale: Firebase Auth + Postgres/Drizzle. */
+export interface FirebaseAuthContract {
+  provider: 'firebase_auth';
+  strategy: 'google_sign_in_id_token';
   tables: string[];
-  rlsPolicyNote: string;
+  accessPolicyNote: string;
 }
 
 export interface WhatsAppWebhookContract {
