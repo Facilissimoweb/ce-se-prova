@@ -26,6 +26,6 @@
     "noImplicitAny": true,
     "strictNullChecks": true
   },
-  "include": ["src", "server.ts", "vite.config.ts"],
+  "include": ["src"],
   "exclude": ["dist", "api"]
 }
