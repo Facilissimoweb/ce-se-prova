@@ -15,6 +15,8 @@ import { educationalCourses, siteContent } from '../data/siteContent';
 import { MAJOR_ARCANA } from '../data/majorArcana';
 import { CopyText } from '../components/CopyText';
 import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
+import { ResilientImage } from '../components/ResilientImage';
+import { COURSE_SECTION_IMAGES } from '../data/sectionImages';
 import { MinorArcanaSuitsPlate, SpreadGeometryExplorer } from '../components/CourseVisuals';
 import { useAuth } from '../context/AuthContext';
 
@@ -183,16 +185,27 @@ export function CorsiScreen({
       <section aria-label="Catalogo percorsi didattici a pagamento" className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
         {educationalCourses.map((course) => {
           const isSelected = course.id === activeCourse.id;
+          const courseImage = COURSE_SECTION_IMAGES[course.id];
           return (
             <article
               key={course.id}
-              className={`rounded-2xl p-6 md:p-8 flex flex-col justify-between gap-6 transition-all duration-200 ${
+              className={`rounded-2xl p-6 md:p-7 flex flex-col justify-between gap-6 transition-all duration-200 ${
                 isSelected
                   ? 'glass-tier-2 border-[#D4AF37]/55 shadow-[0_0_28px_rgba(212,175,55,0.14)]'
                   : 'glass-tier-1 hover:border-[#D4AF37]/35'
               }`}
             >
               <div className="space-y-5">
+                {/* 4:3 Bespoke Course Visual */}
+                <div className="rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#12100E]">
+                  <ResilientImage
+                    src={courseImage.src}
+                    alt={courseImage.alt}
+                    className="w-full aspect-[4/3] object-cover"
+                    fallbackLabel={course.title}
+                  />
+                </div>
+
                 {/* Quiet unboxed metadata */}
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                   <span className="font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
@@ -731,6 +744,15 @@ export function CorsiScreen({
 
         {/* Sticky Course Summary */}
         <aside className="lg:col-span-4 glass-tier-1 rounded-2xl p-6 space-y-5 lg:sticky lg:top-24">
+          <div className="rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#12100E]">
+            <ResilientImage
+              src={COURSE_SECTION_IMAGES[activeCourse.id].src}
+              alt={COURSE_SECTION_IMAGES[activeCourse.id].alt}
+              className="w-full aspect-[4/3] object-cover"
+              fallbackLabel={activeCourse.title}
+            />
+          </div>
+
           <div className="space-y-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
               Riepilogo Percorso Scelto

@@ -12,6 +12,7 @@ import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
 import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
 import { TarotEmblemLogo } from '../components/TarotEmblem';
+import { COURSE_SECTION_IMAGES } from '../data/sectionImages';
 import heroSanctuaryImg from '../assets/images/hero_tarot_sanctuary_1794651607080.jpg';
 import practitionerHandsImg from '../assets/images/percorsi_hands_tarot_1794651609400.jpg';
 
@@ -289,31 +290,42 @@ export function HomeScreen({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 items-stretch">
-          {educationalCourses.map((course, idx) => (
-            <article
-              key={course.id}
-              className={`rounded-2xl p-6 md:p-7 flex flex-col justify-between gap-6 transition-colors duration-150 ${
-                course.recommended
-                  ? 'glass-tier-2 border-[#D4AF37]/40 hover:border-[#D4AF37]/60'
-                  : 'glass-tier-1 hover:border-[#D4AF37]/40'
-              }`}
-            >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between gap-2 text-xs text-[#A39B93]">
-                  <span className="font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                    {idx + 1}) {course.title}
-                  </span>
-                  <span className="tabular-nums">{course.lessonsCount} lezioni</span>
+          {educationalCourses.map((course, idx) => {
+            const courseImage = COURSE_SECTION_IMAGES[course.id];
+            return (
+              <article
+                key={course.id}
+                className={`rounded-2xl p-5 md:p-6 flex flex-col justify-between gap-6 transition-colors duration-150 ${
+                  course.recommended
+                    ? 'glass-tier-2 border-[#D4AF37]/40 hover:border-[#D4AF37]/60'
+                    : 'glass-tier-1 hover:border-[#D4AF37]/40'
+                }`}
+              >
+                <div className="space-y-4">
+                  <div className="rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#12100E]">
+                    <ResilientImage
+                      src={courseImage.src}
+                      alt={courseImage.alt}
+                      className="w-full aspect-[4/3] object-cover"
+                      fallbackLabel={course.title}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 text-xs text-[#A39B93]">
+                    <span className="font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                      {idx + 1}) {course.title}
+                    </span>
+                    <span className="tabular-nums">{course.lessonsCount} lezioni</span>
+                  </div>
+
+                  <h3 className="font-display text-lg md:text-xl text-[#F4F1EA]">
+                    {course.subtitle}
+                  </h3>
+
+                  <p className="text-sm leading-relaxed text-[#A39B93]">
+                    {course.description}
+                  </p>
                 </div>
-
-                <h3 className="font-display text-lg md:text-xl text-[#F4F1EA]">
-                  {course.subtitle}
-                </h3>
-
-                <p className="text-sm leading-relaxed text-[#A39B93]">
-                  {course.description}
-                </p>
-              </div>
 
               <div className="pt-4 border-t border-[#D4AF37]/15 flex items-center justify-between gap-3">
                 <span className="font-display text-xl text-[#D4AF37] tabular-nums">
@@ -329,7 +341,8 @@ export function HomeScreen({
                 </button>
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
       </section>
 

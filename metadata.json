@@ -2,5 +2,7 @@
   "name": "Tarot Italia",
   "description": "Tarot Italia di Maria Teresa Rogani, operatore olistico. Consulenze simboliche ed evolutive dei Tarocchi con approccio etico e deontologico, prenotazioni e dialogo guidato.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

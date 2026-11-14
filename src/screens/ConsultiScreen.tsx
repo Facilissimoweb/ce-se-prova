@@ -4,6 +4,7 @@ import type { ConsultationTariff } from '../types/handoff';
 import { consultationTariffs, siteContent } from '../data/siteContent';
 import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
+import { TARIFF_SECTION_IMAGES } from '../data/sectionImages';
 import consultiDeskImg from '../assets/images/consulti_desk_linen_1794651607906.jpg';
 
 interface ConsultiScreenProps {
@@ -49,16 +50,27 @@ export function ConsultiScreen({
       <section aria-label="Tariffe dei consulti" className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
         {consultationTariffs.map((tariff) => {
           const isSelected = selectedTariffId === tariff.id;
+          const tariffImage = TARIFF_SECTION_IMAGES[tariff.id];
           return (
             <article
               key={tariff.id}
-              className={`rounded-2xl p-6 md:p-8 flex flex-col justify-between gap-6 transition-all duration-200 ${
+              className={`rounded-2xl p-6 md:p-7 flex flex-col justify-between gap-6 transition-all duration-200 ${
                 tariff.recommended
                   ? 'glass-tier-2 border-[#D4AF37]/45 shadow-[0_0_28px_rgba(212,175,55,0.12)]'
                   : 'glass-tier-1 hover:border-[#D4AF37]/35'
               }`}
             >
               <div className="space-y-5">
+                {/* 4:3 Bespoke Consultation Visual */}
+                <div className="rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#12100E]">
+                  <ResilientImage
+                    src={tariffImage.src}
+                    alt={tariffImage.alt}
+                    className="w-full aspect-[4/3] object-cover"
+                    fallbackLabel={tariff.title}
+                  />
+                </div>
+
                 {/* Quiet metadata header without pill clutter */}
                 <div className="flex items-center justify-between gap-2 text-xs">
                   <span className="font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
