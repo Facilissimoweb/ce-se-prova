@@ -3,6 +3,7 @@ import type {
   ChatMessage,
   ClientTestimonial,
   ConsultationTariff,
+  DisciplinaryCredential,
   EducationalCourse,
   HolisticFaqItem,
   HolisticPathway,
@@ -92,6 +93,48 @@ export const siteContent = {
       cmsKey: '[COPY: siteContent.home.coursesIntro]',
       liveText:
         'Tre moduli formativi a pagamento per apprendere la lettura simbolica e previsionale dei Tarocchi con metodo rigoroso ed etico.',
+    },
+  },
+  chiSono: {
+    kicker: {
+      cmsKey: '[COPY: siteContent.chiSono.kicker]',
+      liveText: 'Maria Teresa Rogani · Chi Sono',
+    },
+    heading: {
+      cmsKey: '[COPY: siteContent.chiSono.heading]',
+      liveText: 'Il mio percorso',
+    },
+    researchHeading: {
+      cmsKey: '[COPY: siteContent.chiSono.researchHeading]',
+      liveText: 'Formazione e ricerca',
+    },
+    researchP1: {
+      cmsKey: '[COPY: siteContent.chiSono.researchP1]',
+      liveText:
+        'La mia formazione accademica e umanistica informa il modo in cui osservo e interpreto le carte.',
+    },
+    researchP2: {
+      cmsKey: '[COPY: siteContent.chiSono.researchP2]',
+      liveText:
+        'Diplomata come Grafica e laureata in Tecniche della Comunicazione Visiva all’Accademia di Belle Arti, ho approfondito la scultura contemporanea e la filosofia classica.',
+    },
+    researchP3: {
+      cmsKey: '[COPY: siteContent.chiSono.researchP3]',
+      liveText:
+        'Questa formazione guida il mio sguardo su composizione, colore e simboli, che considero nel loro contesto storico, iconografico e simbolico.',
+    },
+    disciplinaryKicker: {
+      cmsKey: '[COPY: siteContent.chiSono.disciplinaryKicker]',
+      liveText: 'Percorso Disciplinare Integrato',
+    },
+    disciplinaryHeading: {
+      cmsKey: '[COPY: siteContent.chiSono.disciplinaryHeading]',
+      liveText: 'Percorso disciplinare',
+    },
+    disciplinaryIntro: {
+      cmsKey: '[COPY: siteContent.chiSono.disciplinaryIntro]',
+      liveText:
+        'Un intreccio coerente tra tarologia esoterica, tradizione iconografica Rider Waite Smith e pratiche olistiche di ascolto e consapevolezza.',
     },
   },
   consulti: {
@@ -187,6 +230,69 @@ export const siteContent = {
     },
   },
 } as const;
+
+export const disciplinaryCredentials: DisciplinaryCredential[] = [
+  {
+    index: '01',
+    area: 'tarologia',
+    areaLabel: 'Tarologia & Iconografia',
+    cmsKeyTitle: '[COPY: disciplina.placeholder.1.title]',
+    title: 'Tarocchi Rider Waite Smith',
+    cmsKeyDetails: '[COPY: disciplina.placeholder.1.details]',
+    details: 'Mariangela Aggio · Percorso formativo completo dedicato alla simbologia e lettura Rider Waite Smith.',
+    periodOrCert: 'Percorso 2025',
+  },
+  {
+    index: '02',
+    area: 'tarologia',
+    areaLabel: 'Tarocco Esoterico',
+    cmsKeyTitle: '[COPY: disciplina.placeholder.2.title]',
+    title: 'Accademia Nazionale del Tarocco Esoterico',
+    cmsKeyDetails: '[COPY: disciplina.placeholder.2.details]',
+    details: 'La società dello Zolfo, Dorian Bones · Studio annuale dei fondamenti esoterici, alchemici e iniziatici del Tarocco.',
+    periodOrCert: 'Annuale 2023/2024',
+  },
+  {
+    index: '03',
+    area: 'olistico',
+    areaLabel: 'Disciplina Energetica',
+    cmsKeyTitle: '[COPY: disciplina.placeholder.3.title]',
+    title: 'Operatore Reiki II Livello',
+    cmsKeyDetails: '[COPY: disciplina.placeholder.3.details]',
+    details: 'Lignaggio Mikao Usui®, M. F. Tartuferi · Pratica di armonizzazione energetica accreditata IPHM.',
+    periodOrCert: 'IPHM dal 2009',
+  },
+  {
+    index: '04',
+    area: 'olistico',
+    areaLabel: 'Consapevolezza',
+    cmsKeyTitle: '[COPY: disciplina.placeholder.4.title]',
+    title: 'Facilitatore Mindfulness',
+    cmsKeyDetails: '[COPY: disciplina.placeholder.4.details]',
+    details: 'Mindfulness Educators® · Accompagnamento alla presenza mentale, respiro e ascolto non giudicante.',
+    periodOrCert: 'IPHM',
+  },
+  {
+    index: '05',
+    area: 'olistico',
+    areaLabel: 'Naturopatia',
+    cmsKeyTitle: '[COPY: disciplina.placeholder.5.title]',
+    title: 'Operatore Naturopata',
+    cmsKeyDetails: '[COPY: disciplina.placeholder.5.details]',
+    details: 'Future Academy® · Approccio olistico integrato al benessere naturale e all’equilibrio della persona.',
+    periodOrCert: 'IPHM',
+  },
+  {
+    index: '06',
+    area: 'olistico',
+    areaLabel: 'Radiestesia',
+    cmsKeyTitle: '[COPY: disciplina.placeholder.6.title]',
+    title: 'Radiestesia & Pendolo PTAH',
+    cmsKeyDetails: '[COPY: disciplina.placeholder.6.details]',
+    details: 'Emiliano Amici · Tecniche radiestesiche e impiego del pendolo PTAH per l’indagine sottile e l’equilibrio.',
+    periodOrCert: 'Formazione Specialistica',
+  },
+];
 
 export const holisticPathways: HolisticPathway[] = [
   {

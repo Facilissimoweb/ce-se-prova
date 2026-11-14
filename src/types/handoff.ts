@@ -1,10 +1,22 @@
 export type ScreenId =
   | 'home'
+  | 'chi-sono'
   | 'consulti'
   | 'corsi'
   | 'area-riservata'
   | 'booking'
   | 'chat';
+
+export interface DisciplinaryCredential {
+  index: string;
+  area: 'tarologia' | 'olistico';
+  areaLabel: string;
+  cmsKeyTitle: string;
+  title: string;
+  cmsKeyDetails: string;
+  details: string;
+  periodOrCert: string;
+}
 
 export type CourseId = 'arcani-maggiori' | 'arcani-minori' | 'metodi-stesura';
 

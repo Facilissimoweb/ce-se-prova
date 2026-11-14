@@ -174,9 +174,19 @@ export function HomeScreen({
           <p className="text-sm md:text-base leading-relaxed text-[#E8e1dd]">
             <CopyText entry={siteContent.home.ethicsBannerBody} showKeys={showCmsKeys} />
           </p>
-          <p className="text-xs md:text-sm text-[#A39B93] pt-2 border-t border-[#D4AF37]/15">
-            Disciplinato ai sensi della Legge 4/2013 sulle professioni non organizzate · Operatore Olistico Maria Teresa Rogani.
-          </p>
+          <div className="pt-2 border-t border-[#D4AF37]/15 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-xs md:text-sm text-[#A39B93]">
+              Disciplinato ai sensi della Legge 4/2013 · Operatore Olistico Maria Teresa Rogani.
+            </p>
+            <button
+              type="button"
+              onClick={() => onNavigate('chi-sono')}
+              className="text-xs md:text-sm font-medium text-[#D4AF37] hover:text-[#E6C65C] inline-flex items-center gap-1.5 whitespace-nowrap"
+            >
+              Chi sono e percorso formativo
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </section>
 

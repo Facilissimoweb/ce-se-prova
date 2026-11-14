@@ -10,6 +10,7 @@ import { HandoffDrawer } from './components/HandoffDrawer';
 import { PrivacyCookiesWidget } from './components/PrivacyCookiesWidget';
 import { AmbientSanctuaryBackground } from './components/AmbientSanctuaryBackground';
 import { HomeScreen } from './screens/HomeScreen';
+import { ChiSonoScreen } from './screens/ChiSonoScreen';
 import { ConsultiScreen } from './screens/ConsultiScreen';
 import { CorsiScreen } from './screens/CorsiScreen';
 import { ReservedAreaScreen } from './screens/ReservedAreaScreen';
@@ -56,6 +57,13 @@ export function App() {
               onSelectCourse={handleSelectCourseAndNavigate}
               onOpenHandoff={() => setIsHandoffOpen(true)}
               onOpenPrivacy={() => setIsPrivacyOpen(true)}
+            />
+          )}
+
+          {activeScreen === 'chi-sono' && (
+            <ChiSonoScreen
+              showCmsKeys={showCmsKeys}
+              onNavigate={handleNavigate}
             />
           )}
 
@@ -108,6 +116,13 @@ export function App() {
               Tarot Italia · Maria Teresa Rogani, Operatore Olistico · Lettura del presente e del futuro
             </p>
             <div className="flex items-center gap-5">
+              <button
+                type="button"
+                onClick={() => handleNavigate('chi-sono')}
+                className="hover:text-[#D4AF37] transition-colors"
+              >
+                Chi Sono
+              </button>
               <button
                 type="button"
                 onClick={() => handleNavigate('area-riservata')}

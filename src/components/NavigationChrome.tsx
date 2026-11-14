@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Calendar, Compass, Lock, MessageCircle, Sparkles, Code2, PhoneCall, ShieldCheck } from 'lucide-react';
+import { BookOpen, Calendar, Compass, Lock, MessageCircle, Sparkles, User, Code2, PhoneCall, ShieldCheck } from 'lucide-react';
 import type { ScreenId } from '../types/handoff';
 import { TarotEmblemLogo } from './TarotEmblem';
 
@@ -8,12 +8,13 @@ interface TopBarProps {
   onNavigate: (screen: ScreenId) => void;
 }
 
-const NAV_ITEMS: { id: ScreenId; label: string; mobileLabel?: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { id: 'home', label: 'Home', icon: Compass },
-  { id: 'consulti', label: 'Consulti', icon: Sparkles },
-  { id: 'corsi', label: 'Corsi', icon: BookOpen },
-  { id: 'chat', label: 'Dialogo', icon: MessageCircle },
-  { id: 'area-riservata', label: 'Area Riservata', mobileLabel: 'Riservata', icon: Lock },
+const NAV_ITEMS: { id: ScreenId; label: string; mobileLabel?: string; showOnMobileBottom?: boolean; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: 'home', label: 'Home', showOnMobileBottom: true, icon: Compass },
+  { id: 'chi-sono', label: 'Chi Sono', showOnMobileBottom: true, icon: User },
+  { id: 'consulti', label: 'Consulti', showOnMobileBottom: true, icon: Sparkles },
+  { id: 'corsi', label: 'Corsi', showOnMobileBottom: true, icon: BookOpen },
+  { id: 'chat', label: 'Dialogo', showOnMobileBottom: false, icon: MessageCircle },
+  { id: 'area-riservata', label: 'Area Riservata', mobileLabel: 'Riservata', showOnMobileBottom: true, icon: Lock },
 ];
 
 export function TopBar({ activeScreen, onNavigate }: TopBarProps) {
@@ -34,7 +35,7 @@ export function TopBar({ activeScreen, onNavigate }: TopBarProps) {
         </button>
 
         {/* Zone 2: Desktop Single-Line Navigation Links */}
-        <nav className="hidden md:flex items-center gap-7" aria-label="Navigazione principale">
+        <nav className="hidden md:flex items-center gap-4 lg:gap-6" aria-label="Navigazione principale">
           {NAV_ITEMS.map((item) => {
             const isActive = activeScreen === item.id;
             return (
@@ -43,7 +44,7 @@ export function TopBar({ activeScreen, onNavigate }: TopBarProps) {
                 type="button"
                 onClick={() => onNavigate(item.id)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`relative py-2 text-sm font-medium whitespace-nowrap shrink-0 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded ${
+                className={`relative py-2 text-xs lg:text-sm font-medium whitespace-nowrap shrink-0 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded ${
                   isActive ? 'text-[#D4AF37]' : 'text-[#A39B93] hover:text-[#F4F1EA]'
                 }`}
               >
@@ -81,7 +82,7 @@ export function MobileBottomNav({ activeScreen, onNavigate }: TopBarProps) {
       aria-label="Navigazione mobile"
     >
       <div className="grid grid-cols-5 h-full max-w-md mx-auto">
-        {NAV_ITEMS.map((item) => {
+        {NAV_ITEMS.filter((item) => item.showOnMobileBottom).map((item) => {
           const Icon = item.icon;
           const isActive = activeScreen === item.id;
           return (
