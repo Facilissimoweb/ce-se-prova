@@ -24,7 +24,12 @@ import {
   openHoursForDate,
   toIsoDate,
 } from '../lib/bookingCalendar';
-import { isEveningSlot } from '../lib/bookingRules';
+import {
+  isEveningSlot,
+  isSlotAllowedForMode,
+  sessionModeLabel,
+  type BookingMode,
+} from '../lib/bookingRules';
 import {
   isValidEmail,
   isValidFullName,
@@ -84,18 +89,19 @@ export function BookingScreen({
   }, [user]);
 
   useEffect(() => {
-    const hours = openHoursForDate(draft.selectedDateIso, occupied);
+    const hours = openHoursForDate(draft.selectedDateIso, occupied).filter(
+      (slot) => isSlotAllowedForMode(draft.mode, slot)
+    );
     if (hours.length === 0) {
       const next = getNextAvailableDate(occupied);
       const iso = toIsoDate(next);
-      const nextHours = openHoursForDate(iso, occupied);
+      const nextHours = openHoursForDate(iso, occupied).filter((slot) =>
+        isSlotAllowedForMode(draft.mode, slot)
+      );
       setDraft((prev) => ({
         ...prev,
         selectedDateIso: iso,
         selectedTimeSlot: nextHours[0] ?? prev.selectedTimeSlot,
-        mode: isEveningSlot(nextHours[0] ?? prev.selectedTimeSlot)
-          ? 'remote'
-          : prev.mode,
       }));
       return;
     }
@@ -103,10 +109,9 @@ export function BookingScreen({
       setDraft((prev) => ({
         ...prev,
         selectedTimeSlot: hours[0],
-        mode: isEveningSlot(hours[0]) ? 'remote' : prev.mode,
       }));
     }
-  }, [occupied, draft.selectedDateIso, draft.selectedTimeSlot]);
+  }, [occupied, draft.selectedDateIso, draft.selectedTimeSlot, draft.mode]);
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -130,8 +135,11 @@ export function BookingScreen({
   );
 
   const openHours = useMemo(
-    () => openHoursForDate(draft.selectedDateIso, occupied),
-    [draft.selectedDateIso, occupied]
+    () =>
+      openHoursForDate(draft.selectedDateIso, occupied).filter((slot) =>
+        isSlotAllowedForMode(draft.mode, slot)
+      ),
+    [draft.selectedDateIso, occupied, draft.mode]
   );
 
   useEffect(() => {
@@ -179,6 +187,10 @@ export function BookingScreen({
     setDraft((prev) => ({ ...prev, tariffId: id }));
   };
 
+  const handleModePick = (mode: BookingMode) => {
+    setDraft((prev) => ({ ...prev, mode }));
+  };
+
   const validateAndPrepareCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     const errors: Record<string, string> = {};
@@ -218,7 +230,7 @@ export function BookingScreen({
           tariffId: activeTariff.id,
           scheduledDate: draft.selectedDateIso,
           scheduledTime: draft.selectedTimeSlot,
-          mode: isEveningSlot(draft.selectedTimeSlot) ? 'remote' : draft.mode,
+          mode: draft.mode,
           fullName: draft.fullName.trim(),
           email: draft.email.trim(),
           phoneWhatsApp: draft.phoneWhatsApp.trim(),
@@ -311,11 +323,11 @@ export function BookingScreen({
             <div className="space-y-6">
               <div className="space-y-1">
                 <h2 className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]">
-                  Seleziona la durata del consulto
+                  Durata e modalità del consulto
                 </h2>
                 <p className="text-sm text-[#A39B93]">
-                  Prezzi e durate dal catalogo server — checkout Stripe al passo
-                  finale.
+                  Scegli durata e se preferisci online (chiamata vocale) o di
+                  persona a Macerata. Checkout Stripe al passo finale.
                 </p>
               </div>
 
@@ -379,6 +391,49 @@ export function BookingScreen({
                 })}
               </div>
 
+              <div className="space-y-3 pt-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                  Modalità *
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {(
+                    [
+                      [
+                        'remote',
+                        'Online',
+                        'Chiamata vocale riservata (WhatsApp)',
+                      ],
+                      [
+                        'studio',
+                        'Di persona a Macerata',
+                        'Via Crispi 37 · fino alle 18:00',
+                      ],
+                    ] as const
+                  ).map(([value, label, hint]) => {
+                    const selected = draft.mode === value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => handleModePick(value)}
+                        className={`min-h-[64px] px-4 py-3 rounded-xl text-left border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
+                          selected
+                            ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-[#F4F1EA]'
+                            : 'border-[#D4AF37]/20 bg-[#12100E]/60 text-[#A39B93] hover:border-[#D4AF37]/45'
+                        }`}
+                      >
+                        <span className="block text-sm font-semibold text-[#F4F1EA]">
+                          {label}
+                        </span>
+                        <span className="block text-xs mt-0.5 opacity-90">
+                          {hint}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <div className="flex justify-end pt-2">
                 <button
                   type="button"
@@ -414,14 +469,13 @@ export function BookingScreen({
                 selectedDateIso={draft.selectedDateIso}
                 onMonthShift={handleMonthShift}
                 onSelectDate={(iso) => {
-                  const hours = openHoursForDate(iso, occupied);
+                  const hours = openHoursForDate(iso, occupied).filter((slot) =>
+                    isSlotAllowedForMode(draft.mode, slot)
+                  );
                   setDraft((prev) => ({
                     ...prev,
                     selectedDateIso: iso,
                     selectedTimeSlot: hours[0] ?? prev.selectedTimeSlot,
-                    mode: isEveningSlot(hours[0] ?? prev.selectedTimeSlot)
-                      ? 'remote'
-                      : prev.mode,
                   }));
                 }}
               />
@@ -433,7 +487,9 @@ export function BookingScreen({
                 </div>
                 <div className="grid grid-cols-3 sm:grid-cols-7 gap-2">
                   {HOUR_SLOTS.map((slot) => {
-                    const available = openHours.includes(slot);
+                    const available =
+                      isSlotAllowedForMode(draft.mode, slot) &&
+                      openHours.includes(slot);
                     const isSelected =
                       draft.selectedTimeSlot === slot && available;
                     return (
@@ -445,7 +501,6 @@ export function BookingScreen({
                           setDraft((prev) => ({
                             ...prev,
                             selectedTimeSlot: slot,
-                            mode: isEveningSlot(slot) ? 'remote' : prev.mode,
                           }))
                         }
                         aria-pressed={isSelected}
@@ -468,35 +523,10 @@ export function BookingScreen({
                   })}
                 </div>
                 <p className="text-xs text-[#A39B93] leading-relaxed">
-                  Dalle 19:00 i consulti sono solo online (chiamata vocale
-                  WhatsApp).
+                  {draft.mode === 'studio'
+                    ? 'Di persona a Macerata: disponibili fino alle 18:00. Dalle 19:00 solo online.'
+                    : 'Dalle 19:00 i consulti sono solo online (chiamata vocale WhatsApp).'}
                 </p>
-
-                {!isEveningSlot(draft.selectedTimeSlot) ? (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {(
-                      [
-                        ['remote', 'Online · WhatsApp'],
-                        ['studio', 'Di persona · Macerata'],
-                      ] as const
-                    ).map(([value, label]) => (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() =>
-                          setDraft((prev) => ({ ...prev, mode: value }))
-                        }
-                        className={`min-h-[40px] px-3 py-2 rounded-lg text-xs font-medium border ${
-                          draft.mode === value
-                            ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-[#E6C65C]'
-                            : 'border-[#D4AF37]/20 text-[#A39B93]'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
               </div>
 
               <div className="flex items-center justify-between gap-4 pt-2">
@@ -793,9 +823,7 @@ export function BookingScreen({
             <div className="flex items-center justify-between gap-2">
               <dt className="text-[#A39B93]">Modalità</dt>
               <dd className="text-[#F4F1EA] font-medium text-right">
-                {isEveningSlot(draft.selectedTimeSlot) || draft.mode === 'remote'
-                  ? 'Online'
-                  : 'Studio'}
+                {sessionModeLabel(draft.mode)}
               </dd>
             </div>
           </dl>

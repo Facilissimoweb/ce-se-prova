@@ -8,16 +8,26 @@ export function isEveningSlot(slot: string): boolean {
   return Number.isFinite(hour) && hour >= EVENING_SLOT_HOUR;
 }
 
+/** Di persona: niente slot serali (solo online dalle 19:00). */
+export function isSlotAllowedForMode(mode: BookingMode, slot: string): boolean {
+  if (mode === 'studio' && isEveningSlot(slot)) return false;
+  return true;
+}
+
 export function resolveBookingMode(mode: string, slot: string): BookingMode {
   if (isEveningSlot(slot)) return 'remote';
   return mode === 'studio' ? 'studio' : 'remote';
 }
 
-export function sessionModeLabel(mode: string, slot: string): string {
-  const resolved = resolveBookingMode(mode, slot);
+export function sessionModeLabel(mode: string, slot?: string): string {
+  const resolved =
+    slot != null ? resolveBookingMode(mode, slot) : mode === 'studio' ? 'studio' : 'remote';
   const base =
     resolved === 'remote'
-      ? 'Chiamata vocale WhatsApp'
-      : 'Dal vivo a Macerata';
-  return isEveningSlot(slot) ? `${base} · dalle 19:00 solo online` : base;
+      ? 'Online · chiamata vocale'
+      : 'Di persona a Macerata';
+  if (slot != null && isEveningSlot(slot) && mode === 'studio') {
+    return `${base} · dalle 19:00 solo online`;
+  }
+  return base;
 }

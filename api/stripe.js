@@ -7749,6 +7749,13 @@ async function ensureCatalogSeeded() {
 
 // src/lib/paymentCatalog.ts
 var BOOKING_TARIFF_CATALOG = {
+  "20m": {
+    id: "20m",
+    title: "Consulto Breve",
+    durationMinutes: 20,
+    priceEur: 20,
+    stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_20M"
+  },
   "45m": {
     id: "45m",
     title: "Consulto Essenziale",
@@ -7783,9 +7790,12 @@ function resolveBookingMode(mode, slot) {
   return mode === "studio" ? "studio" : "remote";
 }
 function sessionModeLabel(mode, slot) {
-  const resolved = resolveBookingMode(mode, slot);
-  const base = resolved === "remote" ? "Chiamata vocale WhatsApp" : "Dal vivo a Macerata";
-  return isEveningSlot(slot) ? `${base} \xB7 dalle 19:00 solo online` : base;
+  const resolved = slot != null ? resolveBookingMode(mode, slot) : mode === "studio" ? "studio" : "remote";
+  const base = resolved === "remote" ? "Online \xB7 chiamata vocale" : "Di persona a Macerata";
+  if (slot != null && isEveningSlot(slot) && mode === "studio") {
+    return `${base} \xB7 dalle 19:00 solo online`;
+  }
+  return base;
 }
 
 // src/lib/bookingSlots.ts

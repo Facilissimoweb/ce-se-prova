@@ -5,7 +5,12 @@ import {
   createConsultationBooking,
   listOccupiedSlots,
 } from '../../db/repository.ts';
-import { resolveBookingMode, sessionModeLabel } from '../../lib/bookingRules.ts';
+import {
+  isSlotAllowedForMode,
+  resolveBookingMode,
+  sessionModeLabel,
+  type BookingMode,
+} from '../../lib/bookingRules.ts';
 import {
   HOUR_SLOTS,
   isValidDateIso,
@@ -70,10 +75,8 @@ export async function postBooking(params: {
     const phoneWhatsApp = String(body.phoneWhatsApp || '').trim();
     const sessionIntent = String(body.sessionIntent || '').trim();
     const deontologyAccepted = Boolean(body.deontologyAccepted);
-    const mode = resolveBookingMode(
-      String(body.mode || 'remote'),
-      scheduledTime
-    );
+    const requestedMode: BookingMode =
+      String(body.mode || '').trim() === 'studio' ? 'studio' : 'remote';
 
     if (
       !tariff ||
@@ -89,6 +92,15 @@ export async function postBooking(params: {
         error: 'Completa tutti i campi obbligatori della prenotazione.',
       });
     }
+
+    if (!isSlotAllowedForMode(requestedMode, scheduledTime)) {
+      return json(400, {
+        error:
+          'Di persona a Macerata è disponibile fino alle 18:00. Scegli un orario diurno o la modalità online.',
+      });
+    }
+
+    const mode = resolveBookingMode(requestedMode, scheduledTime);
 
     if (!slotsForDate(scheduledDate).includes(scheduledTime)) {
       return json(400, {

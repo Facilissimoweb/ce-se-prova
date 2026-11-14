@@ -13,6 +13,11 @@ export interface SectionImageAsset {
 }
 
 export const TARIFF_SECTION_IMAGES: Record<ConsultationTariff['id'], SectionImageAsset> = {
+  '20m': {
+    src: consultoEssenzialeImg,
+    alt: 'Singola carta dei Tarocchi bordata in oro su lino scuro per il Consulto Breve da venti minuti',
+    caption: 'Consulto Breve · Domanda rapida e primo orientamento',
+  },
   '45m': {
     src: consultoEssenzialeImg,
     alt: 'Singola carta dei Tarocchi bordata in oro su lino scuro accanto a un candeliere in ottone battuto per il Consulto Essenziale',

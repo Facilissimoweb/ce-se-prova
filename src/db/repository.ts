@@ -491,7 +491,7 @@ export async function isSlotTaken(
 export async function createConsultationBooking(params: {
   uid?: string | null;
   authEmail?: string | null;
-  tariffId: '45m' | '60m' | '90m';
+  tariffId: '20m' | '45m' | '60m' | '90m';
   scheduledDate: string;
   scheduledTime: string;
   fullName: string;

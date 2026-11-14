@@ -146,7 +146,7 @@ export const siteContent = {
     subheading: {
       cmsKey: '[COPY: siteContent.consulti.subheading]',
       liveText:
-        'Tre durate calibrate per profondità differenti: online esclusivamente in chiamata vocale riservata, oppure di persona a Macerata su appuntamento.',
+        'Quattro durate calibrate per profondità differenti: online in chiamata vocale riservata, oppure di persona a Macerata (Via Crispi 37) su appuntamento.',
     },
     welcomeKicker: {
       cmsKey: '[COPY: siteContent.consulti.welcomeKicker]',
@@ -388,7 +388,7 @@ export const holisticFaqs: HolisticFaqItem[] = [
     id: 'faq-4',
     category: 'Svolgimento Sessione',
     cmsKeyQuestion: '[COPY: faq.placeholder.4.question]',
-    question: 'Come prepararsi a un consulto da 45, 60 o 90 minuti?',
+    question: 'Come prepararsi a un consulto da 20, 45, 60 o 90 minuti?',
     cmsKeyAnswer: '[COPY: faq.placeholder.4.answer]',
     answer:
       'È sufficiente portare una o più domande chiare sul tuo percorso presente o sugli sviluppi futuri — in ambito professionale, creativo o relazionale. I consulti online avvengono esclusivamente in chiamata vocale riservata: dopo la prenotazione riceverai tutte le indicazioni per collegarti oppure l’indirizzo di Via Crispi 37 a Macerata per l’incontro di persona.',
@@ -436,6 +436,24 @@ export const clientTestimonials: ClientTestimonial[] = [
 
 export const consultationTariffs: ConsultationTariff[] = [
   {
+    id: '20m',
+    durationMinutes: 20,
+    priceEur: 20,
+    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_20M',
+    cmsKeyTitle: '[COPY: tariffa.placeholder.0.title]',
+    title: 'Consulto Breve',
+    cmsKeyDesc: '[COPY: tariffa.placeholder.0.desc]',
+    description:
+      'Venti minuti per una domanda chiara e un orientamento rapido, online o di persona a Macerata.',
+    cmsKeyFocus: '[COPY: tariffa.placeholder.0.focus]',
+    focusLabel: 'Domanda rapida · Primo contatto',
+    includes: [
+      '20 minuti di dialogo individuale (online o di persona)',
+      'Stesa sintetica su un tema puntuale',
+      'Indicazioni pratiche via email o WhatsApp',
+    ],
+  },
+  {
     id: '45m',
     durationMinutes: 45,
     priceEur: 60,
@@ -448,7 +466,7 @@ export const consultationTariffs: ConsultationTariff[] = [
     cmsKeyFocus: '[COPY: tariffa.placeholder.1.focus]',
     focusLabel: 'Domanda singola · Chiarezza immediata',
     includes: [
-      '45 minuti di dialogo individuale online in chiamata vocale',
+      '45 minuti di dialogo individuale (online o di persona)',
       'Stesa simbolica focalizzata su un tema specifico',
       'Sintesi scritta dei punti emersi via email o WhatsApp',
     ],
@@ -808,6 +826,7 @@ export const handoffArchitectureSpec: {
     'STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI',
     'STRIPE_PRICE_ID_CORSO_ARCANI_MINORI',
     'STRIPE_PRICE_ID_CORSO_METODI_STESURA',
+    'STRIPE_PRICE_ID_CONSULTO_20M',
     'STRIPE_PRICE_ID_CONSULTO_45M',
     'STRIPE_PRICE_ID_CONSULTO_60M',
     'STRIPE_PRICE_ID_CONSULTO_90M',

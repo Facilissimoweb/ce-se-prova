@@ -130,8 +130,10 @@ export interface CopyEntry {
   liveText: string;
 }
 
+export type ConsultationTariffId = '20m' | '45m' | '60m' | '90m';
+
 export interface ConsultationTariff {
-  id: '45m' | '60m' | '90m';
+  id: ConsultationTariffId;
   durationMinutes: number;
   priceEur: number;
   stripePriceIdAnnotation: string;
@@ -207,7 +209,7 @@ export interface CookieConsentPreferences {
 }
 
 export interface BookingDraft {
-  tariffId: '45m' | '60m' | '90m';
+  tariffId: ConsultationTariffId;
   selectedDateIso: string;
   selectedTimeSlot: string;
   mode: 'studio' | 'remote';

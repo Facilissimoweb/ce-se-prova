@@ -2,7 +2,7 @@
  * Server-side payment catalogs. Never trust client-supplied price/duration.
  */
 
-export type BookingTariffId = '45m' | '60m' | '90m';
+export type BookingTariffId = '20m' | '45m' | '60m' | '90m';
 
 export const BOOKING_TARIFF_CATALOG: Record<
   BookingTariffId,
@@ -14,6 +14,13 @@ export const BOOKING_TARIFF_CATALOG: Record<
     stripePriceIdAnnotation: string;
   }
 > = {
+  '20m': {
+    id: '20m',
+    title: 'Consulto Breve',
+    durationMinutes: 20,
+    priceEur: 20,
+    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_20M',
+  },
   '45m': {
     id: '45m',
     title: 'Consulto Essenziale',
@@ -38,7 +45,12 @@ export const BOOKING_TARIFF_CATALOG: Record<
 };
 
 export function resolveBookingTariff(tariffId: string) {
-  if (tariffId !== '45m' && tariffId !== '60m' && tariffId !== '90m') {
+  if (
+    tariffId !== '20m' &&
+    tariffId !== '45m' &&
+    tariffId !== '60m' &&
+    tariffId !== '90m'
+  ) {
     return null;
   }
   return BOOKING_TARIFF_CATALOG[tariffId];

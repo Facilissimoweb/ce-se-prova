@@ -140,7 +140,7 @@ export function HandoffDrawer({
           </div>
           <div className="p-4 rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/15 text-xs text-[#A39B93] space-y-2">
             <p className="text-[#F4F1EA]">
-              Price IDs configurati: Consulti (45m, 60m, 90m), Pass Chat IA (5m € 3, 10m € 5, 15m € 7) e Corsi (Arcani Maggiori, Arcani Minori, Metodi di Stesura).
+              Price IDs configurati: Consulti (20m, 45m, 60m, 90m), Pass Chat IA (5m € 3, 10m € 5, 15m € 7) e Corsi (Arcani Maggiori, Arcani Minori, Metodi di Stesura).
             </p>
             <p className="leading-relaxed">
               I moduli Prenotazione e Corsi compilano il payload strutturato{' '}
