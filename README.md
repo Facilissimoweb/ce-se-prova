@@ -10,7 +10,7 @@ SPA React (Vite) + API: Firebase Auth, Postgres/Drizzle, contenuti editoriali in
 | Dati | PostgreSQL + Drizzle (`src/db/*`) |
 | UI | React 19 + Vite 8 + Tailwind 4 |
 | API (locale) | Express in `server.ts` — stessi handler di Vercel |
-| API (produzione consigliata) | **Vercel Serverless** catch-all `api/[...path].ts` (Node; ≤12 funzioni Hobby), logica in `src/server/routes/*` |
+| API (produzione consigliata) | **Vercel Serverless** `api/health.ts` + router `api/index.ts` (Node; ≤12 funzioni Hobby), logica in `src/server/routes/*` |
 | Pagamenti | Stripe Checkout + webhook / confirm-session |
 | Prenotazioni | Zoho SMTP + Google Calendar (opzionali) |
 
@@ -34,7 +34,7 @@ npm run lint     # tsc --noEmit
    - `FIREBASE_SERVICE_ACCOUNT_JSON`
    - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
    - `APP_URL` (URL pubblico, es. preview o `https://www.tarotitalia.com`)
-3. Deploy: SPA in `dist/` + **una** funzione Serverless catch-all `api/[...path].ts` (tutte le URL `/api/*` restano uguali). Piano Hobby: max 12 funzioni — non spezzare in un file per endpoint. La rewrite SPA **non** intercetta `/api/*` né `privacy.html`.
+3. Deploy: SPA in `dist/` + due funzioni Serverless (`api/health.ts`, `api/index.ts` via rewrite `/api/*` → `/api`). Piano Hobby: max 12 funzioni — non spezzare in un file per endpoint. La rewrite SPA **non** intercetta `/api` né `privacy.html`.
 4. Webhook Stripe: `https://<deployment>/api/stripe/webhook` (raw body letto dallo stream).
 5. Solo dopo smoke delle API: aggiungi il dominio custom (`www.tarotitalia.com`) — vedi docs cutover nel Project Context.
 
