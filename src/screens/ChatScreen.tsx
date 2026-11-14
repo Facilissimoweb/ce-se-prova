@@ -171,7 +171,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
               <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
                 <CopyText entry={siteContent.brand.name} showKeys={showCmsKeys} /> · 22 Arcani Maggiori
               </p>
-              <h1 className="font-display text-xl md:text-2xl text-[#F4F1EA]">
+              <h1 className="font-display text-2xl md:text-[28px] tracking-[0.02em] text-[#F4F1EA]">
                 <CopyText entry={siteContent.chat.title} showKeys={showCmsKeys} />
               </h1>
             </div>
@@ -237,7 +237,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
                 <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
                   Mazzo Completo · 0 – XXI
                 </p>
-                <h2 className="font-display text-base md:text-lg text-[#F4F1EA]">
+                <h2 className="font-body font-semibold tracking-[-0.015em] text-base md:text-lg text-[#F4F1EA]">
                   Scegli un Arcano Maggiore con cui dialogare
                 </h2>
               </div>
@@ -329,7 +329,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
                 <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
                   {activeSpread ? 'Focus Carta Selezionata' : 'Arcano Attivo'}
                 </p>
-                <h2 className="font-display text-xl text-[#F4F1EA]">
+                <h2 className="font-body font-semibold tracking-[-0.02em] text-xl text-[#F4F1EA]">
                   {activeCard.name} · {activeCard.numeral}
                 </h2>
               </div>

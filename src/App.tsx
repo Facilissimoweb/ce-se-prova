@@ -7,6 +7,7 @@ import {
 } from './components/NavigationChrome';
 import { HandoffDrawer } from './components/HandoffDrawer';
 import { PrivacyCookiesWidget } from './components/PrivacyCookiesWidget';
+import { AmbientSanctuaryBackground } from './components/AmbientSanctuaryBackground';
 import { HomeScreen } from './screens/HomeScreen';
 import { ConsultiScreen } from './screens/ConsultiScreen';
 import { BookingScreen } from './screens/BookingScreen';
@@ -32,15 +33,7 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-[#12100E] text-[#F4F1EA] flex flex-col relative">
-      {/* Subtle warm ambient gold radiance behind hero */}
-      <div
-        className="pointer-events-none fixed inset-x-0 top-0 h-[420px] opacity-35"
-        style={{
-          background:
-            'radial-gradient(ellipse 65% 50% at 50% 0%, rgba(212, 175, 55, 0.14), transparent 70%)',
-        }}
-        aria-hidden="true"
-      />
+      <AmbientSanctuaryBackground />
 
       <TopBar activeScreen={activeScreen} onNavigate={handleNavigate} />
 

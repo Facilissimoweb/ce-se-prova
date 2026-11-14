@@ -85,6 +85,87 @@
   box-shadow: 0 0 24px rgba(212, 175, 55, 0.22);
 }
 
+@keyframes auraBreath {
+  0%,
+  100% {
+    opacity: 0.34;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.56;
+    transform: translate3d(18px, -12px, 0) scale(1.06);
+  }
+}
+
+@keyframes auraBreathReverse {
+  0%,
+  100% {
+    opacity: 0.22;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.42;
+    transform: translate3d(-22px, 14px, 0) scale(1.08);
+  }
+}
+
+@keyframes slowOrbitCW {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slowOrbitCCW {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes floatMote {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0) scale(0.8);
+  }
+  20% {
+    opacity: 0.55;
+  }
+  80% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(10px, -110px, 0) scale(1.1);
+  }
+}
+
+.animate-aura-breath {
+  animation: auraBreath 16s ease-in-out infinite;
+}
+
+.animate-aura-breath-reverse {
+  animation: auraBreathReverse 22s ease-in-out infinite;
+}
+
+.animate-orbit-cw {
+  animation: slowOrbitCW 140s linear infinite;
+}
+
+.animate-orbit-ccw {
+  animation: slowOrbitCCW 190s linear infinite;
+}
+
+.animate-float-mote {
+  animation-name: floatMote;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

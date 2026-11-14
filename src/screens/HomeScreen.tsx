@@ -38,7 +38,7 @@ export function HomeScreen({
               <CopyText entry={siteContent.home.kicker} showKeys={showCmsKeys} />
             </p>
 
-            <h1 className="font-display text-[32px] leading-[40px] md:text-[48px] md:leading-[56px] tracking-[0.02em] text-[#F4F1EA] max-w-2xl text-balance">
+            <h1 className="font-display text-[34px] leading-[42px] md:text-[52px] md:leading-[60px] tracking-[0.02em] font-normal text-[#F4F1EA] max-w-2xl text-balance">
               <CopyText entry={siteContent.home.hero} showKeys={showCmsKeys} />
             </h1>
 
@@ -160,7 +160,7 @@ export function HomeScreen({
               Etica Professionale
             </span>
           </div>
-          <h2 id="ethics-heading" className="font-display text-xl md:text-2xl text-[#F4F1EA] text-balance">
+          <h2 id="ethics-heading" className="font-body text-2xl md:text-[28px] md:leading-[36px] font-semibold tracking-[-0.02em] text-[#F4F1EA] text-balance">
             <CopyText entry={siteContent.home.ethicsBannerTitle} showKeys={showCmsKeys} />
           </h2>
           <p className="text-sm md:text-base leading-relaxed text-[#E8e1dd]">
@@ -176,7 +176,7 @@ export function HomeScreen({
       <section aria-labelledby="pathways-heading" className="space-y-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2 max-w-2xl">
-            <h2 id="pathways-heading" className="font-display text-2xl md:text-[32px] md:leading-[40px] text-[#F4F1EA]">
+            <h2 id="pathways-heading" className="font-body text-2xl md:text-[32px] md:leading-[40px] font-semibold tracking-[-0.02em] text-[#F4F1EA]">
               <CopyText entry={siteContent.home.pathwaysHeading} showKeys={showCmsKeys} />
             </h2>
             <p className="text-sm md:text-base text-[#A39B93]">
@@ -250,7 +250,7 @@ export function HomeScreen({
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
             Esperienze di Ascolto
           </p>
-          <h2 id="testimonials-heading" className="font-display text-2xl md:text-[32px] md:leading-[40px] text-[#F4F1EA]">
+          <h2 id="testimonials-heading" className="font-body text-2xl md:text-[32px] md:leading-[40px] font-semibold tracking-[-0.02em] text-[#F4F1EA]">
             <CopyText entry={siteContent.home.testimonialsHeading} showKeys={showCmsKeys} />
           </h2>
           <p className="text-sm md:text-base text-[#A39B93]">
@@ -301,7 +301,7 @@ export function HomeScreen({
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
             Chiarezza &amp; Deontologia
           </p>
-          <h2 id="faq-heading" className="font-display text-2xl md:text-[30px] md:leading-[38px] text-[#F4F1EA] text-balance">
+          <h2 id="faq-heading" className="font-body text-2xl md:text-[30px] md:leading-[38px] font-semibold tracking-[-0.02em] text-[#F4F1EA] text-balance">
             <CopyText entry={siteContent.home.faqHeading} showKeys={showCmsKeys} />
           </h2>
           <p className="text-sm leading-relaxed text-[#A39B93]">
@@ -330,7 +330,7 @@ export function HomeScreen({
                       <span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]/90">
                         {String(index + 1).padStart(2, '0')} · {faq.category}
                       </span>
-                      <span className="block font-display text-base md:text-lg text-[#F4F1EA]">
+                      <span className="block font-body font-semibold text-base md:text-[17px] tracking-[-0.01em] text-[#F4F1EA]">
                         {showCmsKeys ? (
                           <CopyText
                             entry={{ cmsKey: faq.cmsKeyQuestion, liveText: faq.question }}
@@ -381,7 +381,7 @@ export function HomeScreen({
           <div className="md:col-span-5 flex items-center gap-4">
             <TarotEmblemLogo size={44} className="shrink-0" />
             <div>
-              <h2 id="dock-heading" className="font-display text-lg text-[#F4F1EA]">
+              <h2 id="dock-heading" className="font-body font-semibold tracking-[-0.01em] text-lg text-[#F4F1EA]">
                 <CopyText entry={siteContent.home.dockHeading} showKeys={showCmsKeys} />
               </h2>
               <p className="text-xs text-[#A39B93] mt-0.5">

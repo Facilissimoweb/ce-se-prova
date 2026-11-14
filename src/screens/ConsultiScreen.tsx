@@ -25,7 +25,7 @@ export function ConsultiScreen({
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
             Tariffario Trasparente · Sessioni Individuali
           </p>
-          <h1 className="font-display text-[28px] leading-[36px] md:text-[36px] md:leading-[44px] text-[#F4F1EA] text-balance">
+          <h1 className="font-display text-[32px] leading-[40px] md:text-[42px] md:leading-[50px] tracking-[0.02em] text-[#F4F1EA] text-balance">
             <CopyText entry={siteContent.consulti.heading} showKeys={showCmsKeys} />
           </h1>
           <p className="text-sm md:text-base leading-relaxed text-[#A39B93] max-w-xl">
@@ -70,7 +70,7 @@ export function ConsultiScreen({
                 </div>
 
                 <div className="space-y-2">
-                  <h2 className="font-display text-xl md:text-2xl text-[#F4F1EA]">
+                  <h2 className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]">
                     {showCmsKeys ? (
                       <CopyText
                         entry={{ cmsKey: tariff.cmsKeyTitle, liveText: tariff.title }}

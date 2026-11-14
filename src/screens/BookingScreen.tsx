@@ -213,7 +213,7 @@ export function BookingScreen({
         <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
           Agenda Riservata · Maria Teresa Rogani
         </p>
-        <h1 className="font-display text-[28px] leading-[36px] md:text-[36px] md:leading-[44px] text-[#F4F1EA]">
+        <h1 className="font-display text-[32px] leading-[40px] md:text-[42px] md:leading-[50px] tracking-[0.02em] text-[#F4F1EA]">
           <CopyText entry={siteContent.booking.heading} showKeys={showCmsKeys} />
         </h1>
         <p className="text-sm md:text-base text-[#A39B93]">
@@ -255,7 +255,7 @@ export function BookingScreen({
           {step === 1 && (
             <div className="space-y-6">
               <div className="space-y-1">
-                <h2 className="font-display text-xl text-[#F4F1EA]">
+                <h2 className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]">
                   Seleziona la durata del consulto
                 </h2>
                 <p className="text-sm text-[#A39B93]">
@@ -335,7 +335,7 @@ export function BookingScreen({
           {step === 2 && (
             <div className="space-y-8">
               <div className="space-y-1">
-                <h2 className="font-display text-xl text-[#F4F1EA]">
+                <h2 className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]">
                   Scegli giorno e fascia oraria
                 </h2>
                 <p className="text-sm text-[#A39B93]">
@@ -464,7 +464,7 @@ export function BookingScreen({
           {step === 3 && (
             <form onSubmit={validateAndPrepareCheckout} className="space-y-6" noValidate>
               <div className="space-y-1">
-                <h2 className="font-display text-xl text-[#F4F1EA]">
+                <h2 className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]">
                   Dati di contatto e preparazione Checkout
                 </h2>
                 <p className="text-sm text-[#A39B93]">
