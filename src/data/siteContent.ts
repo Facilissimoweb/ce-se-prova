@@ -333,20 +333,9 @@ export const consultationTariffs: ConsultationTariff[] = [
   },
 ];
 
-export const arcanoDelGiorno: ArcanaCard = {
-  numeral: 'IX',
-  name: "L'Eremita",
-  archetype: 'Discernimento · Silenzio Fertile · Luce Interiore',
-  element: 'Terra · Saggezza Matura',
-  keywords: ['Introspezione', 'Misura', 'Autonomia', 'Prudenza'],
-  synthesis:
-    "L'Eremita non indica isolamento sterile, ma la scelta consapevole di sottrarsi al rumore esterno per ascoltare la propria lanterna. Invita a procedere con passo lento, onorando ciò che è essenziale.",
-  maieuticQuestions: [
-    'Dove sto cercando risposte all’esterno quando conosco già il mio passo?',
-    'Quale rumore superfluo posso sospendere oggi per ascoltare con lucidità?',
-    'Cosa illumina davvero la mia lanterna in questa fase di transizione?',
-  ],
-};
+import { MAJOR_ARCANA } from './majorArcana';
+
+export const arcanoDelGiorno: ArcanaCard = MAJOR_ARCANA[9];
 
 export const initialChatMessages: ChatMessage[] = [
   {
@@ -354,14 +343,14 @@ export const initialChatMessages: ChatMessage[] = [
     sender: 'practitioner',
     authorName: 'Maria Teresa Rogani',
     timestamp: '09:30',
-    text: 'Benvenuto nello spazio di dialogo di Tarot Italia. Qui integriamo l’ascolto del presente e la lettura previsionale del futuro per orientare con chiarezza il tuo cammino.',
+    text: 'Benvenuto nello spazio di dialogo di Tarot Italia. Qui puoi estrarre o scegliere qualsiasi dei 22 Arcani Maggiori per leggere il presente, esplorare le tendenze future e riflettere con consapevolezza.',
   },
   {
     id: 'msg-2',
     sender: 'practitioner',
     authorName: 'Maria Teresa Rogani',
     timestamp: '09:31',
-    text: "Oggi contempliamo L'Eremita (IX): la lanterna rischiara soltanto il passo immediatamente davanti a noi. Scegli una domanda dalla carta o scrivi liberamente ciò che stai attraversando.",
+    text: "Partiamo dall'Arcano del Giorno — L'Eremita (IX) — oppure clicca su «Estrai Arcano» o «Stesa 3 Carte» per interrogare tutto il mazzo.",
     arcanaRef: "L'Eremita · IX",
   },
 ];

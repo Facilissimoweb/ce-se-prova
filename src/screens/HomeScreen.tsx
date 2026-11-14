@@ -4,9 +4,9 @@ import type { ScreenId } from '../types/handoff';
 import { clientTestimonials, holisticFaqs, holisticPathways, siteContent } from '../data/siteContent';
 import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
-import { HermitArcanaIllustration, TarotEmblemLogo } from '../components/TarotEmblem';
+import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
+import { TarotEmblemLogo } from '../components/TarotEmblem';
 import heroSanctuaryImg from '../assets/images/hero_tarot_sanctuary_1794651607080.jpg';
-import hermitCardImg from '../assets/images/arcano_eremita_gold_1794651607019.jpg';
 import practitionerHandsImg from '../assets/images/percorsi_hands_tarot_1794651609400.jpg';
 
 interface HomeScreenProps {
@@ -90,12 +90,12 @@ export function HomeScreen({
                 </span>
                 <span className="font-mono tabular-nums">IX</span>
               </div>
-              <div className="w-40 mx-auto my-2 rounded-xl overflow-hidden border border-[#D4AF37]/30 transition-transform duration-300 group-hover:-translate-y-1">
-                <ResilientImage
-                  src={hermitCardImg}
-                  alt="Carta dei Tarocchi L'Eremita IX in oro su fondo ossidiana"
-                  className="w-full aspect-[3/4] object-cover"
-                  fallbackNode={<HermitArcanaIllustration className="w-full h-auto" />}
+              <div className="w-40 mx-auto my-2 rounded-xl overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
+                <MajorArcanaArtwork
+                  number={9}
+                  numeral="IX"
+                  name="L'Eremita"
+                  className="w-full h-auto"
                 />
               </div>
               <div className="mt-4 pt-3 border-t border-[#D4AF37]/15 flex items-center justify-between">

@@ -110,11 +110,17 @@ export interface ChatMessage {
 }
 
 export interface ArcanaCard {
+  id: string;
+  number: number;
   numeral: string;
   name: string;
   archetype: string;
   element: string;
   keywords: string[];
   synthesis: string;
+  futureTendency: string;
+  advice: string;
+  loveReading: string;
+  workReading: string;
   maieuticQuestions: string[];
 }
