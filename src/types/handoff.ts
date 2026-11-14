@@ -5,7 +5,10 @@ export type ScreenId =
   | 'corsi'
   | 'area-riservata'
   | 'booking'
-  | 'chat';
+  | 'chat'
+  | 'privacy'
+  | 'termini'
+  | 'disclaimer';
 
 export interface DisciplinaryCredential {
   index: string;

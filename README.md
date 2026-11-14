@@ -42,3 +42,16 @@ Vedi `.env.example`:
 | `ALLOW_DIRECT_UNLOCK=true` | Solo non-prod: sblocchi preview senza Stripe |
 
 La config client Firebase è in `firebase-applet-config.json`. Dettagli operativi Stripe: store docs / `docs/payments.md` nel Project Context.
+
+## Path pubblici (Stripe return + legali)
+
+| Path | Ruolo |
+|------|--------|
+| `/area-riservata` | Area corsi + success/cancel Stripe corsi |
+| `/dialogo` | Dialogo Tarot + success/cancel Stripe pass |
+| `/privacy` | Informativa privacy (SPA) |
+| `/privacy.html` | Privacy statica HTML (Google OAuth) |
+| `/termini-di-servizio` | Termini e Condizioni |
+| `/disclaimer` | Disclaimer legale |
+
+Contenuti legali: `src/data/legalContent.ts` (portati da v2tarotitalia).

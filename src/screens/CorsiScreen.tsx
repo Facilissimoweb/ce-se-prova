@@ -129,8 +129,8 @@ export function CorsiScreen({
         phoneWhatsApp: phoneWhatsApp.trim(),
         deontologyAccepted: termsAccepted,
       },
-      successUrlPattern: `/corsi/accesso?course=${activeCourse.id}&session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrlPattern: `/corsi?cancelled=true&course=${activeCourse.id}`,
+      successUrlPattern: `/area-riservata?course_stripe_session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrlPattern: `/area-riservata?checkout=cancel&item=course&course=${activeCourse.id}`,
     };
 
     setCheckoutPayload(payload);

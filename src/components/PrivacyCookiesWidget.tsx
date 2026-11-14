@@ -271,6 +271,28 @@ export function PrivacyCookiesWidget({
                   <p>
                     <CopyText entry={siteContent.privacy.gdprSummary} showKeys={showCmsKeys} />
                   </p>
+                  <p>
+                    <a
+                      href="/privacy"
+                      className="text-[#D4AF37] underline decoration-[#D4AF37]/40 underline-offset-2 hover:text-[#E6C65C]"
+                    >
+                      Leggi l’informativa completa
+                    </a>
+                    {' · '}
+                    <a
+                      href="/privacy.html"
+                      className="text-[#D4AF37] underline decoration-[#D4AF37]/40 underline-offset-2 hover:text-[#E6C65C]"
+                    >
+                      Versione HTML statica
+                    </a>
+                    {' · '}
+                    <a
+                      href="/termini-di-servizio"
+                      className="text-[#D4AF37] underline decoration-[#D4AF37]/40 underline-offset-2 hover:text-[#E6C65C]"
+                    >
+                      Termini e Condizioni
+                    </a>
+                  </p>
                 </div>
               </div>
 

@@ -249,7 +249,7 @@ export const siteContent = {
     gdprSummary: {
       cmsKey: '[COPY: siteContent.privacy.gdprSummary]',
       liveText:
-        'Titolare del trattamento: Maria Teresa Rogani (studio@tarotitalia.it). I dati di contatto e prenotazione vengono trattati esclusivamente per erogare il consulto e gestire gli adempimenti Stripe Checkout, senza cessione a terzi per finalità commerciali.',
+        'Titolare del trattamento: Maria Teresa Rogani — Tarot Italia (P.IVA 02136780430; info@tarotitalia.com). I dati di contatto e prenotazione vengono trattati esclusivamente per erogare il consulto e gestire gli adempimenti Stripe Checkout / Firebase Auth, senza cessione a terzi per finalità commerciali. Informativa completa: /privacy e /privacy.html.',
     },
   },
 } as const;

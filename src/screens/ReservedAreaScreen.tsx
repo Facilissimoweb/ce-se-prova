@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import type { CourseId, ScreenId } from '../types/handoff';
 import { useAuth } from '../context/AuthContext';
+import { CheckoutReturnBanner } from '../components/CheckoutReturnBanner';
 import { FormattedDispensaBody } from '../components/reserved/FormattedDispensaBody';
 import { ReservedLoginGate } from '../components/reserved/ReservedLoginGate';
 import { useReservedArea } from '../hooks/useReservedArea';
@@ -78,6 +79,7 @@ export function ReservedAreaScreen({
 
   return (
     <div className="space-y-10 pt-6 md:pt-10 pb-10">
+      <CheckoutReturnBanner variant="course" />
       {/* Header */}
       <header className="glass-tier-1 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">

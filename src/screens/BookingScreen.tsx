@@ -182,8 +182,9 @@ export function BookingScreen({
         phoneWhatsApp: draft.phoneWhatsApp.trim(),
         deontologyAccepted: draft.deontologyAccepted,
       },
-      successUrlPattern: '/prenotazione/conferma?session_id={CHECKOUT_SESSION_ID}',
-      cancelUrlPattern: '/prenota?cancelled=true',
+      successUrlPattern:
+        '/area-riservata?checkout=ok&booking={BOOKING_ID}&session_id={CHECKOUT_SESSION_ID}',
+      cancelUrlPattern: '/prenota?checkout=cancel&booking={BOOKING_ID}',
     };
 
     setHandoffPayload(payload);
