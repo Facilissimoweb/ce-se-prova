@@ -54,6 +54,7 @@ export function App() {
             <HomeScreen
               showCmsKeys={showCmsKeys}
               onNavigate={handleNavigate}
+              onSelectTariffAndBook={handleSelectTariffAndBook}
               onSelectCourse={handleSelectCourseAndNavigate}
               onOpenHandoff={() => setIsHandoffOpen(true)}
               onOpenPrivacy={() => setIsPrivacyOpen(true)}

@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
-import { ArrowRight, ChevronDown, Mail, MapPin, MessageCircle, Quote, ShieldCheck } from 'lucide-react';
-import type { CourseId, ScreenId } from '../types/handoff';
+import { ArrowRight, Check, ChevronDown, Mail, MapPin, MessageCircle, Quote, ShieldCheck } from 'lucide-react';
+import type { ConsultationTariff, CourseId, ScreenId } from '../types/handoff';
 import {
   clientTestimonials,
+  consultationTariffs,
   educationalCourses,
   holisticFaqs,
-  holisticPathways,
   siteContent,
 } from '../data/siteContent';
 import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
 import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
 import { TarotEmblemLogo } from '../components/TarotEmblem';
-import { COURSE_SECTION_IMAGES } from '../data/sectionImages';
+import { COURSE_SECTION_IMAGES, TARIFF_SECTION_IMAGES } from '../data/sectionImages';
 import heroSanctuaryImg from '../assets/images/hero_tarot_sanctuary_1794651607080.jpg';
 import practitionerHandsImg from '../assets/images/percorsi_hands_tarot_1794651609400.jpg';
 
 interface HomeScreenProps {
   showCmsKeys: boolean;
   onNavigate: (screen: ScreenId) => void;
+  onSelectTariffAndBook: (tariffId: ConsultationTariff['id']) => void;
   onSelectCourse: (courseId: CourseId) => void;
   onOpenHandoff: () => void;
   onOpenPrivacy: () => void;
@@ -27,6 +28,7 @@ interface HomeScreenProps {
 export function HomeScreen({
   showCmsKeys,
   onNavigate,
+  onSelectTariffAndBook,
   onSelectCourse,
   onOpenHandoff,
   onOpenPrivacy,
@@ -191,10 +193,13 @@ export function HomeScreen({
         </div>
       </section>
 
-      {/* Holistic Pathways Grid */}
+      {/* Consulti Section — Matches ConsultiScreen cards & 4:3 images */}
       <section aria-labelledby="pathways-heading" className="space-y-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2 max-w-2xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+              Sessioni Individuali · 45 / 60 / 90 Minuti
+            </p>
             <h2 id="pathways-heading" className="font-body text-2xl md:text-[32px] md:leading-[40px] font-semibold tracking-[-0.02em] text-[#F4F1EA]">
               <CopyText entry={siteContent.home.pathwaysHeading} showKeys={showCmsKeys} />
             </h2>
@@ -207,59 +212,111 @@ export function HomeScreen({
             onClick={() => onNavigate('consulti')}
             className="text-sm font-medium text-[#D4AF37] hover:text-[#E6C65C] inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 self-start md:self-auto"
           >
-            Esplora tutte le tariffe <ArrowRight className="w-4 h-4" />
+            Esplora area Consulti <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-          {holisticPathways.map((pathway) => (
-            <article
-              key={pathway.index}
-              className="glass-tier-1 rounded-2xl p-6 md:p-8 flex flex-col justify-between gap-5 transition-colors duration-150 hover:border-[#D4AF37]/35"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-3 text-xs text-[#A39B93]">
-                  <span className="font-display text-sm text-[#D4AF37] tabular-nums">
-                    {pathway.index}.
-                  </span>
-                  <span>{pathway.modality}</span>
-                </div>
-                <h3 className="font-display text-lg md:text-xl text-[#F4F1EA]">
-                  {showCmsKeys ? (
-                    <CopyText
-                      entry={{ cmsKey: pathway.cmsKeyTitle, liveText: pathway.title }}
-                      showKeys={true}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          {consultationTariffs.map((tariff) => {
+            const tariffImage = TARIFF_SECTION_IMAGES[tariff.id];
+            return (
+              <article
+                key={tariff.id}
+                className={`rounded-2xl p-6 md:p-7 flex flex-col justify-between gap-6 transition-all duration-200 ${
+                  tariff.recommended
+                    ? 'glass-tier-2 border-[#D4AF37]/45 shadow-[0_0_28px_rgba(212,175,55,0.12)]'
+                    : 'glass-tier-1 hover:border-[#D4AF37]/35'
+                }`}
+              >
+                <div className="space-y-5">
+                  <div className="rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#12100E]">
+                    <ResilientImage
+                      src={tariffImage.src}
+                      alt={tariffImage.alt}
+                      className="w-full aspect-[4/3] object-cover"
+                      fallbackLabel={tariff.title}
                     />
-                  ) : (
-                    pathway.title
-                  )}
-                </h3>
-                <p className="text-sm leading-relaxed text-[#A39B93]">
-                  {showCmsKeys ? (
-                    <CopyText
-                      entry={{ cmsKey: pathway.cmsKeyDesc, liveText: pathway.description }}
-                      showKeys={true}
-                    />
-                  ) : (
-                    pathway.description
-                  )}
-                </p>
-              </div>
+                  </div>
 
-              <div className="pt-3 border-t border-[#D4AF37]/12 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() =>
-                    onNavigate(pathway.index === '04' ? 'chat' : 'consulti')
-                  }
-                  className="text-xs md:text-sm font-medium text-[#F4F1EA] hover:text-[#D4AF37] inline-flex items-center gap-1.5 transition-colors"
-                >
-                  {pathway.index === '04' ? 'Vai al Dialogo Guidato' : 'Vedi durata e tariffa'}
-                  <ArrowRight className="w-3.5 h-3.5 text-[#D4AF37]" />
-                </button>
-              </div>
-            </article>
-          ))}
+                  <div className="flex items-center justify-between gap-2 text-xs">
+                    <span className="font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                      {tariff.durationMinutes} Minuti
+                    </span>
+                    <span className="text-[#A39B93]">
+                      {tariff.recommended ? 'Percorso Consigliato' : 'Individuale'}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="font-display text-xl md:text-2xl text-[#F4F1EA]">
+                      {showCmsKeys ? (
+                        <CopyText
+                          entry={{ cmsKey: tariff.cmsKeyTitle, liveText: tariff.title }}
+                          showKeys={true}
+                        />
+                      ) : (
+                        tariff.title
+                      )}
+                    </h3>
+                    <p className="text-xs font-medium text-[#D4AF37]/90">
+                      {showCmsKeys ? (
+                        <CopyText
+                          entry={{ cmsKey: tariff.cmsKeyFocus, liveText: tariff.focusLabel }}
+                          showKeys={true}
+                        />
+                      ) : (
+                        tariff.focusLabel
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="py-3 border-y border-[#D4AF37]/15 flex items-baseline justify-between">
+                    <span className="font-display text-3xl text-[#F4F1EA] tabular-nums">
+                      € {tariff.priceEur}
+                    </span>
+                    <span className="text-xs text-[#A39B93] tabular-nums">
+                      {tariff.durationMinutes} min · IVA inclusa
+                    </span>
+                  </div>
+
+                  <p className="text-sm leading-relaxed text-[#A39B93]">
+                    {showCmsKeys ? (
+                      <CopyText
+                        entry={{ cmsKey: tariff.cmsKeyDesc, liveText: tariff.description }}
+                        showKeys={true}
+                      />
+                    ) : (
+                      tariff.description
+                    )}
+                  </p>
+
+                  <ul className="space-y-2.5 pt-1">
+                    {tariff.includes.map((item) => (
+                      <li key={item} className="flex items-start gap-2.5 text-xs md:text-sm text-[#E8e1dd]">
+                        <Check className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" aria-hidden="true" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => onSelectTariffAndBook(tariff.id)}
+                    className={`w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] ${
+                      tariff.recommended
+                        ? 'bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)]'
+                        : 'bg-[#D4AF37]/10 border border-[#D4AF37]/35 hover:bg-[#D4AF37] hover:text-[#12100E] text-[#F4F1EA]'
+                    }`}
+                  >
+                    Scegli e Prenota ({tariff.durationMinutes}m)
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 
