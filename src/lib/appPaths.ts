@@ -64,6 +64,13 @@ export function bootstrapScreenFromLocation(
   ) {
     return 'chat';
   }
+  if (
+    params.has('booking_stripe_session_id') ||
+    params.get('item') === 'consultation' ||
+    params.get('item') === 'booking'
+  ) {
+    return 'booking';
+  }
   return screenFromPath(pathname);
 }
 

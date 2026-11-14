@@ -759,7 +759,11 @@ export const initialChatMessages: ChatMessage[] = [
   },
 ];
 
-export const bookingTimeSlots = ['09:30', '11:00', '14:30', '16:00', '18:00', '19:30'];
+/** Fasce orarie pubbliche (allineate a HOUR_SLOTS server / v2). */
+export const bookingTimeSlots = Array.from(
+  { length: 14 },
+  (_, i) => `${String(i + 9).padStart(2, '0')}:00`
+);
 
 export const handoffArchitectureSpec: {
   auth: FirebaseAuthContract;

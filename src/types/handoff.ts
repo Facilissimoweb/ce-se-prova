@@ -210,6 +210,7 @@ export interface BookingDraft {
   tariffId: '45m' | '60m' | '90m';
   selectedDateIso: string;
   selectedTimeSlot: string;
+  mode: 'studio' | 'remote';
   fullName: string;
   email: string;
   phoneWhatsApp: string;

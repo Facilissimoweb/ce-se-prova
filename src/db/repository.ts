@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, lte, ne, or } from 'drizzle-orm';
 import { db } from './index.ts';
 import {
   consultationBookings,
@@ -17,6 +17,13 @@ import type {
 } from '../types/handoff.ts';
 import { COURSE_SEED_CATALOG } from './seedData.ts';
 import { resolveBookingTariff } from '../lib/paymentCatalog.ts';
+import {
+  resolveBookingMode,
+  type BookingMode,
+} from '../lib/bookingRules.ts';
+import { occupiedKey, type OccupiedSlot } from '../lib/bookingSlots.ts';
+import { fulfillConfirmedBooking } from '../lib/bookingFulfillment.ts';
+import { fetchGoogleBusySlotKeys } from '../lib/googleCalendar.ts';
 
 let seedPromise: Promise<void> | null = null;
 
@@ -522,6 +529,82 @@ export async function updateDispensaProgress(params: {
   }
 }
 
+export type { OccupiedSlot };
+
+export async function listOccupiedSlots(
+  fromIso: string,
+  toIso: string
+): Promise<OccupiedSlot[]> {
+  try {
+    const rows = await db
+      .select({
+        scheduledDate: consultationBookings.scheduledDate,
+        scheduledTime: consultationBookings.scheduledTime,
+      })
+      .from(consultationBookings)
+      .where(
+        and(
+          gte(consultationBookings.scheduledDate, fromIso),
+          lte(consultationBookings.scheduledDate, toIso),
+          inArray(consultationBookings.status, [
+            'pending_payment',
+            'confirmed',
+          ])
+        )
+      );
+
+    const fromDb = rows.map((row) => ({
+      dateIso: row.scheduledDate,
+      slot: row.scheduledTime,
+    }));
+
+    let fromCalendar: OccupiedSlot[] = [];
+    try {
+      const busyKeys = await fetchGoogleBusySlotKeys(fromIso, toIso);
+      fromCalendar = busyKeys.map((key) => {
+        const [dateIso, slot] = key.split('|');
+        return { dateIso, slot };
+      });
+    } catch (error) {
+      console.error('Google FreeBusy merge skipped:', error);
+    }
+
+    const seen = new Set<string>();
+    const merged: OccupiedSlot[] = [];
+    for (const item of [...fromDb, ...fromCalendar]) {
+      const key = occupiedKey(item.dateIso, item.slot);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      merged.push(item);
+    }
+    return merged;
+  } catch (error) {
+    console.error('Failed to list occupied slots:', error);
+    throw new Error('Impossibile caricare la disponibilità.', { cause: error });
+  }
+}
+
+export async function isSlotTaken(
+  scheduledDate: string,
+  scheduledTime: string,
+  excludeBookingId?: number
+): Promise<boolean> {
+  const conditions = [
+    eq(consultationBookings.scheduledDate, scheduledDate),
+    eq(consultationBookings.scheduledTime, scheduledTime),
+    inArray(consultationBookings.status, ['pending_payment', 'confirmed']),
+  ];
+  if (excludeBookingId != null) {
+    conditions.push(ne(consultationBookings.id, excludeBookingId));
+  }
+  const rows = await db
+    .select({ id: consultationBookings.id })
+    .from(consultationBookings)
+    .where(and(...conditions))
+    .limit(1);
+  return rows.length > 0;
+}
+
 export async function createConsultationBooking(params: {
   uid?: string | null;
   authEmail?: string | null;
@@ -533,11 +616,18 @@ export async function createConsultationBooking(params: {
   phoneWhatsApp: string;
   sessionIntent: string;
   deontologyAccepted: boolean;
+  mode?: BookingMode | string;
+  status?: 'pending_payment' | 'confirmed';
+  stripeSessionId?: string | null;
 }) {
   try {
     const tariff = resolveBookingTariff(params.tariffId);
     if (!tariff) {
       throw new Error('Tariffa consulto non valida.');
+    }
+
+    if (await isSlotTaken(params.scheduledDate, params.scheduledTime)) {
+      throw new Error('SLOT_TAKEN');
     }
 
     let dbUserId: number | null = null;
@@ -549,6 +639,12 @@ export async function createConsultationBooking(params: {
       );
       dbUserId = dbUser.id;
     }
+
+    const mode = resolveBookingMode(
+      params.mode || 'remote',
+      params.scheduledTime
+    );
+    const status = params.status || 'pending_payment';
 
     const result = await db
       .insert(consultationBookings)
@@ -564,7 +660,10 @@ export async function createConsultationBooking(params: {
         phoneWhatsapp: params.phoneWhatsApp,
         sessionIntent: params.sessionIntent,
         deontologyAccepted: params.deontologyAccepted,
-        status: 'confirmed',
+        mode,
+        status,
+        stripeSessionId: params.stripeSessionId ?? null,
+        paidAt: status === 'confirmed' ? new Date() : null,
       })
       .returning();
 
@@ -573,12 +672,153 @@ export async function createConsultationBooking(params: {
     console.error('Failed to create booking:', error);
     if (
       error instanceof Error &&
-      error.message === 'Tariffa consulto non valida.'
+      (error.message === 'Tariffa consulto non valida.' ||
+        error.message === 'SLOT_TAKEN')
     ) {
       throw error;
     }
+    const pgCode =
+      error && typeof error === 'object' && 'code' in error
+        ? String((error as { code?: string }).code)
+        : '';
+    if (pgCode === '23505') {
+      throw new Error('SLOT_TAKEN');
+    }
     throw new Error('Impossibile registrare la prenotazione.', { cause: error });
   }
+}
+
+export async function attachStripeSessionToBooking(
+  bookingId: number,
+  stripeSessionId: string
+) {
+  const result = await db
+    .update(consultationBookings)
+    .set({
+      stripeSessionId,
+      updatedAt: new Date(),
+    })
+    .where(eq(consultationBookings.id, bookingId))
+    .returning();
+  return result[0] ?? null;
+}
+
+export async function cancelPendingBooking(bookingId: number) {
+  const result = await db
+    .update(consultationBookings)
+    .set({ status: 'cancelled', updatedAt: new Date() })
+    .where(
+      and(
+        eq(consultationBookings.id, bookingId),
+        eq(consultationBookings.status, 'pending_payment')
+      )
+    )
+    .returning();
+  return result[0] ?? null;
+}
+
+export async function getBookingById(bookingId: number) {
+  const rows = await db
+    .select()
+    .from(consultationBookings)
+    .where(eq(consultationBookings.id, bookingId))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+export async function getBookingByStripeSessionId(stripeSessionId: string) {
+  const rows = await db
+    .select()
+    .from(consultationBookings)
+    .where(eq(consultationBookings.stripeSessionId, stripeSessionId))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+/**
+ * Conferma prenotazione dopo pagamento Stripe (o unlock diretto).
+ * Idempotente se già `confirmed`. Trigger Zoho mail + Google Calendar.
+ */
+export async function confirmConsultationBooking(params: {
+  bookingId?: number;
+  stripeSessionId?: string;
+  transactionId?: string | null;
+  amountCents?: number | null;
+  customerEmail?: string | null;
+}) {
+  let booking =
+    params.stripeSessionId != null
+      ? await getBookingByStripeSessionId(params.stripeSessionId)
+      : null;
+  if (!booking && params.bookingId != null) {
+    booking = await getBookingById(params.bookingId);
+  }
+  if (!booking) {
+    throw new Error('Prenotazione non trovata.');
+  }
+
+  if (booking.status === 'confirmed') {
+    return { booking, fulfilled: false as const };
+  }
+
+  if (booking.status === 'cancelled' && !params.stripeSessionId) {
+    throw new Error('Prenotazione annullata.');
+  }
+
+  const updated = await db
+    .update(consultationBookings)
+    .set({
+      status: 'confirmed',
+      stripeSessionId: params.stripeSessionId || booking.stripeSessionId,
+      stripePaymentIntentId:
+        params.transactionId || booking.stripePaymentIntentId,
+      paidAt: new Date(),
+      updatedAt: new Date(),
+      mode: resolveBookingMode(booking.mode || 'remote', booking.scheduledTime),
+    })
+    .where(
+      and(
+        eq(consultationBookings.id, booking.id),
+        or(
+          eq(consultationBookings.status, 'pending_payment'),
+          eq(consultationBookings.status, 'cancelled')
+        )
+      )
+    )
+    .returning();
+
+  const confirmed = updated[0];
+  if (!confirmed) {
+    const again = await getBookingById(booking.id);
+    if (again?.status === 'confirmed') {
+      return { booking: again, fulfilled: false as const };
+    }
+    throw new Error('Impossibile confermare la prenotazione.');
+  }
+
+  const { calendarEventId } = await fulfillConfirmedBooking(confirmed, {
+    customerEmail: params.customerEmail || confirmed.email,
+    transactionId:
+      params.transactionId ||
+      params.stripeSessionId ||
+      confirmed.stripeSessionId ||
+      String(confirmed.id),
+    amountCents: params.amountCents,
+  });
+
+  if (calendarEventId) {
+    const withEvent = await db
+      .update(consultationBookings)
+      .set({
+        googleCalendarEventId: calendarEventId,
+        updatedAt: new Date(),
+      })
+      .where(eq(consultationBookings.id, confirmed.id))
+      .returning();
+    return { booking: withEvent[0] ?? confirmed, fulfilled: true as const };
+  }
+
+  return { booking: confirmed, fulfilled: true as const };
 }
 
 export const FREE_TRIAL_SECONDS = 300; // 5 minuti gratuiti

@@ -1,3 +1,12 @@
+import {
+  HOUR_SLOTS,
+  localIso,
+  slotsForDate,
+  type OccupiedSlot,
+} from './bookingSlots.ts';
+
+export type { OccupiedSlot };
+
 export const WEEKDAYS_IT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
 export const MONTHS_IT = [
@@ -15,21 +24,30 @@ export const MONTHS_IT = [
   'Dicembre',
 ];
 
+export { HOUR_SLOTS, localIso, slotsForDate };
+
 export function toIsoDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
+  return localIso(date);
 }
 
-export function getNextAvailableDate(): Date {
-  const candidate = new Date();
-  candidate.setHours(0, 0, 0, 0);
-  candidate.setDate(candidate.getDate() + 1);
-  while (candidate.getDay() === 0) {
-    candidate.setDate(candidate.getDate() + 1);
+export function getNextAvailableDate(
+  occupied: OccupiedSlot[] = []
+): Date {
+  const start = new Date();
+  start.setHours(12, 0, 0, 0);
+  for (let i = 0; i < 60; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    const iso = localIso(d);
+    if (openHoursForDate(iso, occupied).length > 0) {
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
   }
-  return candidate;
+  const fallback = new Date();
+  fallback.setHours(0, 0, 0, 0);
+  fallback.setDate(fallback.getDate() + 1);
+  return fallback;
 }
 
 export function formatItalianDate(iso: string): string {
@@ -49,15 +67,34 @@ export type CalendarCell = {
   disabled: boolean;
 } | null;
 
+export function isOccupied(
+  list: OccupiedSlot[],
+  dateIso: string,
+  slot: string
+): boolean {
+  return list.some((item) => item.dateIso === dateIso && item.slot === slot);
+}
+
+export function openHoursForDate(
+  dateIso: string,
+  occupied: OccupiedSlot[]
+): string[] {
+  return slotsForDate(dateIso).filter(
+    (hour) => !isOccupied(occupied, dateIso, hour)
+  );
+}
+
 export function buildCalendarCells(
   calendarMonth: Date,
-  todayZero: Date
+  todayZero: Date,
+  occupied: OccupiedSlot[] = []
 ): CalendarCell[] {
   const year = calendarMonth.getFullYear();
   const month = calendarMonth.getMonth();
   const firstDay = new Date(year, month, 1);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const startOffset = (firstDay.getDay() + 6) % 7;
+  const todayIso = localIso(todayZero);
 
   const cells: CalendarCell[] = [];
   for (let i = 0; i < startOffset; i++) {
@@ -66,13 +103,22 @@ export function buildCalendarCells(
   for (let day = 1; day <= daysInMonth; day++) {
     const current = new Date(year, month, day);
     current.setHours(0, 0, 0, 0);
-    const isSunday = current.getDay() === 0;
-    const isPast = current.getTime() < todayZero.getTime();
+    const iso = toIsoDate(current);
+    const isPast = iso < todayIso;
+    const noHours = openHoursForDate(iso, occupied).length === 0;
     cells.push({
       day,
-      iso: toIsoDate(current),
-      disabled: isSunday || isPast,
+      iso,
+      disabled: isPast || noHours,
     });
   }
   return cells;
+}
+
+export function monthRangeIso(calendarMonth: Date): { from: string; to: string } {
+  const y = calendarMonth.getFullYear();
+  const m = calendarMonth.getMonth();
+  const from = toIsoDate(new Date(y, m, 1));
+  const to = toIsoDate(new Date(y, m + 1, 0));
+  return { from, to };
 }
