@@ -1,9 +1,42 @@
 /**
  * Single Vercel Serverless Function for all /api/* routes (except /api/health).
  * Hobby plan ≤12 functions — keep related routes in one handler.
- * Invoked via vercel.json rewrite: /api/:path* → /api
+ * Static imports (like v2tarotitalia) so Vercel bundles src/ into the function.
+ * Dynamic import() left .ts modules out of /var/task and caused runtime 500s.
  */
-import type { NodeLikeReq, NodeLikeRes } from '../src/server/nodeHttp.ts';
+import {
+  getBookingsAvailability,
+  postBooking,
+  postBookingConfirmStripe,
+} from '../src/server/routes/bookings.ts';
+import { getCourses } from '../src/server/routes/courses.ts';
+import {
+  getDialogueStatus,
+  postDialogueCheckout,
+  postDialogueConfirmStripe,
+  postDialogueInteract,
+  postDialogueUnlock,
+} from '../src/server/routes/dialogue.ts';
+import {
+  getReservedOverview,
+  postReservedConfirmStripe,
+  postReservedEnroll,
+  putDispensaProgress,
+} from '../src/server/routes/reserved.ts';
+import { postStripeWebhook } from '../src/server/routes/stripeWebhook.ts';
+import {
+  ensureSchemaOnce,
+  methodNotAllowed,
+  optionalUser,
+  queryString,
+  readBodyObject,
+  readRawBody,
+  requestOrigin,
+  requireUser,
+  sendApiResult,
+  type NodeLikeReq,
+  type NodeLikeRes,
+} from '../src/server/vercelAdapter.ts';
 
 export const config = { runtime: 'nodejs', maxDuration: 30 };
 
@@ -51,101 +84,82 @@ function normalizePath(req: NodeLikeReq): string {
 
 export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   try {
+    await ensureSchemaOnce();
+
     const method = (req.method || 'GET').toUpperCase();
     const path = normalizePath(req);
 
-    // Lazy-load shared server code so import failures return JSON instead of 500 FUNCTION_INVOCATION_FAILED.
-    const adapter = await import('../src/server/vercelAdapter.ts');
-    await adapter.ensureSchemaOnce();
-
     if (path === 'courses') {
-      if (method !== 'GET') return adapter.methodNotAllowed(res, ['GET']);
-      const { getCourses } = await import('../src/server/routes/courses.ts');
-      return adapter.sendApiResult(res, await getCourses());
+      if (method !== 'GET') return methodNotAllowed(res, ['GET']);
+      return sendApiResult(res, await getCourses());
     }
 
     if (path === 'bookings') {
-      if (method !== 'POST') return adapter.methodNotAllowed(res, ['POST']);
-      const { postBooking } = await import('../src/server/routes/bookings.ts');
-      const user = await adapter.optionalUser(req);
-      return adapter.sendApiResult(
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const user = await optionalUser(req);
+      return sendApiResult(
         res,
         await postBooking({
           user,
-          body: adapter.readBodyObject(req),
-          origin: adapter.requestOrigin(req),
+          body: readBodyObject(req),
+          origin: requestOrigin(req),
         })
       );
     }
 
     if (path === 'bookings/availability') {
-      if (method !== 'GET') return adapter.methodNotAllowed(res, ['GET']);
-      const { getBookingsAvailability } = await import(
-        '../src/server/routes/bookings.ts'
-      );
-      return adapter.sendApiResult(
+      if (method !== 'GET') return methodNotAllowed(res, ['GET']);
+      return sendApiResult(
         res,
         await getBookingsAvailability({
-          from: adapter.queryString(req.query?.from),
-          to: adapter.queryString(req.query?.to),
+          from: queryString(req.query?.from),
+          to: queryString(req.query?.to),
         })
       );
     }
 
     if (path === 'bookings/confirm-stripe') {
-      if (method !== 'POST') return adapter.methodNotAllowed(res, ['POST']);
-      const { postBookingConfirmStripe } = await import(
-        '../src/server/routes/bookings.ts'
-      );
-      const user = await adapter.optionalUser(req);
-      return adapter.sendApiResult(
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const user = await optionalUser(req);
+      return sendApiResult(
         res,
         await postBookingConfirmStripe({
           user,
-          body: adapter.readBodyObject(req),
+          body: readBodyObject(req),
         })
       );
     }
 
     if (path === 'reserved/overview') {
-      if (method !== 'GET') return adapter.methodNotAllowed(res, ['GET']);
-      const { getReservedOverview } = await import(
-        '../src/server/routes/reserved.ts'
-      );
-      const user = await adapter.requireUser(req, res);
+      if (method !== 'GET') return methodNotAllowed(res, ['GET']);
+      const user = await requireUser(req, res);
       if (!user) return;
-      return adapter.sendApiResult(res, await getReservedOverview(user));
+      return sendApiResult(res, await getReservedOverview(user));
     }
 
     if (path === 'reserved/enroll') {
-      if (method !== 'POST') return adapter.methodNotAllowed(res, ['POST']);
-      const { postReservedEnroll } = await import(
-        '../src/server/routes/reserved.ts'
-      );
-      const user = await adapter.requireUser(req, res);
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const user = await requireUser(req, res);
       if (!user) return;
-      return adapter.sendApiResult(
+      return sendApiResult(
         res,
         await postReservedEnroll({
           user,
-          body: adapter.readBodyObject(req),
-          origin: adapter.requestOrigin(req),
+          body: readBodyObject(req),
+          origin: requestOrigin(req),
         })
       );
     }
 
     if (path === 'reserved/confirm-stripe') {
-      if (method !== 'POST') return adapter.methodNotAllowed(res, ['POST']);
-      const { postReservedConfirmStripe } = await import(
-        '../src/server/routes/reserved.ts'
-      );
-      const user = await adapter.requireUser(req, res);
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const user = await requireUser(req, res);
       if (!user) return;
-      return adapter.sendApiResult(
+      return sendApiResult(
         res,
         await postReservedConfirmStripe({
           user,
-          body: adapter.readBodyObject(req),
+          body: readBodyObject(req),
         })
       );
     }
@@ -154,111 +168,90 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
       /^reserved\/dispense\/([^/]+)\/progress$/
     );
     if (dispensaProgress) {
-      if (method !== 'PUT') return adapter.methodNotAllowed(res, ['PUT']);
-      const { putDispensaProgress } = await import(
-        '../src/server/routes/reserved.ts'
-      );
-      const user = await adapter.requireUser(req, res);
+      if (method !== 'PUT') return methodNotAllowed(res, ['PUT']);
+      const user = await requireUser(req, res);
       if (!user) return;
-      return adapter.sendApiResult(
+      return sendApiResult(
         res,
         await putDispensaProgress({
           user,
           dispensaId: Number(dispensaProgress[1]),
-          body: adapter.readBodyObject(req),
+          body: readBodyObject(req),
         })
       );
     }
 
     if (path === 'dialogue/status') {
-      if (method !== 'GET') return adapter.methodNotAllowed(res, ['GET']);
-      const { getDialogueStatus } = await import(
-        '../src/server/routes/dialogue.ts'
-      );
-      const user = await adapter.optionalUser(req);
-      return adapter.sendApiResult(
+      if (method !== 'GET') return methodNotAllowed(res, ['GET']);
+      const user = await optionalUser(req);
+      return sendApiResult(
         res,
         await getDialogueStatus({
           user,
-          sessionKey: adapter.queryString(req.query?.sessionKey),
+          sessionKey: queryString(req.query?.sessionKey),
         })
       );
     }
 
     if (path === 'dialogue/interact') {
-      if (method !== 'POST') return adapter.methodNotAllowed(res, ['POST']);
-      const { postDialogueInteract } = await import(
-        '../src/server/routes/dialogue.ts'
-      );
-      const user = await adapter.optionalUser(req);
-      return adapter.sendApiResult(
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const user = await optionalUser(req);
+      return sendApiResult(
         res,
         await postDialogueInteract({
           user,
-          body: adapter.readBodyObject(req),
+          body: readBodyObject(req),
         })
       );
     }
 
     if (path === 'dialogue/unlock') {
-      if (method !== 'POST') return adapter.methodNotAllowed(res, ['POST']);
-      const { postDialogueUnlock } = await import(
-        '../src/server/routes/dialogue.ts'
-      );
-      const user = await adapter.optionalUser(req);
-      return adapter.sendApiResult(
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const user = await optionalUser(req);
+      return sendApiResult(
         res,
         await postDialogueUnlock({
           user,
-          body: adapter.readBodyObject(req),
+          body: readBodyObject(req),
         })
       );
     }
 
     if (path === 'dialogue/checkout') {
-      if (method !== 'POST') return adapter.methodNotAllowed(res, ['POST']);
-      const { postDialogueCheckout } = await import(
-        '../src/server/routes/dialogue.ts'
-      );
-      const user = await adapter.optionalUser(req);
-      return adapter.sendApiResult(
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const user = await optionalUser(req);
+      return sendApiResult(
         res,
         await postDialogueCheckout({
           user,
-          body: adapter.readBodyObject(req),
-          origin: adapter.requestOrigin(req),
+          body: readBodyObject(req),
+          origin: requestOrigin(req),
         })
       );
     }
 
     if (path === 'dialogue/confirm-stripe') {
-      if (method !== 'POST') return adapter.methodNotAllowed(res, ['POST']);
-      const { postDialogueConfirmStripe } = await import(
-        '../src/server/routes/dialogue.ts'
-      );
-      const user = await adapter.optionalUser(req);
-      return adapter.sendApiResult(
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const user = await optionalUser(req);
+      return sendApiResult(
         res,
         await postDialogueConfirmStripe({
           user,
-          body: adapter.readBodyObject(req),
+          body: readBodyObject(req),
         })
       );
     }
 
     if (path === 'stripe/webhook') {
-      if (method !== 'POST') return adapter.methodNotAllowed(res, ['POST']);
-      const { postStripeWebhook } = await import(
-        '../src/server/routes/stripeWebhook.ts'
-      );
-      const rawBody = await adapter.readRawBody(req);
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const rawBody = await readRawBody(req);
       const signatureHeader =
         typeof req.headers['stripe-signature'] === 'string'
           ? req.headers['stripe-signature']
           : Array.isArray(req.headers['stripe-signature'])
             ? req.headers['stripe-signature'][0]
             : undefined;
-      return adapter.sendApiResult(
+      return sendApiResult(
         res,
         await postStripeWebhook({
           rawBody,
