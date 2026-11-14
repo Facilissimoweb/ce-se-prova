@@ -514,7 +514,7 @@ export function BookingScreen({
                   Dati di contatto e preparazione Checkout
                 </h2>
                 <p className="text-sm text-[#A39B93]">
-                  Inserisci i riferimenti per ricevere la conferma e il link alla videochiamata.
+                  Inserisci i riferimenti per ricevere la conferma e le indicazioni per la chiamata vocale riservata.
                 </p>
               </div>
 
@@ -755,7 +755,7 @@ export function BookingScreen({
           </div>
 
           <p className="text-xs leading-relaxed text-[#A39B93]">
-            Modalità: Videochiamata riservata o Studio su appuntamento. Autenticazione utente prevista tramite Supabase Auth.
+            Modalità: Online esclusivamente in chiamata vocale riservata, oppure Studio su appuntamento. Autenticazione utente prevista tramite Supabase Auth.
           </p>
         </aside>
       </div>

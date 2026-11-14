@@ -145,7 +145,29 @@ export const siteContent = {
     subheading: {
       cmsKey: '[COPY: siteContent.consulti.subheading]',
       liveText:
-        'Tre durate calibrate per profondità differenti, tutte in videochiamata riservata o in presenza su appuntamento.',
+        'Tre durate calibrate per profondità differenti: online esclusivamente in chiamata vocale riservata, oppure in studio su appuntamento.',
+    },
+    welcomeKicker: {
+      cmsKey: '[COPY: siteContent.consulti.welcomeKicker]',
+      liveText: 'Benvenuto e Accoglimento · Dal Caos al Cosmos',
+    },
+    welcomeHeading: {
+      cmsKey: '[COPY: siteContent.consulti.welcomeHeading]',
+      liveText: 'Ti accolgo esattamente dove ti trovi, senza giudizio né risposte meccaniche.',
+    },
+    welcomeBody1: {
+      cmsKey: '[COPY: siteContent.consulti.welcomeBody1]',
+      liveText:
+        'Che tu arrivi con una domanda immediata e sincera — anche semplice o legata agli affetti, come «Mi pensa?» — o con il bisogno di fare chiarezza su un passaggio complesso, i miei consulti nascono per trasformare il caos in cosmos. Integro la lettura viva della cartomanzia pura con la tarologia evolutiva attraverso tutti i 78 Arcani, Maggiori e Minori.',
+    },
+    welcomeBody2: {
+      cmsKey: '[COPY: siteContent.consulti.welcomeBody2]',
+      liveText:
+        'Non è richiesta alcuna conoscenza preliminare delle carte: ti guido passo dopo passo tra archetipi, motivazioni e chiavi di lettura pratiche perché tu possa uscire con una visione rinnovata e riprendere in mano le redini del tuo percorso. I consulti online si svolgono esclusivamente in modalità chiamata vocale, per favorire ascolto profondo e concentrazione.',
+    },
+    faqHeading: {
+      cmsKey: '[COPY: siteContent.consulti.faqHeading]',
+      liveText: 'Domande sul Metodo e sullo Svolgimento del Consulto',
     },
     ethicsCallout: {
       cmsKey: '[COPY: siteContent.consulti.ethicsCallout]',
@@ -311,7 +333,7 @@ export const holisticPathways: HolisticPathway[] = [
     cmsKeyDesc: '[COPY: percorso.placeholder.2.desc]',
     description:
       'Confronto maieutico su passaggi professionali o relazionali complessi attraverso gli Arcani Maggiori.',
-    modality: 'Video o studio · 60 min',
+    modality: 'Chiamata vocale o studio · 60 min',
   },
   {
     index: '03',
@@ -368,7 +390,7 @@ export const holisticFaqs: HolisticFaqItem[] = [
     question: 'Come prepararsi a un consulto da 45, 60 o 90 minuti?',
     cmsKeyAnswer: '[COPY: faq.placeholder.4.answer]',
     answer:
-      'È sufficiente portare una o più domande chiare sul tuo percorso presente o sugli sviluppi futuri — in ambito professionale, creativo o relazionale. Dopo la prenotazione riceverai il link riservato per la videochiamata o l’indirizzo dello studio.',
+      'È sufficiente portare una o più domande chiare sul tuo percorso presente o sugli sviluppi futuri — in ambito professionale, creativo o relazionale. I consulti online avvengono esclusivamente in chiamata vocale riservata: dopo la prenotazione riceverai tutte le indicazioni per collegarti o l’indirizzo dello studio.',
   },
   {
     id: 'faq-5',
@@ -425,7 +447,7 @@ export const consultationTariffs: ConsultationTariff[] = [
     cmsKeyFocus: '[COPY: tariffa.placeholder.1.focus]',
     focusLabel: 'Domanda singola · Chiarezza immediata',
     includes: [
-      '45 minuti di dialogo individuale online',
+      '45 minuti di dialogo individuale online in chiamata vocale',
       'Stesa simbolica focalizzata su un tema specifico',
       'Sintesi scritta dei punti emersi via email o WhatsApp',
     ],
@@ -443,7 +465,7 @@ export const consultationTariffs: ConsultationTariff[] = [
     cmsKeyFocus: '[COPY: tariffa.placeholder.2.focus]',
     focusLabel: 'Consigliato · Analisi approfondita',
     includes: [
-      '60 minuti di sessione individuale in video o in studio',
+      '60 minuti di sessione individuale in chiamata vocale o in studio',
       'Esplorazione combinata di Arcani Maggiori e Minori',
       'Mappa delle domande maieutiche per le settimane successive',
     ],
@@ -462,10 +484,58 @@ export const consultationTariffs: ConsultationTariff[] = [
     cmsKeyFocus: '[COPY: tariffa.placeholder.3.focus]',
     focusLabel: 'Ciclo annuale · Massima profondità',
     includes: [
-      '90 minuti di dialogo olistico senza fretta',
+      '90 minuti di dialogo olistico in chiamata vocale o in studio',
       'Stesa completa a dodici case simboliche o doppio confronto',
       'Follow-up scritto entro 48 ore tramite canale riservato',
     ],
+  },
+];
+
+export const consultiFaqs: HolisticFaqItem[] = [
+  {
+    id: 'cfaq-1',
+    category: 'Metodo Ibrido',
+    cmsKeyQuestion: '[COPY: consulti.faq.1.question]',
+    question: 'Che differenza c’è tra la cartomanzia tradizionale e il mio metodo?',
+    cmsKeyAnswer: '[COPY: consulti.faq.1.answer]',
+    answer:
+      'La cartomanzia tradizionale cerca spesso risposte meccaniche e a tenuta stagna (sì, no, quando). Il mio approccio è un ibrido che integra sia la cartomanzia pura che la tarologia evolutiva: utilizzo i 78 Arcani (tra Maggiori e Minori) non per inchiodarti a un futuro immobile, ma per trasformare il caos in cosmos, dando alla stesa una piega molto più riflessiva e profonda rispetto all’immediatezza di una risposta statica.',
+  },
+  {
+    id: 'cfaq-2',
+    category: 'Domande e Affetti',
+    cmsKeyQuestion: '[COPY: consulti.faq.2.question]',
+    question: 'Ha senso fare una domanda semplice o legata agli affetti, come «Mi pensa?»',
+    cmsKeyAnswer: '[COPY: consulti.faq.2.answer]',
+    answer:
+      'Assolutamente sì. Spesso si parte da un interrogativo immediato o impulsivo tipico della cartomanzia per scavare in profondità. Da una domanda sugli affetti inizio a tracciare dinamiche, motivazioni e chiavi di lettura per nulla banali, restituendo alla situazione una prospettiva riflessiva e la sua reale complessità.',
+  },
+  {
+    id: 'cfaq-3',
+    category: 'I 78 Arcani',
+    cmsKeyQuestion: '[COPY: consulti.faq.3.question]',
+    question: 'Qual è il ruolo dei 78 Arcani durante una sessione?',
+    cmsKeyAnswer: '[COPY: consulti.faq.3.answer]',
+    answer:
+      'I 78 Arcani — comprensivi sia di Arcani Maggiori che di Minori — agiscono come icone, archetipi e specchi della tua interiorità. Non sono entità che decidono per te, ma messaggeri e narratori che ti accompagnano nell’esplorazione della tua narrazione più autentica, in uno spazio sicuro e privo di giudizio.',
+  },
+  {
+    id: 'cfaq-4',
+    category: 'Esito del Consulto',
+    cmsKeyQuestion: '[COPY: consulti.faq.4.question]',
+    question: 'Cosa devo aspettarmi alla fine di una consulenza?',
+    cmsKeyAnswer: '[COPY: consulti.faq.4.answer]',
+    answer:
+      'Di uscire con una visione rinnovata. Più che risposte preconfezionate, riceverai tracce, chiavi di lettura e consapevolezze pratiche per rimettere ordine nel tuo vissuto e riprendere in mano le redini del tuo percorso con maggiore chiarezza.',
+  },
+  {
+    id: 'cfaq-5',
+    category: 'Svolgimento e Accoglienza',
+    cmsKeyQuestion: '[COPY: consulti.faq.5.question]',
+    question: 'Come si svolge la lettura, e mi serve una conoscenza preliminare?',
+    cmsKeyAnswer: '[COPY: consulti.faq.5.answer]',
+    answer:
+      'Non è richiesta alcuna conoscenza preliminare della simbologia o del linguaggio degli arcani. Lavoro integrando la lettura viva della cartomanzia con un percorso di riflessione profonda: ti accolgo esattamente dove ti trovi, guidandoti passo dopo passo attraverso le immagini per decifrare la tua storia. I consulti online avvengono esclusivamente in modalità chiamata vocale.',
   },
 ];
 

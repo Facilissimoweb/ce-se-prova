@@ -84,7 +84,7 @@ export function HomeScreen({
               <span aria-hidden="true" className="text-[#D4AF37]/60">·</span>
               <span>Sessioni riservate 45 / 60 / 90 min</span>
               <span aria-hidden="true" className="text-[#D4AF37]/60">·</span>
-              <span>Online &amp; Studio su appuntamento</span>
+              <span>Chiamata vocale online &amp; Studio</span>
             </div>
           </div>
 
@@ -145,7 +145,7 @@ export function HomeScreen({
               </p>
             </div>
             <span className="text-xs text-[#A39B93] whitespace-nowrap shrink-0">
-              In studio &amp; Videochiamata
+              Chiamata vocale &amp; In studio
             </span>
           </figcaption>
         </figure>
