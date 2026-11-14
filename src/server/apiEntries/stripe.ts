@@ -1,9 +1,9 @@
 /**
  * Stripe group: webhook (raw body for Stripe-Signature).
  * /api/stripe/* → /api/stripe?__path=… (see vercel.json).
- * Static imports so Vercel bundles src/.
+ * Bundled by scripts/bundle-api.mjs into api/*.js for Vercel.
  */
-import { postStripeWebhook } from '../src/server/routes/stripeWebhook.ts';
+import { postStripeWebhook } from '../routes/stripeWebhook.ts';
 import {
   ensureSchemaOnce,
   methodNotAllowed,
@@ -11,8 +11,8 @@ import {
   sendApiResult,
   type NodeLikeReq,
   type NodeLikeRes,
-} from '../src/server/vercelAdapter.ts';
-import { groupSubpath, sendJson } from '../src/server/vercelEntry.ts';
+} from '../vercelAdapter.ts';
+import { groupSubpath, sendJson } from '../vercelEntry.ts';
 
 export const config = {
   runtime: 'nodejs',

@@ -1,7 +1,7 @@
 /**
  * Dialogue group: status, checkout, confirm-stripe, unlock, interact.
  * Subpaths via vercel.json → /api/dialogue?__path=…
- * Static imports so Vercel bundles src/.
+ * Bundled by scripts/bundle-api.mjs into api/*.js for Vercel.
  */
 import {
   getDialogueStatus,
@@ -9,7 +9,7 @@ import {
   postDialogueConfirmStripe,
   postDialogueInteract,
   postDialogueUnlock,
-} from '../src/server/routes/dialogue.ts';
+} from '../routes/dialogue.ts';
 import {
   ensureSchemaOnce,
   methodNotAllowed,
@@ -20,8 +20,8 @@ import {
   sendApiResult,
   type NodeLikeReq,
   type NodeLikeRes,
-} from '../src/server/vercelAdapter.ts';
-import { groupSubpath, sendJson } from '../src/server/vercelEntry.ts';
+} from '../vercelAdapter.ts';
+import { groupSubpath, sendJson } from '../vercelEntry.ts';
 
 export const config = { runtime: 'nodejs', maxDuration: 30 };
 
