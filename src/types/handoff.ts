@@ -142,7 +142,7 @@ export interface ConsultationTariff {
   recommended?: boolean;
 }
 
-export type DialoguePackId = '15m' | '30m' | '60m';
+export type DialoguePackId = '5m' | '10m' | '15m';
 
 export interface DialoguePack {
   id: DialoguePackId;

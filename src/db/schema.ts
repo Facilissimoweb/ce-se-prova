@@ -143,7 +143,7 @@ export const dialoguePurchases = pgTable('dialogue_purchases', {
     .references(() => dialogueSessions.id, { onDelete: 'cascade' })
     .notNull(),
   userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
-  packId: text('pack_id').notNull(), // '15m' | '30m' | '60m'
+  packId: text('pack_id').notNull(), // '5m' | '10m' | '15m'
   durationMinutes: integer('duration_minutes').notNull(),
   priceEur: integer('price_eur').notNull(),
   stripePriceId: text('stripe_price_id').notNull(),

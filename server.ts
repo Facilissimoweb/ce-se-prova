@@ -281,7 +281,7 @@ async function startServer() {
     }
   });
 
-  // 8. Dialogue Tarot: Unlock Prepaid Time Pass (15m / 30m / 60m)
+  // 8. Dialogue Tarot: Unlock Prepaid Time Pass (5m / 10m / 15m)
   app.post('/api/dialogue/unlock', optionalAuth, async (req: AuthRequest, res) => {
     try {
       const sessionKey = String(req.body?.sessionKey || '').trim();
@@ -321,6 +321,179 @@ async function startServer() {
           error instanceof Error
             ? error.message
             : 'Impossibile attivare il pass temporale.',
+      });
+    }
+  });
+
+  // 9. Dialogue Tarot: Stripe Checkout Session (5m €3, 10m €5, 15m €7) con fallback diretto in assenza di STRIPE_SECRET_KEY
+  app.post('/api/dialogue/checkout', optionalAuth, async (req: AuthRequest, res) => {
+    try {
+      const sessionKey = String(req.body?.sessionKey || '').trim();
+      const packId = String(req.body?.packId || '').trim() as DialoguePackId;
+      const customerName = String(req.body?.customerName || '').trim();
+      const customerEmail = String(req.body?.customerEmail || '').trim();
+
+      if (
+        !sessionKey ||
+        sessionKey.length < 8 ||
+        !(packId in DIALOGUE_PACK_CATALOG) ||
+        customerName.length < 2 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)
+      ) {
+        return res.status(400).json({
+          error: 'Inserisci nominativo, email valida e un pacchetto minuti (5, 10 o 15 min).',
+        });
+      }
+
+      const pack = DIALOGUE_PACK_CATALOG[packId];
+      const stripeKey = process.env.STRIPE_SECRET_KEY?.trim();
+
+      if (stripeKey && !stripeKey.startsWith('MY_')) {
+        const originHeader =
+          (typeof req.headers.origin === 'string' && req.headers.origin) ||
+          process.env.APP_URL ||
+          `http://localhost:${PORT}`;
+        const baseUrl = originHeader.replace(/\/$/, '');
+
+        const form = new URLSearchParams();
+        form.set('mode', 'payment');
+        form.set('customer_email', customerEmail);
+        form.set('success_url', `${baseUrl}/?dialogue_stripe_session_id={CHECKOUT_SESSION_ID}`);
+        form.set('cancel_url', `${baseUrl}/?dialogue_cancelled=true`);
+        form.set('line_items[0][quantity]', '1');
+
+        if (pack.stripePriceId.startsWith('price_')) {
+          form.set('line_items[0][price]', pack.stripePriceId);
+        } else {
+          form.set('line_items[0][price_data][currency]', 'eur');
+          form.set('line_items[0][price_data][unit_amount]', String(pack.priceEur * 100));
+          form.set(
+            'line_items[0][price_data][product_data][name]',
+            `Tarot Italia IA · ${pack.title}`
+          );
+          form.set(
+            'line_items[0][price_data][product_data][description]',
+            `${pack.durationMinutes} minuti di dialogo guidato con Tarot Italia IA`
+          );
+        }
+
+        form.set('metadata[sessionKey]', sessionKey);
+        form.set('metadata[packId]', pack.id);
+        form.set('metadata[customerName]', customerName);
+        form.set('metadata[customerEmail]', customerEmail);
+
+        const stripeRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${stripeKey}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: form.toString(),
+        });
+
+        const stripeData = (await stripeRes.json()) as {
+          id?: string;
+          url?: string;
+          error?: { message?: string };
+        };
+
+        if (!stripeRes.ok || !stripeData.url) {
+          throw new Error(
+            stripeData.error?.message || 'Errore nella creazione della sessione Stripe.'
+          );
+        }
+
+        return res.status(200).json({
+          mode: 'stripe_redirect',
+          checkoutUrl: stripeData.url,
+          stripeSessionId: stripeData.id,
+        });
+      }
+
+      // Preview / Pre-Stripe fallback: sblocca subito il pass su PostgreSQL
+      const unlocked = await unlockDialogueTimePack({
+        sessionKey,
+        packId,
+        customerName,
+        customerEmail,
+        uid: req.user?.uid ?? null,
+        authEmail: req.user?.email ?? null,
+        authName: typeof req.user?.name === 'string' ? req.user.name : null,
+      });
+
+      return res.status(201).json({
+        mode: 'direct_unlock',
+        ...unlocked,
+      });
+    } catch (error) {
+      res.status(500).json({
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Impossibile avviare il pagamento del pass.',
+      });
+    }
+  });
+
+  // 10. Dialogue Tarot: Verifica sessione Stripe Checkout al rientro e accredita i minuti
+  app.post('/api/dialogue/confirm-stripe', optionalAuth, async (req: AuthRequest, res) => {
+    try {
+      const stripeSessionId = String(req.body?.stripeSessionId || '').trim();
+      const fallbackSessionKey = String(req.body?.sessionKey || '').trim();
+      const stripeKey = process.env.STRIPE_SECRET_KEY?.trim();
+
+      if (!stripeSessionId || !stripeKey || stripeKey.startsWith('MY_')) {
+        return res.status(400).json({ error: 'Sessione Stripe non verificabile.' });
+      }
+
+      const verifyRes = await fetch(
+        `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(stripeSessionId)}`,
+        {
+          headers: { Authorization: `Bearer ${stripeKey}` },
+        }
+      );
+      const sessionObj = (await verifyRes.json()) as {
+        payment_status?: string;
+        customer_email?: string;
+        metadata?: Record<string, string>;
+        error?: { message?: string };
+      };
+
+      if (!verifyRes.ok || sessionObj.payment_status !== 'paid') {
+        return res.status(402).json({
+          error:
+            sessionObj.error?.message || 'Pagamento Stripe non ancora confermato.',
+        });
+      }
+
+      const meta = sessionObj.metadata || {};
+      const packId = (meta.packId || '10m') as DialoguePackId;
+      const sessionKey = meta.sessionKey || fallbackSessionKey;
+      const customerName = meta.customerName || 'Ospite Tarot Italia';
+      const customerEmail = meta.customerEmail || sessionObj.customer_email || '';
+
+      if (!sessionKey || !(packId in DIALOGUE_PACK_CATALOG)) {
+        return res.status(400).json({ error: 'Metadati pagamento incompleti.' });
+      }
+
+      const result = await unlockDialogueTimePack({
+        sessionKey,
+        packId,
+        customerName,
+        customerEmail,
+        stripeSessionId,
+        uid: req.user?.uid ?? null,
+        authEmail: req.user?.email ?? null,
+        authName: typeof req.user?.name === 'string' ? req.user.name : null,
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Errore nella verifica del pagamento Stripe.',
       });
     }
   });

@@ -224,7 +224,7 @@ export const siteContent = {
     whatsappBridgeNote: {
       cmsKey: '[COPY: siteContent.chat.whatsappNote]',
       liveText:
-        'Bridge WhatsApp: puoi proseguire questa riflessione in chiamata vocale dedicata o sul canale WhatsApp di Maria Teresa Rogani.',
+        'Bridge WhatsApp: se dopo il dialogo con Tarot Italia IA desideri una chiamata vocale personale con Maria Teresa Rogani, prosegui su WhatsApp.',
     },
   },
   privacy: {
@@ -707,35 +707,35 @@ import { MAJOR_ARCANA } from './majorArcana';
 
 export const dialogueTimePacks: DialoguePack[] = [
   {
-    id: '15m',
-    title: 'Pass Luce · 15 Minuti',
-    durationMinutes: 15,
-    priceEur: 14,
-    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_DIALOGO_15M',
-    focusLabel: 'Domanda mirata o stesa a 3 carte',
+    id: '5m',
+    title: 'Pass Rapido · 5 Minuti',
+    durationMinutes: 5,
+    priceEur: 3,
+    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_DIALOGO_5M',
+    focusLabel: 'Domanda secca · Prezzo minimo',
     description:
-      'Quindici minuti continui di dialogo con tutti i 22 Arcani Maggiori per sciogliere un dubbio immediato.',
+      'Cinque minuti extra di dialogo immediato con Tarot Italia IA per sciogliere un dubbio urgente su un Arcano.',
   },
   {
-    id: '30m',
-    title: 'Pass Cosmos · 30 Minuti',
-    durationMinutes: 30,
-    priceEur: 25,
-    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_DIALOGO_30M',
-    focusLabel: 'Consigliato · Esplorazione completa',
+    id: '10m',
+    title: 'Pass Luce · 10 Minuti',
+    durationMinutes: 10,
+    priceEur: 5,
+    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_DIALOGO_10M',
+    focusLabel: 'Più scelto · Stesa a 3 carte',
     description:
-      'Mezz’ora di dialogo per confrontare più Arcani su amore, lavoro, scelte future e domande maieutiche.',
+      'Dieci minuti continui per esplorare passato, presente e linee future su amore, scelte o lavoro.',
     recommended: true,
   },
   {
-    id: '60m',
-    title: 'Pass Ciclo · 60 Minuti',
-    durationMinutes: 60,
-    priceEur: 45,
-    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_DIALOGO_60M',
-    focusLabel: 'Massima profondità senza fretta',
+    id: '15m',
+    title: 'Pass Cosmos · 15 Minuti',
+    durationMinutes: 15,
+    priceEur: 7,
+    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_DIALOGO_15M',
+    focusLabel: 'Massima convenienza · Completo',
     description:
-      'Un’ora intera di percorso interattivo con estrazioni multiple e rilettura estesa dei simboli.',
+      'Quindici minuti estesi per confrontare più Arcani Maggiori e approfondire le domande maieutiche.',
   },
 ];
 
@@ -745,14 +745,14 @@ export const initialChatMessages: ChatMessage[] = [
   {
     id: 'msg-1',
     sender: 'practitioner',
-    authorName: 'Maria Teresa Rogani',
+    authorName: 'Tarot Italia IA',
     timestamp: '09:30',
-    text: 'Benvenuto nello spazio di dialogo di Tarot Italia. Qui puoi estrarre o scegliere qualsiasi dei 22 Arcani Maggiori per leggere il presente, esplorare le tendenze future e riflettere con consapevolezza.',
+    text: 'Benvenuto nello spazio di dialogo di Tarot Italia IA. Qui puoi estrarre o scegliere qualsiasi dei 22 Arcani Maggiori per leggere il presente, esplorare le tendenze future e riflettere con consapevolezza.',
   },
   {
     id: 'msg-2',
     sender: 'practitioner',
-    authorName: 'Maria Teresa Rogani',
+    authorName: 'Tarot Italia IA',
     timestamp: '09:31',
     text: "Partiamo dall'Arcano del Giorno — L'Eremita (IX) — oppure clicca su «Estrai Arcano» o «Stesa 3 Carte» per interrogare tutto il mazzo.",
     arcanaRef: "L'Eremita · IX",

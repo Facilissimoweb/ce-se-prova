@@ -537,26 +537,26 @@ export const DIALOGUE_PACK_CATALOG: Record<
     stripePriceId: string;
   }
 > = {
+  '5m': {
+    id: '5m',
+    title: 'Pass Rapido · 5 Minuti',
+    durationMinutes: 5,
+    priceEur: 3,
+    stripePriceId: process.env.STRIPE_PRICE_ID_DIALOGO_5M || 'STRIPE_PRICE_ID_DIALOGO_5M',
+  },
+  '10m': {
+    id: '10m',
+    title: 'Pass Luce · 10 Minuti',
+    durationMinutes: 10,
+    priceEur: 5,
+    stripePriceId: process.env.STRIPE_PRICE_ID_DIALOGO_10M || 'STRIPE_PRICE_ID_DIALOGO_10M',
+  },
   '15m': {
     id: '15m',
-    title: 'Pass Luce · 15 Minuti',
+    title: 'Pass Cosmos · 15 Minuti',
     durationMinutes: 15,
-    priceEur: 14,
-    stripePriceId: 'STRIPE_PRICE_ID_DIALOGO_15M',
-  },
-  '30m': {
-    id: '30m',
-    title: 'Pass Cosmos · 30 Minuti',
-    durationMinutes: 30,
-    priceEur: 25,
-    stripePriceId: 'STRIPE_PRICE_ID_DIALOGO_30M',
-  },
-  '60m': {
-    id: '60m',
-    title: 'Pass Ciclo · 60 Minuti',
-    durationMinutes: 60,
-    priceEur: 45,
-    stripePriceId: 'STRIPE_PRICE_ID_DIALOGO_60M',
+    priceEur: 7,
+    stripePriceId: process.env.STRIPE_PRICE_ID_DIALOGO_15M || 'STRIPE_PRICE_ID_DIALOGO_15M',
   },
 };
 
@@ -751,6 +751,21 @@ export async function unlockDialogueTimePack(params: {
     authEmail: params.authEmail,
     authName: params.authName || params.customerName,
   });
+
+  if (params.stripeSessionId) {
+    const existingPurchase = await db
+      .select()
+      .from(dialoguePurchases)
+      .where(eq(dialoguePurchases.stripeSessionId, params.stripeSessionId))
+      .limit(1);
+
+    if (existingPurchase[0]) {
+      return {
+        status: computeDialogueStatus(session, new Date()),
+        purchase: existingPurchase[0],
+      };
+    }
+  }
 
   const now = new Date();
   const baseMs =

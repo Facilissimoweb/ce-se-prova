@@ -19,7 +19,6 @@ import type {
   ChatMessage,
   DialogueAccessStatus,
   DialoguePackId,
-  StripeCheckoutHandoffPayload,
 } from '../types/handoff';
 import {
   MAJOR_ARCANA,
@@ -107,13 +106,11 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
 
   // Paywall / Timed Pass Checkout state
   const [showPassPanel, setShowPassPanel] = useState(false);
-  const [selectedPackId, setSelectedPackId] = useState<DialoguePackId>('30m');
+  const [selectedPackId, setSelectedPackId] = useState<DialoguePackId>('10m');
   const [customerName, setCustomerName] = useState(user?.displayName ?? '');
   const [customerEmail, setCustomerEmail] = useState(user?.email ?? '');
   const [unlocking, setUnlocking] = useState(false);
   const [unlockError, setUnlockError] = useState<string | null>(null);
-  const [handoffPayload, setHandoffPayload] =
-    useState<StripeCheckoutHandoffPayload | null>(null);
 
   const threadEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -156,8 +153,43 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
   }, [sessionKey, user, getIdToken, applyServerStatus]);
 
   useEffect(() => {
-    fetchDialogueStatus();
-  }, [fetchDialogueStatus]);
+    const params = new URLSearchParams(window.location.search);
+    const stripeSessionId = params.get('dialogue_stripe_session_id');
+    if (stripeSessionId) {
+      (async () => {
+        try {
+          const token = user ? await getIdToken() : null;
+          const res = await fetch('/api/dialogue/confirm-stripe', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({ stripeSessionId, sessionKey }),
+          });
+          const json = (await res.json()) as { status?: DialogueAccessStatus };
+          if (res.ok && json.status) {
+            applyServerStatus(json.status);
+            setShowPassPanel(false);
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `stripe-ok-${Date.now()}`,
+                sender: 'practitioner',
+                authorName: 'Tarot Italia IA · Pass Attivato',
+                timestamp: nowTimeLabel(),
+                text: 'Pagamento confermato. Il tuo pass temporale è attivo: puoi proseguire il dialogo con gli Arcani Maggiori.',
+              },
+            ]);
+          }
+        } finally {
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      })();
+    } else {
+      fetchDialogueStatus();
+    }
+  }, [fetchDialogueStatus, applyServerStatus, getIdToken, sessionKey, user]);
 
   // Synchronized countdown ticker once trial or paid pass has started
   useEffect(() => {
@@ -245,7 +277,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
     const introMsg: ChatMessage = {
       id: `draw-${Date.now()}`,
       sender: 'practitioner',
-      authorName: 'Maria Teresa Rogani · Lettura Guidata',
+      authorName: 'Tarot Italia IA · Lettura Guidata',
       timestamp: timeLabel,
       arcanaRef: `${card.name} · ${card.numeral}`,
       text: [
@@ -286,7 +318,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
     const spreadMsg: ChatMessage = {
       id: `spread-${Date.now()}`,
       sender: 'practitioner',
-      authorName: 'Maria Teresa Rogani · Stesa a 3 Carte',
+      authorName: 'Tarot Italia IA · Stesa a 3 Carte',
       timestamp: nowTimeLabel(),
       arcanaRef: `${spread[0].card.numeral} · ${spread[1].card.numeral} · ${spread[2].card.numeral}`,
       text: buildSpreadSynthesisReply(spread),
@@ -318,7 +350,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
     const practitionerMsg: ChatMessage = {
       id: `prac-${Date.now() + 1}`,
       sender: 'practitioner',
-      authorName: 'Maria Teresa Rogani · Lettura Guidata',
+      authorName: 'Tarot Italia IA · Lettura Guidata',
       timestamp: timeLabel,
       text: replyText,
       arcanaRef: activeSpread
@@ -355,7 +387,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
     setUnlocking(true);
     try {
       const token = user ? await getIdToken() : null;
-      const res = await fetch('/api/dialogue/unlock', {
+      const res = await fetch('/api/dialogue/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -370,46 +402,32 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
       });
       const json = (await res.json()) as {
         error?: string;
+        mode?: 'stripe_redirect' | 'direct_unlock';
+        checkoutUrl?: string;
         status?: DialogueAccessStatus;
       };
       if (!res.ok) {
         throw new Error(json.error || 'Impossibile attivare il pass temporale.');
       }
 
+      if (json.mode === 'stripe_redirect' && json.checkoutUrl) {
+        window.location.assign(json.checkoutUrl);
+        return;
+      }
+
       if (json.status) {
         applyServerStatus(json.status);
       }
 
-      const payload: StripeCheckoutHandoffPayload = {
-        provider: 'stripe_checkout',
-        mode: 'payment',
-        priceId: selectedPack.stripePriceIdAnnotation,
-        amountEur: selectedPack.priceEur,
-        currency: 'EUR',
-        customerEmail: customerEmail.trim(),
-        supabaseUserId: user?.uid ?? '<GUEST_OR_AUTH_SESSION>',
-        metadata: {
-          itemType: 'dialogue_pass',
-          practitioner: 'Maria Teresa Rogani',
-          packId: selectedPack.id,
-          durationMinutes: selectedPack.durationMinutes,
-          phoneWhatsApp: '',
-          deontologyAccepted: true,
-        },
-        successUrlPattern: `/dialogo?pass=${selectedPack.id}&session_id={CHECKOUT_SESSION_ID}`,
-        cancelUrlPattern: `/dialogo?cancelled=true`,
-      };
-      setHandoffPayload(payload);
       setShowPassPanel(false);
-
       setMessages((prev) => [
         ...prev,
         {
           id: `unlock-${Date.now()}`,
           sender: 'practitioner',
-          authorName: 'Maria Teresa Rogani · Pass Attivato',
+          authorName: 'Tarot Italia IA · Pass Attivato',
           timestamp: nowTimeLabel(),
-          text: `${selectedPack.title} attivato (${selectedPack.durationMinutes} minuti). Puoi proseguire il dialogo con gli Arcani Maggiori.`,
+          text: `${selectedPack.title} attivato (${selectedPack.durationMinutes} minuti · € ${selectedPack.priceEur}). Puoi proseguire il dialogo con gli Arcani Maggiori.`,
         },
       ]);
       scrollToBottom();
@@ -438,7 +456,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
       ? Math.max(
           liveRemainingSeconds,
           (dialogueTimePacks.find((p) => p.id === accessStatus.activePackId)
-            ?.durationMinutes ?? 15) * 60
+            ?.durationMinutes ?? 5) * 60
         )
       : accessStatus.freeTrialSecondsTotal;
   const progressRatio = Math.min(
@@ -455,7 +473,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
             <TarotEmblemLogo size={36} className="shrink-0" />
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                <CopyText entry={siteContent.brand.name} showKeys={showCmsKeys} /> · 22 Arcani Maggiori
+                <CopyText entry={siteContent.brand.name} showKeys={showCmsKeys} /> IA · 22 Arcani Maggiori
               </p>
               <h1 className="font-display text-2xl md:text-[28px] tracking-[0.02em] text-[#F4F1EA]">
                 <CopyText entry={siteContent.chat.title} showKeys={showCmsKeys} />
@@ -576,7 +594,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
               className="text-xs font-semibold text-[#D4AF37] hover:text-[#E6C65C] inline-flex items-center gap-1.5 whitespace-nowrap"
             >
               <CreditCard className="w-3.5 h-3.5" aria-hidden="true" />
-              {showPassPanel ? 'Torna al dialogo' : 'Tariffe a tempo (15 / 30 / 60m)'}
+              {showPassPanel ? 'Torna al dialogo' : 'Tariffe a tempo (5 / 10 / 15m)'}
             </button>
           </div>
 
@@ -962,12 +980,6 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
                     </button>
                   </div>
                 </form>
-
-                {handoffPayload && (
-                  <p className="text-[11px] font-mono text-[#E6C65C] truncate">
-                    Stripe Price Ready: {handoffPayload.priceId} (€ {handoffPayload.amountEur})
-                  </p>
-                )}
               </div>
             ) : (
               <div className="border-t border-[#D4AF37]/15 p-4 md:p-5 bg-[#151311]/70 space-y-3">
