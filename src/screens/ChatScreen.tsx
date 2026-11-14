@@ -25,6 +25,7 @@ import { ChatThreadPanel } from '../components/chat/ChatThreadPanel';
 import { useAuth } from '../context/AuthContext';
 import { useDialogueAccess } from '../hooks/useDialogueAccess';
 import { nowTimeLabel } from '../lib/dialogueSession';
+import { whatsappHref as buildWhatsappHref } from '../lib/siteContacts';
 
 interface ChatScreenProps {
   showCmsKeys: boolean;
@@ -192,9 +193,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
         .join(', ')}) e vorrei approfondire con te.`
     : `Buongiorno Maria Teresa, ho dialogato con l'Arcano ${activeCard.name} (${activeCard.numeral}) su Tarot Italia e vorrei proseguire la lettura con te.`;
 
-  const whatsappHref = `https://wa.me/390000000000?text=${encodeURIComponent(
-    whatsappContextText
-  )}`;
+  const whatsappHref = buildWhatsappHref(whatsappContextText);
 
   return (
     <div className="pt-6 md:pt-10 pb-8 space-y-6">

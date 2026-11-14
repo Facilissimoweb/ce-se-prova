@@ -7675,9 +7675,11 @@ Nella sessione integrata da 90 minuti la Ruota delle 12 Case offre una bussola c
 ];
 
 // src/lib/bookingSlots.ts
+var BOOKING_HOUR_START = 9;
+var BOOKING_HOUR_END = 20;
 var HOUR_SLOTS = Array.from(
-  { length: 14 },
-  (_, i) => `${String(i + 9).padStart(2, "0")}:00`
+  { length: BOOKING_HOUR_END - BOOKING_HOUR_START + 1 },
+  (_, i) => `${String(i + BOOKING_HOUR_START).padStart(2, "0")}:00`
 );
 
 // src/lib/zohoMail.ts
