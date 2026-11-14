@@ -1,18 +1,6 @@
-import { readFileSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
 import { cert, getApps, initializeApp, type AppOptions } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-
-type FirebaseAppletConfig = { projectId: string };
-
-function loadFirebaseConfig(): FirebaseAppletConfig {
-  const here = dirname(fileURLToPath(import.meta.url));
-  const configPath = join(here, '../../firebase-applet-config.json');
-  return JSON.parse(readFileSync(configPath, 'utf8')) as FirebaseAppletConfig;
-}
-
-const firebaseConfig = loadFirebaseConfig();
+import firebaseConfig from '../../firebase-applet-config.json';
 
 function buildOptions(): AppOptions {
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim();
@@ -25,8 +13,7 @@ function buildOptions(): AppOptions {
       };
       return {
         credential: cert(serviceAccount as Parameters<typeof cert>[0]),
-        projectId:
-          serviceAccount.project_id || firebaseConfig.projectId,
+        projectId: serviceAccount.project_id || firebaseConfig.projectId,
       };
     } catch (error) {
       console.error(
@@ -35,8 +22,6 @@ function buildOptions(): AppOptions {
       );
     }
   }
-
-  // Cloud Run / ADC: projectId alone is enough. On Vercel set FIREBASE_SERVICE_ACCOUNT_JSON.
   return { projectId: firebaseConfig.projectId };
 }
 
