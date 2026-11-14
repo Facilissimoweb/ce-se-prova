@@ -3,7 +3,11 @@ import { ArrowRight, ChevronDown, Mail, MapPin, MessageCircle, Quote, ShieldChec
 import type { ScreenId } from '../types/handoff';
 import { clientTestimonials, holisticFaqs, holisticPathways, siteContent } from '../data/siteContent';
 import { CopyText } from '../components/CopyText';
+import { ResilientImage } from '../components/ResilientImage';
 import { HermitArcanaIllustration, TarotEmblemLogo } from '../components/TarotEmblem';
+import heroSanctuaryImg from '../assets/images/hero_tarot_sanctuary_1794651607080.jpg';
+import hermitCardImg from '../assets/images/arcano_eremita_gold_1794651607019.jpg';
+import practitionerHandsImg from '../assets/images/percorsi_hands_tarot_1794651609400.jpg';
 
 interface HomeScreenProps {
   showCmsKeys: boolean;
@@ -86,8 +90,13 @@ export function HomeScreen({
                 </span>
                 <span className="font-mono tabular-nums">IX</span>
               </div>
-              <div className="w-36 mx-auto my-2 transition-transform duration-300 group-hover:-translate-y-1">
-                <HermitArcanaIllustration className="w-full h-auto" />
+              <div className="w-40 mx-auto my-2 rounded-xl overflow-hidden border border-[#D4AF37]/30 transition-transform duration-300 group-hover:-translate-y-1">
+                <ResilientImage
+                  src={hermitCardImg}
+                  alt="Carta dei Tarocchi L'Eremita IX in oro su fondo ossidiana"
+                  className="w-full aspect-[3/4] object-cover"
+                  fallbackNode={<HermitArcanaIllustration className="w-full h-auto" />}
+                />
               </div>
               <div className="mt-4 pt-3 border-t border-[#D4AF37]/15 flex items-center justify-between">
                 <span className="font-display text-sm text-[#F4F1EA]">L&apos;Eremita</span>
@@ -100,11 +109,51 @@ export function HomeScreen({
         </div>
       </section>
 
+      {/* Atmospheric Studio Showcase — 16:9 Editorial Visual */}
+      <section aria-label="Atmosfera dello studio Tarot Italia">
+        <figure className="relative rounded-2xl overflow-hidden border border-[#D4AF37]/20 glass-tier-1">
+          <div className="aspect-[16/9] w-full overflow-hidden">
+            <ResilientImage
+              src={heroSanctuaryImg}
+              alt="Tavolo di consultazione olistica con tarocchi bordati in oro, candela in ottone e ramo d'ulivo"
+              className="w-full h-full object-cover"
+              fallbackLabel="Studio Tarot Italia · Maria Teresa Rogani"
+            />
+          </div>
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#12100E]/90 via-[#12100E]/20 to-transparent"
+            aria-hidden="true"
+          />
+          <figcaption className="absolute bottom-0 left-0 right-0 p-5 md:p-8 flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                Lo Studio · Atmosfera e Metodo
+              </p>
+              <p className="font-display text-base md:text-xl text-[#F4F1EA] mt-1">
+                Un dialogo riservato tra simboli archetipici, ascolto e previsione consapevole
+              </p>
+            </div>
+            <span className="text-xs text-[#A39B93] whitespace-nowrap shrink-0">
+              In studio &amp; Videochiamata
+            </span>
+          </figcaption>
+        </figure>
+      </section>
+
       <div className="gold-divider" aria-hidden="true" />
 
-      {/* Editorial Deontological Section */}
-      <section aria-labelledby="ethics-heading" className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <div className="lg:col-span-4 space-y-2">
+      {/* Editorial Deontological Section with Practitioner Hands Photograph */}
+      <section aria-labelledby="ethics-heading" className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        <div className="lg:col-span-5 rounded-2xl overflow-hidden border border-[#D4AF37]/20 glass-tier-1">
+          <ResilientImage
+            src={practitionerHandsImg}
+            alt="Mani dell'operatore olistico accanto ai tarocchi sul tavolo in legno"
+            className="w-full h-full min-h-[240px] aspect-[4/3] lg:aspect-auto object-cover"
+            fallbackLabel="Ascolto ed Etica Professionale"
+          />
+        </div>
+
+        <div className="lg:col-span-7 glass-tier-1 rounded-2xl p-6 md:p-8 flex flex-col justify-center gap-4">
           <div className="flex items-center gap-2.5 text-[#D4AF37]">
             <ShieldCheck className="w-5 h-5 shrink-0" />
             <span className="text-[11px] font-semibold uppercase tracking-[0.08em]">
@@ -114,13 +163,10 @@ export function HomeScreen({
           <h2 id="ethics-heading" className="font-display text-xl md:text-2xl text-[#F4F1EA] text-balance">
             <CopyText entry={siteContent.home.ethicsBannerTitle} showKeys={showCmsKeys} />
           </h2>
-        </div>
-
-        <div className="lg:col-span-8 glass-tier-1 rounded-2xl p-6 md:p-8 space-y-4">
           <p className="text-sm md:text-base leading-relaxed text-[#E8e1dd]">
             <CopyText entry={siteContent.home.ethicsBannerBody} showKeys={showCmsKeys} />
           </p>
-          <p className="text-xs md:text-sm text-[#A39B93]">
+          <p className="text-xs md:text-sm text-[#A39B93] pt-2 border-t border-[#D4AF37]/15">
             Disciplinato ai sensi della Legge 4/2013 sulle professioni non organizzate · Operatore Olistico Maria Teresa Rogani.
           </p>
         </div>

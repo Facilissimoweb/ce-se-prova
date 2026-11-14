@@ -13,10 +13,12 @@ import {
   siteContent,
 } from '../data/siteContent';
 import { CopyText } from '../components/CopyText';
+import { ResilientImage } from '../components/ResilientImage';
 import {
   HermitArcanaIllustration,
   TarotEmblemLogo,
 } from '../components/TarotEmblem';
+import hermitCardImg from '../assets/images/arcano_eremita_gold_1794651607019.jpg';
 
 interface ChatScreenProps {
   showCmsKeys: boolean;
@@ -163,8 +165,13 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
             {cardTab === 'arcano' ? (
               <div className="space-y-4">
                 <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-center gap-5">
-                  <div className="w-36 shrink-0">
-                    <HermitArcanaIllustration className="w-full h-auto" />
+                  <div className="w-36 shrink-0 rounded-xl overflow-hidden border border-[#D4AF37]/30">
+                    <ResilientImage
+                      src={hermitCardImg}
+                      alt="Carta L'Eremita IX incisa in oro"
+                      className="w-full aspect-[3/4] object-cover"
+                      fallbackNode={<HermitArcanaIllustration className="w-full h-auto" />}
+                    />
                   </div>
                   <div className="space-y-3">
                     <p className="text-xs text-[#D4AF37] font-medium">

@@ -3,6 +3,8 @@ import { ArrowRight, Check, ShieldCheck, CreditCard } from 'lucide-react';
 import type { ConsultationTariff } from '../types/handoff';
 import { consultationTariffs, siteContent } from '../data/siteContent';
 import { CopyText } from '../components/CopyText';
+import { ResilientImage } from '../components/ResilientImage';
+import consultiDeskImg from '../assets/images/consulti_desk_linen_1794651607906.jpg';
 
 interface ConsultiScreenProps {
   showCmsKeys: boolean;
@@ -17,17 +19,30 @@ export function ConsultiScreen({
 }: ConsultiScreenProps) {
   return (
     <div className="space-y-12 md:space-y-16 pt-6 md:pt-10 pb-8">
-      {/* Section Header */}
-      <header className="space-y-4 max-w-2xl">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-          Tariffario Trasparente · Sessioni Individuali
-        </p>
-        <h1 className="font-display text-[28px] leading-[36px] md:text-[36px] md:leading-[44px] text-[#F4F1EA] text-balance">
-          <CopyText entry={siteContent.consulti.heading} showKeys={showCmsKeys} />
-        </h1>
-        <p className="text-sm md:text-base leading-relaxed text-[#A39B93]">
-          <CopyText entry={siteContent.consulti.subheading} showKeys={showCmsKeys} />
-        </p>
+      {/* Section Header paired with Editorial Still-Life Photograph */}
+      <header className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="lg:col-span-7 space-y-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+            Tariffario Trasparente · Sessioni Individuali
+          </p>
+          <h1 className="font-display text-[28px] leading-[36px] md:text-[36px] md:leading-[44px] text-[#F4F1EA] text-balance">
+            <CopyText entry={siteContent.consulti.heading} showKeys={showCmsKeys} />
+          </h1>
+          <p className="text-sm md:text-base leading-relaxed text-[#A39B93] max-w-xl">
+            <CopyText entry={siteContent.consulti.subheading} showKeys={showCmsKeys} />
+          </p>
+        </div>
+
+        <div className="lg:col-span-5">
+          <div className="rounded-2xl overflow-hidden border border-[#D4AF37]/20 glass-tier-1">
+            <ResilientImage
+              src={consultiDeskImg}
+              alt="Mazzo di tarocchi con dettagli in oro e quaderno su pietra scura"
+              className="w-full aspect-[4/3] object-cover"
+              fallbackLabel="Consulenza Tarot Italia"
+            />
+          </div>
+        </div>
       </header>
 
       {/* 3 Dark Glass Tariff Cards */}
