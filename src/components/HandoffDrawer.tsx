@@ -114,10 +114,10 @@ export function HandoffDrawer({
           </div>
           <div className="p-4 rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/15 text-xs text-[#A39B93] space-y-2">
             <p className="text-[#F4F1EA]">
-              Price IDs configurati: 45m, 60m, 90m.
+              Price IDs configurati: Consulti (45m, 60m, 90m) e Corsi (Arcani Maggiori, Arcani Minori, Metodi di Stesura).
             </p>
             <p className="leading-relaxed">
-              Nessuna transazione simulata: il modulo Prenotazione compila il payload strutturato{' '}
+              Nessuna transazione simulata: i moduli Prenotazione e Corsi compilano il payload strutturato{' '}
               <code className="text-[#E6C65C]">StripeCheckoutHandoffPayload</code> pronto per la route server{' '}
               <code className="text-[#F4F1EA]">/api/checkout/session</code>.
             </p>

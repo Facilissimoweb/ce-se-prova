@@ -3,6 +3,7 @@ import type {
   ChatMessage,
   ClientTestimonial,
   ConsultationTariff,
+  EducationalCourse,
   HolisticFaqItem,
   HolisticPathway,
   SupabaseAuthContract,
@@ -83,6 +84,15 @@ export const siteContent = {
       liveText:
         'Voci di chi ha scelto un confronto simbolico lucido e rispettoso per orientare un passaggio personale o professionale.',
     },
+    coursesHeading: {
+      cmsKey: '[COPY: siteContent.home.coursesHeading]',
+      liveText: 'Percorsi Didattici · Accademia Tarot Italia',
+    },
+    coursesIntro: {
+      cmsKey: '[COPY: siteContent.home.coursesIntro]',
+      liveText:
+        'Tre moduli formativi a pagamento per apprendere la lettura simbolica e previsionale dei Tarocchi con metodo rigoroso ed etico.',
+    },
   },
   consulti: {
     heading: {
@@ -98,6 +108,26 @@ export const siteContent = {
       cmsKey: '[COPY: siteContent.consulti.ethicsCallout]',
       liveText:
         'Impegno etico: ogni consulto offre una lettura chiara del presente e delle tendenze future nel rispetto del libero arbitrio. Nessuna promessa miracolistica o sostituzione di pareri medici e legali.',
+    },
+  },
+  corsi: {
+    kicker: {
+      cmsKey: '[COPY: siteContent.corsi.kicker]',
+      liveText: 'Formazione Olistica & Tarologia · 3 Percorsi a Pagamento',
+    },
+    heading: {
+      cmsKey: '[COPY: siteContent.corsi.heading]',
+      liveText: 'Percorsi Didattici Tarot Italia',
+    },
+    subheading: {
+      cmsKey: '[COPY: siteContent.corsi.subheading]',
+      liveText:
+        'Un itinerario progressivo in tre moduli autonomi e acquistabili singolarmente per padroneggiare gli Arcani Maggiori, gli Arcani Minori e i Metodi di Stesura previsionali ed evolutivi.',
+    },
+    checkoutNote: {
+      cmsKey: '[COPY: siteContent.corsi.checkoutNote]',
+      liveText:
+        'Accesso immediato all’area riservata dopo la conferma su Stripe Checkout (/api/checkout/session) con registrazione dell’iscrizione su Supabase Auth.',
     },
   },
   booking: {
@@ -333,6 +363,169 @@ export const consultationTariffs: ConsultationTariff[] = [
   },
 ];
 
+export const educationalCourses: EducationalCourse[] = [
+  {
+    id: 'arcani-maggiori',
+    orderLabel: '01 · Primo Pilastro',
+    cmsKeyTitle: '[COPY: corso.placeholder.1.title]',
+    title: 'Arcani Maggiori',
+    cmsKeySubtitle: '[COPY: corso.placeholder.1.subtitle]',
+    subtitle: 'Il Viaggio Archetipico da 0 a XXI · Presente e Previsione',
+    cmsKeyDesc: '[COPY: corso.placeholder.1.desc]',
+    description:
+      'Studio approfondito dei 22 Trionfi: iconografia tradizionale, struttura numerologica, lettura in luce e ombra e interpretazione previsionale delle grandi svolte.',
+    priceEur: 190,
+    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI',
+    lessonsCount: 12,
+    totalHours: '8h 30m video',
+    levelLabel: 'Livello Base e Intermedio',
+    formatLabel: 'On-Demand + Dispensa PDF + 1h Q&A Live',
+    includes: [
+      '12 videolezioni ad alta definizione sui 22 Arcani (da 0 a XXI)',
+      'Manuale PDF illustrato con schede archetipiche e parole chiave',
+      'Analisi pratica di amore, lavoro e linee evolutive future per ogni lama',
+      'Sessione individuale di verifica finale (45 min) con Maria Teresa Rogani',
+    ],
+    modules: [
+      {
+        number: '01',
+        title: 'Struttura del Mazzo e i Tre Settenari (0 – VII)',
+        duration: '2h 15m',
+        summary:
+          'Dal potenziale puro del Matto alla padronanza dell’azione del Carro: i fondamenti dell’identità e del libero arbitrio.',
+      },
+      {
+        number: '02',
+        title: 'Il Crocevia Interiore e il Destino (VIII – XIV)',
+        duration: '2h 30m',
+        summary:
+          'Giustizia, Eremita, Ruota della Fortuna e Temperanza: leggere i cicli temporali, le prove e le svolte imminenti.',
+      },
+      {
+        number: '03',
+        title: 'Trasformazione, Visione e Compimento (XV – XXI)',
+        duration: '2h 15m',
+        summary:
+          'Dal Diavolo e la Torre fino a Stelle, Luna, Sole, Giudizio e Mondo: decifrare crisi, intuizioni e realizzazioni future.',
+      },
+      {
+        number: '04',
+        title: 'Dialoghi tra Coppie di Arcani e Lettura Previsionale',
+        duration: '1h 30m',
+        summary:
+          'Come due Arcani Maggiori si modificano a vicenda in una stesa e come formulare previsioni lucide e responsabili.',
+      },
+    ],
+  },
+  {
+    id: 'arcani-minori',
+    orderLabel: '02 · Secondo Pilastro',
+    cmsKeyTitle: '[COPY: corso.placeholder.2.title]',
+    title: 'Arcani Minori',
+    cmsKeySubtitle: '[COPY: corso.placeholder.2.subtitle]',
+    subtitle: 'I Quattro Semi, Numerologia 1–10 e Carte di Corte',
+    cmsKeyDesc: '[COPY: corso.placeholder.2.desc]',
+    description:
+      'Dall’intuizione alla precisione quotidiana: padroneggia i 56 Arcani Minori per leggere tempi, persone coinvolte, dinamiche lavorative, sentimentali e materiali.',
+    priceEur: 210,
+    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CORSO_ARCANI_MINORI',
+    lessonsCount: 14,
+    totalHours: '9h 45m video',
+    levelLabel: 'Livello Intermedio',
+    formatLabel: 'On-Demand + Atlante dei Semi PDF + 1h Q&A Live',
+    recommended: true,
+    includes: [
+      '14 videolezioni dedicate ai 4 Semi (Bastoni, Coppe, Spade, Denari)',
+      'Mappa comparativa della Numerologia dall’Asso al Dieci per seme',
+      'Profilo psicologico e previsionale delle 16 Figure di Corte',
+      'Esercizi guidati di lettura combinata Maggiori + Minori',
+    ],
+    modules: [
+      {
+        number: '01',
+        title: 'I Quattro Elementi nei Tarocchi: Fuoco, Acqua, Aria e Terra',
+        duration: '1h 50m',
+        summary:
+          'Come riconoscere la dominante elementale di una stesa per capire dove scorre o si blocca l’energia del consultante.',
+      },
+      {
+        number: '02',
+        title: 'Il Ciclo Numerologico dall’Asso al Dieci',
+        duration: '3h 15m',
+        summary:
+          'Progressione dei numeri: inizi (Assi), scelte (Due), espansione (Tre), stabilità e crisi (Quattro-Cinque) fino al compimento (Dieci).',
+      },
+      {
+        number: '03',
+        title: 'Le 16 Figure di Corte: Fanti, Cavalieri, Regine e Re',
+        duration: '2h 40m',
+        summary:
+          'Identificare persone reali, stati d’animo, messaggi in arrivo e ruoli professionali senza confondere i profili.',
+      },
+      {
+        number: '04',
+        title: 'Integrazione Pratica: Tempistiche e Dettagli Previsionali',
+        duration: '2h 00m',
+        summary:
+          'Usare gli Arcani Minori per precisare modalità, tempistiche stagionali e azioni concrete attorno a un Arcano Maggiore.',
+      },
+    ],
+  },
+  {
+    id: 'metodi-stesura',
+    orderLabel: '03 · Terzo Pilastro',
+    cmsKeyTitle: '[COPY: corso.placeholder.3.title]',
+    title: 'Metodi di Stesura',
+    cmsKeySubtitle: '[COPY: corso.placeholder.3.subtitle]',
+    subtitle: 'Architetture di Lettura, Sintesi ed Etica del Consulto',
+    cmsKeyDesc: '[COPY: corso.placeholder.3.desc]',
+    description:
+      'Dalla domanda alla narrazione coerente: impara a scegliere la geometria di stesa più adatta, collegare le carte tra loro e condurre un consulto professionale.',
+    priceEur: 240,
+    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CORSO_METODI_STESURA',
+    lessonsCount: 10,
+    totalHours: '7h 30m video',
+    levelLabel: 'Livello Avanzato & Pratica',
+    formatLabel: 'On-Demand + Schemi Vettoriali + Supervisione Live',
+    includes: [
+      '10 videolezioni operative sulle architetture di stesa classiche e previsionali',
+      'Quaderno con 12 schemi di stesa scaricabili e checklist di conduzione',
+      'Casi studio reali commentati passo dopo passo',
+      'Supervisione pratica su una tua stesa reale con Maria Teresa Rogani',
+    ],
+    modules: [
+      {
+        number: '01',
+        title: 'L’Arte della Domanda e il Patto Deontologico',
+        duration: '1h 20m',
+        summary:
+          'Come riformulare quesiti confusi in domande aperte, chiare ed eticamente fondate prima di toccare il mazzo.',
+      },
+      {
+        number: '02',
+        title: 'Stese Essenziali (3 e 5 Carte) e Dinamica Temporale',
+        duration: '2h 00m',
+        summary:
+          'Passato, Presente, Futuro imminente e linea di sviluppo: costruire letture incisive ed essenziali senza dispersione.',
+      },
+      {
+        number: '03',
+        title: 'La Croce Celtica e la Stesa a Due Bivi Decisionali',
+        duration: '2h 20m',
+        summary:
+          'Padroneggiare le 10 posizioni della Croce Celtica e confrontare due scenari futuri alternativi con rigore.',
+      },
+      {
+        number: '04',
+        title: 'La Ruota delle 12 Case e la Sintesi Finale del Consulto',
+        duration: '1h 50m',
+        summary:
+          'Mappare un intero ciclo annuale e restituire al consultante una sintesi orale e scritta lucida e rispettosa.',
+      },
+    ],
+  },
+];
+
 import { MAJOR_ARCANA } from './majorArcana';
 
 export const arcanoDelGiorno: ArcanaCard = MAJOR_ARCANA[9];
@@ -365,9 +558,9 @@ export const handoffArchitectureSpec: {
   supabase: {
     provider: 'supabase_auth',
     strategy: 'magic_link_or_otp',
-    tables: ['profiles', 'bookings', 'consultation_notes'],
+    tables: ['profiles', 'bookings', 'course_enrollments', 'consultation_notes'],
     rlsPolicyNote:
-      'Row Level Security abilitata su profiles e bookings (auth.uid() = user_id); accesso operatore tramite ruolo verificato.',
+      'Row Level Security abilitata su profiles, bookings e course_enrollments (auth.uid() = user_id); accesso operatore tramite ruolo verificato.',
   },
   whatsapp: {
     provider: 'whatsapp_cloud_api',

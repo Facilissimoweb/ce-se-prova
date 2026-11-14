@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { ArrowRight, ChevronDown, Mail, MapPin, MessageCircle, Quote, ShieldCheck } from 'lucide-react';
-import type { ScreenId } from '../types/handoff';
-import { clientTestimonials, holisticFaqs, holisticPathways, siteContent } from '../data/siteContent';
+import type { CourseId, ScreenId } from '../types/handoff';
+import {
+  clientTestimonials,
+  educationalCourses,
+  holisticFaqs,
+  holisticPathways,
+  siteContent,
+} from '../data/siteContent';
 import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
 import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
@@ -12,6 +18,7 @@ import practitionerHandsImg from '../assets/images/percorsi_hands_tarot_17946516
 interface HomeScreenProps {
   showCmsKeys: boolean;
   onNavigate: (screen: ScreenId) => void;
+  onSelectCourse: (courseId: CourseId) => void;
   onOpenHandoff: () => void;
   onOpenPrivacy: () => void;
 }
@@ -19,6 +26,7 @@ interface HomeScreenProps {
 export function HomeScreen({
   showCmsKeys,
   onNavigate,
+  onSelectCourse,
   onOpenHandoff,
   onOpenPrivacy,
 }: HomeScreenProps) {
@@ -236,6 +244,77 @@ export function HomeScreen({
                   className="text-xs md:text-sm font-medium text-[#F4F1EA] hover:text-[#D4AF37] inline-flex items-center gap-1.5 transition-colors"
                 >
                   {pathway.index === '04' ? 'Vai al Dialogo Guidato' : 'Vedi durata e tariffa'}
+                  <ArrowRight className="w-3.5 h-3.5 text-[#D4AF37]" />
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Paid Educational Courses Showcase — 1) Arcani Maggiori, 2) Arcani Minori, 3) Metodi di Stesura */}
+      <section aria-labelledby="courses-preview-heading" className="space-y-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="space-y-2 max-w-2xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+              Formazione a Pagamento · 3 Moduli
+            </p>
+            <h2
+              id="courses-preview-heading"
+              className="font-body text-2xl md:text-[32px] md:leading-[40px] font-semibold tracking-[-0.02em] text-[#F4F1EA]"
+            >
+              <CopyText entry={siteContent.home.coursesHeading} showKeys={showCmsKeys} />
+            </h2>
+            <p className="text-sm md:text-base text-[#A39B93]">
+              <CopyText entry={siteContent.home.coursesIntro} showKeys={showCmsKeys} />
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigate('corsi')}
+            className="text-sm font-medium text-[#D4AF37] hover:text-[#E6C65C] inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 self-start md:self-auto"
+          >
+            Apri area didattica completa <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 items-stretch">
+          {educationalCourses.map((course, idx) => (
+            <article
+              key={course.id}
+              className={`rounded-2xl p-6 md:p-7 flex flex-col justify-between gap-6 transition-colors duration-150 ${
+                course.recommended
+                  ? 'glass-tier-2 border-[#D4AF37]/40 hover:border-[#D4AF37]/60'
+                  : 'glass-tier-1 hover:border-[#D4AF37]/40'
+              }`}
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-2 text-xs text-[#A39B93]">
+                  <span className="font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                    {idx + 1}) {course.title}
+                  </span>
+                  <span className="tabular-nums">{course.lessonsCount} lezioni</span>
+                </div>
+
+                <h3 className="font-display text-lg md:text-xl text-[#F4F1EA]">
+                  {course.subtitle}
+                </h3>
+
+                <p className="text-sm leading-relaxed text-[#A39B93]">
+                  {course.description}
+                </p>
+              </div>
+
+              <div className="pt-4 border-t border-[#D4AF37]/15 flex items-center justify-between gap-3">
+                <span className="font-display text-xl text-[#D4AF37] tabular-nums">
+                  € {course.priceEur}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onSelectCourse(course.id)}
+                  className="text-xs md:text-sm font-medium text-[#F4F1EA] hover:text-[#D4AF37] inline-flex items-center gap-1.5 transition-colors whitespace-nowrap"
+                >
+                  Scopri il percorso
                   <ArrowRight className="w-3.5 h-3.5 text-[#D4AF37]" />
                 </button>
               </div>

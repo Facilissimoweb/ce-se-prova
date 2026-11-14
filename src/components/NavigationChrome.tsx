@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Compass, MessageCircle, Sparkles, Code2, PhoneCall, ShieldCheck } from 'lucide-react';
+import { BookOpen, Calendar, Compass, Lock, MessageCircle, Sparkles, Code2, PhoneCall, ShieldCheck } from 'lucide-react';
 import type { ScreenId } from '../types/handoff';
 import { TarotEmblemLogo } from './TarotEmblem';
 
@@ -8,11 +8,12 @@ interface TopBarProps {
   onNavigate: (screen: ScreenId) => void;
 }
 
-const NAV_ITEMS: { id: ScreenId; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+const NAV_ITEMS: { id: ScreenId; label: string; mobileLabel?: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'home', label: 'Home', icon: Compass },
   { id: 'consulti', label: 'Consulti', icon: Sparkles },
-  { id: 'booking', label: 'Prenota', icon: Calendar },
+  { id: 'corsi', label: 'Corsi', icon: BookOpen },
   { id: 'chat', label: 'Dialogo', icon: MessageCircle },
+  { id: 'area-riservata', label: 'Area Riservata', mobileLabel: 'Riservata', icon: Lock },
 ];
 
 export function TopBar({ activeScreen, onNavigate }: TopBarProps) {
@@ -79,7 +80,7 @@ export function MobileBottomNav({ activeScreen, onNavigate }: TopBarProps) {
       className="md:hidden fixed bottom-0 left-0 right-0 z-40 h-16 bg-[#151311]/92 backdrop-blur-lg border-t border-[#D4AF37]/20"
       aria-label="Navigazione mobile"
     >
-      <div className="grid grid-cols-4 h-full max-w-md mx-auto">
+      <div className="grid grid-cols-5 h-full max-w-md mx-auto">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = activeScreen === item.id;
@@ -95,7 +96,7 @@ export function MobileBottomNav({ activeScreen, onNavigate }: TopBarProps) {
             >
               <Icon className="w-[20px] h-[20px]" />
               <span className="text-[11px] font-medium tracking-wide whitespace-nowrap">
-                {item.label}
+                {item.mobileLabel ?? item.label}
               </span>
             </button>
           );
@@ -131,6 +132,15 @@ export function FloatingSideRail({
         className="w-11 h-11 rounded-full flex items-center justify-center text-[#D4AF37] hover:bg-[#D4AF37]/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
       >
         <Calendar className="w-5 h-5" />
+      </button>
+      <button
+        type="button"
+        onClick={() => onNavigate('area-riservata')}
+        title="Accedi all'Area Riservata"
+        aria-label="Accedi all'Area Riservata"
+        className="w-11 h-11 rounded-full flex items-center justify-center text-[#F4F1EA] hover:text-[#D4AF37] hover:bg-[#D4AF37]/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+      >
+        <Lock className="w-4 h-4" />
       </button>
       <button
         type="button"

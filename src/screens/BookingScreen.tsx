@@ -22,6 +22,7 @@ import {
   siteContent,
 } from '../data/siteContent';
 import { CopyText } from '../components/CopyText';
+import { useAuth } from '../context/AuthContext';
 
 interface BookingScreenProps {
   showCmsKeys: boolean;
@@ -81,6 +82,7 @@ export function BookingScreen({
   onChangeTariffId,
   onOpenChat,
 }: BookingScreenProps) {
+  const { user, getIdToken } = useAuth();
   const initialDate = useMemo(() => getNextAvailableDate(), []);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [calendarMonth, setCalendarMonth] = useState<Date>(
@@ -91,8 +93,8 @@ export function BookingScreen({
     tariffId: selectedTariffId,
     selectedDateIso: toIsoDate(initialDate),
     selectedTimeSlot: '11:00',
-    fullName: '',
-    email: '',
+    fullName: user?.displayName ?? '',
+    email: user?.email ?? '',
     phoneWhatsApp: '',
     sessionIntent: '',
     deontologyAccepted: false,
@@ -103,7 +105,19 @@ export function BookingScreen({
     setDraft((prev) => ({ ...prev, tariffId: selectedTariffId }));
   }, [selectedTariffId]);
 
+  React.useEffect(() => {
+    if (user) {
+      setDraft((prev) => ({
+        ...prev,
+        fullName: prev.fullName || user.displayName || '',
+        email: prev.email || user.email || '',
+      }));
+    }
+  }, [user]);
+
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [bookingSaved, setBookingSaved] = useState(false);
   const [handoffPayload, setHandoffPayload] =
     useState<StripeCheckoutHandoffPayload | null>(null);
 
@@ -155,7 +169,7 @@ export function BookingScreen({
     setHandoffPayload(null);
   };
 
-  const validateAndPrepareCheckout = (e: React.FormEvent) => {
+  const validateAndPrepareCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     const errors: Record<string, string> = {};
 
@@ -176,6 +190,37 @@ export function BookingScreen({
     setFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
+    setSubmitting(true);
+    try {
+      const token = user ? await getIdToken() : null;
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          tariffId: activeTariff.id,
+          durationMinutes: activeTariff.durationMinutes,
+          priceEur: activeTariff.priceEur,
+          scheduledDate: draft.selectedDateIso,
+          scheduledTime: draft.selectedTimeSlot,
+          fullName: draft.fullName.trim(),
+          email: draft.email.trim(),
+          phoneWhatsApp: draft.phoneWhatsApp.trim(),
+          sessionIntent: draft.sessionIntent.trim(),
+          deontologyAccepted: draft.deontologyAccepted,
+        }),
+      });
+      if (res.ok) {
+        setBookingSaved(true);
+      }
+    } catch {
+      // Handoff payload still presented gracefully even if offline
+    } finally {
+      setSubmitting(false);
+    }
+
     const payload: StripeCheckoutHandoffPayload = {
       provider: 'stripe_checkout',
       mode: 'payment',
@@ -183,8 +228,9 @@ export function BookingScreen({
       amountEur: activeTariff.priceEur,
       currency: 'EUR',
       customerEmail: draft.email.trim(),
-      supabaseUserId: '<SUPABASE_AUTH_UID_FROM_SESSION>',
+      supabaseUserId: user?.uid ?? '<AUTH_UID_FROM_SESSION>',
       metadata: {
+        itemType: 'consultation',
         practitioner: 'Maria Teresa Rogani',
         tariffId: activeTariff.id,
         durationMinutes: activeTariff.durationMinutes,
@@ -600,10 +646,13 @@ export function BookingScreen({
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-3 min-h-[46px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                  disabled={submitting}
+                  className="px-6 py-3 min-h-[46px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
                 >
                   <CreditCard className="w-4 h-4" />
-                  Prepara Stripe Checkout (€ {activeTariff.priceEur})
+                  {submitting
+                    ? 'Registrazione in corso...'
+                    : `Conferma e Prepara Checkout (€ ${activeTariff.priceEur})`}
                 </button>
               </div>
 
@@ -613,10 +662,12 @@ export function BookingScreen({
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                        Payload Stripe Checkout Prontamente Strutturato
+                        {bookingSaved
+                          ? 'Prenotazione Registrata · Riepilogo Checkout'
+                          : 'Payload Stripe Checkout Prontamente Strutturato'}
                       </p>
                       <h3 className="font-display text-lg text-[#F4F1EA] mt-1">
-                        Riepilogo Handoff per {draft.fullName}
+                        Riepilogo per {draft.fullName}
                       </h3>
                     </div>
                   </div>

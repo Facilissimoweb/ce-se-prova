@@ -1,4 +1,104 @@
-export type ScreenId = 'home' | 'consulti' | 'booking' | 'chat';
+export type ScreenId =
+  | 'home'
+  | 'consulti'
+  | 'corsi'
+  | 'area-riservata'
+  | 'booking'
+  | 'chat';
+
+export type CourseId = 'arcani-maggiori' | 'arcani-minori' | 'metodi-stesura';
+
+export interface CourseModuleItem {
+  number: string;
+  title: string;
+  duration: string;
+  summary: string;
+}
+
+export interface EducationalCourse {
+  id: CourseId;
+  orderLabel: string;
+  cmsKeyTitle: string;
+  title: string;
+  cmsKeySubtitle: string;
+  subtitle: string;
+  cmsKeyDesc: string;
+  description: string;
+  priceEur: number;
+  stripePriceIdAnnotation: string;
+  lessonsCount: number;
+  totalHours: string;
+  levelLabel: string;
+  formatLabel: string;
+  includes: string[];
+  modules: CourseModuleItem[];
+  recommended?: boolean;
+}
+
+export interface ReservedDispensaOutline {
+  id: number;
+  courseId: number;
+  moduleNumber: string;
+  title: string;
+  subtitle: string;
+  format: string;
+  readingMinutes: number;
+  sortOrder: number;
+}
+
+export interface ReservedUnlockedDispensa extends ReservedDispensaOutline {
+  contentMarkdown: string;
+  keyTakeaways: string[];
+  completed: boolean;
+  personalNotes: string;
+}
+
+export interface ReservedCourseItem {
+  id: number;
+  slug: CourseId;
+  title: string;
+  subtitle: string;
+  description: string;
+  priceEur: number;
+  stripePriceId: string;
+  lessonsCount: number;
+  totalHours: string;
+  levelLabel: string;
+  sortOrder: number;
+  isUnlocked: boolean;
+  purchasedAt: string | null;
+  amountPaidEur: number | null;
+  dispenseCount: number;
+  dispenseOutline: ReservedDispensaOutline[];
+  unlockedDispense: ReservedUnlockedDispensa[];
+}
+
+export interface ReservedBookingItem {
+  id: number;
+  tariffId: string;
+  durationMinutes: number;
+  priceEur: number;
+  scheduledDate: string;
+  scheduledTime: string;
+  fullName: string;
+  email: string;
+  phoneWhatsapp: string;
+  sessionIntent: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface ReservedAreaOverview {
+  user: {
+    id: number;
+    uid: string;
+    email: string;
+    displayName: string | null;
+    phoneWhatsapp: string | null;
+  };
+  courses: ReservedCourseItem[];
+  bookings: ReservedBookingItem[];
+}
 
 export interface CopyEntry {
   cmsKey: string;
@@ -74,11 +174,14 @@ export interface StripeCheckoutHandoffPayload {
   customerEmail: string;
   supabaseUserId: string;
   metadata: {
+    itemType?: 'consultation' | 'course';
     practitioner: string;
-    tariffId: string;
-    durationMinutes: number;
-    scheduledDate: string;
-    scheduledTime: string;
+    tariffId?: string;
+    courseId?: CourseId;
+    courseTitle?: string;
+    durationMinutes?: number;
+    scheduledDate?: string;
+    scheduledTime?: string;
     phoneWhatsApp: string;
     deontologyAccepted: boolean;
   };
