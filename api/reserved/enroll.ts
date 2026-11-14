@@ -1,30 +1,11 @@
-import { postReservedEnroll } from '../../src/server/routes/reserved.ts';
-import {
-  ensureSchemaOnce,
-  methodNotAllowed,
-  readBodyObject,
-  requestOrigin,
-  requireUser,
-  sendApiResult,
-  type NodeLikeReq,
-  type NodeLikeRes,
-} from '../../src/server/vercelAdapter.ts';
+export const config = { runtime: 'nodejs', maxDuration: 10 };
 
-export const config = { runtime: 'nodejs', maxDuration: 30 };
-
-export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
-  await ensureSchemaOnce();
-  if (req.method !== 'POST') {
-    return methodNotAllowed(res, ['POST']);
-  }
-  const user = await requireUser(req, res);
-  if (!user) return;
-  return sendApiResult(
-    res,
-    await postReservedEnroll({
-      user,
-      body: readBodyObject(req),
-      origin: requestOrigin(req),
-    })
-  );
+export default async function handler(req: { method?: string }, res: {
+  statusCode: number;
+  setHeader(n: string, v: string): void;
+  end(b?: string): void;
+}) {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.end(JSON.stringify({ ok: true, path: '/api/reserved/enroll' }));
 }
