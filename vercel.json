@@ -1,11 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "buildCommand": "npm run build",
+  "installCommand": "env -u npm_config_cache_dir -u NPM_CONFIG_CACHE_DIR npm install",
+  "buildCommand": "env -u npm_config_cache_dir -u NPM_CONFIG_CACHE_DIR npm run build",
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/((?!privacy\\.html).*)",
+      "source": "/((?!api/|privacy\\.html).*)",
       "destination": "/index.html"
     }
   ]

@@ -1,69 +1,57 @@
 # Tarot Italia / Ennamo (`ce-se-prova`)
 
-SPA React (Vite) + API Express: Firebase Auth, Postgres/Drizzle, contenuti editoriali in `src/data/`.
+SPA React (Vite) + API: Firebase Auth, Postgres/Drizzle, contenuti editoriali in `src/data/`.
 
 ## Stack runtime
 
 | Layer | Tecnologia |
 |-------|------------|
-| Auth | Firebase Auth (Google) + verifica ID token lato server (`src/middleware/auth.ts`) |
+| Auth | Firebase Auth (Google) + verifica ID token lato server |
 | Dati | PostgreSQL + Drizzle (`src/db/*`) |
 | UI | React 19 + Vite 8 + Tailwind 4 |
-| Server | Express in `server.ts` (API `/api/*` + static `dist/` in produzione) |
+| API (locale) | Express in `server.ts` — stessi handler di Vercel |
+| API (produzione consigliata) | **Vercel Serverless** `api/*.ts` (Node), logica in `src/server/routes/*` |
 | Pagamenti | Stripe Checkout + webhook / confirm-session |
+| Prenotazioni | Zoho SMTP + Google Calendar (opzionali) |
 
-Non si usa Supabase: eventuali riferimenti storici nel copy sono stati allineati a questo stack.
+Non si usa Supabase per Ennamo: stack Firebase + Postgres.
 
-## Sviluppo e produzione
+## Sviluppo e produzione locale
 
 ```bash
 npm install
 npm run dev      # Express + Vite middleware (API + HMR)
 npm run build    # build frontend in dist/
-npm start        # Express produzione: API + file statici
+npm start        # Express: API + file statici (host Node opzionale)
 npm run lint     # tsc --noEmit
 ```
 
-## Deploy: Express vs `vercel.json`
+## Deploy su Vercel (percorso ufficiale)
 
-- **Percorso ufficiale**: host Node che esegue `server.ts` (`npm start` dopo `npm run build`), tipicamente Cloud Run / AI Studio. Le API (`/api/reserved/*`, `/api/dialogue/*`, `/api/bookings`, `/api/bookings/availability`, `/api/stripe/webhook`, …) vivono lì.
-- **`vercel.json`**: configurazione **solo SPA statica** (rewrite → `index.html`). Utile per un anteprima frontend senza backend; **non** monta Express né le route API. Non trattarlo come deploy completo del prodotto.
+1. Collega il repo a un progetto Vercel (framework Vite; `vercel.json` già presente).
+2. Imposta le env in **Project Settings → Environment Variables** (vedi `.env.example`). Obbligatorie per API reali:
+   - `DATABASE_URL` (Postgres TCP; non usare socket `/cloudsql/…`)
+   - `FIREBASE_SERVICE_ACCOUNT_JSON`
+   - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+   - `APP_URL` (URL pubblico, es. preview o `https://www.tarotitalia.com`)
+3. Deploy: SPA in `dist/` + funzioni in `api/*`. La rewrite SPA **non** intercetta `/api/*` né `privacy.html`.
+4. Webhook Stripe: `https://<deployment>/api/stripe/webhook` (raw body, `bodyParser: false`).
+5. Solo dopo smoke delle API: aggiungi il dominio custom (`www.tarotitalia.com`) — vedi docs cutover nel Project Context.
 
-## Prenotazioni consulto (Zoho + Calendar)
-
-Flusso allineato a `v2tarotitalia` (senza Supabase):
-
-1. `GET /api/bookings/availability` → slot occupati (Postgres + opzionale Google FreeBusy).
-2. `POST /api/bookings` → riserva `pending_payment` + redirect Stripe Checkout (`itemType=consultation`).
-3. Webhook / `POST /api/bookings/confirm-stripe` → `confirmed` + email Zoho SMTP + evento Google Calendar.
-
-Setup ops (Dashboard Zoho / Google / Stripe): Project Context `docs/zoho-booking.md`.
+Express resta per `npm run dev` / host Node di emergenza; **non** serve un processo Express sempre acceso su Vercel.
 
 ## Variabili d’ambiente
 
-Vedi `.env.example`:
+Vedi `.env.example`. Sintesi:
 
 | Variabile | Uso |
 |-----------|-----|
-| `SQL_*` / `APP_URL` | Postgres e URL pubblico |
-| `STRIPE_SECRET_KEY` | Checkout Session (corsi + dialogo + consulti) |
-| `STRIPE_WEBHOOK_SECRET` | `POST /api/stripe/webhook` |
-| `STRIPE_PRICE_ID_*` | Price ID Dashboard (opzionali; altrimenti `price_data`) |
-| `ALLOW_DIRECT_UNLOCK=true` | Solo non-prod: sblocchi preview senza Stripe |
-| `ZOHO_EMAIL` / `ZOHO_PASSWORD` | SMTP conferme prenotazione (App Password) |
-| `GOOGLE_CALENDAR_*` / `GOOGLE_OAUTH_*` | Evento agenda + FreeBusy |
+| `DATABASE_URL` / `SQL_*` | Postgres (`DATABASE_URL` preferito su Vercel) |
+| `FIREBASE_SERVICE_ACCOUNT_JSON` | Admin SDK su Vercel |
+| `APP_URL` | URL pubblico (success/cancel Stripe) |
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Checkout + webhook |
+| `STRIPE_PRICE_ID_*` | Price ID Dashboard (opzionali) |
+| `ZOHO_*` / `GOOGLE_*` | Email e Calendar prenotazioni |
+| `ALLOW_DIRECT_UNLOCK=true` | Solo non-prod |
 
-La config client Firebase è in `firebase-applet-config.json`. Dettagli: `docs/payments.md` e `docs/zoho-booking.md` nel Project Context.
-
-## Path pubblici (Stripe return + legali)
-
-| Path | Ruolo |
-|------|--------|
-| `/area-riservata` | Area corsi + success/cancel Stripe corsi |
-| `/dialogo` | Dialogo Tarot + success/cancel Stripe pass |
-| `/privacy` | Informativa privacy (SPA) |
-| `/privacy.html` | Privacy statica HTML (Google OAuth) |
-| `/termini-di-servizio` | Termini e Condizioni |
-| `/disclaimer` | Disclaimer legale |
-
-Contenuti legali: `src/data/legalContent.ts` (portati da v2tarotitalia).
+La config client Firebase è in `firebase-applet-config.json`.
