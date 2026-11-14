@@ -3,7 +3,6 @@ import type { ConsultationTariff, CourseId, ScreenId } from './types/handoff';
 import { AuthProvider } from './context/AuthContext';
 import {
   FloatingSideRail,
-  MobileBottomNav,
   TopBar,
 } from './components/NavigationChrome';
 import { HandoffDrawer } from './components/HandoffDrawer';
@@ -47,9 +46,15 @@ export function App() {
       <div className="min-h-screen bg-[#12100E] text-[#F4F1EA] flex flex-col relative">
         <AmbientSanctuaryBackground />
 
-        <TopBar activeScreen={activeScreen} onNavigate={handleNavigate} />
+        <TopBar
+          activeScreen={activeScreen}
+          onNavigate={handleNavigate}
+          onOpenHandoff={() => setIsHandoffOpen(true)}
+          onOpenPrivacy={() => setIsPrivacyOpen(true)}
+          showCmsKeys={showCmsKeys}
+        />
 
-        <main className="flex-1 w-full max-w-6xl mx-auto px-5 md:px-8 lg:px-12 pb-24 md:pb-12 relative z-10">
+        <main className="flex-1 w-full max-w-6xl mx-auto px-5 md:px-8 lg:px-12 pb-12 relative z-10">
           {activeScreen === 'home' && (
             <HomeScreen
               showCmsKeys={showCmsKeys}
@@ -111,12 +116,12 @@ export function App() {
         </main>
 
         {/* Quiet Editorial Footer */}
-        <footer className="hidden md:block border-t border-[#D4AF37]/15 py-6 relative z-10">
-          <div className="max-w-6xl mx-auto px-8 lg:px-12 flex flex-wrap items-center justify-between gap-4 text-xs text-[#A39B93]">
+        <footer className="border-t border-[#D4AF37]/15 py-6 relative z-10">
+          <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 flex flex-wrap items-center justify-between gap-4 text-xs text-[#A39B93]">
             <p>
               Tarot Italia · Maria Teresa Rogani, Operatore Olistico · Lettura del presente e del futuro
             </p>
-            <div className="flex items-center gap-5">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
               <button
                 type="button"
                 onClick={() => handleNavigate('chi-sono')}
@@ -155,8 +160,6 @@ export function App() {
             </div>
           </div>
         </footer>
-
-        <MobileBottomNav activeScreen={activeScreen} onNavigate={handleNavigate} />
 
         <FloatingSideRail
           onNavigate={handleNavigate}
