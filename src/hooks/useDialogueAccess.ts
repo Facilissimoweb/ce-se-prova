@@ -235,6 +235,13 @@ export function useDialogueAccess({
           return;
         }
 
+        if (json.mode !== 'direct_unlock') {
+          throw new Error(
+            json.error ||
+              'Pagamento non completato. Configura Stripe o completa il checkout.'
+          );
+        }
+
         if (json.status) {
           applyServerStatus(json.status);
         }
@@ -245,7 +252,7 @@ export function useDialogueAccess({
           sender: 'practitioner',
           authorName: 'Tarot Italia IA · Pass Attivato',
           timestamp: nowTimeLabel(),
-          text: `${selectedPack.title} attivato (${selectedPack.durationMinutes} minuti · € ${selectedPack.priceEur}). Puoi proseguire il dialogo con gli Arcani Maggiori.`,
+          text: `${selectedPack.title} attivato in preview (${selectedPack.durationMinutes} minuti · € ${selectedPack.priceEur}).`,
         });
       } catch (err) {
         setUnlockError(

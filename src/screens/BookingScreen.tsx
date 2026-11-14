@@ -144,9 +144,8 @@ export function BookingScreen({
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
+          // Prezzo e durata sono risolti solo dal catalogo server (tariffId).
           tariffId: activeTariff.id,
-          durationMinutes: activeTariff.durationMinutes,
-          priceEur: activeTariff.priceEur,
           scheduledDate: draft.selectedDateIso,
           scheduledTime: draft.selectedTimeSlot,
           fullName: draft.fullName.trim(),

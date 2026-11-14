@@ -168,6 +168,51 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
     URL.revokeObjectURL(url);
   };
 
+  const confirmCourseStripeSession = useCallback(
+    async (stripeSessionId: string) => {
+      if (!user) return;
+      setEnrolling(true);
+      setEnrollMessage(null);
+      try {
+        const token = await getIdToken();
+        if (!token) throw new Error('Sessione non valida.');
+        const res = await fetch('/api/reserved/confirm-stripe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ stripeSessionId }),
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          throw new Error(json.error || 'Pagamento corso non confermato.');
+        }
+        await loadOverview();
+        setEnrollMessage(
+          'Pagamento confermato: il percorso è attivo e le dispense sono accessibili.'
+        );
+      } catch (err) {
+        setEnrollMessage(
+          err instanceof Error ? err.message : 'Errore nella conferma del pagamento.'
+        );
+      } finally {
+        setEnrolling(false);
+      }
+    },
+    [user, getIdToken, loadOverview]
+  );
+
+  useEffect(() => {
+    if (!user) return;
+    const params = new URLSearchParams(window.location.search);
+    const stripeSessionId = params.get('course_stripe_session_id');
+    if (!stripeSessionId) return;
+    void confirmCourseStripeSession(stripeSessionId).finally(() => {
+      window.history.replaceState({}, '', window.location.pathname);
+    });
+  }, [user, confirmCourseStripeSession]);
+
   const handleUnlockCourse = async (e: FormEvent) => {
     e.preventDefault();
     if (!activeCourse || !user) return;
@@ -189,11 +234,23 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
           customerPhone: enrollPhone.trim() || undefined,
         }),
       });
-      const json = await res.json();
+      const json = (await res.json()) as {
+        error?: string;
+        mode?: 'stripe_redirect' | 'enrolled' | 'direct_unlock';
+        checkoutUrl?: string;
+      };
       if (!res.ok) throw new Error(json.error || 'Attivazione non riuscita.');
+
+      if (json.mode === 'stripe_redirect' && json.checkoutUrl) {
+        window.location.assign(json.checkoutUrl);
+        return;
+      }
+
       await loadOverview();
       setEnrollMessage(
-        `Percorso "${activeCourse.title}" attivato: tutte le dispense del corso sono ora accessibili.`
+        json.mode === 'direct_unlock'
+          ? `Percorso "${activeCourse.title}" attivato in modalità preview (ALLOW_DIRECT_UNLOCK).`
+          : `Percorso "${activeCourse.title}" attivato: tutte le dispense del corso sono ora accessibili.`
       );
     } catch (err) {
       setEnrollMessage(
