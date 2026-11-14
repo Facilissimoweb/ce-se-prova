@@ -5,7 +5,7 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/((?!privacy\\.html).*)",
+      "source": "/((?!api/|privacy\\.html).*)",
       "destination": "/index.html"
     }
   ]
