@@ -9,8 +9,28 @@
       "destination": "/api/health"
     },
     {
-      "source": "/api/(.*)",
-      "destination": "/api?__path=$1"
+      "source": "/api/courses",
+      "destination": "/api/courses"
+    },
+    {
+      "source": "/api/bookings",
+      "destination": "/api/bookings"
+    },
+    {
+      "source": "/api/bookings/(.*)",
+      "destination": "/api/bookings?__path=$1"
+    },
+    {
+      "source": "/api/stripe/(.*)",
+      "destination": "/api/stripe?__path=$1"
+    },
+    {
+      "source": "/api/reserved/(.*)",
+      "destination": "/api/reserved?__path=$1"
+    },
+    {
+      "source": "/api/dialogue/(.*)",
+      "destination": "/api/dialogue?__path=$1"
     },
     {
       "source": "/((?!api(?:/|$)|privacy\\.html).*)",
