@@ -193,7 +193,7 @@ export const siteContent = {
     checkoutNote: {
       cmsKey: '[COPY: siteContent.corsi.checkoutNote]',
       liveText:
-        'Accesso all’area riservata dopo conferma pagamento (Stripe Checkout /api/checkout/session) e registrazione dell’iscrizione su Postgres, protetta da Firebase Auth.',
+        'Accesso all’area riservata solo dopo pagamento Stripe verificato (Checkout Session paid / webhook) e iscrizione su Postgres, protetta da Firebase Auth.',
     },
   },
   booking: {
@@ -209,7 +209,7 @@ export const siteContent = {
     stripeHandoffNote: {
       cmsKey: '[COPY: siteContent.booking.stripeNote]',
       liveText:
-        'Handoff Stripe Checkout: al conferma finale l’app genera il payload verso /api/checkout/session autenticato via Firebase Auth (ID token) e persistenza su Postgres.',
+        'La prenotazione salva tariffa, durata e prezzo dal catalogo server (non dal client). Il pagamento Stripe del consulto può essere collegato in un passo successivo.',
     },
   },
   chat: {
@@ -797,9 +797,16 @@ export const handoffArchitectureSpec: {
     'SQL_PASSWORD',
     'STRIPE_SECRET_KEY',
     'STRIPE_WEBHOOK_SECRET',
+    'ALLOW_DIRECT_UNLOCK',
     'STRIPE_PRICE_ID_DIALOGO_5M',
     'STRIPE_PRICE_ID_DIALOGO_10M',
     'STRIPE_PRICE_ID_DIALOGO_15M',
+    'STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI',
+    'STRIPE_PRICE_ID_CORSO_ARCANI_MINORI',
+    'STRIPE_PRICE_ID_CORSO_METODI_STESURA',
+    'STRIPE_PRICE_ID_CONSULTO_45M',
+    'STRIPE_PRICE_ID_CONSULTO_60M',
+    'STRIPE_PRICE_ID_CONSULTO_90M',
     'WHATSAPP_VERIFY_TOKEN',
     'WHATSAPP_ACCESS_TOKEN',
   ],

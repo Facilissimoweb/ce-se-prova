@@ -16,6 +16,7 @@ import type {
   DialoguePackId,
 } from '../types/handoff.ts';
 import { COURSE_SEED_CATALOG } from './seedData.ts';
+import { resolveBookingTariff } from '../lib/paymentCatalog.ts';
 
 let seedPromise: Promise<void> | null = null;
 
@@ -302,6 +303,30 @@ export async function getReservedAreaOverview(
   }
 }
 
+export async function findCourseBySlug(courseSlug: string) {
+  await ensureCatalogSeeded();
+  const courseRows = await db
+    .select()
+    .from(courses)
+    .where(eq(courses.slug, courseSlug))
+    .limit(1);
+  return courseRows[0] ?? null;
+}
+
+export async function findCoursePurchaseByStripeSession(stripeSessionId: string) {
+  const rows = await db
+    .select()
+    .from(coursePurchases)
+    .where(eq(coursePurchases.stripeSessionId, stripeSessionId))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+/**
+ * Attiva un acquisto corso solo con stripeSessionId già verificato come paid
+ * (webhook / confirm-session) oppure con id esplicito di bypass non-prod (`cs_dev_…`).
+ * Non inventa mai `cs_reserved_…` per sblocchi reali.
+ */
 export async function enrollUserInCourse(params: {
   uid: string;
   email: string;
@@ -309,10 +334,30 @@ export async function enrollUserInCourse(params: {
   courseSlug: string;
   customerName: string;
   customerPhone?: string;
-  stripeSessionId?: string;
+  stripeSessionId: string;
 }) {
   await ensureCatalogSeeded();
   try {
+    const stripeSessionId = params.stripeSessionId.trim();
+    if (!stripeSessionId) {
+      throw new Error('Pagamento Stripe richiesto per attivare il percorso.');
+    }
+
+    const existingBySession =
+      await findCoursePurchaseByStripeSession(stripeSessionId);
+    if (existingBySession && existingBySession.status === 'active') {
+      const courseRows = await db
+        .select()
+        .from(courses)
+        .where(eq(courses.id, existingBySession.courseId))
+        .limit(1);
+      return {
+        purchase: existingBySession,
+        course: courseRows[0] ?? null,
+        alreadyActive: true as const,
+      };
+    }
+
     const dbUser = await getOrCreateUser(
       params.uid,
       params.email,
@@ -330,13 +375,7 @@ export async function enrollUserInCourse(params: {
         .where(eq(users.id, dbUser.id));
     }
 
-    const courseRows = await db
-      .select()
-      .from(courses)
-      .where(eq(courses.slug, params.courseSlug))
-      .limit(1);
-
-    const targetCourse = courseRows[0];
+    const targetCourse = await findCourseBySlug(params.courseSlug);
     if (!targetCourse) {
       throw new Error('Percorso didattico non trovato.');
     }
@@ -348,9 +387,7 @@ export async function enrollUserInCourse(params: {
         courseId: targetCourse.id,
         status: 'active',
         paymentProvider: 'stripe_checkout',
-        stripeSessionId:
-          params.stripeSessionId ||
-          `cs_reserved_${targetCourse.slug}_${Date.now()}`,
+        stripeSessionId,
         amountPaidEur: targetCourse.priceEur,
         customerName: params.customerName,
         customerPhone: params.customerPhone ?? null,
@@ -359,7 +396,11 @@ export async function enrollUserInCourse(params: {
         target: [coursePurchases.userId, coursePurchases.courseId],
         set: {
           status: 'active',
+          stripeSessionId,
+          paymentProvider: 'stripe_checkout',
+          amountPaidEur: targetCourse.priceEur,
           customerName: params.customerName,
+          purchasedAt: new Date(),
           ...(params.customerPhone ? { customerPhone: params.customerPhone } : {}),
         },
       })
@@ -368,13 +409,19 @@ export async function enrollUserInCourse(params: {
     return {
       purchase: purchaseResult[0],
       course: targetCourse,
+      alreadyActive: false as const,
     };
   } catch (error) {
     console.error('Failed to enroll user in course:', error);
+    if (
+      error instanceof Error &&
+      (error.message === 'Percorso didattico non trovato.' ||
+        error.message === 'Pagamento Stripe richiesto per attivare il percorso.')
+    ) {
+      throw error;
+    }
     throw new Error(
-      error instanceof Error && error.message === 'Percorso didattico non trovato.'
-        ? error.message
-        : 'Errore durante la registrazione dell’acquisto del percorso.',
+      'Errore durante la registrazione dell’acquisto del percorso.',
       { cause: error }
     );
   }
@@ -479,8 +526,6 @@ export async function createConsultationBooking(params: {
   uid?: string | null;
   authEmail?: string | null;
   tariffId: '45m' | '60m' | '90m';
-  durationMinutes: number;
-  priceEur: number;
   scheduledDate: string;
   scheduledTime: string;
   fullName: string;
@@ -490,6 +535,11 @@ export async function createConsultationBooking(params: {
   deontologyAccepted: boolean;
 }) {
   try {
+    const tariff = resolveBookingTariff(params.tariffId);
+    if (!tariff) {
+      throw new Error('Tariffa consulto non valida.');
+    }
+
     let dbUserId: number | null = null;
     if (params.uid) {
       const dbUser = await getOrCreateUser(
@@ -504,9 +554,9 @@ export async function createConsultationBooking(params: {
       .insert(consultationBookings)
       .values({
         userId: dbUserId,
-        tariffId: params.tariffId,
-        durationMinutes: params.durationMinutes,
-        priceEur: params.priceEur,
+        tariffId: tariff.id,
+        durationMinutes: tariff.durationMinutes,
+        priceEur: tariff.priceEur,
         scheduledDate: params.scheduledDate,
         scheduledTime: params.scheduledTime,
         fullName: params.fullName,
@@ -521,6 +571,12 @@ export async function createConsultationBooking(params: {
     return result[0];
   } catch (error) {
     console.error('Failed to create booking:', error);
+    if (
+      error instanceof Error &&
+      error.message === 'Tariffa consulto non valida.'
+    ) {
+      throw error;
+    }
     throw new Error('Impossibile registrare la prenotazione.', { cause: error });
   }
 }
@@ -727,12 +783,16 @@ export async function recordDialogueInteraction(params: {
   };
 }
 
+/**
+ * Sblocca un pass dialogo. `stripeSessionId` obbligatorio: sessione Stripe paid
+ * oppure id esplicito di bypass non-prod (`cs_dev_…`). Non inventa sessioni fittizie.
+ */
 export async function unlockDialogueTimePack(params: {
   sessionKey: string;
   packId: DialoguePackId;
   customerName: string;
   customerEmail: string;
-  stripeSessionId?: string;
+  stripeSessionId: string;
   uid?: string | null;
   authEmail?: string | null;
   authName?: string | null;
@@ -745,6 +805,11 @@ export async function unlockDialogueTimePack(params: {
     throw new Error('Pacchetto temporale non valido.');
   }
 
+  const stripeSessionId = params.stripeSessionId.trim();
+  if (!stripeSessionId) {
+    throw new Error('Pagamento Stripe richiesto per attivare il pass.');
+  }
+
   const { session, dbUserId } = await resolveOrCreateDialogueSession({
     sessionKey: params.sessionKey,
     uid: params.uid,
@@ -752,19 +817,38 @@ export async function unlockDialogueTimePack(params: {
     authName: params.authName || params.customerName,
   });
 
-  if (params.stripeSessionId) {
-    const existingPurchase = await db
-      .select()
-      .from(dialoguePurchases)
-      .where(eq(dialoguePurchases.stripeSessionId, params.stripeSessionId))
-      .limit(1);
+  const existingPurchase = await db
+    .select()
+    .from(dialoguePurchases)
+    .where(eq(dialoguePurchases.stripeSessionId, stripeSessionId))
+    .limit(1);
 
-    if (existingPurchase[0]) {
+  if (existingPurchase[0]) {
+    // Idempotent: refresh session expiry from stored purchase if needed
+    const now = new Date();
+    if (
+      existingPurchase[0].expiresAt.getTime() > now.getTime() &&
+      (!session.activePassExpiresAt ||
+        session.activePassExpiresAt.getTime() < existingPurchase[0].expiresAt.getTime())
+    ) {
+      const refreshed = await db
+        .update(dialogueSessions)
+        .set({
+          activePassExpiresAt: existingPurchase[0].expiresAt,
+          activePackId: existingPurchase[0].packId,
+          updatedAt: now,
+        })
+        .where(eq(dialogueSessions.id, session.id))
+        .returning();
       return {
-        status: computeDialogueStatus(session, new Date()),
+        status: computeDialogueStatus(refreshed[0] ?? session, now),
         purchase: existingPurchase[0],
       };
     }
+    return {
+      status: computeDialogueStatus(session, new Date()),
+      purchase: existingPurchase[0],
+    };
   }
 
   const now = new Date();
@@ -793,8 +877,7 @@ export async function unlockDialogueTimePack(params: {
       durationMinutes: pack.durationMinutes,
       priceEur: pack.priceEur,
       stripePriceId: pack.stripePriceId,
-      stripeSessionId:
-        params.stripeSessionId || `cs_dialogue_${pack.id}_${Date.now()}`,
+      stripeSessionId,
       customerName: params.customerName,
       customerEmail: params.customerEmail,
       expiresAt: newExpiresAt,

@@ -462,7 +462,7 @@ export function ReservedAreaScreen({
                     Iscrizione a {activeCourse.title}
                   </h3>
                   <p className="text-xs text-[#A39B93] leading-relaxed">
-                    Completa i tuoi dati per registrare il percorso nel tuo profilo e accedere subito alle 4 dispense formulate.
+                    Completa i tuoi dati e prosegui al checkout Stripe: le 4 dispense si sbloccano solo dopo pagamento verificato.
                   </p>
                 </div>
 
@@ -510,8 +510,8 @@ export function ReservedAreaScreen({
                     className="w-full min-h-[46px] px-5 py-3 rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all"
                   >
                     {enrolling
-                      ? 'Registrazione in corso...'
-                      : `Attiva Percorso & Dispense (€ ${activeCourse.priceEur})`}
+                      ? 'Preparazione checkout...'
+                      : `Paga e sblocca (€ ${activeCourse.priceEur})`}
                   </button>
 
                   <button

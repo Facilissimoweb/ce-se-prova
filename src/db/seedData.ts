@@ -28,7 +28,9 @@ export const COURSE_SEED_CATALOG: CourseSeedEntry[] = [
     description:
       'Studio approfondito dei 22 Trionfi: iconografia tradizionale, struttura numerologica, lettura in luce e ombra e interpretazione previsionale delle grandi svolte.',
     priceEur: 190,
-    stripePriceId: 'STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI',
+    stripePriceId:
+      process.env.STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI ||
+      'STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI',
     lessonsCount: 12,
     totalHours: '8h 30m video',
     levelLabel: 'Livello Base e Intermedio',
@@ -145,7 +147,9 @@ La previsione olistica traccia tendenze reali e punti di snodo lasciando sempre 
     description:
       'Dall’intuizione alla precisione quotidiana: padroneggia i 56 Arcani Minori per leggere tempi, persone coinvolte, dinamiche lavorative, sentimentali e materiali.',
     priceEur: 210,
-    stripePriceId: 'STRIPE_PRICE_ID_CORSO_ARCANI_MINORI',
+    stripePriceId:
+      process.env.STRIPE_PRICE_ID_CORSO_ARCANI_MINORI ||
+      'STRIPE_PRICE_ID_CORSO_ARCANI_MINORI',
     lessonsCount: 14,
     totalHours: '9h 45m video',
     levelLabel: 'Livello Intermedio',
@@ -245,7 +249,9 @@ Un Arcano Maggiore indica *che cosa* sta maturando a livello profondo; l'Arcano 
     description:
       'Dalla domanda alla narrazione coerente: impara a scegliere la geometria di stesa più adatta, collegare le carte tra loro e condurre un consulto professionale.',
     priceEur: 240,
-    stripePriceId: 'STRIPE_PRICE_ID_CORSO_METODI_STESURA',
+    stripePriceId:
+      process.env.STRIPE_PRICE_ID_CORSO_METODI_STESURA ||
+      'STRIPE_PRICE_ID_CORSO_METODI_STESURA',
     lessonsCount: 10,
     totalHours: '7h 30m video',
     levelLabel: 'Livello Avanzato & Pratica',

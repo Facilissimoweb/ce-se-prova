@@ -133,39 +133,53 @@ export function CorsiScreen({
       cancelUrlPattern: `/corsi?cancelled=true&course=${activeCourse.id}`,
     };
 
-    if (user) {
-      setEnrolling(true);
-      try {
-        const token = await getIdToken();
-        if (token) {
-          const res = await fetch('/api/reserved/enroll', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              courseSlug: activeCourse.id,
-              customerName: fullName.trim(),
-              customerPhone: phoneWhatsApp.trim(),
-            }),
-          });
-          if (!res.ok) {
-            const errJson = await res.json();
-            throw new Error(errJson.error || 'Registrazione percorso non riuscita.');
-          }
-          setEnrolledSuccess(true);
-        }
-      } catch (err) {
-        setEnrollError(
-          err instanceof Error ? err.message : 'Errore durante la registrazione.'
-        );
-      } finally {
-        setEnrolling(false);
-      }
+    setCheckoutPayload(payload);
+
+    if (!user) {
+      setEnrollError(
+        'Accedi con Google per avviare il checkout Stripe e attivare il percorso dopo il pagamento.'
+      );
+      return;
     }
 
-    setCheckoutPayload(payload);
+    setEnrolling(true);
+    try {
+      const token = await getIdToken();
+      if (!token) {
+        throw new Error('Sessione non valida. Riprova ad accedere.');
+      }
+      const res = await fetch('/api/reserved/enroll', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          courseSlug: activeCourse.id,
+          customerName: fullName.trim(),
+          customerPhone: phoneWhatsApp.trim(),
+        }),
+      });
+      const json = (await res.json()) as {
+        error?: string;
+        mode?: 'stripe_redirect' | 'enrolled' | 'direct_unlock';
+        checkoutUrl?: string;
+      };
+      if (!res.ok) {
+        throw new Error(json.error || 'Registrazione percorso non riuscita.');
+      }
+      if (json.mode === 'stripe_redirect' && json.checkoutUrl) {
+        window.location.assign(json.checkoutUrl);
+        return;
+      }
+      setEnrolledSuccess(true);
+    } catch (err) {
+      setEnrollError(
+        err instanceof Error ? err.message : 'Errore durante la registrazione.'
+      );
+    } finally {
+      setEnrolling(false);
+    }
   };
 
   const activeSampleArcana =
@@ -693,8 +707,8 @@ export function CorsiScreen({
               {enrolling
                 ? 'Registrazione in corso...'
                 : user
-                  ? `Attiva in Area Riservata (€ ${activeCourse.priceEur})`
-                  : `Prepara Checkout Corso (€ ${activeCourse.priceEur})`}
+                  ? `Vai al pagamento Stripe (€ ${activeCourse.priceEur})`
+                  : `Accedi e paga il corso (€ ${activeCourse.priceEur})`}
             </button>
           </div>
 
