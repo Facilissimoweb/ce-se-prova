@@ -1,0 +1,208 @@
+---
+name: Tarot Italia
+colors:
+  surface: '#151311'
+  surface-dim: '#151311'
+  surface-bright: '#3c3936'
+  surface-container-lowest: '#100e0c'
+  surface-container-low: '#1d1b19'
+  surface-container: '#221f1d'
+  surface-container-high: '#2c2927'
+  surface-container-highest: '#373432'
+  on-surface: '#e8e1dd'
+  on-surface-variant: '#d0c5af'
+  inverse-surface: '#e8e1dd'
+  inverse-on-surface: '#33302d'
+  outline: '#99907c'
+  outline-variant: '#4d4635'
+  surface-tint: '#e9c349'
+  primary: '#f2ca50'
+  on-primary: '#3c2f00'
+  primary-container: '#d4af37'
+  on-primary-container: '#554300'
+  inverse-primary: '#735c00'
+  secondary: '#cdc5c3'
+  on-secondary: '#342f2e'
+  secondary-container: '#4d4846'
+  on-secondary-container: '#bfb7b5'
+  tertiary: '#eccc61'
+  on-tertiary: '#3c2f00'
+  tertiary-container: '#cfb049'
+  on-tertiary-container: '#544300'
+  error: '#ffb4ab'
+  on-error: '#690005'
+  error-container: '#93000a'
+  on-error-container: '#ffdad6'
+  primary-fixed: '#ffe088'
+  primary-fixed-dim: '#e9c349'
+  on-primary-fixed: '#241a00'
+  on-primary-fixed-variant: '#574500'
+  secondary-fixed: '#eae0de'
+  secondary-fixed-dim: '#cdc5c3'
+  on-secondary-fixed: '#1f1b1a'
+  on-secondary-fixed-variant: '#4b4644'
+  tertiary-fixed: '#ffe080'
+  tertiary-fixed-dim: '#e4c45a'
+  on-tertiary-fixed: '#231b00'
+  on-tertiary-fixed-variant: '#564500'
+  background: '#151311'
+  on-background: '#e8e1dd'
+  surface-variant: '#373432'
+typography:
+  display-lg:
+    fontFamily: Noto Serif
+    fontSize: 48px
+    fontWeight: '400'
+    lineHeight: 56px
+    letterSpacing: 0.02em
+  display-lg-mobile:
+    fontFamily: Noto Serif
+    fontSize: 32px
+    fontWeight: '400'
+    lineHeight: 40px
+    letterSpacing: 0.02em
+  headline-lg:
+    fontFamily: Noto Serif
+    fontSize: 36px
+    fontWeight: '400'
+    lineHeight: 44px
+    letterSpacing: 0.01em
+  headline-lg-mobile:
+    fontFamily: Noto Serif
+    fontSize: 26px
+    fontWeight: '400'
+    lineHeight: 34px
+    letterSpacing: 0.01em
+  headline-md:
+    fontFamily: Noto Serif
+    fontSize: 24px
+    fontWeight: '500'
+    lineHeight: 32px
+  headline-sm:
+    fontFamily: Noto Serif
+    fontSize: 20px
+    fontWeight: '500'
+    lineHeight: 28px
+  title-md:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 18px
+    fontWeight: '600'
+    lineHeight: 26px
+  body-lg:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 16px
+    fontWeight: '400'
+    lineHeight: 26px
+  body-md:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 14px
+    fontWeight: '400'
+    lineHeight: 22px
+  label-md:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 13px
+    fontWeight: '600'
+    lineHeight: 18px
+    letterSpacing: 0.06em
+  label-sm:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 11px
+    fontWeight: '600'
+    lineHeight: 16px
+    letterSpacing: 0.08em
+rounded:
+  sm: 0.25rem
+  DEFAULT: 0.5rem
+  md: 0.75rem
+  lg: 1rem
+  xl: 1.5rem
+  full: 9999px
+spacing:
+  gutter: 1.5rem
+  gutter-mobile: 1rem
+  margin: 3rem
+  margin-mobile: 1.25rem
+  space-xs: 0.25rem
+  space-sm: 0.5rem
+  space-md: 1rem
+  space-lg: 1.5rem
+  space-xl: 2.5rem
+---
+
+## Brand & Style
+
+This design system expresses a refined, contemplative atmosphere tailored for an authoritative holistic practice. The aesthetic unites deep, earthen darkness with illuminated gold accents, creating an ambiance of sacred introspection, grounded wisdom, and refined mystery. It consciously avoids theatrical clichés (such as saturated purples or synthetic neons) in favor of organic obsidian tones, warm parchment whites, and muted raw linens.
+
+The design philosophy adopts a dark glassmorphic framework: rich translucency, diffused ambient depth, and luminous gold hair-lines that frame interactive rituals. Modern functional layouts ground the classic spiritual resonance, balancing timeless esoteric dignity with effortless contemporary usability.
+
+## Colors
+
+The color palette is built on deep obsidian earth and sacred metallic gold, supported by warm mineral neutrals:
+
+- **Base Canvas (`#12100E`):** A warm, deep obsidian black providing natural grounding and low retinal fatigue during contemplative readings.
+- **Primary Gold (`#D4AF37`):** The signature metallic accent, utilized for focal actions, active states, key icons, and subtle luminous contours.
+- **Gold Hover / Radiant (`#E6C65C`):** An elevated, warm golden light used during pointer interactions and focus states.
+- **Glass Panel Surface (`rgba(26, 22, 21, 0.75)`):** Semi-translucent dark slate that hosts cards, overlays, and floating rails.
+- **Hairline Border Gold (`rgba(212, 175, 55, 0.15)`):** A restrained, soft structural boundary applied across cards and surfaces.
+- **Text Main (`#F4F1EA`):** Soft, warm parchment ivory ensuring high editorial legibility without clinical harshness.
+- **Text Muted (`#A39B93`):** Neutral quartz gray for secondary metadata, captions, and structural labels.
+- **Aura Glow (`rgba(212, 175, 55, 0.25)`):** An atmospheric back-glow reserved for interactive emphasis and focus rings.
+
+## Typography
+
+Typography balances the classical authority of an elegant serif with the ergonomic clarity of a humanist sans-serif.
+
+- **Headings & Distinct Titles:** Rendered in **Noto Serif**. Letter spacing is slightly expanded on display sizes to introduce breathing room, lending titles the cadence of carved inscriptions and sacred manuscripts.
+- **UI, Body, and Inputs:** Rendered in **Plus Jakarta Sans**. Chosen for its warm geometry, open counters, and effortless readability against dark backgrounds.
+- **Labels & Microcopy:** Rendered with uppercase styling and subtle letter spacing (`0.06em` to `0.08em`) to provide clear visual separation between structural hierarchy and narrative content.
+
+## Layout & Spacing
+
+The layout model is built on an expansive 12-column responsive fluid grid designed to preserve sanctuary-like margins and intentional whitespace.
+
+- **Desktop (1024px+):** Standard 12-column grid, with generous `margin` (3rem) and `gutter` (1.5rem) ensuring panels feel suspended rather than cramped.
+- **Tablet (768px - 1023px):** 8-column layout with 2rem margins and 1rem gutters. Side navigation collapses into an anchored contact dock or glass drawer.
+- **Mobile (< 768px):** 4-column layout with 1.25rem canvas margins. Interactive controls expand to full touch targets (minimum 44px height), stacked vertically.
+- **Rhythm:** Layout flow follows intentional, unhurried pacing. Core interactive containers maintain generous internal padding (`space-lg` to `space-xl`) to honor contemplation.
+
+## Elevation & Depth
+
+Visual hierarchy uses dark glassmorphism and ambient metallic radiance rather than heavy drop shadows:
+
+1. **Flat Base Canvas:** `#12100E` serves as the infinite spatial plane.
+2. **Glass Tier 1 (Cards, Modules, Dock):** Background `rgba(26, 22, 21, 0.75)` combined with `backdrop-filter: blur(12px)`. Enclosed by a 1px border of `rgba(212, 175, 55, 0.15)`.
+3. **Glass Tier 2 (Flyouts, Active Drawers, Modals):** Background `rgba(32, 28, 26, 0.88)` with `backdrop-filter: blur(16px)` and box-shadow `0 20px 40px -10px rgba(0, 0, 0, 0.6)`.
+4. **Sacred Aura / Focus:** Interactive active states project a warm golden halo using `0 0 24px rgba(212, 175, 55, 0.25)`.
+
+## Shapes
+
+The design system embraces smooth, welcoming forms that soften the deep obsidian backdrop:
+
+- **Cards & Modals:** Standard curvature (`1rem` / 16px, `rounded-2xl`) softens sharp geometric edges into organic stone-like slabs.
+- **Buttons, Inputs, & Tags:** Medium curvature (`0.5rem` / 8px) gives controls defined utility while matching the rounded silhouette of the cards.
+- **Pills & Status Indicators:** Fully rounded (`rounded-full`) reserved strictly for status chips, micro-pills, and circular dock actions.
+
+## Components
+
+### Buttons
+- **Primary Gold:** Background `#D4AF37`, text `#12100E` (bold font weight), rounded corners (0.5rem). On hover, transitions to `#E6C65C` with a soft gold glow (`box-shadow: 0 0 16px rgba(212, 175, 55, 0.3)`).
+- **Ghost Glass:** Background `rgba(212, 175, 55, 0.05)`, border 1px `rgba(212, 175, 55, 0.3)`, text `#F4F1EA`. On hover, fills with `rgba(212, 175, 55, 0.12)` and brightens the border to `#D4AF37`.
+
+### Cards & Panels
+- Translucent surface `rgba(26, 22, 21, 0.75)` with `backdrop-blur-md` and 1px border `rgba(212, 175, 55, 0.15)`. Internal padding scales from `space-md` on mobile to `space-xl` on desktop.
+
+### Form Inputs & Textareas
+- Deep inset background `rgba(18, 16, 14, 0.85)` with a 1px border `rgba(163, 155, 147, 0.25)`. Text in `#F4F1EA`, placeholder in `#A39B93`.
+- **Focus State:** Border transitions to `#D4AF37` with an ambient glow (`box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2)`).
+
+### Selection Controls (Checkboxes & Radios)
+- Base inset box with a subtle gold hairline. Checked state fills with `#D4AF37` featuring an obsidian checkmark or center pip.
+
+### Chips & Badges
+- Compact capsules (`rounded-full`) with `rgba(212, 175, 55, 0.08)` background, hairline border `rgba(212, 175, 55, 0.25)`, and uppercase label typography (`label-sm`).
+
+### Widget Modal Header
+- Standardized header containing the sacred monogram/logo mark, the brand signature, and the modal title in `Noto Serif`, separated by a fine horizontal gold gradient divider (`linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent)`).
+
+### Side Rail & Floating Contact Dock
+- Fixed floating orientation, utilizing glass tier 2 with rounded pill geometries, housing quick-action consultations, contact channels, and holistic ritual links with muted gold iconography.

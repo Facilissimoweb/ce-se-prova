@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Cinzel", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --color-obsidian: #12100e;
+  --color-obsidian-soft: #151311;
+  --color-obsidian-elevated: #1d1b19;
+  --color-obsidian-surface: #221f1d;
+  --color-parchment: #f4f1ea;
+  --color-parchment-soft: #e8e1dd;
+  --color-quartz: #a39b93;
+  --color-gold: #d4af37;
+  --color-gold-hover: #e6c65c;
+}
+
+@layer base {
+  html {
+    background-color: #12100e;
+    color: #f4f1ea;
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #12100e;
+    color: #f4f1ea;
+    overflow-x: hidden;
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-body {
+  font-family: var(--font-sans);
+}
+
+.glass-tier-1 {
+  background-color: rgba(26, 22, 21, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.glass-tier-2 {
+  background-color: rgba(32, 28, 26, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+}
+
+.input-inset {
+  background-color: rgba(18, 16, 14, 0.85);
+  border: 1px solid rgba(163, 155, 147, 0.25);
+  color: #f4f1ea;
+  transition: border-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.input-inset::placeholder {
+  color: #a39b93;
+}
+
+.input-inset:focus {
+  outline: none;
+  border-color: #d4af37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+.gold-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(212, 175, 55, 0.4),
+    transparent
+  );
+}
+
+.sacred-aura {
+  box-shadow: 0 0 24px rgba(212, 175, 55, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
