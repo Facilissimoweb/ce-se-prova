@@ -1,11 +1,24 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { ensureBookingSchema } from '../db/ensureBookingSchema.ts';
 import { verifyBearerToken } from './authToken.ts';
+import type { ApiResult, ApiUser } from './http.ts';
 import {
-  resolveRequestOrigin,
-  type ApiResult,
-  type ApiUser,
-} from './http.ts';
+  queryString,
+  readBodyObject,
+  readRawBody,
+  requestOrigin,
+  sendJson,
+  type NodeLikeReq,
+  type NodeLikeRes,
+} from './nodeHttp.ts';
+
+export {
+  queryString,
+  readBodyObject,
+  readRawBody,
+  requestOrigin,
+  sendJson,
+};
+export type { NodeLikeReq, NodeLikeRes };
 
 declare global {
   // eslint-disable-next-line no-var
@@ -21,94 +34,46 @@ export async function ensureSchemaOnce(): Promise<void> {
   await globalThis._ennamoSchemaReady;
 }
 
-export function sendApiResult(res: VercelResponse, result: ApiResult): void {
-  res.status(result.status).json(result.body);
-}
-
-export function readBodyObject(req: VercelRequest): Record<string, unknown> {
-  if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) {
-    return req.body as Record<string, unknown>;
-  }
-  if (typeof req.body === 'string' && req.body.trim()) {
-    try {
-      return JSON.parse(req.body) as Record<string, unknown>;
-    } catch {
-      return {};
-    }
-  }
-  return {};
-}
-
-export function queryString(
-  value: string | string[] | undefined
-): string {
-  if (Array.isArray(value)) return String(value[0] || '');
-  return String(value || '');
-}
-
-export function requestOrigin(req: VercelRequest): string {
-  const proto = String(req.headers['x-forwarded-proto'] || 'https');
-  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '');
-  if (host) {
-    return `${proto}://${host}`.replace(/\/$/, '');
-  }
-  const origin =
-    typeof req.headers.origin === 'string' ? req.headers.origin : undefined;
-  return resolveRequestOrigin(origin);
+export function sendApiResult(res: NodeLikeRes, result: ApiResult): void {
+  sendJson(res, result.status, result.body);
 }
 
 export async function requireUser(
-  req: VercelRequest,
-  res: VercelResponse
+  req: NodeLikeReq,
+  res: NodeLikeRes
 ): Promise<ApiUser | null> {
   const auth = await verifyBearerToken(
-    typeof req.headers.authorization === 'string'
-      ? req.headers.authorization
-      : undefined,
+    readHeaderSafe(req, 'authorization') || undefined,
     'required'
   );
   if (!auth.ok) {
-    res.status(auth.status).json({ error: auth.error });
+    sendJson(res, auth.status, { error: auth.error });
     return null;
   }
   return auth.user;
 }
 
-export async function optionalUser(req: VercelRequest): Promise<ApiUser | null> {
+export async function optionalUser(req: NodeLikeReq): Promise<ApiUser | null> {
   const auth = await verifyBearerToken(
-    typeof req.headers.authorization === 'string'
-      ? req.headers.authorization
-      : undefined,
+    readHeaderSafe(req, 'authorization') || undefined,
     'optional'
   );
   return auth.ok ? auth.user : null;
 }
 
 export function methodNotAllowed(
-  res: VercelResponse,
+  res: NodeLikeRes,
   allowed: string[]
 ): void {
   res.setHeader('Allow', allowed.join(', '));
-  res.status(405).json({ error: 'Metodo non consentito.' });
+  sendJson(res, 405, { error: 'Metodo non consentito.' });
 }
 
-/** Read raw body for Stripe webhook signature verification. */
-export async function readRawBody(req: VercelRequest): Promise<Buffer> {
-  if (Buffer.isBuffer(req.body)) {
-    return req.body;
+function readHeaderSafe(req: NodeLikeReq, name: string): string {
+  const target = name.toLowerCase();
+  for (const [key, value] of Object.entries(req.headers || {})) {
+    if (key.toLowerCase() !== target) continue;
+    return (Array.isArray(value) ? value[0] : value)?.trim() ?? '';
   }
-  if (typeof req.body === 'string') {
-    return Buffer.from(req.body, 'utf8');
-  }
-  if (req.body && typeof req.body === 'object') {
-    // Fallback if a platform layer already parsed JSON — re-serialize is unsafe
-    // for Stripe signatures; prefer bodyParser:false + stream below.
-    return Buffer.from(JSON.stringify(req.body), 'utf8');
-  }
-
-  const chunks: Buffer[] = [];
-  for await (const chunk of req) {
-    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-  }
-  return Buffer.concat(chunks);
+  return '';
 }

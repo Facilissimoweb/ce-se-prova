@@ -1,28 +1,31 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { postStripeWebhook } from '../../src/server/routes/stripeWebhook.ts';
 import {
   ensureSchemaOnce,
   methodNotAllowed,
   readRawBody,
   sendApiResult,
+  type NodeLikeReq,
+  type NodeLikeRes,
 } from '../../src/server/vercelAdapter.ts';
 
-/** Disable Vercel body parsing so Stripe signature verification sees the raw payload. */
+/**
+ * bodyParser:false keeps the raw payload for Stripe-Signature.
+ * maxDuration 30 matches v2 Hobby-friendly Node functions.
+ */
 export const config = {
-  api: {
-    bodyParser: false,
-  },
-  maxDuration: 60,
+  runtime: 'nodejs',
+  api: { bodyParser: false },
+  maxDuration: 30,
 };
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   await ensureSchemaOnce();
   if (req.method !== 'POST') {
     return methodNotAllowed(res, ['POST']);
   }
 
   const rawBody = await readRawBody(req);
-  const signature =
+  const signatureHeader =
     typeof req.headers['stripe-signature'] === 'string'
       ? req.headers['stripe-signature']
       : Array.isArray(req.headers['stripe-signature'])
@@ -33,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res,
     await postStripeWebhook({
       rawBody,
-      signatureHeader: signature,
+      signatureHeader,
     })
   );
 }

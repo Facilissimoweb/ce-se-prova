@@ -1,4 +1,3 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { postReservedEnroll } from '../../src/server/routes/reserved.ts';
 import {
   ensureSchemaOnce,
@@ -7,9 +6,13 @@ import {
   requestOrigin,
   requireUser,
   sendApiResult,
+  type NodeLikeReq,
+  type NodeLikeRes,
 } from '../../src/server/vercelAdapter.ts';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export const config = { runtime: 'nodejs', maxDuration: 30 };
+
+export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   await ensureSchemaOnce();
   if (req.method !== 'POST') {
     return methodNotAllowed(res, ['POST']);

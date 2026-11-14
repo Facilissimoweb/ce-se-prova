@@ -1,4 +1,3 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getDialogueStatus } from '../../src/server/routes/dialogue.ts';
 import {
   ensureSchemaOnce,
@@ -6,9 +5,13 @@ import {
   optionalUser,
   queryString,
   sendApiResult,
+  type NodeLikeReq,
+  type NodeLikeRes,
 } from '../../src/server/vercelAdapter.ts';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export const config = { runtime: 'nodejs', maxDuration: 30 };
+
+export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   await ensureSchemaOnce();
   if (req.method !== 'GET') {
     return methodNotAllowed(res, ['GET']);
@@ -18,7 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res,
     await getDialogueStatus({
       user,
-      sessionKey: queryString(req.query.sessionKey),
+      sessionKey: queryString(req.query?.sessionKey),
     })
   );
 }

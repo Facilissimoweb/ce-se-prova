@@ -1,4 +1,3 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { putDispensaProgress } from '../../../../src/server/routes/reserved.ts';
 import {
   ensureSchemaOnce,
@@ -7,9 +6,13 @@ import {
   readBodyObject,
   requireUser,
   sendApiResult,
+  type NodeLikeReq,
+  type NodeLikeRes,
 } from '../../../../src/server/vercelAdapter.ts';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export const config = { runtime: 'nodejs', maxDuration: 30 };
+
+export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   await ensureSchemaOnce();
   if (req.method !== 'PUT') {
     return methodNotAllowed(res, ['PUT']);
@@ -17,12 +20,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const user = await requireUser(req, res);
   if (!user) return;
 
-  const dispensaId = Number(
-    queryString(req.query.dispensaId) ||
-      (typeof req.query.dispensaId === 'undefined'
-        ? ''
-        : String(req.query.dispensaId))
-  );
+  const dispensaId = Number(queryString(req.query?.dispensaId));
 
   return sendApiResult(
     res,

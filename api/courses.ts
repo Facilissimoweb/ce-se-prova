@@ -1,12 +1,15 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getCourses } from '../src/server/routes/courses.ts';
 import {
   ensureSchemaOnce,
   methodNotAllowed,
   sendApiResult,
+  type NodeLikeReq,
+  type NodeLikeRes,
 } from '../src/server/vercelAdapter.ts';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export const config = { runtime: 'nodejs', maxDuration: 30 };
+
+export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   await ensureSchemaOnce();
   if (req.method !== 'GET') {
     return methodNotAllowed(res, ['GET']);
