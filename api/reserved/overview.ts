@@ -5,7 +5,7 @@ import {
   methodNotAllowed,
   requireUser,
   sendApiResult,
-} from '../_lib/vercelHandler.ts';
+} from '../../src/server/vercelAdapter.ts';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   await ensureSchemaOnce();

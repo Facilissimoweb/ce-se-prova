@@ -5,7 +5,7 @@ import {
   methodNotAllowed,
   readRawBody,
   sendApiResult,
-} from '../_lib/vercelHandler.ts';
+} from '../../src/server/vercelAdapter.ts';
 
 /** Disable Vercel body parsing so Stripe signature verification sees the raw payload. */
 export const config = {

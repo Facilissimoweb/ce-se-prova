@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { ensureBookingSchema } from '../../src/db/ensureBookingSchema.ts';
-import { verifyBearerToken } from '../../src/server/authToken.ts';
+import { ensureBookingSchema } from '../db/ensureBookingSchema.ts';
+import { verifyBearerToken } from './authToken.ts';
 import {
   resolveRequestOrigin,
   type ApiResult,
   type ApiUser,
-} from '../../src/server/http.ts';
+} from './http.ts';
 
 declare global {
   // eslint-disable-next-line no-var
