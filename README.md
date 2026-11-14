@@ -34,8 +34,8 @@ npm run lint     # tsc --noEmit
    - `FIREBASE_SERVICE_ACCOUNT_JSON`
    - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
    - `APP_URL` (URL pubblico, es. preview o `https://www.tarotitalia.com`)
-3. Deploy: SPA in `dist/` + **6** funzioni Serverless (`health.ts` zero-dep; gli altri prodotti da `npm run build:api` → `api/*.js`). Il transpile Vercel non risolve i `.ts` di `src/` a runtime — serve il bundle esbuild. Sotto-path via rewrite `?__path=`. URL frontend `/api/*` invariate. Hobby: max 12 funzioni. La rewrite SPA **non** intercetta `/api` né `privacy.html`.
-4. Webhook Stripe: `https://<deployment>/api/stripe/webhook` (raw body; `bodyParser: false` sul bundle `api/stripe.js`).
+3. Deploy: SPA in `dist/` + **6** funzioni Serverless (`api/health.ts` + **committed** `api/{courses,bookings,stripe,reserved,dialogue}.js` from `npm run build:api`). Vercel only discovers functions present in the repo `api/` tree — generated-only JS was 404. Refresh bundles with `npm run build:api` before commit when entries change. Sotto-path via rewrite `?__path=`. Hobby: max 12. SPA rewrite skips `/api` and `privacy.html`.
+4. Webhook Stripe: `https://<deployment>/api/stripe/webhook` (raw body; `bodyParser: false` on `api/stripe.js`).
 5. Solo dopo smoke delle API: aggiungi il dominio custom (`www.tarotitalia.com`) — vedi docs cutover nel Project Context.
 
 Express resta per `npm run dev` / host Node di emergenza; **non** serve un processo Express sempre acceso su Vercel.
