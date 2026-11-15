@@ -301,6 +301,223 @@
   animation: heroMarkGlow 7.5s ease-in-out infinite;
 }
 
+/**
+ * Home hero nebula — soft smoke/stars behind logo+copy only.
+ * GPU-friendly: opacity + translate3d; no blur/filter on animated layers.
+ */
+.home-hero-nebula {
+  position: absolute;
+  inset: -8% -12% -18%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: layout paint;
+}
+
+.home-hero-nebula__veil {
+  position: absolute;
+  inset: 8% 12% 18%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(18, 16, 14, 0.18) 0%,
+    transparent 70%
+  );
+  opacity: 0.55;
+}
+
+.home-hero-nebula__cloud {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+}
+
+.home-hero-nebula__cloud--gold {
+  left: 12%;
+  top: 2%;
+  width: min(78vw, 460px);
+  height: min(56vw, 320px);
+  background: radial-gradient(
+    ellipse at 45% 40%,
+    rgba(212, 175, 55, 0.28) 0%,
+    rgba(212, 175, 55, 0.09) 40%,
+    transparent 72%
+  );
+  animation: heroNebulaDriftA 18s ease-in-out infinite;
+}
+
+.home-hero-nebula__cloud--purple {
+  right: 4%;
+  top: 14%;
+  width: min(74vw, 420px);
+  height: min(62vw, 350px);
+  background: radial-gradient(
+    ellipse at 55% 45%,
+    rgba(120, 78, 178, 0.26) 0%,
+    rgba(88, 60, 140, 0.1) 44%,
+    transparent 74%
+  );
+  animation: heroNebulaDriftB 22s ease-in-out infinite;
+}
+
+.home-hero-nebula__cloud--green {
+  left: 18%;
+  bottom: 0%;
+  width: min(70vw, 400px);
+  height: min(52vw, 300px);
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(72, 140, 108, 0.2) 0%,
+    rgba(52, 110, 88, 0.07) 46%,
+    transparent 72%
+  );
+  animation: heroNebulaDriftC 20s ease-in-out infinite;
+}
+
+.home-hero-nebula__cloud--gold-soft {
+  left: 38%;
+  top: 24%;
+  width: min(54vw, 300px);
+  height: min(44vw, 240px);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(230, 198, 92, 0.18) 0%,
+    transparent 68%
+  );
+  animation: heroNebulaDriftA 26s ease-in-out infinite reverse;
+  animation-delay: -6s;
+}
+
+.home-hero-nebula__cloud--purple-soft {
+  left: 4%;
+  top: 32%;
+  width: min(48vw, 250px);
+  height: min(40vw, 210px);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(140, 96, 200, 0.16) 0%,
+    transparent 70%
+  );
+  animation: heroNebulaDriftB 24s ease-in-out infinite reverse;
+  animation-delay: -4s;
+}
+
+.home-hero-nebula__haze {
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  width: min(96vw, 560px);
+  height: min(74vw, 430px);
+  transform: translate3d(-50%, 0, 0);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(212, 175, 55, 0.09) 0%,
+    rgba(98, 68, 150, 0.07) 36%,
+    rgba(72, 140, 108, 0.05) 58%,
+    transparent 76%
+  );
+  opacity: 0.9;
+  animation: heroNebulaBreath 14s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.home-hero-nebula__star {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(244, 241, 234, 0.85);
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.35);
+  animation-name: heroNebulaTwinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: opacity, transform;
+}
+
+@keyframes heroNebulaDriftA {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(14px, -10px, 0) scale(1.06);
+    opacity: 0.85;
+  }
+}
+
+@keyframes heroNebulaDriftB {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate3d(-16px, 12px, 0) scale(1.08);
+    opacity: 0.78;
+  }
+}
+
+@keyframes heroNebulaDriftC {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.02);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate3d(10px, -14px, 0) scale(1.1);
+    opacity: 0.72;
+  }
+}
+
+@keyframes heroNebulaBreath {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: translate3d(-50%, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate3d(-50%, -8px, 0) scale(1.05);
+  }
+}
+
+@keyframes heroNebulaTwinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-nebula__cloud,
+  .home-hero-nebula__haze,
+  .home-hero-nebula__star {
+    animation: none !important;
+  }
+
+  .home-hero-nebula__cloud--gold,
+  .home-hero-nebula__cloud--purple,
+  .home-hero-nebula__cloud--green,
+  .home-hero-nebula__cloud--gold-soft,
+  .home-hero-nebula__cloud--purple-soft {
+    opacity: 0.5;
+  }
+
+  .home-hero-nebula__haze {
+    opacity: 0.75;
+  }
+
+  .home-hero-nebula__star {
+    opacity: 0.35;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
