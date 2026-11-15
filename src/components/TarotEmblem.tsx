@@ -3,6 +3,9 @@ import React from 'react';
 /** Canonical brand mark — transparent PNG in public/brand/. */
 export const TAROT_ITALIA_LOGO_SRC = '/brand/tarot-italia-logo.png';
 
+/** Home opening hero mark (triangle / eye · TAROT ITALIA) — RGBA as-is. */
+export const TAROT_ITALIA_HOME_HERO_SRC = '/brand/tarot-italia-home-hero.png';
+
 interface LogoProps {
   className?: string;
   size?: number;
