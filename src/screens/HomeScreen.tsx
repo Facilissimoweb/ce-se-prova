@@ -10,7 +10,7 @@ import {
 import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
 import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
-import { TarotEmblemLogo } from '../components/TarotEmblem';
+import { TAROT_ITALIA_HOME_HERO_SRC, TarotEmblemLogo } from '../components/TarotEmblem';
 import { HomeArticlesLoop } from '../components/HomeArticlesLoop';
 import {
   HOME_CONSULTI_SECTION_ID,
@@ -56,86 +56,64 @@ export function HomeScreen({
     <div className="space-y-16 md:space-y-24 pb-8">
       <HomeSectionBookmarks visible />
 
-      {/* Sartorial Hero — No overlapping cards, generous obsidian negative space */}
-      <section className="pt-8 md:pt-14">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          <div className="lg:col-span-8 space-y-6">
-            <p className="text-xs md:text-[13px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-              <CopyText entry={siteContent.home.kicker} showKeys={showCmsKeys} />
-            </p>
+      {/* Opening brand mark — one composition: mark leads, copy follows with restraint */}
+      <section className="relative pt-1 md:pt-3" aria-labelledby="home-hero-heading">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-[4%] flex justify-center"
+          aria-hidden="true"
+        >
+          <div className="h-[min(44vw,260px)] w-[min(64vw,340px)] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.16)_0%,rgba(88,60,140,0.08)_42%,transparent_72%)] animate-hero-mark-glow" />
+        </div>
 
-            <h1 className="font-display text-[34px] leading-[42px] md:text-[52px] md:leading-[60px] tracking-[0.02em] font-normal text-[#F4F1EA] max-w-2xl text-balance">
-              <CopyText entry={siteContent.home.hero} showKeys={showCmsKeys} />
-            </h1>
+        <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
+          <img
+            src={TAROT_ITALIA_HOME_HERO_SRC}
+            alt="Tarot Italia"
+            width={1024}
+            height={1024}
+            decoding="async"
+            fetchPriority="high"
+            className="h-auto w-[min(68vw,236px)] object-contain object-center md:w-[min(34vw,268px)] animate-hero-mark-rise"
+          />
 
-            <p className="text-base md:text-[17px] leading-[26px] md:leading-[28px] text-[#A39B93] max-w-[62ch]">
-              <CopyText entry={siteContent.home.heroSubtitle} showKeys={showCmsKeys} />
-            </p>
+          <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#D4AF37]/90 md:mt-5 md:text-xs animate-hero-copy-rise [animation-delay:120ms]">
+            <CopyText entry={siteContent.home.kicker} showKeys={showCmsKeys} />
+          </p>
 
-            {/* Primary & Secondary Actions */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              <button
-                type="button"
-                onClick={() => onNavigate('consulti')}
-                className="cta-label px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 shrink-0 transition-all duration-150 hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
-              >
-                Scegli il Consulto
-                <ArrowRight className="w-4 h-4 shrink-0" />
-              </button>
+          <h1
+            id="home-hero-heading"
+            className="mt-2 max-w-xl font-display text-[22px] leading-[30px] font-normal tracking-[0.02em] text-[#F4F1EA] text-balance md:mt-3 md:text-[28px] md:leading-[36px] animate-hero-copy-rise [animation-delay:220ms]"
+          >
+            <CopyText entry={siteContent.home.hero} showKeys={showCmsKeys} />
+          </h1>
 
-              <button
-                type="button"
-                onClick={() => onNavigate('chat')}
-                className="cta-label px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37]/5 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/12 hover:border-[#D4AF37] text-[#F4F1EA] text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
-              >
-                <MessageCircle className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                Apri Dialogo Tarot
-              </button>
-            </div>
+          <p className="mt-2.5 max-w-[46ch] text-[13px] leading-[20px] text-[#A39B93] md:mt-3 md:text-sm md:leading-[22px] animate-hero-copy-rise [animation-delay:320ms]">
+            <CopyText entry={siteContent.home.heroSubtitle} showKeys={showCmsKeys} />
+          </p>
 
-            {/* Clean Unboxed Deontological & Modality Metadata */}
-            <div className="pt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs md:text-[13px] text-[#A39B93]">
-              <span>Lettura del presente e del futuro</span>
-              <span aria-hidden="true" className="text-[#D4AF37]/60">·</span>
-              <span>Sessioni riservate 20 / 45 / 60 / 90 min</span>
-              <span aria-hidden="true" className="text-[#D4AF37]/60">·</span>
-              <span>Chiamata vocale online &amp; di persona a Macerata</span>
-            </div>
-          </div>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3 md:mt-6 md:gap-4 animate-hero-copy-rise [animation-delay:420ms]">
+            <button
+              type="button"
+              onClick={() => onNavigate('consulti')}
+              className="cta-label px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 shrink-0 transition-all duration-150 hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+            >
+              Scegli il Consulto
+              <ArrowRight className="w-4 h-4 shrink-0" />
+            </button>
 
-          {/* Right Sartorial Focal Anchor: Subtle Emblem & Arcana Preview */}
-          <div className="lg:col-span-4 flex justify-center lg:justify-end">
             <button
               type="button"
               onClick={() => onNavigate('chat')}
-              className="group glass-tier-1 rounded-2xl p-6 w-full max-w-[300px] text-left transition-all duration-200 hover:border-[#D4AF37]/40 hover:shadow-[0_0_28px_rgba(212,175,55,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+              className="cta-label px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37]/5 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/12 hover:border-[#D4AF37] text-[#F4F1EA] text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
             >
-              <div className="flex items-center justify-between text-xs text-[#A39B93] mb-4">
-                <span className="uppercase tracking-[0.08em] text-[#D4AF37] font-semibold">
-                  Arcano del Giorno
-                </span>
-                <span className="font-mono tabular-nums">IX</span>
-              </div>
-              <div className="w-40 mx-auto my-2 rounded-xl overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
-                <MajorArcanaArtwork
-                  number={9}
-                  numeral="IX"
-                  name="L'Eremita"
-                  className="w-full h-auto"
-                />
-              </div>
-              <div className="mt-4 pt-3 border-t border-[#D4AF37]/15 flex items-center justify-between">
-                <span className="font-display text-sm text-[#F4F1EA]">L&apos;Eremita</span>
-                <span className="text-xs text-[#D4AF37] inline-flex items-center gap-1">
-                  Contempla <ArrowRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
+              <MessageCircle className="w-4 h-4 text-[#D4AF37] shrink-0" />
+              Apri Dialogo Tarot
             </button>
           </div>
         </div>
       </section>
 
-      {/* Atmospheric Showcase — 16:9 Editorial Visual */}
+      {/* Atmospheric Showcase — below the opening brand composition */}
       <section aria-label="Atmosfera di Tarot Italia">
         <figure className="relative rounded-2xl overflow-hidden border border-[#D4AF37]/20 glass-tier-1">
           <div className="aspect-[16/9] w-full overflow-hidden">
@@ -164,6 +142,51 @@ export function HomeScreen({
             </span>
           </figcaption>
         </figure>
+
+        <p className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-xs md:text-[13px] text-[#A39B93]">
+          <span>Lettura del presente e del futuro</span>
+          <span aria-hidden="true" className="text-[#D4AF37]/60">
+            ·
+          </span>
+          <span>Sessioni riservate 20 / 45 / 60 / 90 min</span>
+          <span aria-hidden="true" className="text-[#D4AF37]/60">
+            ·
+          </span>
+          <span>Chiamata vocale online &amp; di persona a Macerata</span>
+        </p>
+      </section>
+
+      {/* Arcano del Giorno — after opening composition (not in the hero) */}
+      <section aria-labelledby="arcano-giorno-heading" className="flex justify-center">
+        <button
+          type="button"
+          onClick={() => onNavigate('chat')}
+          className="group glass-tier-1 rounded-2xl p-6 w-full max-w-[300px] text-left transition-all duration-200 hover:border-[#D4AF37]/40 hover:shadow-[0_0_28px_rgba(212,175,55,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+        >
+          <div className="mb-4 flex items-center justify-between text-xs text-[#A39B93]">
+            <span
+              id="arcano-giorno-heading"
+              className="font-semibold uppercase tracking-[0.08em] text-[#D4AF37]"
+            >
+              Arcano del Giorno
+            </span>
+            <span className="font-mono tabular-nums">IX</span>
+          </div>
+          <div className="mx-auto my-2 w-40 overflow-hidden rounded-xl transition-transform duration-300 group-hover:-translate-y-1">
+            <MajorArcanaArtwork
+              number={9}
+              numeral="IX"
+              name="L'Eremita"
+              className="h-auto w-full"
+            />
+          </div>
+          <div className="mt-4 flex items-center justify-between border-t border-[#D4AF37]/15 pt-3">
+            <span className="font-display text-sm text-[#F4F1EA]">L&apos;Eremita</span>
+            <span className="inline-flex items-center gap-1 text-xs text-[#D4AF37]">
+              Contempla <ArrowRight className="h-3.5 w-3.5" />
+            </span>
+          </div>
+        </button>
       </section>
 
       <div className="gold-divider" aria-hidden="true" />
