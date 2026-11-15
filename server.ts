@@ -1,6 +1,6 @@
 /**
  * Runtime locale / host Node: Express serve API `/api/*` e, in produzione, i file statici in `dist/`.
- * Su Vercel: `api/health.ts` + esbuild di `src/server/apiEntries/*` → `api/{courses,bookings,stripe,reserved,dialogue}.js`.
+ * Su Vercel: `api/health.ts` + esbuild di `src/server/apiEntries/*` → `api/{courses,bookings,stripe,reserved,dialogue,news}.js`.
  */
 import express from 'express';
 import { createServer as createHttpServer } from 'http';
@@ -10,6 +10,7 @@ import { createServer as createViteServer } from 'vite';
 import { requireAuth, optionalAuth, type AuthRequest } from './src/middleware/auth.ts';
 import { ensureBookingSchema } from './src/db/ensureBookingSchema.ts';
 import { getCourses } from './src/server/routes/courses.ts';
+import { getNewsArticles } from './src/server/routes/news.ts';
 import {
   getReservedOverview,
   postReservedConfirmStripe,
@@ -65,6 +66,14 @@ async function startServer() {
 
   app.get('/api/courses', async (_req, res) => {
     sendResult(res, await getCourses());
+  });
+
+  app.get('/api/news', async (_req, res) => {
+    const result = await getNewsArticles();
+    if (result.cacheControl) {
+      res.setHeader('Cache-Control', result.cacheControl);
+    }
+    sendResult(res, { status: result.status, body: result.body });
   });
 
   app.get('/api/reserved/overview', requireAuth, async (req: AuthRequest, res) => {

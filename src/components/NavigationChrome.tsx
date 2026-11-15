@@ -8,6 +8,7 @@ import {
   Lock,
   Menu,
   MessageCircle,
+  Newspaper,
   PhoneCall,
   ShieldCheck,
   Sparkles,
@@ -56,6 +57,13 @@ const NAV_ITEMS: {
     label: 'Corsi',
     subtitle: 'Arcani Maggiori, Minori e Stesure',
     icon: BookOpen,
+  },
+  {
+    id: 'news',
+    label: 'News',
+    drawerLabel: 'News / Articoli',
+    subtitle: 'Scritti da Substack @tarotitalia',
+    icon: Newspaper,
   },
   {
     id: 'chat',

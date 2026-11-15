@@ -6,6 +6,7 @@ export type ScreenId =
   | 'area-riservata'
   | 'booking'
   | 'chat'
+  | 'news'
   | 'privacy'
   | 'termini'
   | 'disclaimer'

@@ -22,6 +22,8 @@ import { TerminiScreen } from './screens/TerminiScreen';
 import { DisclaimerScreen } from './screens/DisclaimerScreen';
 import { SitemapScreen } from './screens/SitemapScreen';
 import { NotFoundScreen } from './screens/NotFoundScreen';
+import { NewsScreen } from './screens/NewsScreen';
+import { SocialShareButtons } from './components/SocialShareButtons';
 import { legalContent } from './data/legalContent';
 import {
   bootstrapScreenFromLocation,
@@ -44,6 +46,7 @@ const FOOTER_MENU: { id: ScreenId; label: string }[] = [
   { id: 'consulti', label: 'Consulti' },
   { id: 'corsi', label: 'Corsi' },
   { id: 'chat', label: 'Dialogo' },
+  { id: 'news', label: 'News / Articoli' },
   { id: 'booking', label: 'Prenota' },
   { id: 'area-riservata', label: 'Area Riservata' },
   { id: 'sitemap', label: 'Mappa del sito' },
@@ -181,6 +184,10 @@ export function App() {
             />
           )}
 
+          {activeScreen === 'news' && (
+            <NewsScreen onNavigate={handleNavigate} />
+          )}
+
           {activeScreen === 'privacy' && (
             <PrivacyScreen onNavigate={handleNavigate} />
           )}
@@ -274,39 +281,42 @@ export function App() {
                 </nav>
               </div>
 
-              {/* Legale */}
-              <div className="md:col-span-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D4AF37]">
-                  Informazioni legali
-                </p>
-                <div className="mt-4 flex flex-col items-start gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => handleNavigate('privacy')}
-                    className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
-                  >
-                    {legalContent.privacy.sezione}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleNavigate('termini')}
-                    className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
-                  >
-                    {legalContent.vendita.sezione}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsPrivacyOpen(true)}
-                    className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
-                  >
-                    Preferenze Cookie
-                  </button>
-                  <a
-                    href="/sitemap.xml"
-                    className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
-                  >
-                    sitemap.xml
-                  </a>
+              {/* Condivisione + legale */}
+              <div className="md:col-span-4 space-y-8">
+                <SocialShareButtons activeScreen={activeScreen} />
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D4AF37]">
+                    Informazioni legali
+                  </p>
+                  <div className="mt-4 flex flex-col items-start gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => handleNavigate('privacy')}
+                      className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
+                    >
+                      {legalContent.privacy.sezione}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleNavigate('termini')}
+                      className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
+                    >
+                      {legalContent.vendita.sezione}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsPrivacyOpen(true)}
+                      className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
+                    >
+                      Preferenze Cookie
+                    </button>
+                    <a
+                      href="/sitemap.xml"
+                      className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
+                    >
+                      sitemap.xml
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
