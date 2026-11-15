@@ -23,6 +23,7 @@ import { DisclaimerScreen } from './screens/DisclaimerScreen';
 import { SitemapScreen } from './screens/SitemapScreen';
 import { NotFoundScreen } from './screens/NotFoundScreen';
 import { NewsScreen } from './screens/NewsScreen';
+import { ContattiScreen } from './screens/ContattiScreen';
 import { SocialShareButtons } from './components/SocialShareButtons';
 import { legalContent } from './data/legalContent';
 import {
@@ -47,6 +48,7 @@ const FOOTER_MENU: { id: ScreenId; label: string }[] = [
   { id: 'corsi', label: 'Corsi' },
   { id: 'chat', label: 'Dialogo' },
   { id: 'news', label: 'News / Articoli' },
+  { id: 'contatti', label: 'Contatti' },
   { id: 'booking', label: 'Prenota' },
   { id: 'area-riservata', label: 'Area Riservata' },
   { id: 'sitemap', label: 'Mappa del sito' },
@@ -188,6 +190,10 @@ export function App() {
             <NewsScreen onNavigate={handleNavigate} />
           )}
 
+          {activeScreen === 'contatti' && (
+            <ContattiScreen onNavigate={handleNavigate} />
+          )}
+
           {activeScreen === 'privacy' && (
             <PrivacyScreen onNavigate={handleNavigate} />
           )}
@@ -245,7 +251,15 @@ export function App() {
                       379 103 82 53
                     </a>
                   </p>
-                  <p>Via Crispi 37, 62100 Macerata</p>
+                  <p>
+                    <button
+                      type="button"
+                      onClick={() => handleNavigate('contatti')}
+                      className="hover:text-[#D4AF37] transition-colors text-left"
+                    >
+                      Via Crispi 37, 62100 Macerata
+                    </button>
+                  </p>
                   <p className="text-[#F4F1EA]/80 tracking-wide">
                     P.IVA 02136780430
                   </p>

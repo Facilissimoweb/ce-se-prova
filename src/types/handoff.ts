@@ -7,6 +7,7 @@ export type ScreenId =
   | 'booking'
   | 'chat'
   | 'news'
+  | 'contatti'
   | 'privacy'
   | 'termini'
   | 'disclaimer'

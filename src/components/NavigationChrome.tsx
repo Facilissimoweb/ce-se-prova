@@ -6,6 +6,7 @@ import {
   Code2,
   Compass,
   Lock,
+  MapPin,
   Menu,
   MessageCircle,
   Newspaper,
@@ -71,6 +72,12 @@ const NAV_ITEMS: {
     drawerLabel: 'Dialogo Tarot',
     subtitle: 'Interagisci con i 22 Arcani Maggiori',
     icon: MessageCircle,
+  },
+  {
+    id: 'contatti',
+    label: 'Contatti',
+    subtitle: 'Email, telefono, mappa e parcheggi',
+    icon: MapPin,
   },
   {
     id: 'area-riservata',
