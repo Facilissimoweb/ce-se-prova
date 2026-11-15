@@ -9,7 +9,7 @@ interface LogoProps {
 }
 
 /**
- * Tarot Italia brand logo (hooded figure + flame).
+ * Tarot Italia brand logo (eye + wings/moons, gold/purple).
  * Transparent PNG — no white plate; sized large enough to read on dark UI.
  */
 export function TarotEmblemLogo({ className = '', size = 56 }: LogoProps) {
