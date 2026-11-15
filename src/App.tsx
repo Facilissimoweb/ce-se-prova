@@ -42,19 +42,66 @@ const AUX_SCREENS: ScreenId[] = [
   'not-found',
 ];
 
-const FOOTER_MENU: { id: ScreenId; label: string }[] = [
-  { id: 'home', label: 'Home' },
-  { id: 'chi-sono', label: 'Chi Sono' },
-  { id: 'consulti', label: 'Consulti' },
-  { id: 'corsi', label: 'Corsi' },
-  { id: 'chat', label: 'Dialogo' },
-  { id: 'news', label: 'News / Articoli' },
-  { id: 'contatti', label: 'Contatti' },
-  { id: 'booking', label: 'Prenota' },
-  { id: 'area-riservata', label: 'Area Riservata' },
-  { id: 'sitemap', label: 'Mappa del sito' },
-  { id: 'disclaimer', label: 'Disclaimer' },
+type FooterNavItem =
+  | { kind: 'screen'; id: ScreenId; label: string }
+  | { kind: 'notice'; notice: LegalKind; label: string }
+  | { kind: 'action'; action: 'cookies'; label: string }
+  | { kind: 'href'; href: string; label: string };
+
+type FooterMenuGroup = {
+  title: string;
+  ariaLabel: string;
+  items: FooterNavItem[];
+};
+
+/** Colonne footer allineate allo sguardo Tarot Italia (Servizi / Info / Legale). */
+const FOOTER_MENU_GROUPS: FooterMenuGroup[] = [
+  {
+    title: 'Servizi',
+    ariaLabel: 'Servizi',
+    items: [
+      { kind: 'screen', id: 'consulti', label: 'Consulti' },
+      { kind: 'screen', id: 'corsi', label: 'Corsi' },
+      { kind: 'screen', id: 'chat', label: 'Dialogo' },
+      { kind: 'screen', id: 'booking', label: 'Prenota' },
+      { kind: 'screen', id: 'area-riservata', label: 'Area Riservata' },
+    ],
+  },
+  {
+    title: 'Info',
+    ariaLabel: 'Informazioni',
+    items: [
+      { kind: 'screen', id: 'home', label: 'Home' },
+      { kind: 'screen', id: 'chi-sono', label: 'Chi Sono' },
+      { kind: 'screen', id: 'news', label: 'News / Articoli' },
+      { kind: 'screen', id: 'contatti', label: 'Contatti' },
+      { kind: 'screen', id: 'sitemap', label: 'Mappa del sito' },
+    ],
+  },
+  {
+    title: 'Legale',
+    ariaLabel: 'Informazioni legali',
+    items: [
+      { kind: 'screen', id: 'disclaimer', label: 'Disclaimer' },
+      { kind: 'notice', notice: 'tutela', label: legalContent.tutela.kicker },
+      {
+        kind: 'screen',
+        id: 'privacy',
+        label: legalContent.privacy.sezione,
+      },
+      {
+        kind: 'screen',
+        id: 'termini',
+        label: legalContent.vendita.sezione,
+      },
+      { kind: 'action', action: 'cookies', label: 'Preferenze Cookie' },
+      { kind: 'href', href: '/sitemap.xml', label: 'sitemap.xml' },
+    ],
+  },
 ];
+
+const FOOTER_LINK_CLASS =
+  'text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors';
 
 export function App() {
   const [activeScreen, setActiveScreen] = useState<ScreenId>(() =>
@@ -218,9 +265,9 @@ export function App() {
 
         <footer className="border-t border-[#D4AF37]/15 py-10 pb-24 relative z-10">
           <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-8 text-xs text-[#A39B93]">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-10">
-              {/* Brand + contatti + P.IVA */}
-              <div className="md:col-span-5 space-y-4">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
+              {/* Brand + contatti + P.IVA + share */}
+              <div className="lg:col-span-4 space-y-5">
                 <div className="flex items-center gap-3">
                   <TarotEmblemLogo size={36} className="shrink-0" />
                   <div>
@@ -265,73 +312,71 @@ export function App() {
                     P.IVA 02136780430
                   </p>
                 </div>
-              </div>
-
-              {/* Menù — colonna allineata */}
-              <div className="md:col-span-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D4AF37]">
-                  Menù
-                </p>
-                <nav
-                  aria-label="Menù del sito"
-                  className="mt-4 flex flex-col items-start gap-2.5"
-                >
-                  {FOOTER_MENU.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => handleNavigate(item.id)}
-                      className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => setLegalNotice('tutela')}
-                    className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
-                  >
-                    {legalContent.tutela.kicker}
-                  </button>
-                </nav>
-              </div>
-
-              {/* Condivisione + legale */}
-              <div className="md:col-span-4 space-y-8">
                 <SocialShareButtons activeScreen={activeScreen} />
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D4AF37]">
-                    Informazioni legali
-                  </p>
-                  <div className="mt-4 flex flex-col items-start gap-2.5">
-                    <button
-                      type="button"
-                      onClick={() => handleNavigate('privacy')}
-                      className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
-                    >
-                      {legalContent.privacy.sezione}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleNavigate('termini')}
-                      className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
-                    >
-                      {legalContent.vendita.sezione}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsPrivacyOpen(true)}
-                      className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
-                    >
-                      Preferenze Cookie
-                    </button>
-                    <a
-                      href="/sitemap.xml"
-                      className="text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors"
-                    >
-                      sitemap.xml
-                    </a>
-                  </div>
+              </div>
+
+              {/* Menù a gruppi: Servizi / Info / Legale */}
+              <div className="lg:col-span-8">
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6 md:gap-8">
+                  {FOOTER_MENU_GROUPS.map((group) => (
+                    <div key={group.title}>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D4AF37]">
+                        {group.title}
+                      </p>
+                      <nav
+                        aria-label={group.ariaLabel}
+                        className="mt-4 flex flex-col items-start gap-2.5"
+                      >
+                        {group.items.map((item) => {
+                          if (item.kind === 'screen') {
+                            return (
+                              <button
+                                key={item.id}
+                                type="button"
+                                onClick={() => handleNavigate(item.id)}
+                                className={FOOTER_LINK_CLASS}
+                              >
+                                {item.label}
+                              </button>
+                            );
+                          }
+                          if (item.kind === 'notice') {
+                            return (
+                              <button
+                                key={item.notice}
+                                type="button"
+                                onClick={() => setLegalNotice(item.notice)}
+                                className={FOOTER_LINK_CLASS}
+                              >
+                                {item.label}
+                              </button>
+                            );
+                          }
+                          if (item.kind === 'action') {
+                            return (
+                              <button
+                                key={item.action}
+                                type="button"
+                                onClick={() => setIsPrivacyOpen(true)}
+                                className={FOOTER_LINK_CLASS}
+                              >
+                                {item.label}
+                              </button>
+                            );
+                          }
+                          return (
+                            <a
+                              key={item.href}
+                              href={item.href}
+                              className={FOOTER_LINK_CLASS}
+                            >
+                              {item.label}
+                            </a>
+                          );
+                        })}
+                      </nav>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
