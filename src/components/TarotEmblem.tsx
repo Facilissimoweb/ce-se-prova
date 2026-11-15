@@ -1,7 +1,7 @@
 import React from 'react';
 
-/** Canonical brand mark — Maria’s JPG in public/brand/. */
-export const TAROT_ITALIA_LOGO_SRC = '/brand/tarot-italia-logo.jpg';
+/** Canonical brand mark — transparent PNG in public/brand/. */
+export const TAROT_ITALIA_LOGO_SRC = '/brand/tarot-italia-logo.png';
 
 interface LogoProps {
   className?: string;
@@ -10,9 +10,9 @@ interface LogoProps {
 
 /**
  * Tarot Italia brand logo (hooded figure + flame).
- * Circular crop so the square light background reads cleanly on the dark UI.
+ * Transparent PNG — no white plate; sized large enough to read on dark UI.
  */
-export function TarotEmblemLogo({ className = '', size = 36 }: LogoProps) {
+export function TarotEmblemLogo({ className = '', size = 56 }: LogoProps) {
   return (
     <img
       src={TAROT_ITALIA_LOGO_SRC}
@@ -20,7 +20,7 @@ export function TarotEmblemLogo({ className = '', size = 36 }: LogoProps) {
       width={size}
       height={size}
       decoding="async"
-      className={`rounded-full object-cover object-center bg-[#F2F2F2] ${className}`.trim()}
+      className={`object-contain object-center ${className}`.trim()}
       style={{ width: size, height: size }}
       aria-hidden="true"
     />

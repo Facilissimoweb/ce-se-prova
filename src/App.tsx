@@ -269,7 +269,7 @@ export function App() {
               {/* Brand + contatti + P.IVA + share */}
               <div className="lg:col-span-4 space-y-5">
                 <div className="flex items-center gap-3">
-                  <TarotEmblemLogo size={36} className="shrink-0" />
+                  <TarotEmblemLogo size={56} className="shrink-0" />
                   <div>
                     <p className="font-display text-base tracking-[0.06em] text-[#F4F1EA]">
                       Tarot Italia

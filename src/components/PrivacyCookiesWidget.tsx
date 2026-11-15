@@ -170,7 +170,7 @@ export function PrivacyCookiesWidget({
             {/* Standardized Tarot Italia Modal Header */}
             <div className="px-6 py-5 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <TarotEmblemLogo size={32} className="shrink-0" />
+                <TarotEmblemLogo size={48} className="shrink-0" />
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
                     Tarot Italia · GDPR

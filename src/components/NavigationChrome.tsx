@@ -134,17 +134,17 @@ export function TopBar({
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-14 md:h-16 bg-[#12100E]/90 backdrop-blur-md border-b border-[#D4AF37]/15">
+      <header className="sticky top-0 z-50 h-16 md:h-[4.5rem] bg-[#12100E]/90 backdrop-blur-md border-b border-[#D4AF37]/15">
         <div className="max-w-6xl mx-auto h-full px-4 md:px-8 lg:px-12 flex items-center justify-between gap-3 md:gap-8">
           {/* Zone 1: Single-line Brand Wordmark + Emblem */}
           <button
             type="button"
             onClick={() => handleMobileSelect('home')}
-            className="flex items-center gap-2.5 md:gap-3 text-left whitespace-nowrap shrink-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-lg py-1"
+            className="flex items-center gap-3 md:gap-3.5 text-left whitespace-nowrap shrink-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-lg py-1"
             aria-label="Torna alla Home di Tarot Italia"
           >
             <TarotEmblemLogo
-              size={28}
+              size={48}
               className="shrink-0 transition-transform duration-200 group-hover:scale-105"
             />
             <span className="font-display text-base md:text-lg tracking-[0.08em] text-[#F4F1EA] font-medium">

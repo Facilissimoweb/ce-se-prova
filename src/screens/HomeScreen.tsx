@@ -530,7 +530,7 @@ export function HomeScreen({
       <section aria-labelledby="dock-heading" className="glass-tier-1 rounded-2xl p-6 md:p-8">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           <div className="md:col-span-5 flex items-center gap-4">
-            <TarotEmblemLogo size={44} className="shrink-0" />
+            <TarotEmblemLogo size={64} className="shrink-0" />
             <div>
               <h2 id="dock-heading" className="font-body font-semibold tracking-[-0.01em] text-lg text-[#F4F1EA]">
                 <CopyText entry={siteContent.home.dockHeading} showKeys={showCmsKeys} />

@@ -201,7 +201,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
       <div className="glass-tier-1 rounded-2xl overflow-hidden">
         <div className="px-5 md:px-6 py-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <TarotEmblemLogo size={36} className="shrink-0" />
+            <TarotEmblemLogo size={56} className="shrink-0" />
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
                 <CopyText entry={siteContent.brand.name} showKeys={showCmsKeys} /> IA · 22

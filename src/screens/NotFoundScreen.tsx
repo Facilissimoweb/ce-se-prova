@@ -19,7 +19,7 @@ export function NotFoundScreen({ onNavigate }: Props) {
 
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-2 pb-16 pt-10 text-center">
-      <TarotEmblemLogo size={56} className="mb-6 opacity-90" />
+      <TarotEmblemLogo size={96} className="mb-6 opacity-90" />
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#D4AF37]">
         Errore 404
       </p>
