@@ -6,6 +6,7 @@ import {
   TopBar,
 } from './components/NavigationChrome';
 import { HandoffDrawer } from './components/HandoffDrawer';
+import { BackToTopFab } from './components/BackToTopFab';
 import { PrivacyCookiesWidget } from './components/PrivacyCookiesWidget';
 import { StickyContactBar } from './components/StickyContactBar';
 import { LegalNotice, type LegalKind } from './components/LegalNotice';
@@ -420,6 +421,8 @@ export function App() {
         />
 
         <StickyContactBar />
+
+        <BackToTopFab />
 
         <PrivacyCookiesWidget
           showCmsKeys={showCmsKeys}
