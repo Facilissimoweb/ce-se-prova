@@ -28,7 +28,7 @@ export function ReservedLoginGate({
     return (
       <div className="pt-12 pb-16 flex justify-center">
         <div className="glass-tier-1 rounded-2xl p-8 w-full max-w-lg text-center space-y-3">
-          <TarotEmblemLogo size={42} className="mx-auto" />
+          <TarotEmblemLogo size={72} className="mx-auto" />
           <p className="text-sm text-[#A39B93]">Verifica sessione in corso...</p>
         </div>
       </div>

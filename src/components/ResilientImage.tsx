@@ -32,7 +32,7 @@ export function ResilientImage({
         aria-label={alt}
         className={`w-full h-full min-h-[160px] flex flex-col items-center justify-center gap-3 p-6 bg-gradient-to-br from-[#1D1B19] via-[#151311] to-[#12100E] border border-[#D4AF37]/20 ${className}`}
       >
-        <TarotEmblemLogo size={42} />
+        <TarotEmblemLogo size={64} />
         {fallbackLabel && (
           <span className="font-display text-xs tracking-[0.08em] text-[#D4AF37] text-center">
             {fallbackLabel}
