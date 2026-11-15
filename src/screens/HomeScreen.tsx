@@ -29,7 +29,7 @@ import {
 } from '../lib/siteContacts';
 import practitionerHandsImg from '../assets/images/percorsi_hands_tarot_1794651609400.jpg';
 
-/** Home «Atmosfera e Metodo» — cleaned consultation-table photo (no logo/text watermark). */
+/** Home «Atmosfera e Metodo» — as-is photo (brand mark on image kept). */
 const ATMOSFERA_METODO_IMG = '/brand/atmosfera-metodo.jpg';
 
 interface HomeScreenProps {
@@ -122,12 +122,18 @@ export function HomeScreen({
       </section>
 
       {/* Atmospheric Showcase — below the opening brand composition */}
-      <section aria-label="Atmosfera e Metodo">
+      <section aria-labelledby="atmosfera-metodo-heading" className="space-y-4">
+        <h2
+          id="atmosfera-metodo-heading"
+          className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]"
+        >
+          Atmosfera e Metodo
+        </h2>
         <figure className="rounded-2xl overflow-hidden border border-[#D4AF37]/20 glass-tier-1">
           <div className="aspect-[16/9] w-full overflow-hidden">
             <ResilientImage
               src={ATMOSFERA_METODO_IMG}
-              alt="Maria Teresa Rogani al tavolo di consultazione con i tarocchi"
+              alt="Atmosfera e Metodo"
               className="w-full h-full object-cover object-center"
               fallbackLabel="Atmosfera e Metodo"
             />
