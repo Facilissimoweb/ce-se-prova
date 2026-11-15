@@ -7,6 +7,7 @@ import {
 } from './components/NavigationChrome';
 import { HandoffDrawer } from './components/HandoffDrawer';
 import { PrivacyCookiesWidget } from './components/PrivacyCookiesWidget';
+import { StickyContactBar } from './components/StickyContactBar';
 import { LegalNotice, type LegalKind } from './components/LegalNotice';
 import { AmbientSanctuaryBackground } from './components/AmbientSanctuaryBackground';
 import { TarotEmblemLogo } from './components/TarotEmblem';
@@ -126,7 +127,7 @@ export function App() {
           showCmsKeys={showCmsKeys}
         />
 
-        <main className="flex-1 w-full max-w-6xl mx-auto px-5 md:px-8 lg:px-12 pb-12 relative z-10">
+        <main className="flex-1 w-full max-w-6xl mx-auto px-5 md:px-8 lg:px-12 pb-24 relative z-10">
           {activeScreen === 'home' && (
             <HomeScreen
               showCmsKeys={showCmsKeys}
@@ -215,7 +216,7 @@ export function App() {
           )}
         </main>
 
-        <footer className="border-t border-[#D4AF37]/15 py-10 relative z-10">
+        <footer className="border-t border-[#D4AF37]/15 py-10 pb-24 relative z-10">
           <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-8 text-xs text-[#A39B93]">
             <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-10">
               {/* Brand + contatti + P.IVA */}
@@ -372,6 +373,8 @@ export function App() {
           showCmsKeys={showCmsKeys}
           onToggleCmsKeys={() => setShowCmsKeys((prev) => !prev)}
         />
+
+        <StickyContactBar />
 
         <PrivacyCookiesWidget
           showCmsKeys={showCmsKeys}

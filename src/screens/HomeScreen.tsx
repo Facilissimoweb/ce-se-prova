@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowRight, Check, ChevronDown, Mail, MapPin, MessageCircle, Phone, Quote, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, Mail, MapPin, MessageCircle, Phone, ShieldCheck } from 'lucide-react';
 import type { ConsultationTariff, CourseId, ScreenId } from '../types/handoff';
 import {
-  clientTestimonials,
   consultationTariffs,
   educationalCourses,
   holisticFaqs,
@@ -13,6 +12,12 @@ import { ResilientImage } from '../components/ResilientImage';
 import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
 import { TarotEmblemLogo } from '../components/TarotEmblem';
 import { HomeArticlesLoop } from '../components/HomeArticlesLoop';
+import {
+  HOME_CONSULTI_SECTION_ID,
+  HOME_DIDATTICA_SECTION_ID,
+  HomeSectionBookmarks,
+} from '../components/HomeSectionBookmarks';
+import { HomeTestimonialsCarousel } from '../components/HomeTestimonialsCarousel';
 import { COURSE_SECTION_IMAGES, TARIFF_SECTION_IMAGES } from '../data/sectionImages';
 import {
   SITE_ADDRESS,
@@ -49,6 +54,8 @@ export function HomeScreen({
 
   return (
     <div className="space-y-16 md:space-y-24 pb-8">
+      <HomeSectionBookmarks visible />
+
       {/* Sartorial Hero — No overlapping cards, generous obsidian negative space */}
       <section className="pt-8 md:pt-14">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
@@ -202,7 +209,11 @@ export function HomeScreen({
       </section>
 
       {/* Consulti Section — Matches ConsultiScreen cards & 4:3 images */}
-      <section aria-labelledby="pathways-heading" className="space-y-8">
+      <section
+        id={HOME_CONSULTI_SECTION_ID}
+        aria-labelledby="pathways-heading"
+        className="scroll-mt-28 space-y-8 md:scroll-mt-32"
+      >
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2 max-w-2xl">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
@@ -329,7 +340,11 @@ export function HomeScreen({
       </section>
 
       {/* Paid Educational Courses Showcase — 1) Arcani Maggiori, 2) Arcani Minori, 3) Metodi di Stesura */}
-      <section aria-labelledby="courses-preview-heading" className="space-y-8">
+      <section
+        id={HOME_DIDATTICA_SECTION_ID}
+        aria-labelledby="courses-preview-heading"
+        className="scroll-mt-28 space-y-8 md:scroll-mt-32"
+      >
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2 max-w-2xl">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
@@ -411,7 +426,7 @@ export function HomeScreen({
         </div>
       </section>
 
-      {/* Testimonianze — Minimalist Dark Glass Cards with Gold-Accented Borders */}
+      {/* Testimonianze — horizontal auto-rotating carousel */}
       <section aria-labelledby="testimonials-heading" className="space-y-8">
         <div className="space-y-2 max-w-2xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
@@ -425,41 +440,7 @@ export function HomeScreen({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 items-stretch">
-          {clientTestimonials.map((item) => (
-            <figure
-              key={item.id}
-              className="glass-tier-1 rounded-2xl border border-[#D4AF37]/25 hover:border-[#D4AF37]/45 p-6 md:p-7 flex flex-col justify-between gap-6 transition-colors duration-150"
-            >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                    {item.sessionContext}
-                  </span>
-                  <Quote className="w-4 h-4 text-[#D4AF37]/60 shrink-0" aria-hidden="true" />
-                </div>
-
-                <blockquote className="text-sm leading-relaxed text-[#E8e1dd]">
-                  &ldquo;
-                  {showCmsKeys ? (
-                    <CopyText
-                      entry={{ cmsKey: item.cmsKeyQuote, liveText: item.quote }}
-                      showKeys={true}
-                    />
-                  ) : (
-                    item.quote
-                  )}
-                  &rdquo;
-                </blockquote>
-              </div>
-
-              <figcaption className="pt-4 border-t border-[#D4AF37]/15">
-                <p className="font-display text-sm text-[#F4F1EA]">{item.authorName}</p>
-                <p className="text-xs text-[#A39B93] mt-0.5">{item.authorRole}</p>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
+        <HomeTestimonialsCarousel showCmsKeys={showCmsKeys} />
       </section>
 
       {/* Holistic & Ethical FAQ Accordion */}
