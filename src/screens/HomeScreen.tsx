@@ -57,8 +57,11 @@ export function HomeScreen({
     <div className="space-y-16 md:space-y-24 pb-8">
       <HomeSectionBookmarks visible />
 
-      {/* Opening brand mark — one composition: mark leads, copy follows with restraint */}
-      <section className="relative isolate overflow-hidden pt-1 md:pt-3" aria-labelledby="home-hero-heading">
+      {/* Opening brand mark — full-bleed hero so nebula can reach true viewport edges */}
+      <section
+        className="home-hero-bleed relative isolate overflow-hidden pt-1 md:pt-3"
+        aria-labelledby="home-hero-heading"
+      >
         <HomeHeroNebula />
 
         <div
@@ -68,7 +71,7 @@ export function HomeScreen({
           <div className="h-[min(44vw,260px)] w-[min(64vw,340px)] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.16)_0%,rgba(88,60,140,0.08)_42%,transparent_72%)] animate-hero-mark-glow" />
         </div>
 
-        <div className="relative z-[2] mx-auto flex max-w-3xl flex-col items-center text-center">
+        <div className="relative z-[2] mx-auto flex max-w-3xl flex-col items-center px-5 text-center md:px-8 lg:px-12">
           <img
             src={TAROT_ITALIA_HOME_HERO_SRC}
             alt="Tarot Italia"
