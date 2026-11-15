@@ -12,6 +12,8 @@ export const SCREEN_PATHS: Record<ScreenId, string> = {
   privacy: '/privacy',
   termini: '/termini-di-servizio',
   disclaimer: '/disclaimer',
+  sitemap: '/sitemap',
+  'not-found': '/404',
 };
 
 const PATH_ALIASES: Record<string, ScreenId> = {
@@ -30,7 +32,85 @@ const PATH_ALIASES: Record<string, ScreenId> = {
   '/termini-di-servizio': 'termini',
   '/termini': 'termini',
   '/disclaimer': 'disclaimer',
+  '/sitemap': 'sitemap',
+  '/mappa-del-sito': 'sitemap',
+  '/404': 'not-found',
 };
+
+/** Pagine pubbliche elencate in mappa del sito e sitemap.xml (esclude catch-all 404). */
+export const SITEMAP_ENTRIES: {
+  screen: Exclude<ScreenId, 'not-found'>;
+  path: string;
+  label: string;
+  description: string;
+}[] = [
+  {
+    screen: 'home',
+    path: '/',
+    label: 'Home',
+    description: 'Panoramica, Arcano del Giorno e percorsi di Tarot Italia',
+  },
+  {
+    screen: 'chi-sono',
+    path: '/chi-sono',
+    label: 'Chi Sono',
+    description: 'Formazione e percorso disciplinare di Maria Teresa Rogani',
+  },
+  {
+    screen: 'consulti',
+    path: '/consulti',
+    label: 'Consulti',
+    description: 'Chiamata vocale online e tariffe',
+  },
+  {
+    screen: 'corsi',
+    path: '/corsi',
+    label: 'Corsi',
+    description: 'Arcani Maggiori, Minori e metodi di stesura',
+  },
+  {
+    screen: 'booking',
+    path: '/prenota',
+    label: 'Prenota Consulto',
+    description: 'Calendario e prenotazione consulto',
+  },
+  {
+    screen: 'chat',
+    path: '/dialogo',
+    label: 'Dialogo Tarot',
+    description: 'Interazione con i 22 Arcani Maggiori',
+  },
+  {
+    screen: 'area-riservata',
+    path: '/area-riservata',
+    label: 'Area Riservata',
+    description: 'Dispense, appunti e percorsi per corsisti',
+  },
+  {
+    screen: 'privacy',
+    path: '/privacy',
+    label: 'Informativa Privacy',
+    description: 'Trattamento dati e cookie (GDPR)',
+  },
+  {
+    screen: 'termini',
+    path: '/termini-di-servizio',
+    label: 'Termini e Condizioni',
+    description: 'Condizioni di vendita e di servizio',
+  },
+  {
+    screen: 'disclaimer',
+    path: '/disclaimer',
+    label: 'Disclaimer',
+    description: 'Limiti del servizio e responsabilità',
+  },
+  {
+    screen: 'sitemap',
+    path: '/sitemap',
+    label: 'Mappa del sito',
+    description: 'Indice delle pagine pubbliche',
+  },
+];
 
 export function pathForScreen(screen: ScreenId): string {
   return SCREEN_PATHS[screen];
@@ -38,7 +118,7 @@ export function pathForScreen(screen: ScreenId): string {
 
 export function screenFromPath(pathname: string): ScreenId {
   const normalized = (pathname.replace(/\/+$/, '') || '/').toLowerCase();
-  return PATH_ALIASES[normalized] ?? 'home';
+  return PATH_ALIASES[normalized] ?? 'not-found';
 }
 
 /**

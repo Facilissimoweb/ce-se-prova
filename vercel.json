@@ -33,7 +33,7 @@
       "destination": "/api/dialogue?__path=$1"
     },
     {
-      "source": "/((?!api(?:/|$)|privacy\\.html).*)",
+      "source": "/((?!api(?:/|$)|privacy\\.html|sitemap\\.xml).*)",
       "destination": "/index.html"
     }
   ]

@@ -8,7 +8,9 @@ export type ScreenId =
   | 'chat'
   | 'privacy'
   | 'termini'
-  | 'disclaimer';
+  | 'disclaimer'
+  | 'sitemap'
+  | 'not-found';
 
 export interface DisciplinaryCredential {
   index: string;
