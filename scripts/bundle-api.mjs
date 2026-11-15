@@ -12,7 +12,7 @@ const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const entriesDir = path.join(root, 'src', 'server', 'apiEntries');
 const outDir = path.join(root, 'api');
 
-const names = ['courses', 'bookings', 'stripe', 'reserved', 'dialogue'];
+const names = ['courses', 'bookings', 'stripe', 'reserved', 'dialogue', 'news'];
 
 mkdirSync(outDir, { recursive: true });
 

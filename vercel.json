@@ -9,6 +9,10 @@
       "destination": "/api/health"
     },
     {
+      "source": "/api/news",
+      "destination": "/api/news"
+    },
+    {
       "source": "/api/courses",
       "destination": "/api/courses"
     },

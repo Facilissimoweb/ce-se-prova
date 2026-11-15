@@ -12,6 +12,7 @@ import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
 import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
 import { TarotEmblemLogo } from '../components/TarotEmblem';
+import { HomeArticlesLoop } from '../components/HomeArticlesLoop';
 import { COURSE_SECTION_IMAGES, TARIFF_SECTION_IMAGES } from '../data/sectionImages';
 import {
   SITE_ADDRESS,
@@ -540,6 +541,9 @@ export function HomeScreen({
           })}
         </div>
       </section>
+
+      {/* News loop — prima del footer / dock contatti */}
+      <HomeArticlesLoop onNavigate={onNavigate} />
 
       {/* Contact Dock */}
       <section aria-labelledby="dock-heading" className="glass-tier-1 rounded-2xl p-6 md:p-8">

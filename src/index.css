@@ -240,6 +240,21 @@
   animation: mandalaPulse 14s ease-in-out infinite;
 }
 
+@keyframes homeArticleIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-home-article-in {
+  animation: homeArticleIn 0.55s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
