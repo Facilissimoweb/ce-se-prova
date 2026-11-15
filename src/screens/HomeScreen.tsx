@@ -11,6 +11,7 @@ import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
 import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
 import { TAROT_ITALIA_HOME_HERO_SRC, TarotEmblemLogo } from '../components/TarotEmblem';
+import { HomeHeroNebula } from '../components/HomeHeroNebula';
 import { HomeArticlesLoop } from '../components/HomeArticlesLoop';
 import {
   HOME_CONSULTI_SECTION_ID,
@@ -57,15 +58,17 @@ export function HomeScreen({
       <HomeSectionBookmarks visible />
 
       {/* Opening brand mark — one composition: mark leads, copy follows with restraint */}
-      <section className="relative pt-1 md:pt-3" aria-labelledby="home-hero-heading">
+      <section className="relative isolate overflow-hidden pt-1 md:pt-3" aria-labelledby="home-hero-heading">
+        <HomeHeroNebula />
+
         <div
-          className="pointer-events-none absolute inset-x-0 top-[4%] flex justify-center"
+          className="pointer-events-none absolute inset-x-0 top-[4%] z-[1] flex justify-center"
           aria-hidden="true"
         >
           <div className="h-[min(44vw,260px)] w-[min(64vw,340px)] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.16)_0%,rgba(88,60,140,0.08)_42%,transparent_72%)] animate-hero-mark-glow" />
         </div>
 
-        <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
+        <div className="relative z-[2] mx-auto flex max-w-3xl flex-col items-center text-center">
           <img
             src={TAROT_ITALIA_HOME_HERO_SRC}
             alt="Tarot Italia"
