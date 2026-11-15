@@ -1,78 +1,29 @@
 import React from 'react';
 
+/** Canonical brand mark — Maria’s JPG in public/brand/. */
+export const TAROT_ITALIA_LOGO_SRC = '/brand/tarot-italia-logo.jpg';
+
 interface LogoProps {
   className?: string;
   size?: number;
 }
 
 /**
- * Tarot Italia Emblem Logo
- * Sole, luna crescente e stella a otto punte in oro #D4AF37
+ * Tarot Italia brand logo (hooded figure + flame).
+ * Circular crop so the square light background reads cleanly on the dark UI.
  */
 export function TarotEmblemLogo({ className = '', size = 36 }: LogoProps) {
   return (
-    <svg
+    <img
+      src={TAROT_ITALIA_LOGO_SRC}
+      alt=""
       width={size}
       height={size}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
+      decoding="async"
+      className={`rounded-full object-cover object-center bg-[#F2F2F2] ${className}`.trim()}
+      style={{ width: size, height: size }}
       aria-hidden="true"
-    >
-      {/* Outer sacred circle */}
-      <circle
-        cx="32"
-        cy="32"
-        r="29"
-        stroke="#D4AF37"
-        strokeWidth="1.25"
-        strokeOpacity="0.65"
-      />
-      <circle
-        cx="32"
-        cy="32"
-        r="25.5"
-        stroke="#D4AF37"
-        strokeWidth="0.75"
-        strokeOpacity="0.3"
-        strokeDasharray="2 3"
-      />
-
-      {/* Sun rays at top */}
-      <circle cx="32" cy="18" r="4.5" stroke="#D4AF37" strokeWidth="1.4" />
-      <path
-        d="M32 9.5V11.5M32 24.5V26.5M23.5 18H25.5M38.5 18H40.5M26 12L27.4 13.4M36.6 22.6L38 24M38 12L36.6 13.4M27.4 22.6L26 24"
-        stroke="#D4AF37"
-        strokeWidth="1.25"
-        strokeLinecap="round"
-      />
-
-      {/* Crescent Moon cradling center */}
-      <path
-        d="M21 31.5C21 38.4 26.2 44 33 44C36.6 44 39.8 42.4 42 39.8C39.9 40.7 37.5 41 35 40.4C29.6 39.1 26 34.1 26.6 28.6C26.9 26.3 27.8 24.3 29.2 22.7C24.4 24 21 27.4 21 31.5Z"
-        stroke="#D4AF37"
-        strokeWidth="1.35"
-        fill="rgba(212, 175, 55, 0.12)"
-      />
-
-      {/* Eight-pointed star at lower focus */}
-      <path
-        d="M36 28L37.4 33.6L43 35L37.4 36.4L36 42L34.6 36.4L29 35L34.6 33.6L36 28Z"
-        fill="#D4AF37"
-      />
-      <path
-        d="M32 31L35.2 34.2L36 35L32.8 38.2L32 35L31.2 34.2L32 31Z"
-        fill="#E6C65C"
-        fillOpacity="0.45"
-      />
-      <path
-        d="M32 48L33 50.8L35.8 51.8L33 52.8L32 55.6L31 52.8L28.2 51.8L31 50.8L32 48Z"
-        stroke="#D4AF37"
-        strokeWidth="1"
-        fill="rgba(212, 175, 55, 0.2)"
-      />
-    </svg>
+    />
   );
 }
 
