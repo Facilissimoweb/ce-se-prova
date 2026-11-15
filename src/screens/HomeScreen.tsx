@@ -27,8 +27,10 @@ import {
   SITE_PHONE_TEL,
   whatsappHref,
 } from '../lib/siteContacts';
-import heroSanctuaryImg from '../assets/images/hero_tarot_sanctuary_1794651607080.jpg';
 import practitionerHandsImg from '../assets/images/percorsi_hands_tarot_1794651609400.jpg';
+
+/** Home «Atmosfera e Metodo» — cleaned consultation-table photo (no logo/text watermark). */
+const ATMOSFERA_METODO_IMG = '/brand/atmosfera-metodo.jpg';
 
 interface HomeScreenProps {
   showCmsKeys: boolean;
@@ -120,46 +122,17 @@ export function HomeScreen({
       </section>
 
       {/* Atmospheric Showcase — below the opening brand composition */}
-      <section aria-label="Atmosfera di Tarot Italia">
-        <figure className="relative rounded-2xl overflow-hidden border border-[#D4AF37]/20 glass-tier-1">
+      <section aria-label="Atmosfera e Metodo">
+        <figure className="rounded-2xl overflow-hidden border border-[#D4AF37]/20 glass-tier-1">
           <div className="aspect-[16/9] w-full overflow-hidden">
             <ResilientImage
-              src={heroSanctuaryImg}
-              alt="Tavolo di consultazione olistica con tarocchi bordati in oro, candela in ottone e ramo d'ulivo"
-              className="w-full h-full object-cover"
-              fallbackLabel="Tarot Italia · Maria Teresa Rogani"
+              src={ATMOSFERA_METODO_IMG}
+              alt="Maria Teresa Rogani al tavolo di consultazione con i tarocchi"
+              className="w-full h-full object-cover object-center"
+              fallbackLabel="Atmosfera e Metodo"
             />
           </div>
-          <div
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#12100E]/90 via-[#12100E]/20 to-transparent"
-            aria-hidden="true"
-          />
-          <figcaption className="absolute bottom-0 left-0 right-0 p-5 md:p-8 flex flex-col sm:flex-row sm:items-end justify-between gap-2">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                Atmosfera e Metodo
-              </p>
-              <p className="font-display text-base md:text-xl text-[#F4F1EA] mt-1">
-                Un dialogo riservato tra simboli archetipici, ascolto e previsione consapevole
-              </p>
-            </div>
-            <span className="text-xs text-[#A39B93] shrink-0">
-              Chiamata vocale &amp; di persona a Macerata
-            </span>
-          </figcaption>
         </figure>
-
-        <p className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-xs md:text-[13px] text-[#A39B93]">
-          <span>Lettura del presente e del futuro</span>
-          <span aria-hidden="true" className="text-[#D4AF37]/60">
-            ·
-          </span>
-          <span>Sessioni riservate 20 / 45 / 60 / 90 min</span>
-          <span aria-hidden="true" className="text-[#D4AF37]/60">
-            ·
-          </span>
-          <span>Chiamata vocale online &amp; di persona a Macerata</span>
-        </p>
       </section>
 
       {/* Arcano del Giorno — after opening composition (not in the hero) */}
