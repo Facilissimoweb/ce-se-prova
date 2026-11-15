@@ -83,3 +83,13 @@ export function hasGoogleMapsApiKey(): boolean {
 export function whatsappHref(prefill: string): string {
   return `${SITE_WHATSAPP_HREF}?text=${encodeURIComponent(prefill)}`;
 }
+
+/**
+ * Deep-link Telegram (allineato a v2 `telegramHref`):
+ * `VITE_TELEGRAM_URL` se impostato, altrimenti `https://t.me/+${SITE_PHONE_E164}`.
+ */
+export function telegramHref(): string {
+  const fromEnv = import.meta.env.VITE_TELEGRAM_URL?.trim();
+  if (fromEnv) return fromEnv;
+  return `https://t.me/+${SITE_PHONE_E164}`;
+}
