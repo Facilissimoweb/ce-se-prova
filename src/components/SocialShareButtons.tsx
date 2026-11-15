@@ -73,6 +73,8 @@ function pageTitleForScreen(screen: ScreenId): string {
       return 'Area Riservata — Tarot Italia';
     case 'news':
       return 'News / Articoli — Tarot Italia';
+    case 'contatti':
+      return 'Contatti — Tarot Italia';
     case 'privacy':
       return 'Privacy — Tarot Italia';
     case 'termini':
