@@ -103,13 +103,13 @@ export function ChiSonoScreen({ showCmsKeys, onNavigate }: ChiSonoScreenProps) {
             <span>Contesto Storico e Simbolico</span>
           </div>
 
-          {/* Section art — eye + moons + signature (not sitewide logo) */}
+          {/* Section art — eye + moons + signature (not sitewide logo); ship original JPG as-is (ENN-28) */}
           <figure className="pt-8 md:pt-10 flex justify-center">
             <img
-              src="/brand/sguardo-iconografico.png"
+              src="/brand/sguardo-iconografico.jpg"
               alt="Sguardo iconografico: occhio tra lune e firma M. Teresa Rogari"
-              width={876}
-              height={900}
+              width={1600}
+              height={1600}
               className="w-full max-w-[200px] md:max-w-[240px] h-auto select-none"
               decoding="async"
             />
