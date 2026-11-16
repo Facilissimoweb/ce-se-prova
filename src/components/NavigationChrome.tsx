@@ -28,6 +28,7 @@ interface TopBarProps {
   showCmsKeys: boolean;
 }
 
+/** Desktop + mobile page links — Home → Contatti. Area personale stays a CTA below. */
 const NAV_ITEMS: {
   id: ScreenId;
   label: string;
@@ -43,7 +44,7 @@ const NAV_ITEMS: {
   },
   {
     id: 'chi-sono',
-    label: 'Chi Sono',
+    label: 'Chi sono',
     subtitle: 'Formazione e percorso disciplinare',
     icon: User,
   },
@@ -54,6 +55,12 @@ const NAV_ITEMS: {
     icon: Sparkles,
   },
   {
+    id: 'chat',
+    label: 'Dialogo',
+    subtitle: 'Interagisci con i 22 Arcani Maggiori',
+    icon: MessageCircle,
+  },
+  {
     id: 'corsi',
     label: 'Corsi',
     subtitle: 'Arcani Maggiori, Minori e Stesure',
@@ -61,17 +68,9 @@ const NAV_ITEMS: {
   },
   {
     id: 'news',
-    label: 'News',
-    drawerLabel: 'News / Articoli',
+    label: 'Blog',
     subtitle: 'Scritti da Substack @tarotitalia',
     icon: Newspaper,
-  },
-  {
-    id: 'chat',
-    label: 'Dialogo',
-    drawerLabel: 'Dialogo Tarot',
-    subtitle: 'Interagisci con i 22 Arcani Maggiori',
-    icon: MessageCircle,
   },
   {
     id: 'contatti',
@@ -79,18 +78,7 @@ const NAV_ITEMS: {
     subtitle: 'Email, telefono, mappa e parcheggi',
     icon: MapPin,
   },
-  {
-    id: 'area-riservata',
-    label: 'Area Riservata',
-    subtitle: 'Dispense, appunti e consulti',
-    icon: Lock,
-  },
 ];
-
-/** Mobile drawer pages — Contatti lives in the sticky dock; Area Riservata is a CTA below. */
-const DRAWER_PAGE_ITEMS = NAV_ITEMS.filter(
-  (item) => item.id !== 'contatti' && item.id !== 'area-riservata'
-);
 
 const HEADER_HEIGHT_CLASS =
   'h-[calc(4.75rem+env(safe-area-inset-top,0px))] md:h-[calc(5rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)]';
@@ -105,6 +93,17 @@ export function TopBar({
   showCmsKeys,
 }: TopBarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  /** When true, closing the drawer must not restore mid-page scroll (route change → top). */
+  const skipScrollRestoreRef = React.useRef(false);
+  /** Capture scrollY before React reflow from opening the fixed header. */
+  const lockedScrollYRef = React.useRef(0);
+
+  const setMobileMenuOpen = (open: boolean) => {
+    if (open) {
+      lockedScrollYRef.current = window.scrollY;
+    }
+    setIsMobileMenuOpen(open);
+  };
 
   // Close on Escape; lock scroll without losing the top navbar mid-page
   useEffect(() => {
@@ -112,11 +111,11 @@ export function TopBar({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsMobileMenuOpen(false);
+        setMobileMenuOpen(false);
       }
     };
 
-    const scrollY = window.scrollY;
+    const scrollY = lockedScrollYRef.current;
     const previous = {
       overflow: document.body.style.overflow,
       position: document.body.style.position,
@@ -135,7 +134,12 @@ export function TopBar({
       document.body.style.position = previous.position;
       document.body.style.top = previous.top;
       document.body.style.width = previous.width;
-      window.scrollTo(0, scrollY);
+      if (skipScrollRestoreRef.current) {
+        skipScrollRestoreRef.current = false;
+        window.scrollTo(0, 0);
+      } else {
+        window.scrollTo(0, scrollY);
+      }
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isMobileMenuOpen]);
@@ -144,7 +148,7 @@ export function TopBar({
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
-        setIsMobileMenuOpen(false);
+        setMobileMenuOpen(false);
       }
     };
     window.addEventListener('resize', handleResize);
@@ -152,7 +156,10 @@ export function TopBar({
   }, []);
 
   const handleMobileSelect = (screen: ScreenId) => {
-    setIsMobileMenuOpen(false);
+    if (isMobileMenuOpen) {
+      skipScrollRestoreRef.current = true;
+    }
+    setMobileMenuOpen(false);
     onNavigate(screen);
   };
 
@@ -226,7 +233,7 @@ export function TopBar({
 
             <button
               type="button"
-              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+              onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-hamburger-menu"
               aria-label={
@@ -274,7 +281,7 @@ export function TopBar({
               </div>
 
               <nav aria-label="Pagine del sito" className="space-y-2.5">
-                {DRAWER_PAGE_ITEMS.map((item) => {
+                {NAV_ITEMS.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeScreen === item.id;
                   return (
@@ -351,7 +358,7 @@ export function TopBar({
                 <button
                   type="button"
                   onClick={() => {
-                    setIsMobileMenuOpen(false);
+                    setMobileMenuOpen(false);
                     onOpenPrivacy();
                   }}
                   className="min-h-[44px] px-3.5 py-2 rounded-lg bg-[#151311]/85 border border-[#A39B93]/20 hover:border-[#D4AF37] text-xs font-medium text-[#A39B93] hover:text-[#F4F1EA] inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
@@ -363,7 +370,7 @@ export function TopBar({
                 <button
                   type="button"
                   onClick={() => {
-                    setIsMobileMenuOpen(false);
+                    setMobileMenuOpen(false);
                     onOpenHandoff();
                   }}
                   className={`min-h-[44px] px-3.5 py-2 rounded-lg border text-xs font-medium inline-flex items-center justify-center gap-1.5 whitespace-nowrap ${
