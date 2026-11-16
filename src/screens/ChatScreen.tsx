@@ -213,11 +213,11 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex w-full flex-col gap-2.5 lg:w-auto lg:flex-row lg:flex-wrap lg:items-center">
             <button
               type="button"
               onClick={() => void handleDrawRandomCard()}
-              className="min-h-[42px] px-3.5 py-2 rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs font-semibold inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors"
+              className="min-h-[42px] w-full px-3.5 py-2 rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap transition-colors lg:w-auto lg:shrink-0 lg:justify-start"
             >
               <Shuffle className="w-3.5 h-3.5" />
               Estrai Arcano
@@ -226,7 +226,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
             <button
               type="button"
               onClick={() => void handleDrawThreeCardSpread()}
-              className="min-h-[42px] px-3.5 py-2 rounded-lg bg-[#D4AF37]/12 border border-[#D4AF37]/35 hover:border-[#D4AF37] text-[#F4F1EA] text-xs font-semibold inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors"
+              className="min-h-[42px] w-full px-3.5 py-2 rounded-lg bg-[#D4AF37]/12 border border-[#D4AF37]/35 hover:border-[#D4AF37] text-[#F4F1EA] text-xs font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap transition-colors lg:w-auto lg:shrink-0 lg:justify-start"
             >
               <Layers className="w-3.5 h-3.5 text-[#D4AF37]" />
               Stesa 3 Carte
@@ -236,7 +236,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
               type="button"
               onClick={() => setIsDeckOpen((prev) => !prev)}
               aria-expanded={isDeckOpen}
-              className={`min-h-[42px] px-3.5 py-2 rounded-lg border text-xs font-medium inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors ${
+              className={`min-h-[42px] w-full px-3.5 py-2 rounded-lg border text-xs font-medium inline-flex items-center justify-center gap-1.5 whitespace-nowrap transition-colors lg:w-auto lg:shrink-0 lg:justify-start ${
                 isDeckOpen
                   ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-[#E6C65C]'
                   : 'bg-[#12100E]/80 border-[#D4AF37]/25 hover:border-[#D4AF37] text-[#F4F1EA]'
@@ -250,7 +250,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="min-h-[42px] px-3.5 py-2 rounded-lg bg-[#12100E]/80 border border-[#D4AF37]/25 hover:border-[#D4AF37] text-xs font-semibold text-[#F4F1EA] inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors"
+              className="min-h-[42px] w-full px-3.5 py-2 rounded-lg bg-[#12100E]/80 border border-[#D4AF37]/25 hover:border-[#D4AF37] text-xs font-semibold text-[#F4F1EA] inline-flex items-center justify-center gap-1.5 whitespace-nowrap transition-colors lg:w-auto lg:shrink-0 lg:justify-start"
             >
               <MessageCircle className="w-3.5 h-3.5 text-[#D4AF37]" />
               WhatsApp
