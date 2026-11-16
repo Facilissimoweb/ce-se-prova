@@ -55,12 +55,12 @@ const linkClass =
   'flex items-center gap-3 rounded-xl border border-[#D4AF37]/15 bg-[#12100E]/55 px-3 py-2.5 text-sm font-semibold text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]';
 
 const WELCOME_ASSISTANT =
-  'Ciao, sono l’assistente di Tarot Italia. Dimmi pure come posso orientarti — consulti, Dialogo, corsi o contatti.';
+  'Ciao, sono Nina, l’assistente virtuale di Tarot Italia. Sono qui per accoglierti e orientarti — e, quando vorrai un consulto autentico, ti accompagno verso Maria Teresa.';
 
 /**
  * Left FAB stack: under accessibility, above Torna su
  * (cookie → a11y → chat → Torna su).
- * Live chat via server `/api/chat` (Groq) when
+ * Live chat via server `/api/chat` (Groq / Nina) when
  * `TAROTITALIACHATGENERICAGROQ_API_KEY` is set on Vercel; otherwise contacts only.
  * On mobile, only visible when «Strumenti» is open.
  */
@@ -149,7 +149,7 @@ export function ChatFab() {
         setChatAvailable(false);
         setSendError(
           data.error ||
-            'La chat assistita non è ancora attiva. Usa i contatti qui sotto.'
+            'Nina non è ancora attiva. Usa i contatti qui sotto per parlare con Maria Teresa.'
         );
         return;
       }
@@ -184,10 +184,10 @@ export function ChatFab() {
             setOpen((prev) => !prev);
             if (isCompact) setToolsOpen(false);
           }}
-          aria-label="Apri chat e contatti"
+          aria-label="Apri chat con Nina e contatti"
           aria-expanded={open}
           aria-controls={panelId}
-          title="Chat"
+          title="Chat con Nina"
           className="fixed bottom-[9.5rem] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[5.75rem] md:left-6"
         >
           <MessageCircle className="h-4 w-4" aria-hidden="true" />
@@ -199,7 +199,7 @@ export function ChatFab() {
           id={panelId}
           role="dialog"
           aria-modal="false"
-          aria-label="Chat e contatti"
+          aria-label="Chat con Nina e contatti"
           className="fixed bottom-[16.75rem] left-4 z-50 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md md:bottom-[12.75rem] md:left-6"
         >
           <div className="mb-3 flex items-start justify-between gap-3">
@@ -207,19 +207,19 @@ export function ChatFab() {
               <p className="font-display text-sm tracking-[0.08em] text-[#D4AF37] uppercase">
                 Tarot Italia
               </p>
-              <h2 className="mt-1 font-display text-lg text-[#F4F1EA]">Chat</h2>
+              <h2 className="mt-1 font-display text-lg text-[#F4F1EA]">Nina</h2>
               <p className="mt-1 text-sm leading-relaxed text-[#A39B93]">
                 {statusLoading
-                  ? 'Verifico la chat…'
+                  ? 'Verifico Nina…'
                   : chatAvailable
-                    ? 'Assistente del sito · tono Tarot Italia. Per un consulto personale usa Prenota o WhatsApp.'
-                    : 'La chat assistita non è attiva in questo momento. Scrivimi su WhatsApp, Telegram o email.'}
+                    ? 'Assistente virtuale di Maria Teresa. Per un consulto autentico, ti accompagno verso di lei (Prenota o WhatsApp).'
+                    : 'Nina non è attiva in questo momento. Scrivi a Maria Teresa su WhatsApp, Telegram o email.'}
               </p>
             </div>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              aria-label="Chiudi chat"
+              aria-label="Chiudi chat con Nina"
               className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#A39B93] transition-colors hover:bg-[#D4AF37]/10 hover:text-[#F4F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
             >
               <X className="h-4 w-4" aria-hidden="true" />
@@ -248,14 +248,14 @@ export function ChatFab() {
                 {sending && (
                   <div className="mr-4 flex items-center gap-2 rounded-lg bg-[#1C1916] px-2.5 py-2 text-sm text-[#A39B93]">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
-                    Sto ascoltando…
+                    Nina sta ascoltando…
                   </div>
                 )}
               </div>
 
               <form onSubmit={sendMessage} className="flex items-end gap-2">
                 <label htmlFor={composerId} className="sr-only">
-                  Messaggio chat
+                  Messaggio per Nina
                 </label>
                 <textarea
                   id={composerId}
