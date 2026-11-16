@@ -17,6 +17,7 @@ import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
 import { TARIFF_SECTION_IMAGES } from '../data/sectionImages';
 import consultiDeskImg from '../assets/images/consulti_desk_linen_1794651607906.jpg';
+import { CONSULTATION_STRIPE_ENABLED } from '../lib/bookingCheckoutMode';
 
 interface ConsultiScreenProps {
   showCmsKeys: boolean;
@@ -234,9 +235,11 @@ export function ConsultiScreen({
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
-                <p className="text-[11px] font-mono text-[#A39B93]/80 text-center truncate">
-                  Stripe Price Key: {tariff.stripePriceIdAnnotation}
-                </p>
+                {CONSULTATION_STRIPE_ENABLED ? (
+                  <p className="text-[11px] font-mono text-[#A39B93]/80 text-center truncate">
+                    Stripe Price Key: {tariff.stripePriceIdAnnotation}
+                  </p>
+                ) : null}
               </div>
             </article>
           );
@@ -344,10 +347,14 @@ export function ConsultiScreen({
           <CreditCard className="w-5 h-5 text-[#D4AF37] shrink-0 mt-0.5" aria-hidden="true" />
           <div className="space-y-1.5">
             <h3 className="font-display text-base text-[#F4F1EA]">
-              Handoff Pagamenti &amp; Auth
+              {CONSULTATION_STRIPE_ENABLED
+                ? 'Handoff Pagamenti & Auth'
+                : 'Prenotazione e pagamento'}
             </h3>
             <p className="text-xs md:text-sm leading-relaxed text-[#A39B93]">
-              Le tariffe selezionate pre-compilano la sessione Stripe Checkout e il record di prenotazione protetto da Firebase Auth e persistito su Postgres.
+              {CONSULTATION_STRIPE_ENABLED
+                ? 'Le tariffe selezionate pre-compilano la sessione Stripe Checkout e il record di prenotazione protetto da Firebase Auth e persistito su Postgres.'
+                : 'Dopo aver scelto la tariffa, invii la richiesta su WhatsApp: Maria Teresa ti risponde con le indicazioni per il pagamento. Il checkout Stripe resta disponibile per ripartire quando sarà il momento.'}
             </p>
           </div>
         </div>

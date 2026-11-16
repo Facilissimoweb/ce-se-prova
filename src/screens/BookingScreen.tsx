@@ -8,6 +8,7 @@ import {
   CreditCard,
   Lock,
   MessageCircle,
+  Send,
 } from 'lucide-react';
 import type { BookingDraft, ConsultationTariff } from '../types/handoff';
 import { consultationTariffs, siteContent } from '../data/siteContent';
@@ -25,6 +26,10 @@ import {
   toIsoDate,
 } from '../lib/bookingCalendar';
 import {
+  buildBookingWhatsAppMessage,
+  CONSULTATION_STRIPE_ENABLED,
+} from '../lib/bookingCheckoutMode';
+import {
   isEveningSlot,
   isSlotAllowedForMode,
   sessionModeLabel,
@@ -35,6 +40,7 @@ import {
   isValidFullName,
   isValidPhone,
 } from '../lib/formValidation';
+import { whatsappHref } from '../lib/siteContacts';
 
 interface BookingScreenProps {
   showCmsKeys: boolean;
@@ -143,6 +149,8 @@ export function BookingScreen({
   );
 
   useEffect(() => {
+    // Kept for when CONSULTATION_STRIPE_ENABLED is turned back on.
+    if (!CONSULTATION_STRIPE_ENABLED) return;
     const params = new URLSearchParams(window.location.search);
     const stripeSessionId = params.get('booking_stripe_session_id');
     if (!stripeSessionId) return;
@@ -218,6 +226,36 @@ export function BookingScreen({
 
     setSubmitting(true);
     setSubmitError(null);
+
+    // Frozen path: open WhatsApp with booking details; Maria sends payment info.
+    if (!CONSULTATION_STRIPE_ENABLED) {
+      try {
+        const message = buildBookingWhatsAppMessage({
+          tariffTitle: activeTariff.title,
+          durationMinutes: activeTariff.durationMinutes,
+          priceEur: activeTariff.priceEur,
+          dateLabel: formatItalianDate(draft.selectedDateIso),
+          timeSlot: draft.selectedTimeSlot,
+          modeLabel: sessionModeLabel(draft.mode, draft.selectedTimeSlot),
+          fullName: draft.fullName.trim(),
+          email: draft.email.trim(),
+          phoneWhatsApp: draft.phoneWhatsApp.trim(),
+          sessionIntent: draft.sessionIntent.trim(),
+        });
+        window.open(whatsappHref(message), '_blank', 'noopener,noreferrer');
+        setBookingConfirmed(true);
+      } catch (err) {
+        setSubmitError(
+          err instanceof Error
+            ? err.message
+            : 'Impossibile aprire WhatsApp. Riprova o scrivi al numero dello studio.'
+        );
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
     try {
       const token = user ? await getIdToken() : null;
       const res = await fetch('/api/bookings', {
@@ -240,7 +278,11 @@ export function BookingScreen({
       });
       const json = (await res.json()) as {
         error?: string;
-        mode?: 'stripe_redirect' | 'direct_unlock' | 'confirmed';
+        mode?:
+          | 'stripe_redirect'
+          | 'direct_unlock'
+          | 'confirmed'
+          | 'whatsapp_handoff';
         checkoutUrl?: string;
       };
       if (!res.ok) {
@@ -264,12 +306,19 @@ export function BookingScreen({
   const steps: { num: 1 | 2 | 3; label: string }[] = [
     { num: 1, label: '01. Servizio' },
     { num: 2, label: '02. Data e Ora' },
-    { num: 3, label: '03. Dati e Checkout' },
+    {
+      num: 3,
+      label: CONSULTATION_STRIPE_ENABLED
+        ? '03. Dati e Checkout'
+        : '03. Dati e invio',
+    },
   ];
 
   return (
     <div className="space-y-10 pt-6 md:pt-10 pb-8">
-      <CheckoutReturnBanner variant="booking" />
+      {CONSULTATION_STRIPE_ENABLED ? (
+        <CheckoutReturnBanner variant="booking" />
+      ) : null}
 
       <header className="space-y-3 max-w-2xl">
         <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
@@ -326,8 +375,9 @@ export function BookingScreen({
                   Durata e modalità del consulto
                 </h2>
                 <p className="text-sm text-[#A39B93]">
-                  Scegli durata e se preferisci online (chiamata vocale) o di
-                  persona a Macerata. Checkout Stripe al passo finale.
+                  {CONSULTATION_STRIPE_ENABLED
+                    ? 'Scegli durata e se preferisci online (chiamata vocale) o di persona a Macerata. Checkout Stripe al passo finale.'
+                    : 'Scegli durata e se preferisci online (chiamata vocale) o di persona a Macerata. Al passo finale invii la richiesta su WhatsApp.'}
                 </p>
               </div>
 
@@ -559,25 +609,70 @@ export function BookingScreen({
             >
               <div className="space-y-1">
                 <h2 className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]">
-                  Dati di contatto e checkout
+                  {CONSULTATION_STRIPE_ENABLED
+                    ? 'Dati di contatto e checkout'
+                    : 'Dati di contatto e invio'}
                 </h2>
                 <p className="text-sm text-[#A39B93]">
-                  Dopo il pagamento ricevi conferma via email (Zoho) e lo slot
-                  viene riservato sul calendario.
+                  {CONSULTATION_STRIPE_ENABLED
+                    ? 'Dopo il pagamento ricevi conferma via email (Zoho) e lo slot viene riservato sul calendario.'
+                    : 'Compila i dati e invia la richiesta su WhatsApp: Maria Teresa ti risponderà con le indicazioni per il pagamento e la conferma dello slot.'}
                 </p>
               </div>
 
               {bookingConfirmed ? (
                 <div className="rounded-xl border border-[#D4AF37]/45 bg-[#12100E]/90 p-5 space-y-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                    Prenotazione confermata
+                    {CONSULTATION_STRIPE_ENABLED
+                      ? 'Prenotazione confermata'
+                      : 'Richiesta inviata'}
                   </p>
                   <p className="text-sm text-[#F4F1EA] leading-relaxed">
-                    Grazie {draft.fullName}. La sessione del{' '}
-                    {formatItalianDate(draft.selectedDateIso)} alle{' '}
-                    {draft.selectedTimeSlot} è riservata. Controlla la casella
-                    email per i dettagli.
+                    {CONSULTATION_STRIPE_ENABLED ? (
+                      <>
+                        Grazie {draft.fullName}. La sessione del{' '}
+                        {formatItalianDate(draft.selectedDateIso)} alle{' '}
+                        {draft.selectedTimeSlot} è riservata. Controlla la
+                        casella email per i dettagli.
+                      </>
+                    ) : (
+                      <>
+                        Grazie {draft.fullName}. Abbiamo aperto WhatsApp con i
+                        dettagli della sessione del{' '}
+                        {formatItalianDate(draft.selectedDateIso)} alle{' '}
+                        {draft.selectedTimeSlot}. Invia il messaggio: Maria
+                        Teresa ti risponderà a breve con le modalità di
+                        pagamento.
+                      </>
+                    )}
                   </p>
+                  {!CONSULTATION_STRIPE_ENABLED ? (
+                    <a
+                      href={whatsappHref(
+                        buildBookingWhatsAppMessage({
+                          tariffTitle: activeTariff.title,
+                          durationMinutes: activeTariff.durationMinutes,
+                          priceEur: activeTariff.priceEur,
+                          dateLabel: formatItalianDate(draft.selectedDateIso),
+                          timeSlot: draft.selectedTimeSlot,
+                          modeLabel: sessionModeLabel(
+                            draft.mode,
+                            draft.selectedTimeSlot
+                          ),
+                          fullName: draft.fullName.trim(),
+                          email: draft.email.trim(),
+                          phoneWhatsApp: draft.phoneWhatsApp.trim(),
+                          sessionIntent: draft.sessionIntent.trim(),
+                        })
+                      )}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs font-semibold"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      Riapri WhatsApp
+                    </a>
+                  ) : null}
                   <button
                     type="button"
                     onClick={onOpenChat}
@@ -724,10 +819,17 @@ export function BookingScreen({
                   </div>
 
                   <div className="p-4 rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/15 text-xs text-[#A39B93] flex items-start gap-3">
-                    <Lock
-                      className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5"
-                      aria-hidden="true"
-                    />
+                    {CONSULTATION_STRIPE_ENABLED ? (
+                      <Lock
+                        className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <MessageCircle
+                        className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5"
+                        aria-hidden="true"
+                      />
+                    )}
                     <p className="leading-relaxed">
                       <CopyText
                         entry={siteContent.booking.stripeHandoffNote}
@@ -759,24 +861,34 @@ export function BookingScreen({
                       disabled={submitting}
                       className="px-6 py-3 min-h-[46px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
                     >
-                      <CreditCard className="w-4 h-4" />
+                      {CONSULTATION_STRIPE_ENABLED ? (
+                        <CreditCard className="w-4 h-4" />
+                      ) : (
+                        <Send className="w-4 h-4" />
+                      )}
                       {submitting
-                        ? 'Reindirizzamento…'
-                        : `Paga e conferma (€ ${activeTariff.priceEur})`}
+                        ? CONSULTATION_STRIPE_ENABLED
+                          ? 'Reindirizzamento…'
+                          : 'Apertura WhatsApp…'
+                        : CONSULTATION_STRIPE_ENABLED
+                          ? `Paga e conferma (€ ${activeTariff.priceEur})`
+                          : 'Invia prenotazione'}
                     </button>
                   </div>
 
-                  <a
-                    href={`https://wa.me/393791038253?text=${encodeURIComponent(
-                      `Buongiorno Maria Teresa, vorrei conferma per ${activeTariff.title} (${activeTariff.durationMinutes}m) il ${draft.selectedDateIso} alle ${draft.selectedTimeSlot}. Nome: ${draft.fullName}.`
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-xs text-[#A39B93] hover:text-[#D4AF37]"
-                  >
-                    <MessageCircle className="w-3.5 h-3.5" />
-                    Assistenza WhatsApp
-                  </a>
+                  {CONSULTATION_STRIPE_ENABLED ? (
+                    <a
+                      href={whatsappHref(
+                        `Buongiorno Maria Teresa, vorrei conferma per ${activeTariff.title} (${activeTariff.durationMinutes}m) il ${draft.selectedDateIso} alle ${draft.selectedTimeSlot}. Nome: ${draft.fullName}.`
+                      )}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-xs text-[#A39B93] hover:text-[#D4AF37]"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      Assistenza WhatsApp
+                    </a>
+                  ) : null}
                 </>
               )}
             </form>
@@ -838,8 +950,9 @@ export function BookingScreen({
           </div>
 
           <p className="text-xs leading-relaxed text-[#A39B93]">
-            Pagamento Stripe · conferma email Zoho · evento Google Calendar.
-            Firebase Auth + Postgres.
+            {CONSULTATION_STRIPE_ENABLED
+              ? 'Pagamento Stripe · conferma email Zoho · evento Google Calendar. Firebase Auth + Postgres.'
+              : 'Richiesta via WhatsApp · Maria Teresa invia le indicazioni di pagamento · conferma slot a mano. Il checkout Stripe resta pronto per ripartire.'}
           </p>
         </aside>
       </div>

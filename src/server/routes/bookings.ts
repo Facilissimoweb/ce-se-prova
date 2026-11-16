@@ -18,6 +18,7 @@ import {
   slotsForDate,
 } from '../../lib/bookingSlots.ts';
 import { resolveBookingTariff } from '../../lib/paymentCatalog.ts';
+import { CONSULTATION_STRIPE_ENABLED } from '../../lib/bookingCheckoutMode.ts';
 import {
   allowDirectUnlock,
   assertCheckoutPaid,
@@ -128,6 +129,16 @@ export async function postBooking(params: {
           meta.customerEmail || paid.customer_email || email || null,
       });
       return json(200, { mode: 'confirmed', booking: result.booking });
+    }
+
+    // Soft-freeze: consulti booking UI uses WhatsApp handoff; keep Stripe path
+    // compiled for later re-enable via CONSULTATION_STRIPE_ENABLED.
+    if (!CONSULTATION_STRIPE_ENABLED) {
+      return json(200, {
+        mode: 'whatsapp_handoff',
+        message:
+          'Prenotazione consulti via WhatsApp: apri il messaggio precompilato e invialo a Maria Teresa. Il pagamento online riprenderà in un secondo momento.',
+      });
     }
 
     if (isStripeConfigured()) {
