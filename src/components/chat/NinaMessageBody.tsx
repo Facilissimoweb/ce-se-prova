@@ -1,14 +1,12 @@
 import React from 'react';
-import {
-  SITE_EMAIL,
-  telegramHref,
-  whatsappHref,
-} from '../../lib/siteContacts';
+import { SITE_EMAIL } from '../../lib/siteContacts';
 
 /**
  * Safe rendering for Nina chat replies.
  * Never uses dangerouslySetInnerHTML — only React text nodes + allowlisted links.
- * Supports: short paragraphs, **bold**, markdown links, and a final CTA block after ---.
+ * Supports: short paragraphs, **bold**, markdown links.
+ * Trailing contact CTA blocks (--- / Prenota·WhatsApp·Telegram·email) are stripped:
+ * those actions live only in the ChatFab «Parla con Maria Teresa» panel.
  */
 
 const ALLOWED_HREF =
@@ -67,7 +65,8 @@ function renderInline(text: string, keyPrefix: string): React.ReactNode {
       );
     }
     if (part.type === 'link') {
-      const external = /^https?:\/\//i.test(part.href) || part.href.startsWith('mailto:');
+      const external =
+        /^https?:\/\//i.test(part.href) || part.href.startsWith('mailto:');
       return (
         <a
           key={key}
@@ -109,31 +108,27 @@ function looksLikeCtaLine(line: string): boolean {
   );
 }
 
-function splitBodyAndCta(content: string): { body: string; cta: string | null } {
+/** Drop trailing contact CTA blocks so buttons are not duplicated in-thread. */
+function stripTrailingCtaBlock(content: string): string {
   const normalized = content.replace(/\r\n/g, '\n').trim();
-  // Explicit separator preferred
   const sep = normalized.search(/\n---+\n/);
   if (sep >= 0) {
-    return {
-      body: normalized.slice(0, sep).trim(),
-      cta: normalized.slice(sep).replace(/^\n?---+\n?/, '').trim() || null,
-    };
+    return normalized.slice(0, sep).trim();
   }
-  // Fallback: last contiguous block that looks like contact CTAs
   const blocks = normalized.split(/\n{2,}/);
-  if (blocks.length < 2) return { body: normalized, cta: null };
+  if (blocks.length < 2) return normalized;
   const last = blocks[blocks.length - 1];
-  const lastLines = last.split('\n').map((l) => l.trim()).filter(Boolean);
+  const lastLines = last
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
   if (
     lastLines.some(isCtaHeading) ||
     lastLines.filter(looksLikeCtaLine).length >= 2
   ) {
-    return {
-      body: blocks.slice(0, -1).join('\n\n').trim(),
-      cta: last.trim(),
-    };
+    return blocks.slice(0, -1).join('\n\n').trim();
   }
-  return { body: normalized, cta: null };
+  return normalized;
 }
 
 function paragraphsFrom(text: string): string[] {
@@ -143,88 +138,9 @@ function paragraphsFrom(text: string): string[] {
     .filter(Boolean);
 }
 
-function ctaLinesFrom(text: string): string[] {
-  return text
-    .split('\n')
-    .map((l) => l.replace(/^[-*•]\s+/, '').trim())
-    .filter(Boolean);
-}
-
-const DEFAULT_CTA_LINKS: Array<{ label: string; href: string }> = [
-  { label: 'Prenota', href: '/prenota' },
-  {
-    label: 'WhatsApp',
-    href: whatsappHref(
-      'Buongiorno Maria Teresa, ti scrivo dalla chat con Nina.'
-    ),
-  },
-  { label: 'Telegram', href: telegramHref() },
-  { label: 'Email', href: `mailto:${SITE_EMAIL}` },
-];
-
-function resolveCtaHref(label: string, explicitHref?: string): string | null {
-  if (explicitHref) return sanitizeHref(explicitHref);
-  const key = label.trim().toLowerCase();
-  if (key.startsWith('prenota')) return '/prenota';
-  if (key.startsWith('whatsapp')) {
-    return whatsappHref(
-      'Buongiorno Maria Teresa, ti scrivo dalla chat con Nina.'
-    );
-  }
-  if (key.startsWith('telegram')) return telegramHref();
-  if (key.startsWith('email') || key.includes('@')) {
-    return `mailto:${SITE_EMAIL}`;
-  }
-  return null;
-}
-
-function parseCtaItems(
-  ctaText: string
-): { heading: string | null; items: Array<{ label: string; href: string }> } {
-  const lines = ctaLinesFrom(ctaText);
-  let heading: string | null = null;
-  const items: Array<{ label: string; href: string }> = [];
-
-  for (const line of lines) {
-    const plain = line.replace(/\*\*/g, '').trim();
-    if (!heading && isCtaHeading(plain) && !/^\[/.test(line)) {
-      heading = plain;
-      continue;
-    }
-
-    const md = line.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
-    if (md) {
-      const href = resolveCtaHref(md[1], md[2]);
-      if (href) items.push({ label: md[1].trim(), href });
-      continue;
-    }
-
-    // "Prenota · WhatsApp · Telegram · email" or "WhatsApp — …"
-    const chunks = plain.split(/\s*[·|•—–-]\s*|\s{2,}/).map((c) => c.trim()).filter(Boolean);
-    for (const chunk of chunks) {
-      const href = resolveCtaHref(chunk);
-      if (href) {
-        const label =
-          chunk.toLowerCase().includes('email') || chunk.includes('@')
-            ? 'Email'
-            : chunk.replace(/\*\*/g, '').split(/\s+/)[0];
-        if (!items.some((i) => i.label.toLowerCase() === label.toLowerCase())) {
-          items.push({ label, href });
-        }
-      }
-    }
-  }
-
-  if (items.length === 0) {
-    return { heading: heading || 'Parla con Maria Teresa', items: DEFAULT_CTA_LINKS };
-  }
-  return { heading: heading || 'Parla con Maria Teresa', items };
-}
-
 export function NinaMessageBody({ content }: { content: string }) {
-  const { body, cta } = splitBodyAndCta(content);
+  const body = stripTrailingCtaBlock(content);
   const paras = paragraphsFrom(body);
-  const ctaParsed = cta ? parseCtaItems(cta) : null;
 
   return (
     <div className="space-y-2.5 text-sm leading-relaxed">
@@ -233,39 +149,6 @@ export function NinaMessageBody({ content }: { content: string }) {
           {renderInline(para, `p${idx}`)}
         </p>
       ))}
-
-      {ctaParsed && (
-        <div
-          className="mt-1 rounded-xl border border-[#D4AF37]/25 bg-[#12100E]/65 px-2.5 py-2.5"
-          role="group"
-          aria-label={ctaParsed.heading || 'Contatti'}
-        >
-          {ctaParsed.heading && (
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-              {ctaParsed.heading}
-            </p>
-          )}
-          <ul className="flex flex-col gap-1.5">
-            {ctaParsed.items.map((item) => {
-              const external =
-                /^https?:\/\//i.test(item.href) || item.href.startsWith('mailto:');
-              return (
-                <li key={item.label}>
-                  <a
-                    href={item.href}
-                    {...(external
-                      ? { target: '_blank', rel: 'noopener noreferrer' }
-                      : {})}
-                    className="flex min-h-9 items-center rounded-lg border border-[#D4AF37]/15 bg-[#151311]/80 px-2.5 text-sm font-semibold text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }

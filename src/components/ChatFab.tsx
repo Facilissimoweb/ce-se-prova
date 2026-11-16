@@ -59,14 +59,7 @@ const WELCOME_ASSISTANT = `Ciao, sono **Nina**, l’assistente virtuale di Tarot
 
 Sono qui per **accoglierti** e orientarti con calma.
 
-Quando vorrai un consulto autentico, ti accompagno verso **Maria Teresa**.
-
----
-**Parla con Maria Teresa**
-[Prenota](/prenota)
-[WhatsApp](https://wa.me/393791038253)
-[Telegram](https://t.me/+393791038253)
-[Email](mailto:info@tarotitalia.com)`;
+Quando vorrai un consulto autentico, ti accompagno verso **Maria Teresa** — usa la sezione **Parla con Maria Teresa** qui sotto.`;
 
 /**
  * Left FAB stack: under accessibility, above Torna su
@@ -223,8 +216,8 @@ export function ChatFab() {
                 {statusLoading
                   ? 'Verifico Nina…'
                   : chatAvailable
-                    ? 'Assistente virtuale di Maria Teresa. Per un consulto autentico, ti accompagno verso di lei (Prenota o WhatsApp).'
-                    : 'Nina non è attiva in questo momento. Scrivi a Maria Teresa su WhatsApp, Telegram o email.'}
+                    ? 'Assistente virtuale di Maria Teresa. Per un consulto autentico, usa la sezione Parla con Maria Teresa qui sotto.'
+                    : 'Nina non è attiva in questo momento. Usa la sezione Parla con Maria Teresa qui sotto.'}
               </p>
             </div>
             <button
