@@ -87,6 +87,16 @@ const NAV_ITEMS: {
   },
 ];
 
+/** Mobile drawer pages — Contatti lives in the sticky dock; Area Riservata is a CTA below. */
+const DRAWER_PAGE_ITEMS = NAV_ITEMS.filter(
+  (item) => item.id !== 'contatti' && item.id !== 'area-riservata'
+);
+
+const HEADER_HEIGHT_CLASS =
+  'h-[calc(4.75rem+env(safe-area-inset-top,0px))] md:h-[calc(5rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)]';
+const HEADER_OFFSET_TOP =
+  'top-[calc(4.75rem+env(safe-area-inset-top,0px))]';
+
 export function TopBar({
   activeScreen,
   onNavigate,
@@ -96,7 +106,7 @@ export function TopBar({
 }: TopBarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Close mobile drawer on Escape and lock body scroll while open
+  // Close on Escape; lock scroll without losing the top navbar mid-page
   useEffect(() => {
     if (!isMobileMenuOpen) return;
 
@@ -106,12 +116,26 @@ export function TopBar({
       }
     };
 
-    const previousOverflow = document.body.style.overflow;
+    const scrollY = window.scrollY;
+    const previous = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+    };
+
     document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.body.style.overflow = previous.overflow;
+      document.body.style.position = previous.position;
+      document.body.style.top = previous.top;
+      document.body.style.width = previous.width;
+      window.scrollTo(0, scrollY);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isMobileMenuOpen]);
@@ -134,7 +158,13 @@ export function TopBar({
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-[calc(4.75rem+env(safe-area-inset-top,0px))] md:h-[calc(5rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)] bg-[#12100E]/90 backdrop-blur-md border-b border-[#D4AF37]/15">
+      <header
+        className={`${
+          isMobileMenuOpen
+            ? 'fixed inset-x-0 top-0 z-[60]'
+            : 'sticky top-0 z-50'
+        } ${HEADER_HEIGHT_CLASS} bg-[#12100E]/90 backdrop-blur-md border-b border-[#D4AF37]/15`}
+      >
         <div className="max-w-6xl mx-auto h-full px-4 md:px-8 lg:px-12 flex items-center justify-between gap-2.5 md:gap-8">
           {/* Zone 1: Single-line Brand Wordmark + Nav mark */}
           <button
@@ -220,16 +250,21 @@ export function TopBar({
         </div>
       </header>
 
-      {/* Mobile Hamburger Drawer */}
+      {/* Spacer when header is fixed open — keeps page offset while menu is up */}
+      {isMobileMenuOpen && (
+        <div className={`md:hidden ${HEADER_HEIGHT_CLASS}`} aria-hidden="true" />
+      )}
+
+      {/* Mobile Hamburger Drawer — sits under the always-visible top navbar */}
       {isMobileMenuOpen && (
         <div
           id="mobile-hamburger-menu"
           role="dialog"
           aria-modal="true"
           aria-label="Menu di navigazione mobile"
-          className="md:hidden fixed inset-0 top-[calc(4.75rem+env(safe-area-inset-top,0px))] z-40 bg-[#12100E]/96 backdrop-blur-xl border-t border-[#D4AF37]/20 overflow-y-auto"
+          className={`md:hidden fixed inset-x-0 bottom-0 ${HEADER_OFFSET_TOP} z-50 bg-[#12100E]/96 backdrop-blur-xl border-t border-[#D4AF37]/20 overflow-y-auto`}
         >
-          <div className="min-h-full px-5 py-6 flex flex-col justify-between gap-8 max-w-lg mx-auto">
+          <div className="min-h-full px-5 py-6 flex flex-col justify-between gap-8 max-w-lg mx-auto pb-[max(6rem,env(safe-area-inset-bottom))]">
             <div className="space-y-6">
               <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
                 <span>Navigazione Studio</span>
@@ -239,7 +274,7 @@ export function TopBar({
               </div>
 
               <nav aria-label="Pagine del sito" className="space-y-2.5">
-                {NAV_ITEMS.map((item) => {
+                {DRAWER_PAGE_ITEMS.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeScreen === item.id;
                   return (
@@ -288,64 +323,58 @@ export function TopBar({
                 })}
               </nav>
 
-              <button
-                type="button"
-                onClick={() => handleMobileSelect('booking')}
-                className="w-full min-h-[48px] px-5 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors"
-              >
-                <Calendar className="w-4 h-4" aria-hidden="true" />
-                Prenota un Consulto
-                <ArrowRight className="w-4 h-4" aria-hidden="true" />
-              </button>
+              <div className="space-y-2.5">
+                <button
+                  type="button"
+                  onClick={() => handleMobileSelect('booking')}
+                  className="w-full min-h-[48px] px-5 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors"
+                >
+                  <Calendar className="w-4 h-4" aria-hidden="true" />
+                  Prenotazioni
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleMobileSelect('area-riservata')}
+                  className="w-full min-h-[48px] px-5 py-3 rounded-xl bg-[#151311]/90 border border-[#D4AF37]/35 hover:border-[#D4AF37] text-[#F4F1EA] text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors"
+                >
+                  <Lock className="w-4 h-4 text-[#D4AF37]" aria-hidden="true" />
+                  Area personale
+                  <ArrowRight className="w-4 h-4 text-[#A39B93]" aria-hidden="true" />
+                </button>
+              </div>
             </div>
 
             <div className="space-y-4 pt-4 border-t border-[#D4AF37]/15">
-              <div className="grid grid-cols-1 gap-2.5">
-                <a
-                  href={whatsappHref(
-                    'Buongiorno Maria Teresa, desidero informazioni su un consulto Tarot Italia.'
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="cta-label min-h-[44px] px-4 py-2.5 rounded-lg bg-[#151311]/85 border border-[#D4AF37]/20 hover:border-[#D4AF37] text-xs font-medium text-[#F4F1EA] inline-flex items-center justify-between gap-2"
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onOpenPrivacy();
+                  }}
+                  className="min-h-[44px] px-3.5 py-2 rounded-lg bg-[#151311]/85 border border-[#A39B93]/20 hover:border-[#D4AF37] text-xs font-medium text-[#A39B93] hover:text-[#F4F1EA] inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
                 >
-                  <span className="inline-flex items-center gap-2">
-                    <PhoneCall className="w-4 h-4 text-[#D4AF37]" />
-                    WhatsApp Diretto
-                  </span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#A39B93]" />
-                </a>
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  Privacy &amp; Cookie
+                </button>
 
-                <div className="grid grid-cols-2 gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      onOpenPrivacy();
-                    }}
-                    className="min-h-[44px] px-3.5 py-2 rounded-lg bg-[#151311]/85 border border-[#A39B93]/20 hover:border-[#D4AF37] text-xs font-medium text-[#A39B93] hover:text-[#F4F1EA] inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
-                  >
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
-                    Privacy &amp; Cookie
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      onOpenHandoff();
-                    }}
-                    className={`min-h-[44px] px-3.5 py-2 rounded-lg border text-xs font-medium inline-flex items-center justify-center gap-1.5 whitespace-nowrap ${
-                      showCmsKeys
-                        ? 'bg-[#D4AF37]/15 border-[#D4AF37] text-[#E6C65C]'
-                        : 'bg-[#151311]/85 border-[#A39B93]/20 hover:border-[#D4AF37] text-[#A39B93] hover:text-[#F4F1EA]'
-                    }`}
-                  >
-                    <Code2 className="w-3.5 h-3.5 text-[#D4AF37]" />
-                    Handoff &amp; CMS
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onOpenHandoff();
+                  }}
+                  className={`min-h-[44px] px-3.5 py-2 rounded-lg border text-xs font-medium inline-flex items-center justify-center gap-1.5 whitespace-nowrap ${
+                    showCmsKeys
+                      ? 'bg-[#D4AF37]/15 border-[#D4AF37] text-[#E6C65C]'
+                      : 'bg-[#151311]/85 border-[#A39B93]/20 hover:border-[#D4AF37] text-[#A39B93] hover:text-[#F4F1EA]'
+                  }`}
+                >
+                  <Code2 className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  Handoff &amp; CMS
+                </button>
               </div>
 
               <p className="text-[11px] text-[#A39B93] text-center">
