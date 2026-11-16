@@ -164,7 +164,7 @@ export function App() {
 
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-[#12100E] text-[#F4F1EA] flex flex-col relative">
+      <div className="min-h-screen min-h-[100dvh] w-full max-w-[100%] overflow-x-clip bg-[#12100E] text-[#F4F1EA] flex flex-col relative">
         <AmbientSanctuaryBackground />
 
         <TopBar
@@ -175,7 +175,7 @@ export function App() {
           showCmsKeys={showCmsKeys}
         />
 
-        <main className="flex-1 w-full max-w-6xl mx-auto px-5 md:px-8 lg:px-12 pb-24 relative z-10">
+        <main className="flex-1 w-full max-w-6xl mx-auto px-5 md:px-8 lg:px-12 pb-[max(6rem,env(safe-area-inset-bottom))] relative z-10">
           {activeScreen === 'home' && (
             <HomeScreen
               showCmsKeys={showCmsKeys}

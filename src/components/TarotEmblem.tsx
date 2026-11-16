@@ -36,11 +36,12 @@ export function TarotEmblemLogo({ className = '', size = 56 }: LogoProps) {
 /**
  * Nav / header brand mark (ENN-37): eye in glowing triangle + green nebula.
  * RGBA PNG used as-is — no flood-fill / alpha rewrite.
- * Pass `size` for a fixed box, or omit it and size via `className` (e.g. h-14 md:h-16).
+ * Pass `size` for a fixed box, or omit it and size via `className`
+ * (e.g. h-[4.25rem] — readable on mobile next to the wordmark).
  */
 export function TarotNavLogo({ className = '', size }: LogoProps) {
   const fixed = typeof size === 'number';
-  const box = size ?? 64;
+  const box = size ?? 68;
   return (
     <img
       src={TAROT_ITALIA_NAV_SRC}
