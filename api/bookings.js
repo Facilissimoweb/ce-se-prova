@@ -8487,6 +8487,9 @@ var DIALOGUE_PACK_CATALOG = {
   }
 };
 
+// src/lib/bookingCheckoutMode.ts
+var CONSULTATION_STRIPE_ENABLED = false;
+
 // src/lib/stripe.ts
 function stripeSecretKey() {
   const key = process.env.STRIPE_SECRET_KEY?.trim();
@@ -8712,6 +8715,12 @@ async function postBooking(params) {
         customerEmail: meta.customerEmail || paid.customer_email || email || null
       });
       return json2(200, { mode: "confirmed", booking: result.booking });
+    }
+    if (!CONSULTATION_STRIPE_ENABLED) {
+      return json2(200, {
+        mode: "whatsapp_handoff",
+        message: "Prenotazione consulti via WhatsApp: apri il messaggio precompilato e invialo a Maria Teresa. Il pagamento online riprender\xE0 in un secondo momento."
+      });
     }
     if (isStripeConfigured()) {
       const booking = await createConsultationBooking({

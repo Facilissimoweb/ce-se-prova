@@ -80,8 +80,28 @@ export function hasGoogleMapsApiKey(): boolean {
   return Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY?.trim());
 }
 
+/**
+ * Base WhatsApp assist URL (client).
+ * Prefer `VITE_WHATSAPP_ASSIST_URL` when set (mirrors server `WHATSAPP_ASSIST_URL`);
+ * otherwise default `https://wa.me/393791038253`.
+ */
+export function assistWhatsappBaseUrl(): string {
+  const fromEnv = import.meta.env.VITE_WHATSAPP_ASSIST_URL?.trim();
+  if (fromEnv) {
+    try {
+      const url = new URL(fromEnv);
+      url.search = '';
+      url.hash = '';
+      return url.toString().replace(/\/$/, '');
+    } catch {
+      return fromEnv.split('?')[0].replace(/\/$/, '') || SITE_WHATSAPP_HREF;
+    }
+  }
+  return SITE_WHATSAPP_HREF;
+}
+
 export function whatsappHref(prefill: string): string {
-  return `${SITE_WHATSAPP_HREF}?text=${encodeURIComponent(prefill)}`;
+  return `${assistWhatsappBaseUrl()}?text=${encodeURIComponent(prefill)}`;
 }
 
 /**

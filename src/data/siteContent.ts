@@ -238,12 +238,12 @@ export const siteContent = {
     subheading: {
       cmsKey: '[COPY: siteContent.booking.subheading]',
       liveText:
-        'Seleziona il formato, scegli giorno e orario dal calendario e prepara i tuoi riferimenti per il checkout protetto.',
+        'Scegli durata, giorno e orario, poi inviaci la richiesta su WhatsApp: Maria Teresa ti risponderà con le indicazioni per il pagamento.',
     },
     stripeHandoffNote: {
       cmsKey: '[COPY: siteContent.booking.stripeNote]',
       liveText:
-        'La prenotazione salva tariffa, durata e prezzo dal catalogo server (non dal client). Il pagamento Stripe del consulto può essere collegato in un passo successivo.',
+        'Per ora il pagamento online è in pausa. Invia la prenotazione su WhatsApp: riceverai da Maria Teresa le modalità di pagamento e la conferma dello slot.',
     },
   },
   chat: {
