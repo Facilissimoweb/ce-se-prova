@@ -200,7 +200,7 @@ export function ChatFab() {
           role="dialog"
           aria-modal="false"
           aria-label="Chat con Nina e contatti"
-          className="fixed bottom-[16.75rem] left-4 z-50 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md md:bottom-[12.75rem] md:left-6"
+          className="fixed z-50 max-h-[min(70dvh,calc(100dvh-7.5rem))] w-auto max-w-[22rem] overflow-y-auto overscroll-contain rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md left-[max(1rem,env(safe-area-inset-left,0px))] right-[max(1rem,env(safe-area-inset-right,0px))] bottom-[calc(6.25rem+env(safe-area-inset-bottom,0px))] md:bottom-[12.75rem] md:left-6 md:right-auto md:max-h-none md:w-[22rem] md:overflow-visible"
         >
           <div className="mb-3 flex items-start justify-between gap-3">
             <div>
@@ -238,8 +238,8 @@ export function ChatFab() {
                     key={`${turn.role}-${index}`}
                     className={
                       turn.role === 'user'
-                        ? 'ml-6 rounded-lg bg-[#D4AF37]/15 px-2.5 py-2 text-sm text-[#F4F1EA]'
-                        : 'mr-4 rounded-lg bg-[#1C1916] px-2.5 py-2 text-sm text-[#D6CFC6]'
+                        ? 'ml-6 break-words rounded-lg bg-[#D4AF37]/15 px-2.5 py-2 text-sm text-[#F4F1EA]'
+                        : 'mr-4 break-words rounded-lg bg-[#1C1916] px-2.5 py-2 text-sm text-[#D6CFC6]'
                     }
                   >
                     {turn.content}
@@ -253,7 +253,7 @@ export function ChatFab() {
                 )}
               </div>
 
-              <form onSubmit={sendMessage} className="flex items-end gap-2">
+              <form onSubmit={sendMessage} className="flex min-w-0 items-end gap-2">
                 <label htmlFor={composerId} className="sr-only">
                   Messaggio per Nina
                 </label>
@@ -264,7 +264,7 @@ export function ChatFab() {
                   onChange={(e) => setDraft(e.target.value)}
                   disabled={sending}
                   placeholder="Scrivi qui…"
-                  className="min-h-[2.75rem] flex-1 resize-none rounded-xl border border-[#D4AF37]/20 bg-[#12100E] px-3 py-2 text-sm text-[#F4F1EA] placeholder:text-[#6F675F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:opacity-60"
+                  className="min-h-[2.75rem] min-w-0 flex-1 resize-none rounded-xl border border-[#D4AF37]/20 bg-[#12100E] px-3 py-2 text-sm text-[#F4F1EA] placeholder:text-[#6F675F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:opacity-60"
                 />
                 <button
                   type="submit"
@@ -310,9 +310,9 @@ export function ChatFab() {
               </a>
             </li>
             <li>
-              <a href={`mailto:${SITE_EMAIL}`} className={linkClass}>
-                <Mail className="h-4 w-4 text-[#D4AF37]" aria-hidden="true" />
-                Email · {SITE_EMAIL}
+              <a href={`mailto:${SITE_EMAIL}`} className={`${linkClass} min-w-0`}>
+                <Mail className="h-4 w-4 shrink-0 text-[#D4AF37]" aria-hidden="true" />
+                <span className="min-w-0 break-words">Email · {SITE_EMAIL}</span>
               </a>
             </li>
           </ul>
