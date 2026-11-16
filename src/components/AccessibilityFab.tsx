@@ -139,7 +139,7 @@ export function AccessibilityFab() {
           role="dialog"
           aria-modal="false"
           aria-label="Visualizzazione facilitata"
-          className="fixed bottom-[20.25rem] left-4 z-50 w-[min(20.5rem,calc(100vw-2rem))] rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md md:bottom-[16.25rem] md:left-6"
+          className="fixed z-50 max-h-[min(70dvh,calc(100dvh-7.5rem))] w-auto max-w-[20.5rem] overflow-y-auto overscroll-contain rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md left-[max(1rem,env(safe-area-inset-left,0px))] right-[max(1rem,env(safe-area-inset-right,0px))] bottom-[calc(6.25rem+env(safe-area-inset-bottom,0px))] md:bottom-[16.25rem] md:left-6 md:right-auto md:max-h-none md:w-[20.5rem] md:overflow-visible"
         >
           <div className="mb-3 flex items-start justify-between gap-3">
             <div>
