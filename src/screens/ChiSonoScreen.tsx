@@ -3,6 +3,8 @@ import { ArrowRight, BookOpen, Compass, ShieldCheck } from 'lucide-react';
 import type { ScreenId } from '../types/handoff';
 import { disciplinaryCredentials, siteContent } from '../data/siteContent';
 import { CopyText } from '../components/CopyText';
+import { ResilientImage } from '../components/ResilientImage';
+import chiSonoAtelierImg from '../assets/images/chi_sono_atelier_tarot_1794659562519.jpg';
 
 interface ChiSonoScreenProps {
   showCmsKeys: boolean;
@@ -11,8 +13,8 @@ interface ChiSonoScreenProps {
 
 type DisciplineFilter = 'all' | 'tarologia' | 'olistico';
 
-/** Section art — eye + moons + signature (not sitewide logo); PNG with alpha as-is (ENN-29 / ENN-66). */
-const SGUARDO_ICONOGRAFICO_SRC = '/brand/sguardo-iconografico.png';
+/** Logo + firma composite — eye/triangle + green nebula + gold cursive (ENN-67); PNG with alpha as-is. */
+const LOGO_FIRMA_SRC = '/brand/logo-firma.png';
 
 export function ChiSonoScreen({ showCmsKeys, onNavigate }: ChiSonoScreenProps) {
   const [filter, setFilter] = useState<DisciplineFilter>('all');
@@ -43,19 +45,17 @@ export function ChiSonoScreen({ showCmsKeys, onNavigate }: ChiSonoScreenProps) {
         </div>
       </header>
 
-      {/* Formazione e Ricerca — Balanced 12-col Split; primary slot uses former second image (ENN-66) */}
+      {/* Formazione e Ricerca — dual layout: atelier hero + logo/firma (ENN-67 restores pre-ENN-66 hero) */}
       <section
         aria-labelledby="research-heading"
         className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch"
       >
-        <div className="lg:col-span-6 rounded-2xl border border-[#D4AF37]/20 glass-tier-1 flex items-center justify-center p-8 md:p-12 min-h-[260px] bg-transparent">
-          <img
-            src={SGUARDO_ICONOGRAFICO_SRC}
-            alt="Sguardo iconografico: occhio tra lune e firma M. Teresa Rogani"
-            width={1800}
-            height={1800}
-            className="w-full max-w-[280px] md:max-w-[360px] h-auto select-none bg-transparent object-contain"
-            decoding="async"
+        <div className="lg:col-span-6 rounded-2xl overflow-hidden border border-[#D4AF37]/20 glass-tier-1">
+          <ResilientImage
+            src={chiSonoAtelierImg}
+            alt="Tavolo da studio tra Accademia di Belle Arti e tarologia: taccuino con geometrie classiche, busto classico in ombra, lama delle Stelle e pendolo in ottone"
+            className="w-full h-full min-h-[260px] aspect-[4/3] lg:aspect-auto object-cover"
+            fallbackLabel="Atelier Maria Teresa Rogani · Belle Arti e Tarologia"
           />
         </div>
 
@@ -105,6 +105,18 @@ export function ChiSonoScreen({ showCmsKeys, onNavigate }: ChiSonoScreenProps) {
             <span aria-hidden="true" className="text-[#D4AF37]/40">·</span>
             <span>Contesto Storico e Simbolico</span>
           </div>
+
+          {/* Logo + firma — composite as-is (ENN-67); not the sitewide nav mark */}
+          <figure className="pt-8 md:pt-10 flex justify-center bg-transparent">
+            <img
+              src={LOGO_FIRMA_SRC}
+              alt="Logo e firma: occhio nel triangolo con nebulosa verde e firma M. Teresa Rogani"
+              width={800}
+              height={800}
+              className="w-full max-w-[200px] md:max-w-[240px] h-auto select-none bg-transparent"
+              decoding="async"
+            />
+          </figure>
         </div>
       </section>
 
