@@ -7680,28 +7680,29 @@ var BOOKING_TARIFF_CATALOG = {
     id: "20m",
     title: "Consulto Breve",
     durationMinutes: 20,
-    priceEur: 20,
-    stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_20M"
+    priceEur: 19,
+    stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_20M",
+    onlineOnly: true
   },
   "45m": {
     id: "45m",
     title: "Consulto Essenziale",
     durationMinutes: 45,
-    priceEur: 60,
+    priceEur: 50,
     stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_45M"
   },
   "60m": {
     id: "60m",
     title: "Consulto Evolutivo Completo",
     durationMinutes: 60,
-    priceEur: 85,
+    priceEur: 75,
     stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_60M"
   },
   "90m": {
     id: "90m",
-    title: "Sessione Integrata & Ciclo",
+    title: "Sessione Integrata",
     durationMinutes: 90,
-    priceEur: 120,
+    priceEur: 90,
     stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_90M"
   }
 };
@@ -8686,12 +8687,17 @@ async function postBooking(params) {
         error: "Completa tutti i campi obbligatori della prenotazione."
       });
     }
+    if (tariff.onlineOnly && requestedMode === "studio") {
+      return json2(400, {
+        error: "Il Consulto Breve \xE8 disponibile solo online in chiamata vocale."
+      });
+    }
     if (!isSlotAllowedForMode(requestedMode, scheduledTime)) {
       return json2(400, {
         error: "Di persona a Macerata \xE8 disponibile fino alle 18:00. Scegli un orario diurno o la modalit\xE0 online."
       });
     }
-    const mode = resolveBookingMode(requestedMode, scheduledTime);
+    const mode = tariff.onlineOnly ? "remote" : resolveBookingMode(requestedMode, scheduledTime);
     if (!slotsForDate(scheduledDate).includes(scheduledTime)) {
       return json2(400, {
         error: "Seleziona una fascia oraria ancora disponibile."

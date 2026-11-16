@@ -12,34 +12,37 @@ export const BOOKING_TARIFF_CATALOG: Record<
     durationMinutes: number;
     priceEur: number;
     stripePriceIdAnnotation: string;
+    /** Se true, solo chiamata vocale online (niente studio di persona). */
+    onlineOnly?: boolean;
   }
 > = {
   '20m': {
     id: '20m',
     title: 'Consulto Breve',
     durationMinutes: 20,
-    priceEur: 20,
+    priceEur: 19,
     stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_20M',
+    onlineOnly: true,
   },
   '45m': {
     id: '45m',
     title: 'Consulto Essenziale',
     durationMinutes: 45,
-    priceEur: 60,
+    priceEur: 50,
     stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_45M',
   },
   '60m': {
     id: '60m',
     title: 'Consulto Evolutivo Completo',
     durationMinutes: 60,
-    priceEur: 85,
+    priceEur: 75,
     stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_60M',
   },
   '90m': {
     id: '90m',
-    title: 'Sessione Integrata & Ciclo',
+    title: 'Sessione Integrata',
     durationMinutes: 90,
-    priceEur: 120,
+    priceEur: 90,
     stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_90M',
   },
 };

@@ -321,7 +321,11 @@ export function HomeScreen({
                       {tariff.durationMinutes} Minuti
                     </span>
                     <span className="text-[#A39B93]">
-                      {tariff.recommended ? 'Percorso Consigliato' : 'Individuale'}
+                      {tariff.recommended
+                        ? 'Percorso Consigliato'
+                        : tariff.onlineOnly
+                          ? 'Solo Online'
+                          : 'Individuale'}
                     </span>
                   </div>
 
