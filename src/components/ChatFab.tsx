@@ -1,10 +1,11 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
-import { Loader2, Mail, MessageCircle, Send, X } from 'lucide-react';
+import { CalendarDays, Loader2, Mail, MessageCircle, Send, X } from 'lucide-react';
 import {
   SITE_EMAIL,
   telegramHref,
   whatsappHref,
 } from '../lib/siteContacts';
+import { NinaMessageBody } from './chat/NinaMessageBody';
 import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
 
 type ChatTurn = { role: 'user' | 'assistant'; content: string };
@@ -54,8 +55,18 @@ function TelegramLogo({ className }: { className?: string }) {
 const linkClass =
   'flex items-center gap-3 rounded-xl border border-[#D4AF37]/15 bg-[#12100E]/55 px-3 py-2.5 text-sm font-semibold text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]';
 
-const WELCOME_ASSISTANT =
-  'Ciao, sono Nina, l’assistente virtuale di Tarot Italia. Sono qui per accoglierti e orientarti — e, quando vorrai un consulto autentico, ti accompagno verso Maria Teresa.';
+const WELCOME_ASSISTANT = `Ciao, sono **Nina**, l’assistente virtuale di Tarot Italia.
+
+Sono qui per **accoglierti** e orientarti con calma.
+
+Quando vorrai un consulto autentico, ti accompagno verso **Maria Teresa**.
+
+---
+**Parla con Maria Teresa**
+[Prenota](/prenota)
+[WhatsApp](https://wa.me/393791038253)
+[Telegram](https://t.me/+393791038253)
+[Email](mailto:info@tarotitalia.com)`;
 
 /**
  * Left FAB stack: under accessibility, above Torna su
@@ -238,11 +249,15 @@ export function ChatFab() {
                     key={`${turn.role}-${index}`}
                     className={
                       turn.role === 'user'
-                        ? 'ml-6 break-words rounded-lg bg-[#D4AF37]/15 px-2.5 py-2 text-sm text-[#F4F1EA]'
-                        : 'mr-4 break-words rounded-lg bg-[#1C1916] px-2.5 py-2 text-sm text-[#D6CFC6]'
+                        ? 'ml-6 break-words rounded-lg bg-[#D4AF37]/15 px-2.5 py-2 text-sm text-[#F4F1EA] whitespace-pre-wrap'
+                        : 'mr-2 break-words rounded-lg bg-[#1C1916] px-2.5 py-2.5'
                     }
                   >
-                    {turn.content}
+                    {turn.role === 'assistant' ? (
+                      <NinaMessageBody content={turn.content} />
+                    ) : (
+                      turn.content
+                    )}
                   </div>
                 ))}
                 {sending && (
@@ -284,38 +299,53 @@ export function ChatFab() {
             </div>
           )}
 
-          <ul className="space-y-2">
-            <li>
-              <a
-                href={whatsappHref(
-                  'Buongiorno Maria Teresa, vorrei scrivere in chat.'
-                )}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={linkClass}
-              >
-                <WhatsAppLogo className="h-4 w-4 text-[#D4AF37]" />
-                WhatsApp
-              </a>
-            </li>
-            <li>
-              <a
-                href={telegramHref()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={linkClass}
-              >
-                <TelegramLogo className="h-4 w-4 text-[#D4AF37]" />
-                Telegram
-              </a>
-            </li>
-            <li>
-              <a href={`mailto:${SITE_EMAIL}`} className={`${linkClass} min-w-0`}>
-                <Mail className="h-4 w-4 shrink-0 text-[#D4AF37]" aria-hidden="true" />
-                <span className="min-w-0 break-words">Email · {SITE_EMAIL}</span>
-              </a>
-            </li>
-          </ul>
+          <div
+            className="rounded-xl border border-[#D4AF37]/20 bg-[#0F0D0B]/55 p-3"
+            role="group"
+            aria-label="Parla con Maria Teresa"
+          >
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+              Parla con Maria Teresa
+            </p>
+            <ul className="space-y-2">
+              <li>
+                <a href="/prenota" className={linkClass}>
+                  <CalendarDays className="h-4 w-4 text-[#D4AF37]" aria-hidden="true" />
+                  Prenota
+                </a>
+              </li>
+              <li>
+                <a
+                  href={whatsappHref(
+                    'Buongiorno Maria Teresa, vorrei scrivere in chat.'
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  <WhatsAppLogo className="h-4 w-4 text-[#D4AF37]" />
+                  WhatsApp
+                </a>
+              </li>
+              <li>
+                <a
+                  href={telegramHref()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  <TelegramLogo className="h-4 w-4 text-[#D4AF37]" />
+                  Telegram
+                </a>
+              </li>
+              <li>
+                <a href={`mailto:${SITE_EMAIL}`} className={`${linkClass} min-w-0`}>
+                  <Mail className="h-4 w-4 shrink-0 text-[#D4AF37]" aria-hidden="true" />
+                  <span className="min-w-0 break-words">Email · {SITE_EMAIL}</span>
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       )}
     </>
