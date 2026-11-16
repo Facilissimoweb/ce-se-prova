@@ -76,6 +76,7 @@ export async function postBooking(params: {
     const phoneWhatsApp = String(body.phoneWhatsApp || '').trim();
     const sessionIntent = String(body.sessionIntent || '').trim();
     const deontologyAccepted = Boolean(body.deontologyAccepted);
+    const privacyTermsAccepted = Boolean(body.privacyTermsAccepted);
     const requestedMode: BookingMode =
       String(body.mode || '').trim() === 'studio' ? 'studio' : 'remote';
 
@@ -87,7 +88,8 @@ export async function postBooking(params: {
       !email ||
       !isValidEmail(email) ||
       !phoneWhatsApp ||
-      !deontologyAccepted
+      !deontologyAccepted ||
+      !privacyTermsAccepted
     ) {
       return json(400, {
         error: 'Completa tutti i campi obbligatori della prenotazione.',

@@ -8683,8 +8683,9 @@ async function postBooking(params) {
     const phoneWhatsApp = String(body.phoneWhatsApp || "").trim();
     const sessionIntent = String(body.sessionIntent || "").trim();
     const deontologyAccepted = Boolean(body.deontologyAccepted);
+    const privacyTermsAccepted = Boolean(body.privacyTermsAccepted);
     const requestedMode = String(body.mode || "").trim() === "studio" ? "studio" : "remote";
-    if (!tariff || !isValidDateIso(scheduledDate) || !isValidSlotFormat(scheduledTime) || !fullName || !email || !isValidEmail(email) || !phoneWhatsApp || !deontologyAccepted) {
+    if (!tariff || !isValidDateIso(scheduledDate) || !isValidSlotFormat(scheduledTime) || !fullName || !email || !isValidEmail(email) || !phoneWhatsApp || !deontologyAccepted || !privacyTermsAccepted) {
       return json2(400, {
         error: "Completa tutti i campi obbligatori della prenotazione."
       });
