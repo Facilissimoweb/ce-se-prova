@@ -40,6 +40,7 @@ import {
   isValidFullName,
   isValidPhone,
 } from '../lib/formValidation';
+import { SCREEN_PATHS } from '../lib/appPaths';
 import { whatsappHref } from '../lib/siteContacts';
 
 interface BookingScreenProps {
@@ -78,6 +79,7 @@ export function BookingScreen({
     phoneWhatsApp: '',
     sessionIntent: '',
     deontologyAccepted: false,
+    privacyTermsAccepted: false,
   });
 
   useEffect(() => {
@@ -230,6 +232,10 @@ export function BookingScreen({
       errors.deontologyAccepted =
         'Conferma la presa visione del codice deontologico per procedere.';
     }
+    if (!draft.privacyTermsAccepted) {
+      errors.privacyTermsAccepted =
+        'Conferma di essere maggiorenne e di accettare privacy e termini per procedere.';
+    }
     if (!openHours.includes(draft.selectedTimeSlot)) {
       errors.selectedTimeSlot =
         'Seleziona una fascia oraria ancora disponibile.';
@@ -288,6 +294,7 @@ export function BookingScreen({
           phoneWhatsApp: draft.phoneWhatsApp.trim(),
           sessionIntent: draft.sessionIntent.trim(),
           deontologyAccepted: draft.deontologyAccepted,
+          privacyTermsAccepted: draft.privacyTermsAccepted,
         }),
       });
       const json = (await res.json()) as {
@@ -841,6 +848,60 @@ export function BookingScreen({
                     {formErrors.deontologyAccepted && (
                       <p className="text-xs text-[#ffb4ab]">
                         {formErrors.deontologyAccepted}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="flex items-start gap-3 cursor-pointer select-none">
+                      <button
+                        type="button"
+                        role="checkbox"
+                        aria-checked={draft.privacyTermsAccepted}
+                        onClick={() =>
+                          setDraft((p) => ({
+                            ...p,
+                            privacyTermsAccepted: !p.privacyTermsAccepted,
+                          }))
+                        }
+                        className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center border shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
+                          draft.privacyTermsAccepted
+                            ? 'bg-[#D4AF37] border-[#D4AF37] text-[#12100E]'
+                            : 'bg-[#12100E]/85 border-[#D4AF37]/40'
+                        }`}
+                      >
+                        {draft.privacyTermsAccepted && (
+                          <Check className="w-3.5 h-3.5 stroke-[3]" />
+                        )}
+                      </button>
+                      <span className="text-xs md:text-sm leading-relaxed text-[#A39B93]">
+                        Confermo di essere maggiorenne (18+) e di aver letto e
+                        accettato la{' '}
+                        <a
+                          href={SCREEN_PATHS.privacy}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[#D4AF37] underline decoration-[#D4AF37]/40 underline-offset-2 hover:text-[#E6C65C]"
+                        >
+                          Privacy Policy
+                        </a>{' '}
+                        e i{' '}
+                        <a
+                          href={SCREEN_PATHS.termini}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[#D4AF37] underline decoration-[#D4AF37]/40 underline-offset-2 hover:text-[#E6C65C]"
+                        >
+                          Termini di servizio
+                        </a>
+                        .
+                      </span>
+                    </label>
+                    {formErrors.privacyTermsAccepted && (
+                      <p className="text-xs text-[#ffb4ab]">
+                        {formErrors.privacyTermsAccepted}
                       </p>
                     )}
                   </div>

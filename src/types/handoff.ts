@@ -224,6 +224,8 @@ export interface BookingDraft {
   phoneWhatsApp: string;
   sessionIntent: string;
   deontologyAccepted: boolean;
+  /** Consenso privacy / termini + maggiorenne (18+), gate UI Prenota. */
+  privacyTermsAccepted: boolean;
 }
 
 export interface StripeCheckoutHandoffPayload {
