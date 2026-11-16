@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Check, ChevronDown, Mail, MapPin, MessageCircle, Phone, ShieldCheck } from 'lucide-react';
 import type { ConsultationTariff, CourseId, ScreenId } from '../types/handoff';
 import {
@@ -28,9 +28,16 @@ import {
   whatsappHref,
 } from '../lib/siteContacts';
 import practitionerHandsImg from '../assets/images/percorsi_hands_tarot_1794651609400.jpg';
+import homePageVideo from '../assets/videos/home-page.mp4';
 
-/** Home «Atmosfera e Metodo» — as-is photo (brand mark on image kept). */
-const ATMOSFERA_METODO_IMG = '/brand/atmosfera-metodo.jpg';
+function isReduceMotionPreferred(): boolean {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return false;
+  const osPrefers =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const a11yPrefers = document.documentElement.classList.contains('a11y-reduce-motion');
+  return osPrefers || a11yPrefers;
+}
 
 interface HomeScreenProps {
   showCmsKeys: boolean;
@@ -50,10 +57,49 @@ export function HomeScreen({
   onOpenPrivacy,
 }: HomeScreenProps) {
   const [openFaqId, setOpenFaqId] = useState<string | null>(holisticFaqs[0]?.id ?? null);
+  const atmosferaVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const toggleFaq = (id: string) => {
     setOpenFaqId((prev) => (prev === id ? null : id));
   };
+
+  useEffect(() => {
+    const video = atmosferaVideoRef.current;
+    if (!video) return;
+
+    const syncPlayback = () => {
+      if (isReduceMotionPreferred()) {
+        video.pause();
+        return;
+      }
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          /* Autoplay may be blocked; muted + playsInline covers typical cases. */
+        });
+      }
+    };
+
+    syncPlayback();
+
+    const mediaQuery =
+      typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-reduced-motion: reduce)')
+        : null;
+    const onMediaChange = () => syncPlayback();
+    mediaQuery?.addEventListener('change', onMediaChange);
+
+    const observer = new MutationObserver(syncPlayback);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => {
+      mediaQuery?.removeEventListener('change', onMediaChange);
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <div className="space-y-16 md:space-y-24 pb-8">
@@ -131,11 +177,16 @@ export function HomeScreen({
         </h2>
         <figure className="rounded-2xl overflow-hidden border border-[#D4AF37]/20 glass-tier-1">
           <div className="aspect-[16/9] w-full overflow-hidden">
-            <ResilientImage
-              src={ATMOSFERA_METODO_IMG}
-              alt="Atmosfera e Metodo"
-              className="w-full h-full object-cover object-center"
-              fallbackLabel="Atmosfera e Metodo"
+            <video
+              ref={atmosferaVideoRef}
+              src={homePageVideo}
+              className="h-full w-full object-cover object-center"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label="Atmosfera e Metodo"
             />
           </div>
         </figure>
