@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import type { ScreenId } from '../types/handoff';
 import { whatsappHref } from '../lib/siteContacts';
-import { TarotEmblemLogo } from './TarotEmblem';
+import { TarotNavLogo } from './TarotEmblem';
 
 interface TopBarProps {
   activeScreen: ScreenId;
@@ -134,19 +134,17 @@ export function TopBar({
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-16 md:h-[4.5rem] bg-[#12100E]/90 backdrop-blur-md border-b border-[#D4AF37]/15">
+      <header className="sticky top-0 z-50 h-[4.5rem] md:h-20 bg-[#12100E]/90 backdrop-blur-md border-b border-[#D4AF37]/15">
         <div className="max-w-6xl mx-auto h-full px-4 md:px-8 lg:px-12 flex items-center justify-between gap-3 md:gap-8">
-          {/* Zone 1: Single-line Brand Wordmark + Emblem */}
+          {/* Zone 1: Single-line Brand Wordmark + Nav mark */}
           <button
             type="button"
             onClick={() => handleMobileSelect('home')}
             className="flex items-center gap-3 md:gap-3.5 text-left whitespace-nowrap shrink-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-lg py-1"
             aria-label="Torna alla Home di Tarot Italia"
           >
-            <TarotEmblemLogo
-              size={48}
-              className="shrink-0 transition-transform duration-200 group-hover:scale-105"
-            />
+            {/* Mobile 56 / desktop 64 — readable, not tiny */}
+            <TarotNavLogo className="h-14 w-14 md:h-16 md:w-16 shrink-0 transition-transform duration-200 group-hover:scale-105" />
             <span className="font-display text-base md:text-lg tracking-[0.08em] text-[#F4F1EA] font-medium">
               Tarot Italia
             </span>
@@ -227,7 +225,7 @@ export function TopBar({
           role="dialog"
           aria-modal="true"
           aria-label="Menu di navigazione mobile"
-          className="md:hidden fixed inset-0 top-14 z-40 bg-[#12100E]/96 backdrop-blur-xl border-t border-[#D4AF37]/20 overflow-y-auto"
+          className="md:hidden fixed inset-0 top-[4.5rem] z-40 bg-[#12100E]/96 backdrop-blur-xl border-t border-[#D4AF37]/20 overflow-y-auto"
         >
           <div className="min-h-full px-5 py-6 flex flex-col justify-between gap-8 max-w-lg mx-auto">
             <div className="space-y-6">

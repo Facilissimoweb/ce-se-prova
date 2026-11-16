@@ -6,6 +6,9 @@ export const TAROT_ITALIA_LOGO_SRC = '/brand/tarot-italia-logo.png';
 /** Home opening hero mark (triangle / eye · TAROT ITALIA) — RGBA as-is. */
 export const TAROT_ITALIA_HOME_HERO_SRC = '/brand/tarot-italia-home-hero.png';
 
+/** Sitewide nav brand mark (eye in glowing triangle + green nebula) — RGBA as-is. */
+export const TAROT_ITALIA_NAV_SRC = '/brand/tarot-italia-nav.png';
+
 interface LogoProps {
   className?: string;
   size?: number;
@@ -25,6 +28,28 @@ export function TarotEmblemLogo({ className = '', size = 56 }: LogoProps) {
       decoding="async"
       className={`object-contain object-center ${className}`.trim()}
       style={{ width: size, height: size }}
+      aria-hidden="true"
+    />
+  );
+}
+
+/**
+ * Nav / header brand mark (ENN-37): eye in glowing triangle + green nebula.
+ * RGBA PNG used as-is — no flood-fill / alpha rewrite.
+ * Pass `size` for a fixed box, or omit it and size via `className` (e.g. h-14 md:h-16).
+ */
+export function TarotNavLogo({ className = '', size }: LogoProps) {
+  const fixed = typeof size === 'number';
+  const box = size ?? 64;
+  return (
+    <img
+      src={TAROT_ITALIA_NAV_SRC}
+      alt=""
+      width={box}
+      height={box}
+      decoding="async"
+      className={`object-contain object-center ${className}`.trim()}
+      style={fixed ? { width: size, height: size } : undefined}
       aria-hidden="true"
     />
   );
