@@ -3,6 +3,7 @@ import { Check, Cookie, ShieldCheck, SlidersHorizontal, X } from 'lucide-react';
 import type { CookieConsentPreferences } from '../types/handoff';
 import { siteContent } from '../data/siteContent';
 import { CopyText } from './CopyText';
+import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
 import { TarotEmblemLogo } from './TarotEmblem';
 
 export const COOKIE_CONSENT_STORAGE_KEY = 'tarot_italia_cookie_consent_v1';
@@ -50,6 +51,9 @@ export function PrivacyCookiesWidget({
   const [draftFunctional, setDraftFunctional] = useState(false);
   const [draftAnalytics, setDraftAnalytics] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const fabVisible = useLeftToolFabVisible();
+  const { isCompact, setToolsOpen } = useLeftToolsMenu();
+
 
   useEffect(() => {
     const existing = loadSavedCookiePreferences();
@@ -96,14 +100,18 @@ export function PrivacyCookiesWidget({
 
   return (
     <>
-      {/* Sticky left icon — cima dello stack (cookie → a11y → chat → Torna su) */}
-      {showReopenFab && (
+      {/* Sticky left icon — cima dello stack (cookie → a11y → chat → Torna su).
+          On mobile, only when «Strumenti» is open. */}
+      {showReopenFab && fabVisible && (
         <button
           type="button"
-          onClick={onOpenModal}
+          onClick={() => {
+            onOpenModal();
+            if (isCompact) setToolsOpen(false);
+          }}
           aria-label="Riapri preferenze cookie e privacy"
           title="Preferenze cookie"
-          className="fixed bottom-[13rem] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[12.5rem] md:left-6"
+          className="fixed bottom-[16.5rem] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[12.5rem] md:left-6"
         >
           <Cookie className="h-4 w-4" aria-hidden="true" />
         </button>

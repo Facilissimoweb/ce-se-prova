@@ -1,5 +1,6 @@
 import React, { useEffect, useId, useState } from 'react';
 import { Contrast, Pause, Type, X } from 'lucide-react';
+import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
 
 export const A11Y_PREFS_STORAGE_KEY = 'tarot_italia_a11y_prefs_v1';
 
@@ -61,12 +62,15 @@ function applyPrefsToDocument(prefs: A11yPreferences) {
 /**
  * Left FAB stack: directly under the cookie reopen control
  * (cookie → accessibility → chat → Torna su). Opens «Visualizzazione facilitata».
+ * On mobile, only visible when «Strumenti» is open.
  */
 export function AccessibilityFab() {
   const panelId = useId();
   const [open, setOpen] = useState(false);
   const [prefs, setPrefs] = useState<A11yPreferences>(DEFAULT_PREFS);
   const [hydrated, setHydrated] = useState(false);
+  const fabVisible = useLeftToolFabVisible();
+  const { isCompact, setToolsOpen } = useLeftToolsMenu();
 
   useEffect(() => {
     const existing = readStoredPrefs();
@@ -106,23 +110,28 @@ export function AccessibilityFab() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen((prev) => !prev)}
-        aria-label="Visualizzazione facilitata"
-        aria-expanded={open}
-        aria-controls={panelId}
-        title="Visualizzazione facilitata"
-        className="fixed bottom-[9.5rem] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[9rem] md:left-6"
-      >
-        <OpenArmsPersonIcon className="h-5 w-5" />
-        {anyActive && (
-          <span
-            className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[#D4AF37]"
-            aria-hidden="true"
-          />
-        )}
-      </button>
+      {fabVisible && (
+        <button
+          type="button"
+          onClick={() => {
+            setOpen((prev) => !prev);
+            if (isCompact) setToolsOpen(false);
+          }}
+          aria-label="Visualizzazione facilitata"
+          aria-expanded={open}
+          aria-controls={panelId}
+          title="Visualizzazione facilitata"
+          className="fixed bottom-[13rem] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[9rem] md:left-6"
+        >
+          <OpenArmsPersonIcon className="h-5 w-5" />
+          {anyActive && (
+            <span
+              className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[#D4AF37]"
+              aria-hidden="true"
+            />
+          )}
+        </button>
+      )}
 
       {open && (
         <div
@@ -130,7 +139,7 @@ export function AccessibilityFab() {
           role="dialog"
           aria-modal="false"
           aria-label="Visualizzazione facilitata"
-          className="fixed bottom-[16.75rem] left-4 z-50 w-[min(20.5rem,calc(100vw-2rem))] rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md md:bottom-[16.25rem] md:left-6"
+          className="fixed bottom-[20.25rem] left-4 z-50 w-[min(20.5rem,calc(100vw-2rem))] rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md md:bottom-[16.25rem] md:left-6"
         >
           <div className="mb-3 flex items-start justify-between gap-3">
             <div>
