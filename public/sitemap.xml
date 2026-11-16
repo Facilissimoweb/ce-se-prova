@@ -1,72 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated without absolute origin (local / missing env). Locs are path-only; Vercel builds inject VERCEL_URL. At cutover set VITE_SITE_ORIGIN=https://www.tarotitalia.com. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.tarotitalia.com/</loc>
+    <loc>/</loc>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.tarotitalia.com/chi-sono</loc>
+    <loc>/chi-sono</loc>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tarotitalia.com/consulti</loc>
+    <loc>/consulti</loc>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://www.tarotitalia.com/corsi</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.tarotitalia.com/prenota</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.tarotitalia.com/dialogo</loc>
+    <loc>/dialogo</loc>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.tarotitalia.com/news</loc>
+    <loc>/corsi</loc>
+    <lastmod>2026-11-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>/news</loc>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tarotitalia.com/contatti</loc>
+    <loc>/contatti</loc>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.tarotitalia.com/area-riservata</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <loc>/prenota</loc>
+    <lastmod>2026-11-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://www.tarotitalia.com/privacy</loc>
+    <loc>/privacy</loc>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.tarotitalia.com/privacy.html</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://www.tarotitalia.com/termini-di-servizio</loc>
+    <loc>/termini-di-servizio</loc>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.tarotitalia.com/disclaimer</loc>
+    <loc>/disclaimer</loc>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.tarotitalia.com/sitemap</loc>
+    <loc>/sitemap</loc>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>

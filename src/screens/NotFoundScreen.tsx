@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ArrowLeft, Compass } from 'lucide-react';
 import type { ScreenId } from '../types/handoff';
 import { TarotEmblemLogo } from '../components/TarotEmblem';
@@ -9,14 +9,6 @@ type Props = {
 
 /** Catch-all SPA per percorsi sconosciuti — layout brand-consistent con via di ritorno. */
 export function NotFoundScreen({ onNavigate }: Props) {
-  useEffect(() => {
-    const previous = document.title;
-    document.title = 'Pagina non trovata — Tarot Italia';
-    return () => {
-      document.title = previous;
-    };
-  }, []);
-
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-2 pb-16 pt-10 text-center">
       <TarotEmblemLogo size={96} className="mb-6 opacity-90" />

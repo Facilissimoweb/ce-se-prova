@@ -44,7 +44,11 @@ const PATH_ALIASES: Record<string, ScreenId> = {
   '/404': 'not-found',
 };
 
-/** Pagine pubbliche elencate in mappa del sito e sitemap.xml (esclude catch-all 404). */
+/**
+ * Pagine elencate nella mappa del sito HTML (`/sitemap`).
+ * Lo `sitemap.xml` per i crawler (ENN-62) esclude area riservata / auth e 404;
+ * vedi `scripts/generate-seo-assets.mjs`.
+ */
 export const SITEMAP_ENTRIES: {
   screen: Exclude<ScreenId, 'not-found'>;
   path: string;

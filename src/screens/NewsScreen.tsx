@@ -21,14 +21,6 @@ export function NewsScreen({ onNavigate }: Props) {
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
 
   useEffect(() => {
-    const previous = document.title;
-    document.title = 'News / Articoli — Tarot Italia';
-    return () => {
-      document.title = previous;
-    };
-  }, []);
-
-  useEffect(() => {
     const controller = new AbortController();
     fetchNewsArticles(controller.signal)
       .then((data) => {

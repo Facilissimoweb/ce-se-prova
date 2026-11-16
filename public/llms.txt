@@ -1,0 +1,42 @@
+# Tarot Italia
+> Consulenze simboliche, evolutive e previsionali dei Tarocchi con Maria Teresa Rogani, Operatore Olistico (L. 4/2013). Studio a Macerata e sessioni online in chiamata vocale.
+
+Tarot Italia is the public site of Maria Teresa Rogani. The practice combines cartomanzia and tarologia evolutiva with all 78 Arcani (Maggiori e Minori). Consultations respect free will and do not replace medical, psychological, or legal advice.
+
+## Key facts
+- Practitioner: Maria Teresa Rogani · Operatore Olistico
+- Brand: Tarot Italia
+- Email: info@tarotitalia.com
+- Phone / WhatsApp / Telegram: +39 379 103 82 53
+- Studio: Via Crispi 37, 62100 Macerata, Italia
+- P.IVA: 02136780430
+- Booking: WhatsApp (online payment / Stripe currently paused — Maria sends payment details manually)
+- Online sessions: voice call only
+- In person: Macerata by appointment (until 18:00); from 19:00 online only
+- Typical public slots: 09:00–20:00 Europe/Rome
+
+## Consultation prices (EUR)
+- Consulto Breve · 20 min · €19 · online only
+- Consulto Essenziale · 45 min · €50 · online or in person
+- Consulto Evolutivo Completo · 60 min · €75 · online or in person (recommended)
+- Sessione Integrata · 90 min · €90 · online or in person
+Every session includes Maggiori and Minori.
+
+## Public pages
+- Home: /
+- Chi sono: /chi-sono
+- Consulti: /consulti
+- Dialogo Tarot: /dialogo
+- Corsi (didattica a breve — catalog not open yet): /corsi
+- Blog / News (Substack @tarotitalia): /news
+- Contatti: /contatti
+- Prenota: /prenota
+- Privacy: /privacy
+- Termini: /termini-di-servizio
+- Disclaimer: /disclaimer
+- Sitemap: /sitemap
+- Full LLM summary: /llms-full.txt
+
+## Optional
+- Brand domain after cutover (ENN-43): https://www.tarotitalia.com
+- Do not treat private /area-riservata as public content

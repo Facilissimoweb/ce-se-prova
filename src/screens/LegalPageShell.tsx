@@ -1,10 +1,11 @@
-import React, { useEffect, type ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import type { ScreenId } from '../types/handoff';
 import { LegalCopy } from '../components/LegalNotice';
 
 type LegalPageShellProps = {
   title: string;
+  /** Kept for call-site compatibility; document title is owned by DocumentSeo. */
   documentTitle: string;
   intestazione: string;
   onNavigate: (screen: ScreenId) => void;
@@ -14,19 +15,11 @@ type LegalPageShellProps = {
 /** Layout condiviso per Privacy / Termini / Disclaimer (pagine pubbliche). */
 export function LegalPageShell({
   title,
-  documentTitle,
+  documentTitle: _documentTitle,
   intestazione,
   onNavigate,
   children,
 }: LegalPageShellProps) {
-  useEffect(() => {
-    const previous = document.title;
-    document.title = documentTitle;
-    return () => {
-      document.title = previous;
-    };
-  }, [documentTitle]);
-
   return (
     <div className="space-y-8 pb-12 pt-6 md:pt-10">
       <button
