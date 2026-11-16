@@ -190,6 +190,19 @@ export const siteContent = {
       liveText:
         'Un itinerario progressivo in tre moduli autonomi e acquistabili singolarmente per padroneggiare gli Arcani Maggiori, gli Arcani Minori e i Metodi di Stesura previsionali ed evolutivi.',
     },
+    soonBadge: {
+      cmsKey: '[COPY: siteContent.corsi.soonBadge]',
+      liveText: 'Didattica in arrivo',
+    },
+    soonHoverTitle: {
+      cmsKey: '[COPY: siteContent.corsi.soonHoverTitle]',
+      liveText: 'Contenuti a breve',
+    },
+    soonHoverBody: {
+      cmsKey: '[COPY: siteContent.corsi.soonHoverBody]',
+      liveText:
+        'I materiali didattici di questo percorso saranno distribuiti a breve. Restate in ascolto: la formazione Tarot Italia è in preparazione con cura.',
+    },
     checkoutNote: {
       cmsKey: '[COPY: siteContent.corsi.checkoutNote]',
       liveText:

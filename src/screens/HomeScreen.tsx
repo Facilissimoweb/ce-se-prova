@@ -466,10 +466,7 @@ export function HomeScreen({
                   </p>
                 </div>
 
-              <div className="pt-4 border-t border-[#D4AF37]/15 flex items-center justify-between gap-3">
-                <span className="font-display text-xl text-[#D4AF37] tabular-nums">
-                  € {course.priceEur}
-                </span>
+              <div className="pt-4 border-t border-[#D4AF37]/15 flex items-center justify-end">
                 <button
                   type="button"
                   onClick={() => onSelectCourse(course.id)}
