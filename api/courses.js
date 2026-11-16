@@ -7316,7 +7316,9 @@ var createPool = () => {
     const connectionString = process.env.DATABASE_URL?.trim();
     const config2 = {
       max: poolMax(),
-      connectionTimeoutMillis: 15e3,
+      // Serverless: fail fast so ensureSchema / handlers return JSON 5xx
+      // instead of burning maxDuration (FUNCTION_INVOCATION_FAILED).
+      connectionTimeoutMillis: process.env.VERCEL ? 5e3 : 15e3,
       ssl: sslOption()
     };
     if (connectionString) {

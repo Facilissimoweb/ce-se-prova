@@ -1,10 +1,10 @@
 /**
- * Server-side Groq helpers for the generic site chat FAB.
+ * Server-side Groq helpers for the generic site chat FAB (Nina).
  * API key must stay server-only — never VITE_* / never log the secret.
  */
 
 export const GROQ_CHAT_ENV_KEY = 'TAROTITALIACHATGENERICAGROQ_API_KEY';
-export const GROQ_CHAT_DEFAULT_MODEL = 'llama-3.1-8b-instant';
+export const GROQ_CHAT_DEFAULT_MODEL = 'openai/gpt-oss-20b'; // was llama-3.1-8b-instant (retired 2026-08-16)
 export const GROQ_CHAT_COMPLETIONS_URL =
   'https://api.groq.com/openai/v1/chat/completions';
 
@@ -13,7 +13,7 @@ export const TAROT_ITALIA_CHAT_SYSTEM_PROMPT = `Sei Nina, l’assistente virtual
 
 Tono e stile:
 - Empatico, caldo, profondo, rigoroso e rispettoso; sensibilità simbolica unita a chiarezza pratica.
-- Italiano chiaro; niente teatralità, sensazionalismo o toni fatalisti.
+- Linguaggio simbolico ed evolutivo dei Tarocchi, senza toni teatrali o sensazionalistici.
 - Prima persona plurale del sito («ti accompagno», «possiamo») oppure voce del brand; non inventare di essere Maria Teresa in carne e ossa se non serve: sei l’assistente del sito.
 
 Cosa puoi fare:
@@ -43,6 +43,14 @@ export type GroqChatMessage = {
   content: string;
 };
 
+/** Stable error codes for /api/chat — never include the API key. */
+export type GroqChatFailureCode =
+  | 'GROQ_CHAT_UNAVAILABLE'
+  | 'GROQ_CHAT_AUTH'
+  | 'GROQ_CHAT_MODEL'
+  | 'GROQ_CHAT_UPSTREAM'
+  | 'GROQ_CHAT_EMPTY';
+
 export function readGroqApiKey(): string | null {
   const raw = process.env[GROQ_CHAT_ENV_KEY];
   if (typeof raw !== 'string') return null;
@@ -63,12 +71,31 @@ type GroqCompletionsResponse = {
   choices?: Array<{
     message?: { content?: string | null };
   }>;
-  error?: { message?: string };
+  error?: { message?: string; code?: string; type?: string };
 };
 
+function classifyGroqHttpFailure(
+  status: number,
+  providerMessage: string | undefined
+): GroqChatFailureCode {
+  const msg = (providerMessage || '').toLowerCase();
+  if (status === 401 || status === 403) return 'GROQ_CHAT_AUTH';
+  if (
+    status === 400 ||
+    status === 404 ||
+    msg.includes('model') ||
+    msg.includes('decommission') ||
+    msg.includes('deprecated') ||
+    msg.includes('not found')
+  ) {
+    return 'GROQ_CHAT_MODEL';
+  }
+  return 'GROQ_CHAT_UPSTREAM';
+}
+
 /**
- * Call Groq Chat Completions. Throws Error with a safe Italian message on failure.
- * Never logs the API key.
+ * Call Groq Chat Completions. Throws Error with a GroqChatFailureCode message.
+ * Never logs the API key or raw Authorization header.
  */
 export async function createGroqChatCompletion(params: {
   messages: GroqChatMessage[];
@@ -78,7 +105,7 @@ export async function createGroqChatCompletion(params: {
 }): Promise<string> {
   const apiKey = readGroqApiKey();
   if (!apiKey) {
-    throw new Error('GROQ_CHAT_UNAVAILABLE');
+    throw new Error('GROQ_CHAT_UNAVAILABLE' satisfies GroqChatFailureCode);
   }
 
   const model = params.model || resolveGroqChatModel();
@@ -92,7 +119,8 @@ export async function createGroqChatCompletion(params: {
       model,
       messages: params.messages,
       temperature: params.temperature ?? 0.6,
-      max_tokens: params.maxTokens ?? 512,
+      // gpt-oss models use reasoning tokens inside the completion budget.
+      max_tokens: params.maxTokens ?? 1024,
       stream: false,
     }),
   });
@@ -105,19 +133,19 @@ export async function createGroqChatCompletion(params: {
   }
 
   if (!response.ok) {
-    // Do not surface provider error text that might echo request metadata.
-    console.error(
-      'Groq chat completion failed:',
+    const code = classifyGroqHttpFailure(
       response.status,
-      payload?.error?.message ? '(provider error)' : '(no body)'
+      payload?.error?.message
     );
-    throw new Error('GROQ_CHAT_UPSTREAM');
+    // Log status + classification only — never the secret, never full provider payload.
+    console.error('Groq chat completion failed:', response.status, code);
+    throw new Error(code);
   }
 
   const reply = payload?.choices?.[0]?.message?.content?.trim();
   if (!reply) {
     console.error('Groq chat completion returned empty content');
-    throw new Error('GROQ_CHAT_EMPTY');
+    throw new Error('GROQ_CHAT_EMPTY' satisfies GroqChatFailureCode);
   }
 
   return reply;
