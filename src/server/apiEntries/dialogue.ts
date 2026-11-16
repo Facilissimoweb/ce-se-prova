@@ -29,6 +29,7 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   try {
     const method = (req.method || 'GET').toUpperCase();
     const path = groupSubpath(req, 'dialogue');
+    // Non-fatal if Postgres is down — routes return JSON 5xx instead of hanging.
     await ensureSchemaOnce();
 
     if (path === 'status') {

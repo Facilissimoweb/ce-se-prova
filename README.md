@@ -53,7 +53,7 @@ Vedi `.env.example`. Sintesi:
 | `STRIPE_PRICE_ID_*` | Price ID Dashboard (opzionali) |
 | `ZOHO_*` / `GOOGLE_*` | Email e Calendar prenotazioni |
 | `TAROTITALIACHATGENERICAGROQ_API_KEY` | Chat FAB generica via Groq (server-only; opzionale) |
-| `GROQ_CHAT_MODEL` | Override modello chat (default `llama-3.1-8b-instant`) |
+| `GROQ_CHAT_MODEL` | Override modello chat (default `openai/gpt-oss-20b`) |
 | `ALLOW_DIRECT_UNLOCK=true` | Solo non-prod |
 
 La config client Firebase è in `firebase-applet-config.json`.

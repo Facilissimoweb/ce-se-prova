@@ -1,12 +1,12 @@
 // src/lib/groqChat.ts
 var GROQ_CHAT_ENV_KEY = "TAROTITALIACHATGENERICAGROQ_API_KEY";
-var GROQ_CHAT_DEFAULT_MODEL = "llama-3.1-8b-instant";
+var GROQ_CHAT_DEFAULT_MODEL = "openai/gpt-oss-20b";
 var GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions";
 var TAROT_ITALIA_CHAT_SYSTEM_PROMPT = `Sei Nina, l\u2019assistente virtuale ufficiale e la guida di accoglienza di Tarot Italia (tarotitalia.com), il progetto di Maria Teresa Rogani dedicato a tarologia, cartomanzia evolutiva e ricerca esoterica.
 
 Tono e stile:
 - Empatico, caldo, profondo, rigoroso e rispettoso; sensibilit\xE0 simbolica unita a chiarezza pratica.
-- Italiano chiaro; niente teatralit\xE0, sensazionalismo o toni fatalisti.
+- Linguaggio simbolico ed evolutivo dei Tarocchi, senza toni teatrali o sensazionalistici.
 - Prima persona plurale del sito (\xABti accompagno\xBB, \xABpossiamo\xBB) oppure voce del brand; non inventare di essere Maria Teresa in carne e ossa se non serve: sei l\u2019assistente del sito.
 
 Cosa puoi fare:
@@ -41,6 +41,14 @@ function resolveGroqChatModel() {
 function isGroqChatConfigured() {
   return readGroqApiKey() !== null;
 }
+function classifyGroqHttpFailure(status, providerMessage) {
+  const msg = (providerMessage || "").toLowerCase();
+  if (status === 401 || status === 403) return "GROQ_CHAT_AUTH";
+  if (status === 400 || status === 404 || msg.includes("model") || msg.includes("decommission") || msg.includes("deprecated") || msg.includes("not found")) {
+    return "GROQ_CHAT_MODEL";
+  }
+  return "GROQ_CHAT_UPSTREAM";
+}
 async function createGroqChatCompletion(params) {
   const apiKey = readGroqApiKey();
   if (!apiKey) {
@@ -57,7 +65,8 @@ async function createGroqChatCompletion(params) {
       model,
       messages: params.messages,
       temperature: params.temperature ?? 0.6,
-      max_tokens: params.maxTokens ?? 512,
+      // gpt-oss models use reasoning tokens inside the completion budget.
+      max_tokens: params.maxTokens ?? 1024,
       stream: false
     })
   });
@@ -68,12 +77,12 @@ async function createGroqChatCompletion(params) {
     payload = null;
   }
   if (!response.ok) {
-    console.error(
-      "Groq chat completion failed:",
+    const code = classifyGroqHttpFailure(
       response.status,
-      payload?.error?.message ? "(provider error)" : "(no body)"
+      payload?.error?.message
     );
-    throw new Error("GROQ_CHAT_UPSTREAM");
+    console.error("Groq chat completion failed:", response.status, code);
+    throw new Error(code);
   }
   const reply = payload?.choices?.[0]?.message?.content?.trim();
   if (!reply) {
@@ -93,8 +102,16 @@ var MAX_MESSAGE_CHARS = 2e3;
 var MAX_HISTORY_TURNS = 12;
 function getChatStatus() {
   const available = isGroqChatConfigured();
-  const body = available ? { available: true, model: resolveGroqChatModel() } : { available: false };
-  return json(200, body);
+  if (!available) {
+    return json(200, {
+      available: false,
+      reason: "missing_key"
+    });
+  }
+  return json(200, {
+    available: true,
+    model: resolveGroqChatModel()
+  });
 }
 function asHistory(raw) {
   if (!Array.isArray(raw)) return [];
@@ -110,12 +127,43 @@ function asHistory(raw) {
   }
   return out;
 }
+function chatFailureResponse(code) {
+  switch (code) {
+    case "GROQ_CHAT_UNAVAILABLE":
+      return json(503, {
+        available: false,
+        code: "missing_key",
+        error: "Nina non \xE8 ancora attiva: manca la chiave Groq su Vercel (TAROTITALIACHATGENERICAGROQ_API_KEY). Puoi scrivere a Maria Teresa su WhatsApp, Telegram o email."
+      });
+    case "GROQ_CHAT_AUTH":
+      return json(502, {
+        available: true,
+        code: "auth",
+        error: "Nina non riesce ad autenticarsi con Groq. Verifica la chiave TAROTITALIACHATGENERICAGROQ_API_KEY su Vercel (Production e Preview), poi ridistribuisci. Nel frattempo usa WhatsApp, Telegram o email."
+      });
+    case "GROQ_CHAT_MODEL":
+      return json(502, {
+        available: true,
+        code: "model",
+        error: "Il modello Groq non \xE8 disponibile. Controlla GROQ_CHAT_MODEL oppure il default del sito, poi riprova. Nel frattempo usa WhatsApp, Telegram o email."
+      });
+    case "GROQ_CHAT_EMPTY":
+      return json(502, {
+        available: true,
+        code: "empty",
+        error: "Nina non ha ricevuto una risposta utile. Riprova tra poco oppure usa WhatsApp, Telegram o email."
+      });
+    default:
+      return json(502, {
+        available: true,
+        code: "upstream",
+        error: "Non riesco a rispondere in questo momento. Riprova tra poco oppure usa WhatsApp, Telegram o email."
+      });
+  }
+}
 async function postChatMessage(body) {
   if (!isGroqChatConfigured()) {
-    return json(503, {
-      available: false,
-      error: "La chat assistita non \xE8 ancora attiva. Puoi scrivermi su WhatsApp, Telegram o email."
-    });
+    return chatFailureResponse("GROQ_CHAT_UNAVAILABLE");
   }
   const message = typeof body.message === "string" ? body.message.trim() : "";
   if (!message) {
@@ -137,17 +185,11 @@ async function postChatMessage(body) {
     return json(200, { available: true, reply });
   } catch (error) {
     const code = error instanceof Error ? error.message : "";
-    if (code === "GROQ_CHAT_UNAVAILABLE") {
-      return json(503, {
-        available: false,
-        error: "La chat assistita non \xE8 ancora attiva. Puoi scrivermi su WhatsApp, Telegram o email."
-      });
+    if (code.startsWith("GROQ_CHAT_")) {
+      return chatFailureResponse(code);
     }
     console.error("postChatMessage failed:", code || error);
-    return json(502, {
-      available: true,
-      error: "Non riesco a rispondere in questo momento. Riprova tra poco oppure usa WhatsApp, Telegram o email."
-    });
+    return chatFailureResponse("GROQ_CHAT_UPSTREAM");
   }
 }
 
