@@ -134,18 +134,19 @@ export function TopBar({
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-[4.5rem] md:h-20 bg-[#12100E]/90 backdrop-blur-md border-b border-[#D4AF37]/15">
-        <div className="max-w-6xl mx-auto h-full px-4 md:px-8 lg:px-12 flex items-center justify-between gap-3 md:gap-8">
+      <header className="sticky top-0 z-50 h-[calc(4.75rem+env(safe-area-inset-top,0px))] md:h-[calc(5rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)] bg-[#12100E]/90 backdrop-blur-md border-b border-[#D4AF37]/15">
+        <div className="max-w-6xl mx-auto h-full px-4 md:px-8 lg:px-12 flex items-center justify-between gap-2.5 md:gap-8">
           {/* Zone 1: Single-line Brand Wordmark + Nav mark */}
           <button
             type="button"
+            data-nowrap-keep
             onClick={() => handleMobileSelect('home')}
-            className="flex items-center gap-3 md:gap-3.5 text-left whitespace-nowrap shrink-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-lg py-1"
+            className="flex items-center gap-2 md:gap-3.5 text-left whitespace-nowrap shrink min-w-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-lg py-1"
             aria-label="Torna alla Home di Tarot Italia"
           >
-            {/* Mobile 56 / desktop 64 — readable, not tiny */}
-            <TarotNavLogo className="h-14 w-14 md:h-16 md:w-16 shrink-0 transition-transform duration-200 group-hover:scale-105" />
-            <span className="font-display text-base md:text-lg tracking-[0.08em] text-[#F4F1EA] font-medium">
+            {/* Mobile 72 / desktop 68 — readable next to wordmark, not crowding Prenota */}
+            <TarotNavLogo className="h-[4.5rem] w-[4.5rem] md:h-[4.25rem] md:w-[4.25rem] shrink-0 transition-transform duration-200 group-hover:scale-105" />
+            <span className="font-display text-base md:text-lg tracking-[0.08em] text-[#F4F1EA] font-medium truncate">
               Tarot Italia
             </span>
           </button>
@@ -182,11 +183,12 @@ export function TopBar({
           </nav>
 
           {/* Zone 3: Primary CTA (Desktop) + Compact CTA & Hamburger Toggle (Mobile) */}
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
+              data-nowrap-keep
               onClick={() => handleMobileSelect('booking')}
-              className="px-3.5 md:px-4 py-2 min-h-[40px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs md:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+              className="px-3 md:px-4 py-2 min-h-[40px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs md:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
             >
               <span className="sm:hidden">Prenota</span>
               <span className="hidden sm:inline">Prenota Consulto</span>
@@ -225,7 +227,7 @@ export function TopBar({
           role="dialog"
           aria-modal="true"
           aria-label="Menu di navigazione mobile"
-          className="md:hidden fixed inset-0 top-[4.5rem] z-40 bg-[#12100E]/96 backdrop-blur-xl border-t border-[#D4AF37]/20 overflow-y-auto"
+          className="md:hidden fixed inset-0 top-[calc(4.75rem+env(safe-area-inset-top,0px))] z-40 bg-[#12100E]/96 backdrop-blur-xl border-t border-[#D4AF37]/20 overflow-y-auto"
         >
           <div className="min-h-full px-5 py-6 flex flex-col justify-between gap-8 max-w-lg mx-auto">
             <div className="space-y-6">
