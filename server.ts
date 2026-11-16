@@ -1,6 +1,6 @@
 /**
  * Runtime locale / host Node: Express serve API `/api/*` e, in produzione, i file statici in `dist/`.
- * Su Vercel: `api/health.ts` + esbuild di `src/server/apiEntries/*` → `api/{courses,bookings,stripe,reserved,dialogue,news}.js`.
+ * Su Vercel: `api/health.ts` + esbuild di `src/server/apiEntries/*` → `api/{courses,bookings,stripe,reserved,dialogue,news,chat}.js`.
  */
 import express from 'express';
 import { createServer as createHttpServer } from 'http';
@@ -11,6 +11,7 @@ import { requireAuth, optionalAuth, type AuthRequest } from './src/middleware/au
 import { ensureBookingSchema } from './src/db/ensureBookingSchema.ts';
 import { getCourses } from './src/server/routes/courses.ts';
 import { getNewsArticles } from './src/server/routes/news.ts';
+import { getChatStatus, postChatMessage } from './src/server/routes/chat.ts';
 import {
   getReservedOverview,
   postReservedConfirmStripe,
@@ -74,6 +75,14 @@ async function startServer() {
       res.setHeader('Cache-Control', result.cacheControl);
     }
     sendResult(res, { status: result.status, body: result.body });
+  });
+
+  app.get('/api/chat', async (_req, res) => {
+    sendResult(res, getChatStatus());
+  });
+
+  app.post('/api/chat', async (req, res) => {
+    sendResult(res, await postChatMessage(bodyRecord(req)));
   });
 
   app.get('/api/reserved/overview', requireAuth, async (req: AuthRequest, res) => {

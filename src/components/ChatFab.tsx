@@ -1,5 +1,5 @@
-import React, { useEffect, useId, useState } from 'react';
-import { Mail, MessageCircle, X } from 'lucide-react';
+import React, { useEffect, useId, useRef, useState } from 'react';
+import { Loader2, Mail, MessageCircle, Send, X } from 'lucide-react';
 import {
   SITE_EMAIL,
   telegramHref,
@@ -7,31 +7,17 @@ import {
 } from '../lib/siteContacts';
 import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
 
-/**
- * Future live-chat / APE widget hook (UI-only for now).
- *
- * When Maria installs Vercel env (e.g. APE / chat provider keys), wire them here:
- * - Prefer `import.meta.env.VITE_APE_CHAT_ENABLED` (or provider-specific keys)
- *   to swap this placeholder panel for the real widget mount.
- * - Do NOT add new Vercel secrets yet — keep contacts (WhatsApp / Telegram / email)
- *   as the interim path so the FAB ships without env changes.
- *
- * Suggested future env names (document only until Maria adds them):
- *   VITE_APE_CHAT_ENABLED
- *   VITE_APE_CHAT_WIDGET_ID
- *   VITE_APE_CHAT_SCRIPT_URL
- */
-function resolveFutureChatWidgetConfig(): {
-  enabled: boolean;
-  widgetId?: string;
-  scriptUrl?: string;
-} {
-  // Intentionally unread until Maria installs Vercel variables.
-  // const enabled = import.meta.env.VITE_APE_CHAT_ENABLED === 'true';
-  // const widgetId = import.meta.env.VITE_APE_CHAT_WIDGET_ID?.trim();
-  // const scriptUrl = import.meta.env.VITE_APE_CHAT_SCRIPT_URL?.trim();
-  return { enabled: false };
-}
+type ChatTurn = { role: 'user' | 'assistant'; content: string };
+
+type ChatStatusResponse = {
+  available?: boolean;
+};
+
+type ChatPostResponse = {
+  available?: boolean;
+  reply?: string;
+  error?: string;
+};
 
 function WhatsAppLogo({ className }: { className?: string }) {
   return (
@@ -68,15 +54,29 @@ function TelegramLogo({ className }: { className?: string }) {
 const linkClass =
   'flex items-center gap-3 rounded-xl border border-[#D4AF37]/15 bg-[#12100E]/55 px-3 py-2.5 text-sm font-semibold text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]';
 
+const WELCOME_ASSISTANT =
+  'Ciao, sono l’assistente di Tarot Italia. Dimmi pure come posso orientarti — consulti, Dialogo, corsi o contatti.';
+
 /**
  * Left FAB stack: under accessibility, above Torna su
- * (cookie → a11y → chat → Torna su). Italian placeholder until APE env lands.
+ * (cookie → a11y → chat → Torna su).
+ * Live chat via server `/api/chat` (Groq) when
+ * `TAROTITALIACHATGENERICAGROQ_API_KEY` is set on Vercel; otherwise contacts only.
  * On mobile, only visible when «Strumenti» is open.
  */
 export function ChatFab() {
   const panelId = useId();
+  const composerId = useId();
+  const threadRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
-  const futureWidget = resolveFutureChatWidgetConfig();
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [chatAvailable, setChatAvailable] = useState(false);
+  const [turns, setTurns] = useState<ChatTurn[]>([
+    { role: 'assistant', content: WELCOME_ASSISTANT },
+  ]);
+  const [draft, setDraft] = useState('');
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const fabVisible = useLeftToolFabVisible();
   const { isCompact, setToolsOpen } = useLeftToolsMenu();
 
@@ -88,6 +88,92 @@ export function ChatFab() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    const controller = new AbortController();
+
+    async function loadStatus() {
+      setStatusLoading(true);
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'GET',
+          signal: controller.signal,
+        });
+        const data = (await res.json().catch(() => ({}))) as ChatStatusResponse;
+        if (!cancelled) {
+          setChatAvailable(Boolean(res.ok && data.available));
+        }
+      } catch {
+        if (!cancelled) setChatAvailable(false);
+      } finally {
+        if (!cancelled) setStatusLoading(false);
+      }
+    }
+
+    void loadStatus();
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || !threadRef.current) return;
+    threadRef.current.scrollTop = threadRef.current.scrollHeight;
+  }, [open, turns, sending]);
+
+  async function sendMessage(event: React.FormEvent) {
+    event.preventDefault();
+    const message = draft.trim();
+    if (!message || sending || !chatAvailable) return;
+
+    setSendError(null);
+    setDraft('');
+    const history = turns
+      .filter((t) => t.role === 'user' || t.role === 'assistant')
+      .slice(-12);
+    setTurns((prev) => [...prev, { role: 'user', content: message }]);
+    setSending(true);
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, history }),
+      });
+      const data = (await res.json().catch(() => ({}))) as ChatPostResponse;
+
+      if (data.available === false) {
+        setChatAvailable(false);
+        setSendError(
+          data.error ||
+            'La chat assistita non è ancora attiva. Usa i contatti qui sotto.'
+        );
+        return;
+      }
+
+      if (!res.ok || !data.reply) {
+        setSendError(
+          data.error ||
+            'Non riesco a rispondere in questo momento. Riprova o usa i contatti.'
+        );
+        return;
+      }
+
+      setTurns((prev) => [
+        ...prev,
+        { role: 'assistant', content: data.reply as string },
+      ]);
+    } catch {
+      setSendError(
+        'Connessione interrotta. Riprova tra poco oppure usa WhatsApp, Telegram o email.'
+      );
+    } finally {
+      setSending(false);
+    }
+  }
 
   return (
     <>
@@ -114,18 +200,20 @@ export function ChatFab() {
           role="dialog"
           aria-modal="false"
           aria-label="Chat e contatti"
-          className="fixed bottom-[16.75rem] left-4 z-50 w-[min(20.5rem,calc(100vw-2rem))] rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md md:bottom-[12.75rem] md:left-6"
+          className="fixed bottom-[16.75rem] left-4 z-50 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md md:bottom-[12.75rem] md:left-6"
         >
           <div className="mb-3 flex items-start justify-between gap-3">
             <div>
               <p className="font-display text-sm tracking-[0.08em] text-[#D4AF37] uppercase">
-                Contatti
+                Tarot Italia
               </p>
               <h2 className="mt-1 font-display text-lg text-[#F4F1EA]">Chat</h2>
               <p className="mt-1 text-sm leading-relaxed text-[#A39B93]">
-                {futureWidget.enabled
-                  ? 'Chat live disponibile.'
-                  : 'La chat live arriverà a breve. Per ora puoi scrivermi subito su WhatsApp, Telegram o email.'}
+                {statusLoading
+                  ? 'Verifico la chat…'
+                  : chatAvailable
+                    ? 'Assistente del sito · tono Tarot Italia. Per un consulto personale usa Prenota o WhatsApp.'
+                    : 'La chat assistita non è attiva in questo momento. Scrivimi su WhatsApp, Telegram o email.'}
               </p>
             </div>
             <button
@@ -138,12 +226,63 @@ export function ChatFab() {
             </button>
           </div>
 
-          {/* Placeholder mount point for future APE / chat widget script */}
-          <div
-            id="tarot-italia-chat-widget-root"
-            data-chat-widget-hook="pending-vercel-env"
-            hidden={!futureWidget.enabled}
-          />
+          {chatAvailable && (
+            <div className="mb-3">
+              <div
+                ref={threadRef}
+                className="mb-2 max-h-52 space-y-2 overflow-y-auto rounded-xl border border-[#D4AF37]/12 bg-[#0F0D0B]/70 p-2.5"
+                aria-live="polite"
+              >
+                {turns.map((turn, index) => (
+                  <div
+                    key={`${turn.role}-${index}`}
+                    className={
+                      turn.role === 'user'
+                        ? 'ml-6 rounded-lg bg-[#D4AF37]/15 px-2.5 py-2 text-sm text-[#F4F1EA]'
+                        : 'mr-4 rounded-lg bg-[#1C1916] px-2.5 py-2 text-sm text-[#D6CFC6]'
+                    }
+                  >
+                    {turn.content}
+                  </div>
+                ))}
+                {sending && (
+                  <div className="mr-4 flex items-center gap-2 rounded-lg bg-[#1C1916] px-2.5 py-2 text-sm text-[#A39B93]">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                    Sto ascoltando…
+                  </div>
+                )}
+              </div>
+
+              <form onSubmit={sendMessage} className="flex items-end gap-2">
+                <label htmlFor={composerId} className="sr-only">
+                  Messaggio chat
+                </label>
+                <textarea
+                  id={composerId}
+                  rows={2}
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  disabled={sending}
+                  placeholder="Scrivi qui…"
+                  className="min-h-[2.75rem] flex-1 resize-none rounded-xl border border-[#D4AF37]/20 bg-[#12100E] px-3 py-2 text-sm text-[#F4F1EA] placeholder:text-[#6F675F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:opacity-60"
+                />
+                <button
+                  type="submit"
+                  disabled={sending || !draft.trim()}
+                  aria-label="Invia messaggio"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/35 bg-[#D4AF37]/15 text-[#D4AF37] transition-colors hover:bg-[#D4AF37]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <Send className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </form>
+
+              {sendError && (
+                <p className="mt-2 text-xs leading-relaxed text-[#C9A27A]" role="alert">
+                  {sendError}
+                </p>
+              )}
+            </div>
+          )}
 
           <ul className="space-y-2">
             <li>
