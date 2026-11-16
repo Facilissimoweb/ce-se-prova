@@ -1,13 +1,16 @@
 import React from 'react';
 
-/** Canonical brand mark — transparent PNG in public/brand/. */
-export const TAROT_ITALIA_LOGO_SRC = '/brand/tarot-italia-logo.png';
-
-/** Home opening hero mark (triangle / eye · TAROT ITALIA) — RGBA as-is. */
+/** Home opening hero mark (triangle / eye · TAROT ITALIA) — RGBA as-is. Do not swap for nav mark. */
 export const TAROT_ITALIA_HOME_HERO_SRC = '/brand/tarot-italia-home-hero.png';
 
-/** Sitewide nav brand mark (eye in glowing triangle + green nebula) — RGBA as-is. */
+/**
+ * Canonical sitewide brand mark (ENN-37 nav / ENN-48 sitewide):
+ * eye in glowing triangle + green nebula — RGBA PNG as-is (no flood-fill).
+ */
 export const TAROT_ITALIA_NAV_SRC = '/brand/tarot-italia-nav.png';
+
+/** Alias of the nav mark — shared sitewide asset (footer, splash, empty states, etc.). */
+export const TAROT_ITALIA_LOGO_SRC = TAROT_ITALIA_NAV_SRC;
 
 interface LogoProps {
   className?: string;
@@ -15,29 +18,10 @@ interface LogoProps {
 }
 
 /**
- * Tarot Italia brand logo (eye + wings/moons, gold/purple).
- * Transparent PNG — no white plate; sized large enough to read on dark UI.
- */
-export function TarotEmblemLogo({ className = '', size = 56 }: LogoProps) {
-  return (
-    <img
-      src={TAROT_ITALIA_LOGO_SRC}
-      alt=""
-      width={size}
-      height={size}
-      decoding="async"
-      className={`object-contain object-center ${className}`.trim()}
-      style={{ width: size, height: size }}
-      aria-hidden="true"
-    />
-  );
-}
-
-/**
  * Nav / header brand mark (ENN-37): eye in glowing triangle + green nebula.
  * RGBA PNG used as-is — no flood-fill / alpha rewrite.
  * Pass `size` for a fixed box, or omit it and size via `className`
- * (e.g. h-[4.25rem] — readable on mobile next to the wordmark).
+ * (e.g. h-[4.5rem] — readable on mobile next to the wordmark).
  */
 export function TarotNavLogo({ className = '', size }: LogoProps) {
   const fixed = typeof size === 'number';
@@ -54,6 +38,15 @@ export function TarotNavLogo({ className = '', size }: LogoProps) {
       aria-hidden="true"
     />
   );
+}
+
+/**
+ * Sitewide Tarot Italia brand logo — same asset/component as the navbar (ENN-48).
+ * Transparent PNG as-is; sized large enough to read on dark UI.
+ * Home hero opening mark stays on TAROT_ITALIA_HOME_HERO_SRC separately.
+ */
+export function TarotEmblemLogo({ className = '', size = 56 }: LogoProps) {
+  return <TarotNavLogo className={className} size={size} />;
 }
 
 /**
