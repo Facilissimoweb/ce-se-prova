@@ -1,7 +1,28 @@
 import React, { useEffect, useId, useState } from 'react';
-import { Accessibility, Contrast, Pause, Type, X } from 'lucide-react';
+import { Contrast, Pause, Type, X } from 'lucide-react';
 
 export const A11Y_PREFS_STORAGE_KEY = 'tarot_italia_a11y_prefs_v1';
+
+/**
+ * Classic «persona a braccia aperte» (universal-access / open-arms figure).
+ * Filled silhouette so it stays readable at FAB size — not Lucide Accessibility.
+ */
+function OpenArmsPersonIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      aria-hidden="true"
+      focusable="false"
+      fill="currentColor"
+    >
+      {/* Head */}
+      <circle cx="12" cy="4.6" r="2.35" />
+      {/* Body + outstretched arms + open legs (single silhouette) */}
+      <path d="M3.2 9.1c0-.7.55-1.25 1.25-1.25h15.1c.7 0 1.25.55 1.25 1.25s-.55 1.25-1.25 1.25h-5.35v2.35l4.85 7.55a1.25 1.25 0 0 1-2.1 1.35L12 14.55l-4.95 7.15a1.25 1.25 0 0 1-2.1-1.35l4.85-7.55V10.35H4.45c-.7 0-1.25-.55-1.25-1.25Z" />
+    </svg>
+  );
+}
 
 export interface A11yPreferences {
   largeText: boolean;
@@ -38,8 +59,8 @@ function applyPrefsToDocument(prefs: A11yPreferences) {
 }
 
 /**
- * Left FAB stack: sits directly under the cookie reopen control
- * (cookie → accessibility → Torna su). Opens «Visualizzazione facilitata».
+ * Left FAB stack: directly under the cookie reopen control
+ * (cookie → accessibility → chat → Torna su). Opens «Visualizzazione facilitata».
  */
 export function AccessibilityFab() {
   const panelId = useId();
@@ -92,9 +113,9 @@ export function AccessibilityFab() {
         aria-expanded={open}
         aria-controls={panelId}
         title="Visualizzazione facilitata"
-        className="fixed bottom-24 left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[5.75rem] md:left-6"
+        className="fixed bottom-[9.5rem] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[9rem] md:left-6"
       >
-        <Accessibility className="h-4 w-4" aria-hidden="true" />
+        <OpenArmsPersonIcon className="h-5 w-5" />
         {anyActive && (
           <span
             className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[#D4AF37]"
@@ -109,7 +130,7 @@ export function AccessibilityFab() {
           role="dialog"
           aria-modal="false"
           aria-label="Visualizzazione facilitata"
-          className="fixed bottom-[13.25rem] left-4 z-50 w-[min(20.5rem,calc(100vw-2rem))] rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md md:bottom-[12.75rem] md:left-6"
+          className="fixed bottom-[16.75rem] left-4 z-50 w-[min(20.5rem,calc(100vw-2rem))] rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md md:bottom-[16.25rem] md:left-6"
         >
           <div className="mb-3 flex items-start justify-between gap-3">
             <div>

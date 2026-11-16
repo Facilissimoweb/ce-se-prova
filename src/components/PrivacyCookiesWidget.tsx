@@ -96,14 +96,14 @@ export function PrivacyCookiesWidget({
 
   return (
     <>
-      {/* Sticky left icon — cima dello stack (cookie → a11y → Torna su) */}
+      {/* Sticky left icon — cima dello stack (cookie → a11y → chat → Torna su) */}
       {showReopenFab && (
         <button
           type="button"
           onClick={onOpenModal}
           aria-label="Riapri preferenze cookie e privacy"
           title="Preferenze cookie"
-          className="fixed bottom-[9.5rem] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[9rem] md:left-6"
+          className="fixed bottom-[13rem] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[12.5rem] md:left-6"
         >
           <Cookie className="h-4 w-4" aria-hidden="true" />
         </button>

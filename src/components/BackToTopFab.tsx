@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowUp } from 'lucide-react';
 
 /**
- * Left FAB stack (lowest): cookie → accessibility → Torna su.
+ * Left FAB stack (lowest): cookie → accessibility → chat → Torna su.
  * Smooth-scrolls to top. Italian label «Torna su».
  */
 export function BackToTopFab() {
