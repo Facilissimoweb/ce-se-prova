@@ -51,7 +51,7 @@ const divider = (
 
 /**
  * Discreet site-wide sticky contact dock — icons only.
- * True viewport center; left cookie / Torna su FAB stack stays clear.
+ * True viewport center; left cookie / a11y / Torna su FAB stack stays clear.
  */
 export function StickyContactBar() {
   return (
