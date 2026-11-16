@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { pathForScreen } from '../lib/appPaths';
+import { getSiteOrigin, pageTitleForScreen } from '../lib/seo';
 import type { ScreenId } from '../types/handoff';
 
 type Props = {
@@ -55,39 +56,6 @@ function PinterestIcon({ className }: { className?: string }) {
   );
 }
 
-function pageTitleForScreen(screen: ScreenId): string {
-  switch (screen) {
-    case 'home':
-      return 'Tarot Italia — Maria Teresa Rogani';
-    case 'chi-sono':
-      return 'Chi Sono — Tarot Italia';
-    case 'consulti':
-      return 'Consulti — Tarot Italia';
-    case 'corsi':
-      return 'Corsi — Tarot Italia';
-    case 'booking':
-      return 'Prenota Consulto — Tarot Italia';
-    case 'chat':
-      return 'Dialogo Tarot — Tarot Italia';
-    case 'area-riservata':
-      return 'Area Riservata — Tarot Italia';
-    case 'news':
-      return 'News / Articoli — Tarot Italia';
-    case 'contatti':
-      return 'Contatti — Tarot Italia';
-    case 'privacy':
-      return 'Privacy — Tarot Italia';
-    case 'termini':
-      return 'Termini di servizio — Tarot Italia';
-    case 'disclaimer':
-      return 'Disclaimer — Tarot Italia';
-    case 'sitemap':
-      return 'Mappa del sito — Tarot Italia';
-    default:
-      return 'Tarot Italia';
-  }
-}
-
 export function SocialShareButtons({ activeScreen, className = '' }: Props) {
   const share = useMemo(() => {
     const path =
@@ -96,9 +64,8 @@ export function SocialShareButtons({ activeScreen, className = '' }: Props) {
           ? window.location.pathname
           : '/404'
         : pathForScreen(activeScreen);
-    const origin =
-      typeof window !== 'undefined' ? window.location.origin : 'https://www.tarotitalia.com';
-    const url = `${origin}${path}`;
+    const origin = getSiteOrigin();
+    const url = origin ? `${origin}${path}` : path;
     const title = pageTitleForScreen(activeScreen);
     const text = `${title} — ${url}`;
 

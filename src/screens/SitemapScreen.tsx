@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import type { ScreenId } from '../types/handoff';
 import { SITEMAP_ENTRIES } from '../lib/appPaths';
@@ -9,14 +9,6 @@ type Props = {
 
 /** Pagina utente `/sitemap` — indice delle sezioni pubbliche. */
 export function SitemapScreen({ onNavigate }: Props) {
-  useEffect(() => {
-    const previous = document.title;
-    document.title = 'Mappa del sito — Tarot Italia';
-    return () => {
-      document.title = previous;
-    };
-  }, []);
-
   return (
     <div className="space-y-8 pb-12 pt-6 md:pt-10">
       <button

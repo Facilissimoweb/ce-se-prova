@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -32,14 +32,6 @@ type Props = {
 };
 
 export function ContattiScreen({ onNavigate }: Props) {
-  useEffect(() => {
-    const previous = document.title;
-    document.title = 'Contatti — Tarot Italia';
-    return () => {
-      document.title = previous;
-    };
-  }, []);
-
   const placeEmbed = mapsPlaceEmbedSrc();
   const parkingEmbed = mapsParkingEmbedSrc();
   const usingOfficialEmbed = hasGoogleMapsApiKey();

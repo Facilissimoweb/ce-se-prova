@@ -34,6 +34,7 @@ import { NotFoundScreen } from './screens/NotFoundScreen';
 import { NewsScreen } from './screens/NewsScreen';
 import { ContattiScreen } from './screens/ContattiScreen';
 import { SocialShareButtons } from './components/SocialShareButtons';
+import { DocumentSeo } from './components/DocumentSeo';
 import { legalContent } from './data/legalContent';
 import {
   bootstrapScreenFromLocation,
@@ -177,6 +178,7 @@ export function App() {
     <AuthProvider>
       <LeftToolsMenuProvider>
       <div className="min-h-screen min-h-[100dvh] w-full max-w-[100%] overflow-x-clip bg-[#12100E] text-[#F4F1EA] flex flex-col relative">
+        <DocumentSeo activeScreen={activeScreen} />
         <AmbientSanctuaryBackground />
 
         <TopBar
