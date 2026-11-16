@@ -8649,6 +8649,7 @@ function mapSafeError(error, fallback, statusHints) {
 }
 
 // src/server/routes/bookings.ts
+var AVAILABILITY_DEGRADED_NOTICE = "Non riusciamo a verificare gli orari gi\xE0 prenotati in questo momento. Puoi comunque selezionare uno slot; la conferma avverr\xE0 via WhatsApp.";
 async function getBookingsAvailability(params) {
   try {
     const { from, to } = params;
@@ -8657,13 +8658,25 @@ async function getBookingsAvailability(params) {
         error: "Intervallo date non valido (from/to YYYY-MM-DD)."
       });
     }
-    const occupied = await listOccupiedSlots(from, to);
-    return json2(200, {
-      from,
-      to,
-      hourSlots: HOUR_SLOTS,
-      occupied
-    });
+    try {
+      const occupied = await listOccupiedSlots(from, to);
+      return json2(200, {
+        from,
+        to,
+        hourSlots: HOUR_SLOTS,
+        occupied
+      });
+    } catch (error) {
+      console.error("getBookingsAvailability soft-fail (empty occupied):", error);
+      return json2(200, {
+        from,
+        to,
+        hourSlots: HOUR_SLOTS,
+        occupied: [],
+        degraded: true,
+        notice: AVAILABILITY_DEGRADED_NOTICE
+      });
+    }
   } catch (error) {
     return mapSafeError(
       error,
@@ -8864,10 +8877,27 @@ async function postBookingConfirmStripe(params) {
 function isConnectionFailure(error) {
   if (!error || typeof error !== "object") return false;
   const code = String(error.code || "");
-  return code === "ECONNREFUSED" || code === "ENOTFOUND" || code === "ETIMEDOUT" || code === "ECONNRESET" || code === "EAI_AGAIN" || code === "57P01" || // admin_shutdown
-  code === "57P03";
+  if (code === "ECONNREFUSED" || code === "ENOTFOUND" || code === "ETIMEDOUT" || code === "ECONNRESET" || code === "EAI_AGAIN" || code === "57P01" || // admin_shutdown
+  code === "57P03") {
+    return true;
+  }
+  const message = String(
+    error.message || error
+  ).toLowerCase();
+  return message.includes("timeout exceeded when trying to connect") || message.includes("connection terminated due to connection timeout") || message.includes("connect etimedout") || message.includes("could not connect") || message.includes("connection refused") || message.includes("getaddrinfo");
+}
+function hasDatabaseConfig() {
+  return Boolean(
+    process.env.DATABASE_URL?.trim() || process.env.SQL_HOST?.trim()
+  );
 }
 async function ensureBookingSchema() {
+  if (!hasDatabaseConfig()) {
+    console.error(
+      "ensureBookingSchema: skipped (set DATABASE_URL TCP or SQL_HOST)"
+    );
+    return;
+  }
   const pool = createPool();
   const statements = [
     `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS mode text NOT NULL DEFAULT 'remote'`,
@@ -9104,6 +9134,16 @@ async function handler(req, res) {
   try {
     const method = (req.method || "GET").toUpperCase();
     const path = groupSubpath(req, "bookings");
+    if (path === "availability") {
+      if (method !== "GET") return methodNotAllowed(res, ["GET"]);
+      return sendApiResult(
+        res,
+        await getBookingsAvailability({
+          from: queryString(req.query?.from),
+          to: queryString(req.query?.to)
+        })
+      );
+    }
     await ensureSchemaOnce();
     if (!path) {
       if (method !== "POST") return methodNotAllowed(res, ["POST"]);
@@ -9114,16 +9154,6 @@ async function handler(req, res) {
           user,
           body: readBodyObject(req),
           origin: requestOrigin(req)
-        })
-      );
-    }
-    if (path === "availability") {
-      if (method !== "GET") return methodNotAllowed(res, ["GET"]);
-      return sendApiResult(
-        res,
-        await getBookingsAvailability({
-          from: queryString(req.query?.from),
-          to: queryString(req.query?.to)
         })
       );
     }
@@ -9142,7 +9172,7 @@ async function handler(req, res) {
   } catch (error) {
     console.error("api/bookings handler failed:", error);
     return sendJson2(res, 500, {
-      error: "Internal server error",
+      error: "Errore interno del server prenotazioni.",
       detail: error instanceof Error ? error.message : String(error)
     });
   }

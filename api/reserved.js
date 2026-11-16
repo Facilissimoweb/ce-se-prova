@@ -8374,10 +8374,27 @@ async function putDispensaProgress(params) {
 function isConnectionFailure(error) {
   if (!error || typeof error !== "object") return false;
   const code = String(error.code || "");
-  return code === "ECONNREFUSED" || code === "ENOTFOUND" || code === "ETIMEDOUT" || code === "ECONNRESET" || code === "EAI_AGAIN" || code === "57P01" || // admin_shutdown
-  code === "57P03";
+  if (code === "ECONNREFUSED" || code === "ENOTFOUND" || code === "ETIMEDOUT" || code === "ECONNRESET" || code === "EAI_AGAIN" || code === "57P01" || // admin_shutdown
+  code === "57P03") {
+    return true;
+  }
+  const message = String(
+    error.message || error
+  ).toLowerCase();
+  return message.includes("timeout exceeded when trying to connect") || message.includes("connection terminated due to connection timeout") || message.includes("connect etimedout") || message.includes("could not connect") || message.includes("connection refused") || message.includes("getaddrinfo");
+}
+function hasDatabaseConfig() {
+  return Boolean(
+    process.env.DATABASE_URL?.trim() || process.env.SQL_HOST?.trim()
+  );
 }
 async function ensureBookingSchema() {
+  if (!hasDatabaseConfig()) {
+    console.error(
+      "ensureBookingSchema: skipped (set DATABASE_URL TCP or SQL_HOST)"
+    );
+    return;
+  }
   const pool = createPool();
   const statements = [
     `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS mode text NOT NULL DEFAULT 'remote'`,

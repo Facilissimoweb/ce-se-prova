@@ -21,6 +21,10 @@
       "destination": "/api/bookings"
     },
     {
+      "source": "/api/bookings/availability",
+      "destination": "/api/booking-availability"
+    },
+    {
       "source": "/api/bookings/(.*)",
       "destination": "/api/bookings?__path=$1"
     },

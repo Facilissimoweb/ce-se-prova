@@ -34,6 +34,9 @@ import {
   type ApiUser,
 } from '../http.ts';
 
+const AVAILABILITY_DEGRADED_NOTICE =
+  'Non riusciamo a verificare gli orari già prenotati in questo momento. Puoi comunque selezionare uno slot; la conferma avverrà via WhatsApp.';
+
 export async function getBookingsAvailability(params: {
   from: string;
   to: string;
@@ -45,13 +48,27 @@ export async function getBookingsAvailability(params: {
         error: 'Intervallo date non valido (from/to YYYY-MM-DD).',
       });
     }
-    const occupied = await listOccupiedSlots(from, to);
-    return json(200, {
-      from,
-      to,
-      hourSlots: HOUR_SLOTS,
-      occupied,
-    });
+    try {
+      const occupied = await listOccupiedSlots(from, to);
+      return json(200, {
+        from,
+        to,
+        hourSlots: HOUR_SLOTS,
+        occupied,
+      });
+    } catch (error) {
+      // Soft-fail: calendar stays usable with empty occupied set + Italian notice.
+      // Never return a bare 500 that Vercel may surface as plain text.
+      console.error('getBookingsAvailability soft-fail (empty occupied):', error);
+      return json(200, {
+        from,
+        to,
+        hourSlots: HOUR_SLOTS,
+        occupied: [],
+        degraded: true,
+        notice: AVAILABILITY_DEGRADED_NOTICE,
+      });
+    }
   } catch (error) {
     return mapSafeError(
       error,

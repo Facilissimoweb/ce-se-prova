@@ -12,22 +12,27 @@ const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const entriesDir = path.join(root, 'src', 'server', 'apiEntries');
 const outDir = path.join(root, 'api');
 
-const names = [
-  'courses',
-  'bookings',
-  'stripe',
-  'reserved',
-  'dialogue',
-  'news',
-  'chat',
-];
+/** Output basename under api/ → source file under apiEntries/ */
+const entries = {
+  courses: 'courses.ts',
+  bookings: 'bookings.ts',
+  'booking-availability': 'bookingAvailability.ts',
+  stripe: 'stripe.ts',
+  reserved: 'reserved.ts',
+  dialogue: 'dialogue.ts',
+  news: 'news.ts',
+  chat: 'chat.ts',
+};
 
 mkdirSync(outDir, { recursive: true });
 
 await esbuild.build({
   absWorkingDir: root,
   entryPoints: Object.fromEntries(
-    names.map((name) => [name, path.join(entriesDir, `${name}.ts`)])
+    Object.entries(entries).map(([outName, src]) => [
+      outName,
+      path.join(entriesDir, src),
+    ])
   ),
   outdir: outDir,
   entryNames: '[name]',
@@ -54,5 +59,7 @@ await esbuild.build({
 });
 
 console.log(
-  `bundled API -> ${names.map((n) => `api/${n}.js`).join(', ')}`
+  `bundled API -> ${Object.keys(entries)
+    .map((n) => `api/${n}.js`)
+    .join(', ')}`
 );
