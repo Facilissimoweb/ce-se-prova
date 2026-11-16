@@ -1,5 +1,6 @@
 /**
- * Bookings group: POST /api/bookings, availability, confirm-stripe.
+ * Bookings group: POST /api/bookings, confirm-stripe.
+ * Availability lives in bookingAvailability.ts (firebase-free).
  * Subpaths via vercel.json rewrite → /api/bookings?__path=…
  * Bundled by scripts/bundle-api.mjs into api/*.js for Vercel.
  */
@@ -27,6 +28,19 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   try {
     const method = (req.method || 'GET').toUpperCase();
     const path = groupSubpath(req, 'bookings');
+
+    // Fallback if rewrite to booking-availability is missing (local / old deploy).
+    if (path === 'availability') {
+      if (method !== 'GET') return methodNotAllowed(res, ['GET']);
+      return sendApiResult(
+        res,
+        await getBookingsAvailability({
+          from: queryString(req.query?.from),
+          to: queryString(req.query?.to),
+        })
+      );
+    }
+
     await ensureSchemaOnce();
 
     if (!path) {
@@ -38,17 +52,6 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
           user,
           body: readBodyObject(req),
           origin: requestOrigin(req),
-        })
-      );
-    }
-
-    if (path === 'availability') {
-      if (method !== 'GET') return methodNotAllowed(res, ['GET']);
-      return sendApiResult(
-        res,
-        await getBookingsAvailability({
-          from: queryString(req.query?.from),
-          to: queryString(req.query?.to),
         })
       );
     }
@@ -69,7 +72,7 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   } catch (error) {
     console.error('api/bookings handler failed:', error);
     return sendJson(res, 500, {
-      error: 'Internal server error',
+      error: 'Errore interno del server prenotazioni.',
       detail: error instanceof Error ? error.message : String(error),
     });
   }

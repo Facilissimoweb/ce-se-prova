@@ -10,7 +10,7 @@
     "build:api": "node scripts/bundle-api.mjs",
     "seo:generate": "node scripts/generate-seo-assets.mjs",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js api/courses.js api/bookings.js api/stripe.js api/reserved.js api/dialogue.js api/news.js api/chat.js",
+    "clean": "rm -rf dist server.js api/courses.js api/bookings.js api/booking-availability.js api/stripe.js api/reserved.js api/dialogue.js api/news.js api/chat.js",
     "lint": "tsc --noEmit"
   },
   "dependencies": {

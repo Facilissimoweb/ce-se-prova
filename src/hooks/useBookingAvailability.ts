@@ -3,6 +3,32 @@ import { monthRangeIso, type OccupiedSlot } from '../lib/bookingCalendar';
 
 export type { OccupiedSlot };
 
+const FALLBACK_AVAILABILITY_ERROR =
+  'Non riusciamo a caricare la disponibilità degli orari. Puoi comunque selezionare uno slot; la conferma avverrà via WhatsApp.';
+
+async function readAvailabilityJson(res: Response): Promise<{
+  occupied?: OccupiedSlot[];
+  error?: string;
+  notice?: string;
+  degraded?: boolean;
+}> {
+  const text = await res.text();
+  if (!text.trim()) {
+    throw new Error(FALLBACK_AVAILABILITY_ERROR);
+  }
+  try {
+    return JSON.parse(text) as {
+      occupied?: OccupiedSlot[];
+      error?: string;
+      notice?: string;
+      degraded?: boolean;
+    };
+  } catch {
+    // Vercel FUNCTION_INVOCATION_FAILED returns plain text ("A server error…").
+    throw new Error(FALLBACK_AVAILABILITY_ERROR);
+  }
+}
+
 export function useBookingAvailability(calendarMonth: Date) {
   const [occupied, setOccupied] = useState<OccupiedSlot[]>([]);
   const [loading, setLoading] = useState(false);
@@ -16,17 +42,17 @@ export function useBookingAvailability(calendarMonth: Date) {
       const res = await fetch(
         `/api/bookings/availability?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`
       );
-      const json = (await res.json()) as {
-        occupied?: OccupiedSlot[];
-        error?: string;
-      };
+      const json = await readAvailabilityJson(res);
       if (!res.ok) {
-        throw new Error(json.error || 'Disponibilità non disponibile.');
+        throw new Error(json.error || FALLBACK_AVAILABILITY_ERROR);
       }
       setOccupied(json.occupied ?? []);
+      if (json.degraded || json.notice) {
+        setError(json.notice || FALLBACK_AVAILABILITY_ERROR);
+      }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Errore disponibilità calendario.'
+        err instanceof Error ? err.message : FALLBACK_AVAILABILITY_ERROR
       );
       setOccupied([]);
     } finally {

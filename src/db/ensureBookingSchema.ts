@@ -3,7 +3,7 @@ import { createPool } from './index.ts';
 function isConnectionFailure(error: unknown): boolean {
   if (!error || typeof error !== 'object') return false;
   const code = String((error as { code?: unknown }).code || '');
-  return (
+  if (
     code === 'ECONNREFUSED' ||
     code === 'ENOTFOUND' ||
     code === 'ETIMEDOUT' ||
@@ -11,6 +11,26 @@ function isConnectionFailure(error: unknown): boolean {
     code === 'EAI_AGAIN' ||
     code === '57P01' || // admin_shutdown
     code === '57P03' // cannot_connect_now
+  ) {
+    return true;
+  }
+  // node-pg connectionTimeoutMillis often has no errno — match the message.
+  const message = String(
+    (error as { message?: unknown }).message || error
+  ).toLowerCase();
+  return (
+    message.includes('timeout exceeded when trying to connect') ||
+    message.includes('connection terminated due to connection timeout') ||
+    message.includes('connect etimedout') ||
+    message.includes('could not connect') ||
+    message.includes('connection refused') ||
+    message.includes('getaddrinfo')
+  );
+}
+
+function hasDatabaseConfig(): boolean {
+  return Boolean(
+    process.env.DATABASE_URL?.trim() || process.env.SQL_HOST?.trim()
   );
 }
 
@@ -23,6 +43,13 @@ function isConnectionFailure(error: unknown): boolean {
  * as FUNCTION_INVOCATION_FAILED on /api/dialogue and /api/bookings.
  */
 export async function ensureBookingSchema(): Promise<void> {
+  if (!hasDatabaseConfig()) {
+    console.error(
+      'ensureBookingSchema: skipped (set DATABASE_URL TCP or SQL_HOST)'
+    );
+    return;
+  }
+
   const pool = createPool();
   const statements = [
     `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS mode text NOT NULL DEFAULT 'remote'`,
