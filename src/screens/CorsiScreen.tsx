@@ -10,7 +10,7 @@ import {
   MessageCircle,
   ShieldCheck,
 } from 'lucide-react';
-import type { CourseId, StripeCheckoutHandoffPayload } from '../types/handoff';
+import type { CourseId, ScreenId, StripeCheckoutHandoffPayload } from '../types/handoff';
 import { educationalCourses, siteContent } from '../data/siteContent';
 import { MAJOR_ARCANA } from '../data/majorArcana';
 import { CopyText } from '../components/CopyText';
@@ -32,6 +32,7 @@ interface CorsiScreenProps {
   onChangeCourseId: (id: CourseId) => void;
   onOpenChat: () => void;
   onOpenReservedArea: () => void;
+  onNavigate: (screen: ScreenId) => void;
 }
 
 const SAMPLE_MAJOR_ARCANA = [
@@ -47,6 +48,7 @@ export function CorsiScreen({
   onChangeCourseId,
   onOpenChat,
   onOpenReservedArea,
+  onNavigate,
 }: CorsiScreenProps) {
   const { user, signInWithGoogle, getIdToken } = useAuth();
   const activeCourse =
@@ -189,15 +191,67 @@ export function CorsiScreen({
     SAMPLE_MAJOR_ARCANA[sampleArcanaIdx] ?? SAMPLE_MAJOR_ARCANA[0];
 
   return (
-    <div className="space-y-12 md:space-y-16 pt-6 md:pt-10 pb-8">
+    <div className="relative isolate pt-6 md:pt-10 pb-8">
+      {/* Sticky notice — stays readable while scrolling; site nav remains outside this screen */}
+      <div className="sticky top-20 z-30 flex justify-center px-1 sm:px-2 mb-6 md:mb-8">
+        <div
+          role="status"
+          aria-live="polite"
+          className="w-full max-w-xl rounded-2xl border border-[#D4AF37]/40 bg-[#12100E]/92 px-6 py-7 md:px-8 md:py-8 text-center shadow-[0_24px_64px_rgba(0,0,0,0.55)] backdrop-blur-md"
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#D4AF37]">
+            <CopyText entry={siteContent.corsi.obscureKicker} showKeys={showCmsKeys} />
+          </p>
+          <h1 className="mt-3 font-display text-[26px] leading-[34px] md:text-[34px] md:leading-[42px] tracking-[0.03em] text-[#F4F1EA] text-balance">
+            <CopyText entry={siteContent.corsi.obscureTitle} showKeys={showCmsKeys} />
+          </h1>
+          <p className="mt-4 text-sm md:text-base leading-relaxed text-[#C9C0B6]">
+            <CopyText entry={siteContent.corsi.obscureBody} showKeys={showCmsKeys} />
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => onNavigate('consulti')}
+              className="cta-label min-h-[44px] rounded-lg bg-[#D4AF37] px-5 py-2.5 text-sm font-semibold text-[#12100E] transition-colors hover:bg-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+            >
+              <CopyText
+                entry={siteContent.corsi.obscureCtaConsulti}
+                showKeys={showCmsKeys}
+              />
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigate('home')}
+              className="min-h-[44px] rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/8 px-5 py-2.5 text-sm font-medium text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+            >
+              <CopyText
+                entry={siteContent.corsi.obscureCtaHome}
+                showKeys={showCmsKeys}
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Full-page dim so catalog/checkout read as unavailable */}
+      <div
+        className="pointer-events-none absolute inset-0 z-20 bg-[#0C0A09]/78 backdrop-blur-[2px]"
+        aria-hidden="true"
+      />
+
+      <div
+        inert
+        aria-hidden="true"
+        className="relative z-10 space-y-12 md:space-y-16 pointer-events-none select-none opacity-[0.32] saturate-50 contrast-90"
+      >
       {/* Header */}
       <header className="space-y-4 max-w-3xl">
         <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
           <CopyText entry={siteContent.corsi.kicker} showKeys={showCmsKeys} />
         </p>
-        <h1 className="font-display text-[32px] leading-[40px] md:text-[44px] md:leading-[52px] tracking-[0.02em] text-[#F4F1EA] text-balance">
+        <h2 className="font-display text-[32px] leading-[40px] md:text-[44px] md:leading-[52px] tracking-[0.02em] text-[#F4F1EA] text-balance">
           <CopyText entry={siteContent.corsi.heading} showKeys={showCmsKeys} />
-        </h1>
+        </h2>
         <p className="text-sm md:text-base leading-relaxed text-[#A39B93]">
           <CopyText entry={siteContent.corsi.subheading} showKeys={showCmsKeys} />
         </p>
@@ -866,6 +920,7 @@ export function CorsiScreen({
           </div>
         </aside>
       </section>
+      </div>
     </div>
   );
 }
