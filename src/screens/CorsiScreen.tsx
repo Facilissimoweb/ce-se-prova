@@ -65,6 +65,8 @@ export function CorsiScreen({
   const [enrollError, setEnrollError] = useState<string | null>(null);
   const [checkoutPayload, setCheckoutPayload] =
     useState<StripeCheckoutHandoffPayload | null>(null);
+  /** Hover / tap reveal for “didattica in arrivo” on catalog cards */
+  const [soonRevealedId, setSoonRevealedId] = useState<CourseId | null>(null);
 
   const checkoutSectionRef = useRef<HTMLElement | null>(null);
   const workbenchSectionRef = useRef<HTMLElement | null>(null);
@@ -206,9 +208,12 @@ export function CorsiScreen({
         {educationalCourses.map((course) => {
           const isSelected = course.id === activeCourse.id;
           const courseImage = COURSE_SECTION_IMAGES[course.id];
+          const soonOpen = soonRevealedId === course.id;
           return (
             <article
               key={course.id}
+              onMouseEnter={() => setSoonRevealedId(course.id)}
+              onMouseLeave={() => setSoonRevealedId(null)}
               className={`rounded-2xl p-6 md:p-7 flex flex-col justify-between gap-6 transition-all duration-200 ${
                 isSelected
                   ? 'glass-tier-2 border-[#D4AF37]/55 shadow-[0_0_28px_rgba(212,175,55,0.14)]'
@@ -216,14 +221,54 @@ export function CorsiScreen({
               }`}
             >
               <div className="space-y-5">
-                {/* 4:3 Bespoke Course Visual */}
-                <div className="rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#12100E]">
+                {/* 4:3 Bespoke Course Visual — hover/tap reveals “didattica in arrivo” */}
+                <div className="relative rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#12100E]">
                   <ResilientImage
                     src={courseImage.src}
                     alt={courseImage.alt}
-                    className="w-full aspect-[4/3] object-cover"
+                    className={`w-full aspect-[4/3] object-cover transition-transform duration-500 ease-out ${
+                      soonOpen ? 'scale-[1.03]' : ''
+                    }`}
                     fallbackLabel={course.title}
                   />
+                  <div
+                    className={`pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#12100E]/95 via-[#12100E]/55 to-transparent p-4 transition-opacity duration-300 ease-out ${
+                      soonOpen ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    aria-hidden={!soonOpen}
+                  >
+                    <p className="font-display text-sm tracking-[0.06em] text-[#D4AF37]">
+                      <CopyText
+                        entry={siteContent.corsi.soonHoverTitle}
+                        showKeys={showCmsKeys}
+                      />
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-[#E8e1dd]">
+                      <CopyText
+                        entry={siteContent.corsi.soonHoverBody}
+                        showKeys={showCmsKeys}
+                      />
+                    </p>
+                  </div>
+                  {/* Always-visible badge; tap toggles reveal on touch devices */}
+                  <button
+                    type="button"
+                    aria-expanded={soonOpen}
+                    onClick={() =>
+                      setSoonRevealedId((prev) =>
+                        prev === course.id ? null : course.id
+                      )
+                    }
+                    className="absolute left-3 top-3 z-10 max-w-[calc(100%-1.5rem)] rounded-md border border-[#D4AF37]/45 bg-[#12100E]/85 px-2.5 py-1.5 text-left shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-sm transition-colors hover:border-[#D4AF37]/75 hover:bg-[#12100E]/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+                    aria-label={`${siteContent.corsi.soonBadge.liveText}. ${siteContent.corsi.soonHoverBody.liveText}`}
+                  >
+                    <span className="block text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]">
+                      <CopyText
+                        entry={siteContent.corsi.soonBadge}
+                        showKeys={showCmsKeys}
+                      />
+                    </span>
+                  </button>
                 </div>
 
                 {/* Quiet unboxed metadata */}
