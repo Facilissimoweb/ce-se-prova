@@ -127,8 +127,12 @@ export function App() {
   const handleNavigate = useCallback((screen: ScreenId) => {
     setActiveScreen(screen);
     navigatePath(screen);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  // Always land at the top when the active screen changes (nav click, CTA, back/forward).
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [activeScreen]);
 
   // Sync screen from URL on load / browser back-forward; rewrite legacy Stripe root returns.
   // Unknown paths keep the URL and show the 404 screen (no silent redirect to home).
