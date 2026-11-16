@@ -9,6 +9,11 @@ import { HandoffDrawer } from './components/HandoffDrawer';
 import { AccessibilityFab } from './components/AccessibilityFab';
 import { BackToTopFab } from './components/BackToTopFab';
 import { ChatFab } from './components/ChatFab';
+import {
+  LEFT_TOOLS_MENU_ID,
+  LeftToolsMenuProvider,
+  ToolsFab,
+} from './components/LeftToolsMenu';
 import { PrivacyCookiesWidget } from './components/PrivacyCookiesWidget';
 import { StickyContactBar } from './components/StickyContactBar';
 import { LegalNotice, type LegalKind } from './components/LegalNotice';
@@ -166,6 +171,7 @@ export function App() {
 
   return (
     <AuthProvider>
+      <LeftToolsMenuProvider>
       <div className="min-h-screen min-h-[100dvh] w-full max-w-[100%] overflow-x-clip bg-[#12100E] text-[#F4F1EA] flex flex-col relative">
         <AmbientSanctuaryBackground />
 
@@ -424,19 +430,23 @@ export function App() {
 
         <StickyContactBar />
 
-        <BackToTopFab />
-        <ChatFab />
-        <AccessibilityFab />
-
-        <PrivacyCookiesWidget
-          showCmsKeys={showCmsKeys}
-          isModalOpen={isPrivacyOpen}
-          onOpenModal={() => setIsPrivacyOpen(true)}
-          onCloseModal={() => setIsPrivacyOpen(false)}
-        />
+        {/* Mobile: single «Strumenti» FAB; desktop: full vertical stack */}
+        <ToolsFab />
+        <div id={LEFT_TOOLS_MENU_ID}>
+          <BackToTopFab />
+          <ChatFab />
+          <AccessibilityFab />
+          <PrivacyCookiesWidget
+            showCmsKeys={showCmsKeys}
+            isModalOpen={isPrivacyOpen}
+            onOpenModal={() => setIsPrivacyOpen(true)}
+            onCloseModal={() => setIsPrivacyOpen(false)}
+          />
+        </div>
 
         <LegalNotice kind={legalNotice} onClose={() => setLegalNotice(null)} />
       </div>
+      </LeftToolsMenuProvider>
     </AuthProvider>
   );
 }

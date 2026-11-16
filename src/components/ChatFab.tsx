@@ -5,6 +5,7 @@ import {
   telegramHref,
   whatsappHref,
 } from '../lib/siteContacts';
+import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
 
 /**
  * Future live-chat / APE widget hook (UI-only for now).
@@ -70,11 +71,14 @@ const linkClass =
 /**
  * Left FAB stack: under accessibility, above Torna su
  * (cookie → a11y → chat → Torna su). Italian placeholder until APE env lands.
+ * On mobile, only visible when «Strumenti» is open.
  */
 export function ChatFab() {
   const panelId = useId();
   const [open, setOpen] = useState(false);
   const futureWidget = resolveFutureChatWidgetConfig();
+  const fabVisible = useLeftToolFabVisible();
+  const { isCompact, setToolsOpen } = useLeftToolsMenu();
 
   useEffect(() => {
     if (!open) return;
@@ -87,17 +91,22 @@ export function ChatFab() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen((prev) => !prev)}
-        aria-label="Apri chat e contatti"
-        aria-expanded={open}
-        aria-controls={panelId}
-        title="Chat"
-        className="fixed bottom-24 left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[5.75rem] md:left-6"
-      >
-        <MessageCircle className="h-4 w-4" aria-hidden="true" />
-      </button>
+      {fabVisible && (
+        <button
+          type="button"
+          onClick={() => {
+            setOpen((prev) => !prev);
+            if (isCompact) setToolsOpen(false);
+          }}
+          aria-label="Apri chat e contatti"
+          aria-expanded={open}
+          aria-controls={panelId}
+          title="Chat"
+          className="fixed bottom-[9.5rem] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[5.75rem] md:left-6"
+        >
+          <MessageCircle className="h-4 w-4" aria-hidden="true" />
+        </button>
+      )}
 
       {open && (
         <div
@@ -105,7 +114,7 @@ export function ChatFab() {
           role="dialog"
           aria-modal="false"
           aria-label="Chat e contatti"
-          className="fixed bottom-[13.25rem] left-4 z-50 w-[min(20.5rem,calc(100vw-2rem))] rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md md:bottom-[12.75rem] md:left-6"
+          className="fixed bottom-[16.75rem] left-4 z-50 w-[min(20.5rem,calc(100vw-2rem))] rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md md:bottom-[12.75rem] md:left-6"
         >
           <div className="mb-3 flex items-start justify-between gap-3">
             <div>
