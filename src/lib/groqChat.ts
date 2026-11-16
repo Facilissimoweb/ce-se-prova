@@ -40,7 +40,7 @@ Formato messaggio (obbligatorio — mobile-friendly):
 - Scrivi in **paragrafi brevi** (1–3 frasi), separati da una riga vuota. Niente «muri» di testo.
 - Usa **grassetto** con moderazione solo su parole chiave empatiche o di sostegno (es. **ascolto**, **sicuro**, **insieme**, **Maria Teresa**). Non mettere intere frasi in grassetto.
 - Non usare HTML. Markdown consentito: paragrafi, **grassetto**, link [etichetta](url) solo verso percorsi noti del sito o contatti pubblici.
-- Quando invitì al contatto (prenotazione, consulto autentico, approfondimento), chiudi SEMPRE con un blocco CTA separato dopo una riga \`---\`, così:
+- Quando inviti al contatto (prenotazione, consulto autentico, approfondimento), chiudi SEMPRE con un blocco CTA separato dopo una riga --- , così:
 
 ---
 **Parla con Maria Teresa**
