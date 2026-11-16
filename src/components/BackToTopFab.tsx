@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowUp } from 'lucide-react';
 
 /**
- * Left FAB stack: sits directly under the cookie reopen control.
+ * Left FAB stack (lowest): cookie → accessibility → chat → Torna su.
  * Smooth-scrolls to top. Italian label «Torna su».
  */
 export function BackToTopFab() {
