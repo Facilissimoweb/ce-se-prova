@@ -9,7 +9,7 @@
     "build": "vite build && node scripts/bundle-api.mjs",
     "build:api": "node scripts/bundle-api.mjs",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js api/courses.js api/bookings.js api/stripe.js api/reserved.js api/dialogue.js api/news.js",
+    "clean": "rm -rf dist server.js api/courses.js api/bookings.js api/stripe.js api/reserved.js api/dialogue.js api/news.js api/chat.js",
     "lint": "tsc --noEmit"
   },
   "dependencies": {

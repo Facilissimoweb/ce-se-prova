@@ -37,6 +37,10 @@
       "destination": "/api/dialogue?__path=$1"
     },
     {
+      "source": "/api/chat",
+      "destination": "/api/chat"
+    },
+    {
       "source": "/((?!api(?:/|$)|privacy\\.html|sitemap\\.xml).*)",
       "destination": "/index.html"
     }
