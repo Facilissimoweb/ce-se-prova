@@ -94,6 +94,13 @@ export async function postBooking(params: {
       });
     }
 
+    if (tariff.onlineOnly && requestedMode === 'studio') {
+      return json(400, {
+        error:
+          'Il Consulto Breve è disponibile solo online in chiamata vocale.',
+      });
+    }
+
     if (!isSlotAllowedForMode(requestedMode, scheduledTime)) {
       return json(400, {
         error:
@@ -101,7 +108,9 @@ export async function postBooking(params: {
       });
     }
 
-    const mode = resolveBookingMode(requestedMode, scheduledTime);
+    const mode = tariff.onlineOnly
+      ? 'remote'
+      : resolveBookingMode(requestedMode, scheduledTime);
 
     if (!slotsForDate(scheduledDate).includes(scheduledTime)) {
       return json(400, {

@@ -15,23 +15,23 @@ export interface SectionImageAsset {
 export const TARIFF_SECTION_IMAGES: Record<ConsultationTariff['id'], SectionImageAsset> = {
   '20m': {
     src: consultoEssenzialeImg,
-    alt: 'Singola carta dei Tarocchi bordata in oro su lino scuro per il Consulto Breve da venti minuti',
-    caption: 'Consulto Breve · Domanda rapida e primo orientamento',
+    alt: 'Singola carta dei Tarocchi bordata in oro su lino scuro per il Consulto Breve da venti minuti solo online',
+    caption: 'Consulto Breve · Solo online · Arcani Maggiori e Minori',
   },
   '45m': {
     src: consultoEssenzialeImg,
     alt: 'Singola carta dei Tarocchi bordata in oro su lino scuro accanto a un candeliere in ottone battuto per il Consulto Essenziale',
-    caption: 'Consulto Essenziale · Domanda singola e messa a fuoco',
+    caption: 'Consulto Essenziale · Più domande · Arcani Maggiori e Minori',
   },
   '60m': {
     src: consultoEvolutivoImg,
     alt: 'Stesa a cinque carte su pietra scura con quaderno in pelle e penna stilografica in ottone per il Consulto Evolutivo Completo',
-    caption: 'Consulto Evolutivo · Dinamiche e linee future',
+    caption: 'Consulto Evolutivo · Arcani Maggiori e Minori',
   },
   '90m': {
     src: consultoCicloImg,
-    alt: 'Dodici carte dei Tarocchi disposte in ruota simmetrica attorno a un astrolabio in ottone e una candela accesa per la Sessione Integrata e Ciclo',
-    caption: 'Sessione Integrata · Ruota delle dodici case e ciclo annuale',
+    alt: 'Dodici carte dei Tarocchi disposte in ruota simmetrica attorno a un astrolabio in ottone e una candela accesa per la Sessione Integrata',
+    caption: 'Sessione Integrata · Arcani Maggiori e Minori · ciclo annuale',
   },
 };
 

@@ -149,6 +149,8 @@ export interface ConsultationTariff {
   focusLabel: string;
   includes: string[];
   recommended?: boolean;
+  /** Solo online (chiamata vocale); non disponibile di persona a Macerata. */
+  onlineOnly?: boolean;
 }
 
 export type DialoguePackId = '5m' | '10m' | '15m';

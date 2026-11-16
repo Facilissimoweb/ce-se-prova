@@ -81,7 +81,14 @@ export function BookingScreen({
   });
 
   useEffect(() => {
-    setDraft((prev) => ({ ...prev, tariffId: selectedTariffId }));
+    const tariff =
+      consultationTariffs.find((t) => t.id === selectedTariffId) ??
+      consultationTariffs[0];
+    setDraft((prev) => ({
+      ...prev,
+      tariffId: selectedTariffId,
+      mode: tariff.onlineOnly ? 'remote' : prev.mode,
+    }));
   }, [selectedTariffId]);
 
   useEffect(() => {
@@ -192,10 +199,17 @@ export function BookingScreen({
 
   const handleTariffPick = (id: ConsultationTariff['id']) => {
     onChangeTariffId(id);
-    setDraft((prev) => ({ ...prev, tariffId: id }));
+    const tariff =
+      consultationTariffs.find((t) => t.id === id) ?? consultationTariffs[0];
+    setDraft((prev) => ({
+      ...prev,
+      tariffId: id,
+      mode: tariff.onlineOnly ? 'remote' : prev.mode,
+    }));
   };
 
   const handleModePick = (mode: BookingMode) => {
+    if (activeTariff.onlineOnly && mode === 'studio') return;
     setDraft((prev) => ({ ...prev, mode }));
   };
 
@@ -376,8 +390,8 @@ export function BookingScreen({
                 </h2>
                 <p className="text-sm text-[#A39B93]">
                   {CONSULTATION_STRIPE_ENABLED
-                    ? 'Scegli durata e se preferisci online (chiamata vocale) o di persona a Macerata. Checkout Stripe al passo finale.'
-                    : 'Scegli durata e se preferisci online (chiamata vocale) o di persona a Macerata. Al passo finale invii la richiesta su WhatsApp.'}
+                    ? 'Scegli durata e modalità. In ogni sessione leggo Arcani Maggiori e Minori. Il Consulto Breve è solo online. Checkout Stripe al passo finale.'
+                    : 'Scegli durata e modalità. In ogni sessione leggo Arcani Maggiori e Minori. Il Consulto Breve è solo online. Al passo finale invii la richiesta su WhatsApp.'}
                 </p>
               </div>
 
@@ -445,6 +459,11 @@ export function BookingScreen({
                 <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
                   Modalità *
                 </p>
+                {activeTariff.onlineOnly ? (
+                  <p className="text-xs text-[#A39B93]">
+                    Il Consulto Breve è disponibile solo online in chiamata vocale.
+                  </p>
+                ) : null}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {(
                     [
@@ -456,20 +475,28 @@ export function BookingScreen({
                       [
                         'studio',
                         'Di persona a Macerata',
-                        'Via Crispi 37 · fino alle 18:00',
+                        activeTariff.onlineOnly
+                          ? 'Non disponibile per il Consulto Breve'
+                          : 'Via Crispi 37 · fino alle 18:00',
                       ],
                     ] as const
                   ).map(([value, label, hint]) => {
                     const selected = draft.mode === value;
+                    const disabled =
+                      activeTariff.onlineOnly && value === 'studio';
                     return (
                       <button
                         key={value}
                         type="button"
+                        disabled={disabled}
                         onClick={() => handleModePick(value)}
+                        aria-disabled={disabled}
                         className={`min-h-[64px] px-4 py-3 rounded-xl text-left border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
-                          selected
-                            ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-[#F4F1EA]'
-                            : 'border-[#D4AF37]/20 bg-[#12100E]/60 text-[#A39B93] hover:border-[#D4AF37]/45'
+                          disabled
+                            ? 'border-[#D4AF37]/10 bg-[#12100E]/40 text-[#A39B93]/50 cursor-not-allowed opacity-60'
+                            : selected
+                              ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-[#F4F1EA]'
+                              : 'border-[#D4AF37]/20 bg-[#12100E]/60 text-[#A39B93] hover:border-[#D4AF37]/45'
                         }`}
                       >
                         <span className="block text-sm font-semibold text-[#F4F1EA]">

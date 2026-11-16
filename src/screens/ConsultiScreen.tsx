@@ -163,7 +163,11 @@ export function ConsultiScreen({
                     {tariff.durationMinutes} Minuti
                   </span>
                   <span className="text-[#A39B93]">
-                    {tariff.recommended ? 'Percorso Consigliato' : 'Chiamata Vocale'}
+                    {tariff.recommended
+                      ? 'Percorso Consigliato'
+                      : tariff.onlineOnly
+                        ? 'Solo Online'
+                        : 'Chiamata Vocale'}
                   </span>
                 </div>
 
