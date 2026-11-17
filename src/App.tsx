@@ -288,22 +288,27 @@ export function App() {
           )}
         </main>
 
-        <footer className="border-t border-[#D4AF37]/15 py-12 pb-24 relative z-10">
-          <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-10 text-xs text-[#A39B93]">
-            <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12 lg:items-start">
+        <footer className="border-t border-[#D4AF37]/15 py-10 pb-24 relative z-10 md:py-12">
+          <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-8 text-xs text-[#A39B93] md:space-y-10">
+            {/*
+              Desktop (ENN-77): flat 12-col — brand 3 + Servizi/Info/Legale 3 each.
+              Equal spans kill the old 4|8 dead gap; items-start keeps header tops
+              with the hero mark. Mobile stays a single stacked column.
+            */}
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-8 lg:grid-cols-12 lg:gap-x-6 lg:gap-y-8 lg:items-start">
               {/* Brand + contatti + P.IVA (Agenzia Entrate) + share — hero mark (ENN-72), not nav */}
-              <div className="lg:col-span-4 space-y-6">
-                <div className="space-y-3">
-                  <TarotHomeHeroLogo className="block h-auto w-[min(52vw,168px)] md:w-[156px]" />
+              <div className="space-y-4 sm:col-span-3 lg:col-span-3 lg:space-y-4">
+                <div className="space-y-2">
+                  <TarotHomeHeroLogo className="block h-auto w-[min(52vw,168px)] md:w-[148px] lg:w-[10.75rem]" />
                   <p className="text-[12px] leading-snug tracking-[0.04em] text-[#F4F1EA]/88">
                     Maria Teresa Rogani · Operatore Olistico
                   </p>
                 </div>
-                <p className="max-w-[34ch] text-[13px] leading-relaxed text-[#A39B93]">
+                <p className="max-w-[32ch] text-[13px] leading-relaxed text-[#A39B93] lg:max-w-none">
                   Lettura del presente e del futuro · chiamata vocale online e
                   di persona a Macerata
                 </p>
-                <div className="space-y-2.5 max-w-[16rem]">
+                <div className="max-w-[16rem] space-y-2 lg:max-w-none">
                   <div className="flex flex-col gap-1.5">
                     <a
                       href="tel:+393791038253"
@@ -346,70 +351,70 @@ export function App() {
                 <SocialShareButtons activeScreen={activeScreen} />
               </div>
 
-              {/* Menù a gruppi: Servizi / Info / Legale */}
-              <div className="lg:col-span-8">
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6 md:gap-8">
-                  {FOOTER_MENU_GROUPS.map((group) => (
-                    <div key={group.title}>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D4AF37]">
-                        {group.title}
-                      </p>
-                      <nav
-                        aria-label={group.ariaLabel}
-                        className="mt-4 flex flex-col items-start gap-2.5"
-                      >
-                        {group.items.map((item) => {
-                          if (item.kind === 'screen') {
-                            return (
-                              <button
-                                key={item.id}
-                                type="button"
-                                onClick={() => handleNavigate(item.id)}
-                                className={FOOTER_LINK_CLASS}
-                              >
-                                {item.label}
-                              </button>
-                            );
-                          }
-                          if (item.kind === 'notice') {
-                            return (
-                              <button
-                                key={item.notice}
-                                type="button"
-                                onClick={() => setLegalNotice(item.notice)}
-                                className={FOOTER_LINK_CLASS}
-                              >
-                                {item.label}
-                              </button>
-                            );
-                          }
-                          if (item.kind === 'action') {
-                            return (
-                              <button
-                                key={item.action}
-                                type="button"
-                                onClick={() => setIsPrivacyOpen(true)}
-                                className={FOOTER_LINK_CLASS}
-                              >
-                                {item.label}
-                              </button>
-                            );
-                          }
-                          return (
-                            <a
-                              key={item.href}
-                              href={item.href}
-                              className={FOOTER_LINK_CLASS}
-                            >
-                              {item.label}
-                            </a>
-                          );
-                        })}
-                      </nav>
-                    </div>
-                  ))}
+              {/* Menù a gruppi: Servizi / Info / Legale — sibling cols for even rhythm.
+                  lg:pt optically matches hero-mark transparent top pad (~165/1024). */}
+              {FOOTER_MENU_GROUPS.map((group) => (
+                <div
+                  key={group.title}
+                  className="sm:col-span-1 lg:col-span-3 lg:pt-[1.75rem]"
+                >
+                  <p className="text-[11px] font-semibold uppercase leading-none tracking-[0.18em] text-[#D4AF37]">
+                    {group.title}
+                  </p>
+                  <nav
+                    aria-label={group.ariaLabel}
+                    className="mt-3.5 flex flex-col items-start gap-2.5"
+                  >
+                    {group.items.map((item) => {
+                      if (item.kind === 'screen') {
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => handleNavigate(item.id)}
+                            className={FOOTER_LINK_CLASS}
+                          >
+                            {item.label}
+                          </button>
+                        );
+                      }
+                      if (item.kind === 'notice') {
+                        return (
+                          <button
+                            key={item.notice}
+                            type="button"
+                            onClick={() => setLegalNotice(item.notice)}
+                            className={FOOTER_LINK_CLASS}
+                          >
+                            {item.label}
+                          </button>
+                        );
+                      }
+                      if (item.kind === 'action') {
+                        return (
+                          <button
+                            key={item.action}
+                            type="button"
+                            onClick={() => setIsPrivacyOpen(true)}
+                            className={FOOTER_LINK_CLASS}
+                          >
+                            {item.label}
+                          </button>
+                        );
+                      }
+                      return (
+                        <a
+                          key={item.href}
+                          href={item.href}
+                          className={FOOTER_LINK_CLASS}
+                        >
+                          {item.label}
+                        </a>
+                      );
+                    })}
+                  </nav>
                 </div>
-              </div>
+              ))}
             </div>
 
             <div className="flex flex-col gap-3 border-t border-[#D4AF37]/10 pt-5 md:flex-row md:items-center md:justify-between">
