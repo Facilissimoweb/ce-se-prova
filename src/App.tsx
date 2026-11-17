@@ -18,7 +18,7 @@ import { PrivacyCookiesWidget } from './components/PrivacyCookiesWidget';
 import { StickyContactBar } from './components/StickyContactBar';
 import { LegalNotice, type LegalKind } from './components/LegalNotice';
 import { AmbientSanctuaryBackground } from './components/AmbientSanctuaryBackground';
-import { TarotEmblemLogo } from './components/TarotEmblem';
+import { TarotHomeHeroLogo } from './components/TarotEmblem';
 import { HomeScreen } from './screens/HomeScreen';
 import { ChiSonoScreen } from './screens/ChiSonoScreen';
 import { ConsultiScreen } from './screens/ConsultiScreen';
@@ -279,38 +279,35 @@ export function App() {
           )}
         </main>
 
-        <footer className="border-t border-[#D4AF37]/15 py-10 pb-24 relative z-10">
-          <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-8 text-xs text-[#A39B93]">
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
-              {/* Brand + contatti + P.IVA + share */}
-              <div className="lg:col-span-4 space-y-5">
-                <div className="flex items-center gap-3">
-                  <TarotEmblemLogo size={56} className="shrink-0" />
-                  <div>
-                    <p className="font-display text-base tracking-[0.06em] text-[#F4F1EA]">
-                      Tarot Italia
-                    </p>
-                    <p className="text-[11px] text-[#A39B93]">
-                      Maria Teresa Rogani · Operatore Olistico
-                    </p>
-                  </div>
+        <footer className="border-t border-[#D4AF37]/15 py-12 pb-24 relative z-10">
+          <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-10 text-xs text-[#A39B93]">
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12 lg:items-start">
+              {/* Brand + contatti + P.IVA + share — hero mark (ENN-72), not nav */}
+              <div className="lg:col-span-4 space-y-6">
+                <div className="space-y-3">
+                  <TarotHomeHeroLogo className="block h-auto w-[min(52vw,168px)] md:w-[156px]" />
+                  <p className="text-[12px] leading-snug tracking-[0.04em] text-[#F4F1EA]/88">
+                    Maria Teresa Rogani · Operatore Olistico
+                  </p>
                 </div>
-                <p className="text-[#A39B93]/95 leading-relaxed max-w-sm">
+                <p className="max-w-[34ch] text-[13px] leading-relaxed text-[#A39B93]">
                   Lettura del presente e del futuro · chiamata vocale online e
                   di persona a Macerata
                 </p>
-                <div className="space-y-1.5">
-                  <p>
+                <address className="not-italic space-y-2 text-[13px] leading-relaxed text-[#C8C0B6]">
+                  <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                     <a
                       href="mailto:info@tarotitalia.com"
-                      className="hover:text-[#D4AF37] transition-colors"
+                      className="text-[#F4F1EA] hover:text-[#D4AF37] transition-colors"
                     >
                       info@tarotitalia.com
                     </a>
-                    {' · '}
+                    <span className="text-[#A39B93]/55" aria-hidden="true">
+                      ·
+                    </span>
                     <a
                       href="tel:+393791038253"
-                      className="hover:text-[#D4AF37] transition-colors"
+                      className="text-[#F4F1EA] hover:text-[#D4AF37] transition-colors"
                     >
                       379 103 82 53
                     </a>
@@ -324,10 +321,10 @@ export function App() {
                       Via Crispi 37, 62100 Macerata
                     </button>
                   </p>
-                  <p className="text-[#F4F1EA]/80 tracking-wide">
+                  <p className="pt-0.5 text-[12px] tracking-[0.08em] text-[#A39B93]/90">
                     P.IVA 02136780430
                   </p>
-                </div>
+                </address>
                 <SocialShareButtons activeScreen={activeScreen} />
               </div>
 

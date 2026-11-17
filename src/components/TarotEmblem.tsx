@@ -9,7 +9,7 @@ export const TAROT_ITALIA_HOME_HERO_SRC = '/brand/tarot-italia-home-hero.png';
  */
 export const TAROT_ITALIA_NAV_SRC = '/brand/tarot-italia-nav.png';
 
-/** Alias of the nav mark — shared sitewide asset (footer, splash, empty states, etc.). */
+/** Alias of the nav mark — shared sitewide asset (splash, empty states, etc.). */
 export const TAROT_ITALIA_LOGO_SRC = TAROT_ITALIA_NAV_SRC;
 
 interface LogoProps {
@@ -41,9 +41,30 @@ export function TarotNavLogo({ className = '', size }: LogoProps) {
 }
 
 /**
+ * Home hero opening mark (ENN-33) — triangle / eye · TAROT / ITALIA.
+ * RGBA as-is. Use in Home hero and footer brand block (ENN-72); do not swap for nav mark.
+ * Size via `className` (intrinsic 1024×1024); optional `size` sets a square box.
+ */
+export function TarotHomeHeroLogo({ className = '', size }: LogoProps) {
+  const fixed = typeof size === 'number';
+  const box = size ?? 236;
+  return (
+    <img
+      src={TAROT_ITALIA_HOME_HERO_SRC}
+      alt="Tarot Italia"
+      width={fixed ? box : 1024}
+      height={fixed ? box : 1024}
+      decoding="async"
+      className={`object-contain object-center ${className}`.trim()}
+      style={fixed ? { width: size, height: size } : undefined}
+    />
+  );
+}
+
+/**
  * Sitewide Tarot Italia brand logo — same asset/component as the navbar (ENN-48).
  * Transparent PNG as-is; sized large enough to read on dark UI.
- * Home hero opening mark stays on TAROT_ITALIA_HOME_HERO_SRC separately.
+ * Footer brand block uses TarotHomeHeroLogo (ENN-72) instead.
  */
 export function TarotEmblemLogo({ className = '', size = 56 }: LogoProps) {
   return <TarotNavLogo className={className} size={size} />;
