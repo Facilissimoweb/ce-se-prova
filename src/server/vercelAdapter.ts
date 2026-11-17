@@ -1,4 +1,4 @@
-import { ensureBookingSchema } from '../db/ensureBookingSchema.ts';
+export { ensureSchemaOnce } from '../db/ensureBookingSchema.ts';
 import { verifyBearerToken } from './authToken.ts';
 import type { ApiResult, ApiUser } from './http.ts';
 import {
@@ -19,20 +19,6 @@ export {
   sendJson,
 };
 export type { NodeLikeReq, NodeLikeRes };
-
-declare global {
-  // eslint-disable-next-line no-var
-  var _ennamoSchemaReady: Promise<void> | undefined;
-}
-
-export async function ensureSchemaOnce(): Promise<void> {
-  if (!globalThis._ennamoSchemaReady) {
-    globalThis._ennamoSchemaReady = ensureBookingSchema().catch((error) => {
-      console.error('ensureBookingSchema failed (non-fatal):', error);
-    });
-  }
-  await globalThis._ennamoSchemaReady;
-}
 
 export function sendApiResult(res: NodeLikeRes, result: ApiResult): void {
   sendJson(res, result.status, result.body);
