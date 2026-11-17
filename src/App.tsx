@@ -291,73 +291,71 @@ export function App() {
         <footer className="border-t border-[#D4AF37]/15 py-10 pb-24 relative z-10 md:py-12">
           <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-8 text-xs text-[#A39B93] md:space-y-10">
             {/*
-              Desktop (ENN-77): flat 12-col — brand 3 + Servizi/Info/Legale 3 each.
-              Equal spans kill the old 4|8 dead gap; items-start keeps header tops
-              with the hero mark. Mobile stays a single stacked column.
+              ENN-78: brand stack opens the footer centered on top (logo, Nina-compact
+              contacts, address, CONDIVIDI). SERVIZI / INFO / LEGALE sit below as a
+              separate three-column row — not four equal siblings in one grid.
             */}
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-8 lg:grid-cols-12 lg:gap-x-6 lg:gap-y-8 lg:items-start">
-              {/* Brand + contatti + P.IVA (Agenzia Entrate) + share — hero mark (ENN-72), not nav */}
-              <div className="space-y-4 sm:col-span-3 lg:col-span-3 lg:space-y-4">
-                <div className="space-y-2">
-                  <TarotHomeHeroLogo className="block h-auto w-[min(52vw,168px)] md:w-[148px] lg:w-[10.75rem]" />
-                  <p className="text-[12px] leading-snug tracking-[0.04em] text-[#F4F1EA]/88">
-                    Maria Teresa Rogani · Operatore Olistico
-                  </p>
-                </div>
-                <p className="max-w-[32ch] text-[13px] leading-relaxed text-[#A39B93] lg:max-w-none">
-                  Lettura del presente e del futuro · chiamata vocale online e
-                  di persona a Macerata
+            <div className="mx-auto flex w-full max-w-md flex-col items-center space-y-4 text-center">
+              <div className="space-y-2">
+                <TarotHomeHeroLogo className="mx-auto block h-auto w-[min(52vw,168px)] md:w-[148px] lg:w-[10.75rem]" />
+                <p className="text-[12px] leading-snug tracking-[0.04em] text-[#F4F1EA]/88">
+                  Maria Teresa Rogani · Operatore Olistico
                 </p>
-                <div className="max-w-[16rem] space-y-2 lg:max-w-none">
-                  <div className="flex flex-col gap-1.5">
-                    <a
-                      href="tel:+393791038253"
-                      className={FOOTER_CONTACT_BTN_CLASS}
-                    >
-                      <Phone
-                        className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]"
-                        aria-hidden="true"
-                      />
-                      <span className="min-w-0 truncate">379 103 82 53</span>
-                    </a>
-                    <a
-                      href="mailto:info@tarotitalia.com"
-                      className={FOOTER_CONTACT_BTN_CLASS}
-                      title="Email · info@tarotitalia.com"
-                    >
-                      <Mail
-                        className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]"
-                        aria-hidden="true"
-                      />
-                      <span className="min-w-0 truncate">info@tarotitalia.com</span>
-                    </a>
-                    <a
-                      href={SITE_PIVA_VERIFY_URL}
-                      target="_blank"
-                      rel="noopener"
-                      aria-label={`Verifica Partita IVA ${SITE_PIVA} sul sito dell'Agenzia delle Entrate`}
-                      title="Verifica P.IVA · Agenzia delle Entrate"
-                      className={FOOTER_CONTACT_BTN_CLASS}
-                    >
-                      <span className="min-w-0 truncate tracking-[0.06em]">
-                        P.IVA {SITE_PIVA}
-                      </span>
-                    </a>
-                  </div>
-                  <p className="px-0.5 text-[12px] leading-relaxed text-[#A39B93]">
-                    Via Crispi 37, 62100 Macerata
-                  </p>
-                </div>
-                <SocialShareButtons activeScreen={activeScreen} />
               </div>
+              <p className="max-w-[34ch] text-[13px] leading-relaxed text-[#A39B93]">
+                Lettura del presente e del futuro · chiamata vocale online e di
+                persona a Macerata
+              </p>
+              <div className="w-full max-w-[16rem] space-y-2">
+                <div className="flex flex-col gap-1.5">
+                  <a
+                    href="tel:+393791038253"
+                    className={FOOTER_CONTACT_BTN_CLASS}
+                  >
+                    <Phone
+                      className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]"
+                      aria-hidden="true"
+                    />
+                    <span className="min-w-0 truncate">379 103 82 53</span>
+                  </a>
+                  <a
+                    href="mailto:info@tarotitalia.com"
+                    className={FOOTER_CONTACT_BTN_CLASS}
+                    title="Email · info@tarotitalia.com"
+                  >
+                    <Mail
+                      className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]"
+                      aria-hidden="true"
+                    />
+                    <span className="min-w-0 truncate">info@tarotitalia.com</span>
+                  </a>
+                  <a
+                    href={SITE_PIVA_VERIFY_URL}
+                    target="_blank"
+                    rel="noopener"
+                    aria-label={`Verifica Partita IVA ${SITE_PIVA} sul sito dell'Agenzia delle Entrate`}
+                    title="Verifica P.IVA · Agenzia delle Entrate"
+                    className={FOOTER_CONTACT_BTN_CLASS}
+                  >
+                    <span className="min-w-0 truncate tracking-[0.06em]">
+                      P.IVA {SITE_PIVA}
+                    </span>
+                  </a>
+                </div>
+                <p className="px-0.5 text-[12px] leading-relaxed text-[#A39B93]">
+                  Via Crispi 37, 62100 Macerata
+                </p>
+              </div>
+              <SocialShareButtons
+                activeScreen={activeScreen}
+                className="items-center"
+              />
+            </div>
 
-              {/* Menù a gruppi: Servizi / Info / Legale — sibling cols for even rhythm.
-                  lg:pt optically matches hero-mark transparent top pad (~165/1024). */}
+            {/* Menù a gruppi: Servizi / Info / Legale — row under brand */}
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6 md:gap-8">
               {FOOTER_MENU_GROUPS.map((group) => (
-                <div
-                  key={group.title}
-                  className="sm:col-span-1 lg:col-span-3 lg:pt-[1.75rem]"
-                >
+                <div key={group.title}>
                   <p className="text-[11px] font-semibold uppercase leading-none tracking-[0.18em] text-[#D4AF37]">
                     {group.title}
                   </p>
