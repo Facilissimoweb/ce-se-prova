@@ -247,35 +247,6 @@ export function BookingScreen({
     setSubmitting(true);
     setSubmitError(null);
 
-    // Frozen path: open WhatsApp with booking details; Maria sends payment info.
-    if (!CONSULTATION_STRIPE_ENABLED) {
-      try {
-        const message = buildBookingWhatsAppMessage({
-          tariffTitle: activeTariff.title,
-          durationMinutes: activeTariff.durationMinutes,
-          priceEur: activeTariff.priceEur,
-          dateLabel: formatItalianDate(draft.selectedDateIso),
-          timeSlot: draft.selectedTimeSlot,
-          modeLabel: sessionModeLabel(draft.mode, draft.selectedTimeSlot),
-          fullName: draft.fullName.trim(),
-          email: draft.email.trim(),
-          phoneWhatsApp: draft.phoneWhatsApp.trim(),
-          sessionIntent: draft.sessionIntent.trim(),
-        });
-        window.open(whatsappHref(message), '_blank', 'noopener,noreferrer');
-        setBookingConfirmed(true);
-      } catch (err) {
-        setSubmitError(
-          err instanceof Error
-            ? err.message
-            : 'Impossibile aprire WhatsApp. Riprova o scrivi al numero dello studio.'
-        );
-      } finally {
-        setSubmitting(false);
-      }
-      return;
-    }
-
     try {
       const token = user ? await getIdToken() : null;
       const res = await fetch('/api/bookings', {
@@ -305,6 +276,7 @@ export function BookingScreen({
           | 'confirmed'
           | 'whatsapp_handoff';
         checkoutUrl?: string;
+        bookingId?: number;
       };
       if (!res.ok) {
         throw new Error(json.error || 'Prenotazione non riuscita.');
@@ -312,6 +284,22 @@ export function BookingScreen({
       if (json.mode === 'stripe_redirect' && json.checkoutUrl) {
         window.location.assign(json.checkoutUrl);
         return;
+      }
+      // Soft-freeze: slot already reserved in DB as pending_payment; open WhatsApp.
+      if (json.mode === 'whatsapp_handoff') {
+        const message = buildBookingWhatsAppMessage({
+          tariffTitle: activeTariff.title,
+          durationMinutes: activeTariff.durationMinutes,
+          priceEur: activeTariff.priceEur,
+          dateLabel: formatItalianDate(draft.selectedDateIso),
+          timeSlot: draft.selectedTimeSlot,
+          modeLabel: sessionModeLabel(draft.mode, draft.selectedTimeSlot),
+          fullName: draft.fullName.trim(),
+          email: draft.email.trim(),
+          phoneWhatsApp: draft.phoneWhatsApp.trim(),
+          sessionIntent: draft.sessionIntent.trim(),
+        });
+        window.open(whatsappHref(message), '_blank', 'noopener,noreferrer');
       }
       setBookingConfirmed(true);
       void reload();

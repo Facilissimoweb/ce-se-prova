@@ -8739,8 +8739,23 @@ async function postBooking(params) {
       return json2(200, { mode: "confirmed", booking: result.booking });
     }
     if (!CONSULTATION_STRIPE_ENABLED) {
+      const booking = await createConsultationBooking({
+        uid: user?.uid ?? null,
+        authEmail: user?.email ?? null,
+        tariffId: tariff.id,
+        scheduledDate,
+        scheduledTime,
+        fullName,
+        email,
+        phoneWhatsApp,
+        sessionIntent,
+        deontologyAccepted,
+        mode,
+        status: "pending_payment"
+      });
       return json2(200, {
         mode: "whatsapp_handoff",
+        bookingId: booking.id,
         message: "Prenotazione consulti via WhatsApp: apri il messaggio precompilato e invialo a Maria Teresa. Il pagamento online riprender\xE0 in un secondo momento."
       });
     }
