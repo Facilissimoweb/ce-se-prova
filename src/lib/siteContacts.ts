@@ -21,16 +21,29 @@ export type NearbyParking = {
   name: string;
   address: string;
   note: string;
-  mapsUrl: string;
+  /** Primary outbound link (official site or Maps). */
+  href: string;
+  /** Optional coords for styled JS map markers. */
+  latLng?: { lat: number; lng: number };
 };
 
-/** Parcheggi pubblici utili per raggiungere Via Crispi (centro storico / ZTL). */
+/**
+ * Parcheggi pubblici utili per Via Crispi (centro storico / ZTL).
+ * Ordine: il più vicino a casa di Maria Teresa per primo.
+ */
 export const NEARBY_PARKING: NearbyParking[] = [
+  {
+    name: 'Parcheggio Direzionale',
+    address: 'Via Giosuè Carducci 33, 62100 Macerata',
+    note: 'Il più vicino a Via Crispi · coperto, H24 · Impresa Servizi Generali',
+    href: 'https://parcheggimacerata.it/parcheggio-direzionale',
+    latLng: { lat: 43.2972841, lng: 13.4546689 },
+  },
   {
     name: 'Parcheggio Centro Storico',
     address: 'Via Antonio Mugnoz, 62100 Macerata',
     note: 'Struttura APM · collegamento con ascensore al centro storico',
-    mapsUrl:
+    href:
       'https://www.google.com/maps/search/?api=1&query=' +
       encodeURIComponent('Parcheggio Centro Storico Via Antonio Mugnoz Macerata'),
   },
@@ -38,7 +51,7 @@ export const NEARBY_PARKING: NearbyParking[] = [
     name: 'Parcheggio Garibaldi',
     address: 'Via Augusto Murri, 62100 Macerata',
     note: 'Struttura APM · accessibile da nord, ascensore / scale verso il centro',
-    mapsUrl:
+    href:
       'https://www.google.com/maps/search/?api=1&query=' +
       encodeURIComponent('Parcheggio Garibaldi Via Murri Macerata'),
   },
@@ -46,16 +59,17 @@ export const NEARBY_PARKING: NearbyParking[] = [
     name: 'Parcheggio Centrale',
     address: 'Via Leopoldo Armaroli 1, 62100 Macerata',
     note: 'A pochi minuti a piedi dal centro · utile se arrivi in auto',
-    mapsUrl:
+    href:
       'https://www.google.com/maps/search/?api=1&query=' +
       encodeURIComponent('Parcheggio Centrale Via Leopoldo Armaroli Macerata'),
   },
 ];
 
 /**
- * Embed Google Maps senza dipendere da un nuovo key a pagamento:
+ * Embed Google Maps (fallback senza Maps JS):
  * - se `VITE_GOOGLE_MAPS_API_KEY` è presente → Embed API ufficiale (place/search);
  * - altrimenti → iframe legacy `output=embed` (funziona senza key).
+ * Preferire ContattiStyledMap (JS + stili dark/gold) quando la key è impostata.
  */
 export function mapsPlaceEmbedSrc(query: string = SITE_MAPS_QUERY): string {
   const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY?.trim();

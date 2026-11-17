@@ -10,6 +10,7 @@ import {
   Phone,
 } from 'lucide-react';
 import type { ScreenId } from '../types/handoff';
+import { ContattiStyledMap } from '../components/ContattiStyledMap';
 import {
   NEARBY_PARKING,
   SITE_ADDRESS_FULL,
@@ -22,8 +23,6 @@ import {
   SITE_PHONE_TEL,
   SITE_PIVA,
   hasGoogleMapsApiKey,
-  mapsParkingEmbedSrc,
-  mapsPlaceEmbedSrc,
   whatsappHref,
 } from '../lib/siteContacts';
 
@@ -32,9 +31,7 @@ type Props = {
 };
 
 export function ContattiScreen({ onNavigate }: Props) {
-  const placeEmbed = mapsPlaceEmbedSrc();
-  const parkingEmbed = mapsParkingEmbedSrc();
-  const usingOfficialEmbed = hasGoogleMapsApiKey();
+  const usingOfficialMaps = hasGoogleMapsApiKey();
 
   return (
     <div className="space-y-12 pb-12 pt-6 md:pt-10">
@@ -209,13 +206,10 @@ export function ContattiScreen({ onNavigate }: Props) {
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-[#151311]/80 shadow-[0_0_0_1px_rgba(212,175,55,0.05)]">
-            <iframe
+            <ContattiStyledMap
+              mode="place"
               title="Mappa Google — Via Crispi 37, Macerata"
-              src={placeEmbed}
               className="h-[280px] w-full border-0 md:h-[340px]"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              allowFullScreen
             />
           </div>
 
@@ -229,11 +223,11 @@ export function ContattiScreen({ onNavigate }: Props) {
               Indicazioni stradali
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
             </a>
-            {!usingOfficialEmbed && (
-              <span className="text-[#A39B93]/70">
-                Mappa incorporata senza API key (iframe Maps)
-              </span>
-            )}
+            <span className="text-[#A39B93]/70">
+              {usingOfficialMaps
+                ? 'Mappa stilizzata (Maps JavaScript API · tema dark/oro)'
+                : 'Mappa soft senza API key — imposta VITE_GOOGLE_MAPS_API_KEY per lo stile dark/oro'}
+            </span>
           </div>
         </div>
       </section>
@@ -256,7 +250,7 @@ export function ContattiScreen({ onNavigate }: Props) {
             <p className="text-sm leading-relaxed text-[#A39B93]">
               Il centro storico di Macerata è in ZTL: conviene lasciare l’auto in
               una struttura pubblica e proseguire a piedi (o con ascensore)
-              verso Via Crispi.
+              verso Via Crispi. Il più vicino è il Parcheggio Direzionale.
             </p>
           </div>
           <a
@@ -272,21 +266,32 @@ export function ContattiScreen({ onNavigate }: Props) {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           <ul className="space-y-3 lg:col-span-5">
-            {NEARBY_PARKING.map((spot) => (
+            {NEARBY_PARKING.map((spot, index) => (
               <li key={spot.name}>
                 <a
-                  href={spot.mapsUrl}
+                  href={spot.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex gap-3 rounded-xl border border-[#D4AF37]/15 bg-[#151311]/60 px-4 py-3.5 transition-colors hover:border-[#D4AF37]/40"
+                  className={`group flex gap-3 rounded-xl border px-4 py-3.5 transition-colors ${
+                    index === 0
+                      ? 'border-[#D4AF37]/40 bg-[#151311]/85 hover:border-[#D4AF37]/70'
+                      : 'border-[#D4AF37]/15 bg-[#151311]/60 hover:border-[#D4AF37]/40'
+                  }`}
                 >
                   <ParkingSquare
                     className="mt-0.5 h-4 w-4 shrink-0 text-[#D4AF37]"
                     aria-hidden="true"
                   />
                   <span className="min-w-0">
-                    <span className="block font-medium text-[#F4F1EA] group-hover:text-[#D4AF37]">
-                      {spot.name}
+                    <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                      <span className="font-medium text-[#F4F1EA] group-hover:text-[#D4AF37]">
+                        {spot.name}
+                      </span>
+                      {index === 0 && (
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]">
+                          Più vicino
+                        </span>
+                      )}
                     </span>
                     <span className="mt-0.5 block text-xs text-[#A39B93]">
                       {spot.address}
@@ -305,13 +310,10 @@ export function ContattiScreen({ onNavigate }: Props) {
           </ul>
 
           <div className="overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-[#151311]/80 lg:col-span-7">
-            <iframe
+            <ContattiStyledMap
+              mode="parking"
               title="Parcheggi vicino a Via Crispi 37, Macerata"
-              src={parkingEmbed}
               className="h-[280px] w-full border-0 md:h-full md:min-h-[340px]"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              allowFullScreen
             />
           </div>
         </div>
