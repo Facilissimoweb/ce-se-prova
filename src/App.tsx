@@ -43,6 +43,7 @@ import {
   pathForScreen,
   screenFromPath,
 } from './lib/appPaths';
+import { SITE_PIVA, SITE_PIVA_VERIFY_URL } from './lib/siteContacts';
 
 const AUX_SCREENS: ScreenId[] = [
   'privacy',
@@ -290,7 +291,7 @@ export function App() {
         <footer className="border-t border-[#D4AF37]/15 py-12 pb-24 relative z-10">
           <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-10 text-xs text-[#A39B93]">
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12 lg:items-start">
-              {/* Brand + contatti + P.IVA + share — hero mark (ENN-72), not nav */}
+              {/* Brand + contatti + P.IVA (Agenzia Entrate) + share — hero mark (ENN-72), not nav */}
               <div className="lg:col-span-4 space-y-6">
                 <div className="space-y-3">
                   <TarotHomeHeroLogo className="block h-auto w-[min(52vw,168px)] md:w-[156px]" />
@@ -325,16 +326,18 @@ export function App() {
                       />
                       <span className="min-w-0 truncate">info@tarotitalia.com</span>
                     </a>
-                    <button
-                      type="button"
-                      tabIndex={-1}
-                      aria-label="Partita IVA 02136780430"
-                      className={`${FOOTER_CONTACT_BTN_CLASS} cursor-default text-[#C8C0B6] hover:border-[#D4AF37]/15 hover:bg-[#12100E]/55`}
+                    <a
+                      href={SITE_PIVA_VERIFY_URL}
+                      target="_blank"
+                      rel="noopener"
+                      aria-label={`Verifica Partita IVA ${SITE_PIVA} sul sito dell'Agenzia delle Entrate`}
+                      title="Verifica P.IVA · Agenzia delle Entrate"
+                      className={FOOTER_CONTACT_BTN_CLASS}
                     >
                       <span className="min-w-0 truncate tracking-[0.06em]">
-                        P.IVA 02136780430
+                        P.IVA {SITE_PIVA}
                       </span>
-                    </button>
+                    </a>
                   </div>
                   <p className="px-0.5 text-[12px] leading-relaxed text-[#A39B93]">
                     Via Crispi 37, 62100 Macerata

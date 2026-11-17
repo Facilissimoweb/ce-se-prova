@@ -6,6 +6,9 @@ export const SITE_PHONE_TEL = '+393791038253';
 export const SITE_ADDRESS = 'Via Crispi 37, 62100 Macerata';
 export const SITE_ADDRESS_FULL = 'Via Crispi 37, 62100 Macerata, Italia';
 export const SITE_PIVA = '02136780430';
+/** Verifica P.IVA (Agenzia delle Entrate — servizio pubblico). */
+export const SITE_PIVA_VERIFY_URL =
+  'https://telemanagrafici.agenziaentrate.gov.it/VerificaPIVA/Scegli.do';
 export const SITE_WHATSAPP_HREF = `https://wa.me/${SITE_PHONE_E164}`;
 
 /** Query Maps / Business Profile: indirizzo completo (niente “studio” inventato). */
