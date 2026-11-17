@@ -70,7 +70,7 @@ type FooterMenuGroup = {
  * «Parla con Maria Teresa» CTAs (ENN-71), adapted for a vertical stack.
  */
 const FOOTER_CONTACT_BTN_CLASS =
-  'flex min-w-0 w-full items-center justify-start gap-1.5 rounded-lg border border-[#D4AF37]/15 bg-[#12100E]/55 px-2.5 py-1.5 text-[11px] font-semibold leading-tight text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:gap-2 sm:px-2.5 sm:py-2 sm:text-xs';
+  'flex min-w-0 w-full items-center justify-center gap-1.5 rounded-lg border border-[#D4AF37]/15 bg-[#12100E]/55 px-2.5 py-1.5 text-center text-[11px] font-semibold leading-tight text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:gap-2 sm:px-2.5 sm:py-2 sm:text-xs';
 
 /** Colonne footer allineate allo sguardo Tarot Italia (Servizi / Info / Legale). */
 const FOOTER_MENU_GROUPS: FooterMenuGroup[] = [
