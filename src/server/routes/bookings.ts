@@ -161,9 +161,26 @@ export async function postBooking(params: {
 
     // Soft-freeze: consulti booking UI uses WhatsApp handoff; keep Stripe path
     // compiled for later re-enable via CONSULTATION_STRIPE_ENABLED.
+    // Still INSERT a pending_payment row so the slot is occupied immediately
+    // (availability + unique index consultation_bookings_active_slot_idx).
     if (!CONSULTATION_STRIPE_ENABLED) {
+      const booking = await createConsultationBooking({
+        uid: user?.uid ?? null,
+        authEmail: user?.email ?? null,
+        tariffId: tariff.id,
+        scheduledDate,
+        scheduledTime,
+        fullName,
+        email,
+        phoneWhatsApp,
+        sessionIntent,
+        deontologyAccepted,
+        mode,
+        status: 'pending_payment',
+      });
       return json(200, {
         mode: 'whatsapp_handoff',
+        bookingId: booking.id,
         message:
           'Prenotazione consulti via WhatsApp: apri il messaggio precompilato e invialo a Maria Teresa. Il pagamento online riprenderà in un secondo momento.',
       });
