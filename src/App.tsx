@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { Mail, Phone } from 'lucide-react';
 import type { ConsultationTariff, CourseId, ScreenId } from './types/handoff';
 import { AuthProvider } from './context/AuthContext';
 import {
@@ -18,7 +19,7 @@ import { PrivacyCookiesWidget } from './components/PrivacyCookiesWidget';
 import { StickyContactBar } from './components/StickyContactBar';
 import { LegalNotice, type LegalKind } from './components/LegalNotice';
 import { AmbientSanctuaryBackground } from './components/AmbientSanctuaryBackground';
-import { TarotEmblemLogo } from './components/TarotEmblem';
+import { TarotHomeHeroLogo } from './components/TarotEmblem';
 import { HomeScreen } from './screens/HomeScreen';
 import { ChiSonoScreen } from './screens/ChiSonoScreen';
 import { ConsultiScreen } from './screens/ConsultiScreen';
@@ -62,6 +63,13 @@ type FooterMenuGroup = {
   ariaLabel: string;
   items: FooterNavItem[];
 };
+
+/**
+ * Compact dark/gold chrome — same visual language as Nina ChatFab
+ * «Parla con Maria Teresa» CTAs (ENN-71), adapted for a vertical stack.
+ */
+const FOOTER_CONTACT_BTN_CLASS =
+  'flex min-w-0 w-full items-center justify-start gap-1.5 rounded-lg border border-[#D4AF37]/15 bg-[#12100E]/55 px-2.5 py-1.5 text-[11px] font-semibold leading-tight text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:gap-2 sm:px-2.5 sm:py-2 sm:text-xs';
 
 /** Colonne footer allineate allo sguardo Tarot Italia (Servizi / Info / Legale). */
 const FOOTER_MENU_GROUPS: FooterMenuGroup[] = [
@@ -279,53 +287,57 @@ export function App() {
           )}
         </main>
 
-        <footer className="border-t border-[#D4AF37]/15 py-10 pb-24 relative z-10">
-          <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-8 text-xs text-[#A39B93]">
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
-              {/* Brand + contatti + P.IVA + share */}
-              <div className="lg:col-span-4 space-y-5">
-                <div className="flex items-center gap-3">
-                  <TarotEmblemLogo size={56} className="shrink-0" />
-                  <div>
-                    <p className="font-display text-base tracking-[0.06em] text-[#F4F1EA]">
-                      Tarot Italia
-                    </p>
-                    <p className="text-[11px] text-[#A39B93]">
-                      Maria Teresa Rogani · Operatore Olistico
-                    </p>
-                  </div>
+        <footer className="border-t border-[#D4AF37]/15 py-12 pb-24 relative z-10">
+          <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-10 text-xs text-[#A39B93]">
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12 lg:items-start">
+              {/* Brand + contatti + P.IVA + share — hero mark (ENN-72), not nav */}
+              <div className="lg:col-span-4 space-y-6">
+                <div className="space-y-3">
+                  <TarotHomeHeroLogo className="block h-auto w-[min(52vw,168px)] md:w-[156px]" />
+                  <p className="text-[12px] leading-snug tracking-[0.04em] text-[#F4F1EA]/88">
+                    Maria Teresa Rogani · Operatore Olistico
+                  </p>
                 </div>
-                <p className="text-[#A39B93]/95 leading-relaxed max-w-sm">
+                <p className="max-w-[34ch] text-[13px] leading-relaxed text-[#A39B93]">
                   Lettura del presente e del futuro · chiamata vocale online e
                   di persona a Macerata
                 </p>
-                <div className="space-y-1.5">
-                  <p>
-                    <a
-                      href="mailto:info@tarotitalia.com"
-                      className="hover:text-[#D4AF37] transition-colors"
-                    >
-                      info@tarotitalia.com
-                    </a>
-                    {' · '}
+                <div className="space-y-2.5 max-w-[16rem]">
+                  <div className="flex flex-col gap-1.5">
                     <a
                       href="tel:+393791038253"
-                      className="hover:text-[#D4AF37] transition-colors"
+                      className={FOOTER_CONTACT_BTN_CLASS}
                     >
-                      379 103 82 53
+                      <Phone
+                        className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]"
+                        aria-hidden="true"
+                      />
+                      <span className="min-w-0 truncate">379 103 82 53</span>
                     </a>
-                  </p>
-                  <p>
+                    <a
+                      href="mailto:info@tarotitalia.com"
+                      className={FOOTER_CONTACT_BTN_CLASS}
+                      title="Email · info@tarotitalia.com"
+                    >
+                      <Mail
+                        className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]"
+                        aria-hidden="true"
+                      />
+                      <span className="min-w-0 truncate">info@tarotitalia.com</span>
+                    </a>
                     <button
                       type="button"
-                      onClick={() => handleNavigate('contatti')}
-                      className="hover:text-[#D4AF37] transition-colors text-left"
+                      tabIndex={-1}
+                      aria-label="Partita IVA 02136780430"
+                      className={`${FOOTER_CONTACT_BTN_CLASS} cursor-default text-[#C8C0B6] hover:border-[#D4AF37]/15 hover:bg-[#12100E]/55`}
                     >
-                      Via Crispi 37, 62100 Macerata
+                      <span className="min-w-0 truncate tracking-[0.06em]">
+                        P.IVA 02136780430
+                      </span>
                     </button>
-                  </p>
-                  <p className="text-[#F4F1EA]/80 tracking-wide">
-                    P.IVA 02136780430
+                  </div>
+                  <p className="px-0.5 text-[12px] leading-relaxed text-[#A39B93]">
+                    Via Crispi 37, 62100 Macerata
                   </p>
                 </div>
                 <SocialShareButtons activeScreen={activeScreen} />
