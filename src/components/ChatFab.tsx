@@ -93,6 +93,16 @@ export function ChatFab() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
+  // Lock page scroll while Nina covers the viewport (ENN-69).
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
@@ -202,142 +212,146 @@ export function ChatFab() {
         <div
           id={panelId}
           role="dialog"
-          aria-modal="false"
+          aria-modal="true"
           aria-label="Chat con Nina e contatti"
-          className="fixed z-50 max-h-[min(70dvh,calc(100dvh-7.5rem))] w-auto max-w-[22rem] overflow-y-auto overscroll-contain rounded-2xl border border-[#D4AF37]/30 bg-[#151311]/96 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-md left-[max(1rem,env(safe-area-inset-left,0px))] right-[max(1rem,env(safe-area-inset-right,0px))] bottom-[calc(6.25rem+env(safe-area-inset-bottom,0px))] md:bottom-[12.75rem] md:left-6 md:right-auto md:max-h-none md:w-[22rem] md:overflow-visible"
+          className="fixed inset-0 z-50 flex flex-col overflow-hidden border-0 bg-[#151311] pt-[env(safe-area-inset-top,0px)] pr-[env(safe-area-inset-right,0px)] pb-[env(safe-area-inset-bottom,0px)] pl-[env(safe-area-inset-left,0px)] shadow-[0_16px_40px_rgba(0,0,0,0.5)] md:inset-[max(0.75rem,env(safe-area-inset-top,0px))_max(0.75rem,env(safe-area-inset-right,0px))_max(0.75rem,env(safe-area-inset-bottom,0px))_max(0.75rem,env(safe-area-inset-left,0px))] md:rounded-2xl md:border md:border-[#D4AF37]/30 md:bg-[#151311]/98 md:pt-0 md:pr-0 md:pb-0 md:pl-0 md:backdrop-blur-md"
         >
-          <div className="mb-3 flex items-start justify-between gap-3">
-            <div>
-              <p className="font-display text-sm tracking-[0.08em] text-[#D4AF37] uppercase">
-                Tarot Italia
-              </p>
-              <h2 className="mt-1 font-display text-lg text-[#F4F1EA]">Nina</h2>
-              <p className="mt-1 text-sm leading-relaxed text-[#A39B93]">
-                {statusLoading
-                  ? 'Verifico Nina…'
-                  : chatAvailable
-                    ? 'Assistente virtuale di Maria Teresa. Per un consulto autentico, usa la sezione Parla con Maria Teresa qui sotto.'
-                    : 'Nina non è attiva in questo momento. Usa la sezione Parla con Maria Teresa qui sotto.'}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              aria-label="Chiudi chat con Nina"
-              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#A39B93] transition-colors hover:bg-[#D4AF37]/10 hover:text-[#F4F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
-            >
-              <X className="h-4 w-4" aria-hidden="true" />
-            </button>
-          </div>
-
-          {chatAvailable && (
-            <div className="mb-3">
-              <div
-                ref={threadRef}
-                className="mb-2 max-h-52 space-y-2 overflow-y-auto rounded-xl border border-[#D4AF37]/12 bg-[#0F0D0B]/70 p-2.5"
-                aria-live="polite"
+          <div className="flex min-h-0 flex-1 flex-col px-4 pb-4 pt-4 md:px-5 md:pb-5 md:pt-5">
+            <div className="mb-3 flex shrink-0 items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-display text-sm tracking-[0.08em] text-[#D4AF37] uppercase">
+                  Tarot Italia
+                </p>
+                <h2 className="mt-1 font-display text-lg text-[#F4F1EA]">Nina</h2>
+                <p className="mt-1 text-sm leading-relaxed text-[#A39B93]">
+                  {statusLoading
+                    ? 'Verifico Nina…'
+                    : chatAvailable
+                      ? 'Assistente virtuale di Maria Teresa. Per un consulto autentico, usa la sezione Parla con Maria Teresa qui sotto.'
+                      : 'Nina non è attiva in questo momento. Usa la sezione Parla con Maria Teresa qui sotto.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Chiudi chat con Nina"
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/25 text-[#A39B93] transition-colors hover:bg-[#D4AF37]/10 hover:text-[#F4F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
               >
-                {turns.map((turn, index) => (
-                  <div
-                    key={`${turn.role}-${index}`}
-                    className={
-                      turn.role === 'user'
-                        ? 'ml-6 break-words rounded-lg bg-[#D4AF37]/15 px-2.5 py-2 text-sm text-[#F4F1EA] whitespace-pre-wrap'
-                        : 'mr-2 break-words rounded-lg bg-[#1C1916] px-2.5 py-2.5'
-                    }
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+
+            {chatAvailable && (
+              <div className="mb-3 flex min-h-0 min-w-0 flex-1 flex-col">
+                <div
+                  ref={threadRef}
+                  className="mb-2 min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain rounded-xl border border-[#D4AF37]/12 bg-[#0F0D0B]/70 p-2.5"
+                  aria-live="polite"
+                >
+                  {turns.map((turn, index) => (
+                    <div
+                      key={`${turn.role}-${index}`}
+                      className={
+                        turn.role === 'user'
+                          ? 'ml-6 break-words rounded-lg bg-[#D4AF37]/15 px-2.5 py-2 text-sm text-[#F4F1EA] whitespace-pre-wrap'
+                          : 'mr-2 break-words rounded-lg bg-[#1C1916] px-2.5 py-2.5'
+                      }
+                    >
+                      {turn.role === 'assistant' ? (
+                        <NinaMessageBody content={turn.content} />
+                      ) : (
+                        turn.content
+                      )}
+                    </div>
+                  ))}
+                  {sending && (
+                    <div className="mr-4 flex items-center gap-2 rounded-lg bg-[#1C1916] px-2.5 py-2 text-sm text-[#A39B93]">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                      Nina sta ascoltando…
+                    </div>
+                  )}
+                </div>
+
+                <form onSubmit={sendMessage} className="flex min-w-0 shrink-0 items-end gap-2">
+                  <label htmlFor={composerId} className="sr-only">
+                    Messaggio per Nina
+                  </label>
+                  <textarea
+                    id={composerId}
+                    rows={2}
+                    value={draft}
+                    onChange={(e) => setDraft(e.target.value)}
+                    disabled={sending}
+                    placeholder="Scrivi qui…"
+                    className="min-h-[2.75rem] min-w-0 flex-1 resize-none rounded-xl border border-[#D4AF37]/20 bg-[#12100E] px-3 py-2 text-sm text-[#F4F1EA] placeholder:text-[#6F675F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:opacity-60"
+                  />
+                  <button
+                    type="submit"
+                    disabled={sending || !draft.trim()}
+                    aria-label="Invia messaggio"
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/35 bg-[#D4AF37]/15 text-[#D4AF37] transition-colors hover:bg-[#D4AF37]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    {turn.role === 'assistant' ? (
-                      <NinaMessageBody content={turn.content} />
-                    ) : (
-                      turn.content
-                    )}
-                  </div>
-                ))}
-                {sending && (
-                  <div className="mr-4 flex items-center gap-2 rounded-lg bg-[#1C1916] px-2.5 py-2 text-sm text-[#A39B93]">
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
-                    Nina sta ascoltando…
-                  </div>
+                    <Send className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                </form>
+
+                {sendError && (
+                  <p className="mt-2 shrink-0 text-xs leading-relaxed text-[#C9A27A]" role="alert">
+                    {sendError}
+                  </p>
                 )}
               </div>
+            )}
 
-              <form onSubmit={sendMessage} className="flex min-w-0 items-end gap-2">
-                <label htmlFor={composerId} className="sr-only">
-                  Messaggio per Nina
-                </label>
-                <textarea
-                  id={composerId}
-                  rows={2}
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  disabled={sending}
-                  placeholder="Scrivi qui…"
-                  className="min-h-[2.75rem] min-w-0 flex-1 resize-none rounded-xl border border-[#D4AF37]/20 bg-[#12100E] px-3 py-2 text-sm text-[#F4F1EA] placeholder:text-[#6F675F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:opacity-60"
-                />
-                <button
-                  type="submit"
-                  disabled={sending || !draft.trim()}
-                  aria-label="Invia messaggio"
-                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/35 bg-[#D4AF37]/15 text-[#D4AF37] transition-colors hover:bg-[#D4AF37]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <Send className="h-4 w-4" aria-hidden="true" />
-                </button>
-              </form>
-
-              {sendError && (
-                <p className="mt-2 text-xs leading-relaxed text-[#C9A27A]" role="alert">
-                  {sendError}
-                </p>
-              )}
+            <div
+              className={`rounded-xl border border-[#D4AF37]/20 bg-[#0F0D0B]/55 p-3 ${
+                chatAvailable ? 'shrink-0' : 'mt-auto shrink-0'
+              }`}
+              role="group"
+              aria-label="Parla con Maria Teresa"
+            >
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                Parla con Maria Teresa
+              </p>
+              <ul className="space-y-2">
+                <li>
+                  <a href="/prenota" className={linkClass}>
+                    <CalendarDays className="h-4 w-4 text-[#D4AF37]" aria-hidden="true" />
+                    Prenota
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={whatsappHref(
+                      'Buongiorno Maria Teresa, vorrei scrivere in chat.'
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={linkClass}
+                  >
+                    <WhatsAppLogo className="h-4 w-4 text-[#D4AF37]" />
+                    WhatsApp
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={telegramHref()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={linkClass}
+                  >
+                    <TelegramLogo className="h-4 w-4 text-[#D4AF37]" />
+                    Telegram
+                  </a>
+                </li>
+                <li>
+                  <a href={`mailto:${SITE_EMAIL}`} className={`${linkClass} min-w-0`}>
+                    <Mail className="h-4 w-4 shrink-0 text-[#D4AF37]" aria-hidden="true" />
+                    <span className="min-w-0 break-words">Email · {SITE_EMAIL}</span>
+                  </a>
+                </li>
+              </ul>
             </div>
-          )}
-
-          <div
-            className="rounded-xl border border-[#D4AF37]/20 bg-[#0F0D0B]/55 p-3"
-            role="group"
-            aria-label="Parla con Maria Teresa"
-          >
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-              Parla con Maria Teresa
-            </p>
-            <ul className="space-y-2">
-              <li>
-                <a href="/prenota" className={linkClass}>
-                  <CalendarDays className="h-4 w-4 text-[#D4AF37]" aria-hidden="true" />
-                  Prenota
-                </a>
-              </li>
-              <li>
-                <a
-                  href={whatsappHref(
-                    'Buongiorno Maria Teresa, vorrei scrivere in chat.'
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={linkClass}
-                >
-                  <WhatsAppLogo className="h-4 w-4 text-[#D4AF37]" />
-                  WhatsApp
-                </a>
-              </li>
-              <li>
-                <a
-                  href={telegramHref()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={linkClass}
-                >
-                  <TelegramLogo className="h-4 w-4 text-[#D4AF37]" />
-                  Telegram
-                </a>
-              </li>
-              <li>
-                <a href={`mailto:${SITE_EMAIL}`} className={`${linkClass} min-w-0`}>
-                  <Mail className="h-4 w-4 shrink-0 text-[#D4AF37]" aria-hidden="true" />
-                  <span className="min-w-0 break-words">Email · {SITE_EMAIL}</span>
-                </a>
-              </li>
-            </ul>
           </div>
         </div>
       )}
