@@ -41,6 +41,7 @@ import {
   isValidPhone,
 } from '../lib/formValidation';
 import { SCREEN_PATHS } from '../lib/appPaths';
+import { readJsonResponse } from '../lib/readJsonResponse';
 import { whatsappHref } from '../lib/siteContacts';
 
 interface BookingScreenProps {
@@ -175,7 +176,10 @@ export function BookingScreen({
           },
           body: JSON.stringify({ stripeSessionId }),
         });
-        const json = (await res.json()) as { error?: string };
+        const json = await readJsonResponse<{ error?: string }>(
+          res,
+          'Conferma pagamento non riuscita. Riprova o contatta lo studio.'
+        );
         if (!res.ok) throw new Error(json.error || 'Conferma non riuscita.');
         setBookingConfirmed(true);
         setStep(3);
@@ -268,7 +272,7 @@ export function BookingScreen({
           privacyTermsAccepted: draft.privacyTermsAccepted,
         }),
       });
-      const json = (await res.json()) as {
+      const json = await readJsonResponse<{
         error?: string;
         mode?:
           | 'stripe_redirect'
@@ -277,7 +281,10 @@ export function BookingScreen({
           | 'whatsapp_handoff';
         checkoutUrl?: string;
         bookingId?: number;
-      };
+      }>(
+        res,
+        'Il server prenotazioni non ha risposto correttamente. Riprova tra poco o scrivi su WhatsApp.'
+      );
       if (!res.ok) {
         throw new Error(json.error || 'Prenotazione non riuscita.');
       }

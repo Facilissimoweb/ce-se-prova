@@ -3,6 +3,7 @@ import type { DialogueAccessStatus, DialoguePackId } from '../types/handoff';
 import { dialogueTimePacks } from '../data/siteContent';
 import { getOrCreateDialogueSessionKey, nowTimeLabel } from '../lib/dialogueSession';
 import { isValidEmail, isValidFullName } from '../lib/formValidation';
+import { readJsonResponse } from '../lib/readJsonResponse';
 import type { ChatMessage } from '../types/handoff';
 
 type GetIdToken = () => Promise<string | null>;
@@ -62,7 +63,10 @@ export function useDialogueAccess({
         }
       );
       if (!res.ok) return;
-      const json = (await res.json()) as { status?: DialogueAccessStatus };
+      const json = await readJsonResponse<{ status?: DialogueAccessStatus }>(
+        res,
+        'Stato dialogo non disponibile.'
+      );
       if (json.status) {
         applyServerStatus(json.status);
       }
@@ -86,7 +90,9 @@ export function useDialogueAccess({
             },
             body: JSON.stringify({ stripeSessionId, sessionKey }),
           });
-          const json = (await res.json()) as { status?: DialogueAccessStatus };
+          const json = await readJsonResponse<{
+            status?: DialogueAccessStatus;
+          }>(res, 'Conferma pass non riuscita.');
           if (res.ok && json.status) {
             applyServerStatus(json.status);
             setShowPassPanel(false);
@@ -163,10 +169,10 @@ export function useDialogueAccess({
         },
         body: JSON.stringify({ sessionKey }),
       });
-      const json = (await res.json()) as {
+      const json = await readJsonResponse<{
         allowed?: boolean;
         status?: DialogueAccessStatus;
-      };
+      }>(res, 'Interazione dialogo non disponibile.');
       if (json.status) {
         applyServerStatus(json.status);
       }
@@ -220,12 +226,12 @@ export function useDialogueAccess({
             customerEmail: customerEmail.trim(),
           }),
         });
-        const json = (await res.json()) as {
+        const json = await readJsonResponse<{
           error?: string;
           mode?: 'stripe_redirect' | 'direct_unlock';
           checkoutUrl?: string;
           status?: DialogueAccessStatus;
-        };
+        }>(res, 'Impossibile attivare il pass temporale. Riprova tra poco.');
         if (!res.ok) {
           throw new Error(json.error || 'Impossibile attivare il pass temporale.');
         }

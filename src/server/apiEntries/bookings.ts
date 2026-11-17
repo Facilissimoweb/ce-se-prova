@@ -2,27 +2,38 @@
  * Bookings group: POST /api/bookings, confirm-stripe.
  * Availability lives in bookingAvailability.ts (firebase-free).
  * Subpaths via vercel.json rewrite → /api/bookings?__path=…
- * Bundled by scripts/bundle-api.mjs into api/*.js for Vercel.
+ * Bundled by scripts/bundle-api.mjs into api/bookings.js.
+ *
+ * Keep this free of vercelAdapter / firebase-admin: those static imports crash
+ * the Vercel function as FUNCTION_INVOCATION_FAILED (plain text / 500 page),
+ * which Prenota then surfaces as Unexpected token 'A'… is not valid JSON.
+ * Guest WhatsApp booking (ENN-74) does not need Firebase Auth.
  */
+import { ensureSchemaOnce } from '../../db/ensureBookingSchema.ts';
 import {
   getBookingsAvailability,
   postBooking,
   postBookingConfirmStripe,
 } from '../routes/bookings.ts';
 import {
-  ensureSchemaOnce,
-  methodNotAllowed,
-  optionalUser,
   queryString,
   readBodyObject,
   requestOrigin,
-  sendApiResult,
+  sendJson,
   type NodeLikeReq,
   type NodeLikeRes,
-} from '../vercelAdapter.ts';
-import { groupSubpath, sendJson } from '../vercelEntry.ts';
+} from '../nodeHttp.ts';
+import { groupSubpath } from '../vercelEntry.ts';
 
 export const config = { runtime: 'nodejs', maxDuration: 30 };
+
+function methodNotAllowed(res: NodeLikeRes, allowed: string[]): void {
+  res.setHeader('Allow', allowed.join(', '));
+  sendJson(res, 405, {
+    error: 'Metodo non consentito.',
+    allow: allowed,
+  });
+}
 
 export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   try {
@@ -32,43 +43,51 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
     // Fallback if rewrite to booking-availability is missing (local / old deploy).
     if (path === 'availability') {
       if (method !== 'GET') return methodNotAllowed(res, ['GET']);
-      return sendApiResult(
-        res,
-        await getBookingsAvailability({
-          from: queryString(req.query?.from),
-          to: queryString(req.query?.to),
-        })
-      );
+      await ensureSchemaOnce();
+      const result = await getBookingsAvailability({
+        from: queryString(req.query?.from),
+        to: queryString(req.query?.to),
+      });
+      return sendJson(res, result.status, result.body);
     }
 
-    await ensureSchemaOnce();
-
     if (!path) {
-      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
-      const user = await optionalUser(req);
-      return sendApiResult(
-        res,
-        await postBooking({
-          user,
-          body: readBodyObject(req),
-          origin: requestOrigin(req),
-        })
-      );
+      // Browser GET looks like a “missing page”; always answer JSON with hints.
+      if (method !== 'POST') {
+        res.setHeader('Allow', 'POST');
+        return sendJson(res, 405, {
+          error: 'Metodo non consentito.',
+          allow: ['POST'],
+          hint: 'Usa POST /api/bookings per creare una prenotazione (Invia prenotazione → WhatsApp). Per gli slot: GET /api/bookings/availability?from=YYYY-MM-DD&to=YYYY-MM-DD.',
+        });
+      }
+      await ensureSchemaOnce();
+      // Guest path — no firebase-admin. uid stays null until Auth is wired on a
+      // separate light-safe entry.
+      const result = await postBooking({
+        user: null,
+        body: readBodyObject(req),
+        origin: requestOrigin(req),
+      });
+      return sendJson(res, result.status, result.body);
     }
 
     if (path === 'confirm-stripe') {
       if (method !== 'POST') return methodNotAllowed(res, ['POST']);
-      const user = await optionalUser(req);
-      return sendApiResult(
-        res,
-        await postBookingConfirmStripe({
-          user,
-          body: readBodyObject(req),
-        })
-      );
+      await ensureSchemaOnce();
+      const result = await postBookingConfirmStripe({
+        user: null,
+        body: readBodyObject(req),
+      });
+      return sendJson(res, result.status, result.body);
     }
 
-    return sendJson(res, 404, { error: 'Not found', path, method });
+    return sendJson(res, 404, {
+      error: 'Endpoint prenotazioni non trovato.',
+      path,
+      method,
+      hint: 'POST /api/bookings oppure GET /api/bookings/availability?from=&to=',
+    });
   } catch (error) {
     console.error('api/bookings handler failed:', error);
     return sendJson(res, 500, {
