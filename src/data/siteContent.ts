@@ -79,12 +79,12 @@ export const siteContent = {
     },
     testimonialsHeading: {
       cmsKey: '[COPY: siteContent.home.testimonialsHeading]',
-      liveText: 'Testimonianze',
+      liveText: 'Recensioni Google',
     },
     testimonialsIntro: {
       cmsKey: '[COPY: siteContent.home.testimonialsIntro]',
       liveText:
-        'Voci di chi ha scelto un confronto simbolico lucido e rispettoso per orientare un passaggio personale o professionale.',
+        'Le stesse recensioni pubblicate su Google da chi ha consultato Tarot Italia.',
     },
     coursesHeading: {
       cmsKey: '[COPY: siteContent.home.coursesHeading]',
@@ -441,32 +441,191 @@ export const holisticFaqs: HolisticFaqItem[] = [
 export const clientTestimonials: ClientTestimonial[] = [
   {
     id: 'test-1',
-    cmsKeyQuote: '[COPY: testimonianza.placeholder.1.quote]',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.1.quote]',
     quote:
-      'Ero davanti a un cambio di studio professionale e cercavo chiarezza sui mesi successivi. Il consulto con Maria Teresa ha unito una lettura lucida del presente a indicazioni previsionali concrete che hanno rimesso ordine nelle mie priorità.',
-    authorName: 'Chiara Bellini',
-    authorRole: 'Architetto · Milano',
-    sessionContext: 'Consulto Evolutivo · 60 min',
+      `Un'esperienza che ti cambia la prospettiva! ⭐⭐⭐⭐⭐ La lettura è stata di una precisione impressionante: ha colto aspetti della mia situazione che non avevo detto a nessuno. Non si tratta di "prevedere il futuro", ma di un vero e proprio percorso di consapevolezza. La cartomante, Teresa, è fantastica.. di un'empatia, una dolcezza e una professionalità rare. Mi ha trasmesso una serenità enorme e mi ha dato i consigli giusti per affrontare un momento di grande confusione. Il sito è intuitivo, serio e velocissimo. Consigliatissimo! Grazie di cuore ❤️`,
+    authorName: "Caterina Ercoli",
+    authorRole: "27 settembre 2026",
+    sessionContext: 'Recensione Google · 5 stelle',
   },
   {
     id: 'test-2',
-    cmsKeyQuote: '[COPY: testimonianza.placeholder.2.quote]',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.2.quote]',
     quote:
-      'Ciò che distingue Tarot Italia è la sobrietà etica: nessuna formula teatrale, solo un ascolto attento in cui gli Arcani diventano uno specchio concreto per leggere il presente con lucidità.',
-    authorName: 'Lorenzo Ferretti',
-    authorRole: 'Consulente Editoriale · Roma',
-    sessionContext: 'Sessione Integrata · 90 min',
+      "Una professionista attenta e sempre disponibile, la consiglio a chi come me ha scoperto da poco il mondo dei tarocchi :)",
+    authorName: "Anna Moriconi",
+    authorRole: "30 agosto 2026",
+    sessionContext: 'Recensione Google · 5 stelle',
   },
   {
     id: 'test-3',
-    cmsKeyQuote: '[COPY: testimonianza.placeholder.3.quote]',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.3.quote]',
     quote:
-      'In un momento di transizione familiare avevo bisogno di fermarmi senza giudizio. I quarantacinque minuti insieme mi hanno lasciato chiarezza e una sintesi scritta preziosa su cui lavorare.',
-    authorName: 'Giulia Marchetti',
-    authorRole: 'Docente · Bologna',
-    sessionContext: 'Consulto Essenziale · 45 min',
+      `Teresa è una grandissima professionista del mestiere , gentile e disponibile.
+La consultazione è stata molto interessante e precisa , Teresa nei suoi modi e con la sua voce suave fornisce interpretazioni dettagliate e capaci di guidarti al fin di far quadrare ciò che ti dà pensiero.
+☺️`,
+    authorName: "zoe di giacomo",
+    authorRole: "10 agosto 2026",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-4',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.4.quote]',
+    quote:
+      "Ho fatto una consulenza con Teresa, mi sono trovata benissimo, lei sa leggere oltre, a livello molto più profondo, scende nel tuo sé interiore, ti aiuta a guardarti dentro e dare una lettura completa della tua vita, ti accompagna in un viaggio di introspezione molto emozionante. Tornerò sicuramente ❤️",
+    authorName: "Maureen",
+    authorRole: "14 luglio 2026",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-5',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.5.quote]',
+    quote:
+      "ragazza estremamente gentile e professionale. la lettura dei tarocchi durata un’ora, è stata approfondita e coinvolgente: ha descritto con sorprendente precisione ciò che stavo vivendo, facendomi sentire ascoltata e compresa. la consiglio vivamente ❤️",
+    authorName: "Martina Rossetti",
+    authorRole: "11 luglio 2026",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-6',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.6.quote]',
+    quote:
+      "Sei una persona speciale e bravissima unica tvtb",
+    authorName: "Giuseppina Frassino",
+    authorRole: "4 gennaio 2026",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-7',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.7.quote]',
+    quote:
+      "Bellissima esperienza, grazie!!!",
+    authorName: "Maria Cristina Lombardo",
+    authorRole: "3 gennaio 2026",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-8',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.8.quote]',
+    quote:
+      "Teresa è stata gentilissima nei miei confronti, pronta ad ascoltarmi e a darmi qualunque risposta io volessi. Mi ha fatta sentire molto a mio agio🥰",
+    authorName: "Francesca D'Emma",
+    authorRole: "30 settembre 2025",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-9',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.9.quote]',
+    quote:
+      "Persona seria e competente, le ho dato 5 stelle perché consiglio vivamente un consulto con lei!",
+    authorName: "Elisa Salutari",
+    authorRole: "2 settembre 2025",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-10',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.10.quote]',
+    quote:
+      `Teresa è una persona meravigliosa. Fin da subito mi sono sentita in sintonia con lei… È empatica, sa ascoltare e soprattutto non ti fa sentire giudicata. Dalle sue letture si percepisce gli anni di esperienza e sa sicuramente darti più strade e più visioni sulla propria situazione. Esperienza sicuramente da rifare 🥰
+Teresa è indubbiamente la persona più affidabile anche per chi non ha mai conosciuto il mondo dei tarocchi e ci si vuole interfacciare 🫶🏻`,
+    authorName: "Adela Vasile",
+    authorRole: "30 agosto 2025",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-11',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.11.quote]',
+    quote:
+      "Ho conosciuto Teresa ieri sera,abbiamo iniziato a chiacchierare di questioni sentimentali e lei mi ha proposto di interrogare le carte.. Molte cose che lei mi ha detto corrispondevano a quanto mi stesse accadendo e sono tornata a casa con il desiderio di verificare le altre..sicura tornerò da lei, mi è sembrata molto brava.",
+    authorName: "Martina Canesin",
+    authorRole: "27 agosto 2025",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-12',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.12.quote]',
+    quote:
+      "Professionalità, umanità e personale tecnicamente ineccepibile.",
+    authorName: "ELENA ANGELINI",
+    authorRole: "23 agosto 2025",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-13',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.13.quote]',
+    quote:
+      "Con lei mi sono sentita a mio agio: ascolta con attenzione e riesce a leggere i tarocchi con precisione e sensibilità. Le sue parole arrivano con delicatezza, senza giudicare. Un  consulto sincero, umano e illuminante in un momento incerto",
+    authorName: "Fabbrica d'Ideali",
+    authorRole: "22 agosto 2025",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-14',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.14.quote]',
+    quote:
+      "Ho contattato oggi Teresa per caso e il caso ha voluto che ci incontrassimo proprio oggi! Siamo entrate subito in sintonia e lei è stata molto precisa sulla sua lettura utilizzando diversi metodi! Mi ha ascoltata attentamente e mi ha dato anche consigli su come affrontare le situazioni! Sicuramente da provare 🌸",
+    authorName: "Ilaria",
+    authorRole: "3 maggio 2025",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-15',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.15.quote]',
+    quote:
+      `Professionista seria e preparata .
+Molto consigliata.`,
+    authorName: "Silvia Scagnetti",
+    authorRole: "13 aprile 2025",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-16',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.16.quote]',
+    quote:
+      `Seria ,profonda brava. Ti accompagna per mano nel viaggio della tua vita dei tuoi sentimenti e delle tue emozioni piu profonde.
+Assolutamente la consiglio!!!!`,
+    authorName: "cecilia massetani",
+    authorRole: "10 aprile 2025",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-17',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.17.quote]',
+    quote:
+      "Lettura molto esplicativa, ambiente ed energia accogliente e tranquillo. Esperienza da rifare assolutamente! ❤️✨",
+    authorName: "Leonardo Sperandini",
+    authorRole: "10 aprile 2025",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-18',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.18.quote]',
+    quote:
+      "Teresa è stata eccezionale! La sua lettura delle carte è stata incredibilmente precisa e dettagliata, dandomi una visione chiara della mia situazione. Ho apprezzato molto la sua professionalità, empatia e capacità di ascolto.Non solo ha interpretato le carte, ma mi ha anche offerto consigli pratici e spunti di riflessione utili. La consiglio vivamente a chi cerca una cartomante seria e competente.",
+    authorName: "Valentina Sodano",
+    authorRole: "4 febbraio 2025",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-19',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.19.quote]',
+    quote:
+      "Ottima cartomante sia per problemi sentimentali e lavorativi. Disponibile e simpatica. La consiglio vivamente! Grazie Teresa",
+    authorName: "Laurie Capasso",
+    authorRole: "1 febbraio 2025",
+    sessionContext: 'Recensione Google · 5 stelle',
+  },
+  {
+    id: 'test-20',
+    cmsKeyQuote: '[COPY: testimonianza.v2-google.20.quote]',
+    quote:
+      `Seria e professionale. Disponibile all'ascolto e vera. Consiglio!`,
+    authorName: "Daniela Carcereri",
+    authorRole: "1 febbraio 2025",
+    sessionContext: 'Recensione Google · 5 stelle',
   },
 ];
+
 
 export const consultationTariffs: ConsultationTariff[] = [
   {
