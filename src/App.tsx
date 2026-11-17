@@ -294,37 +294,33 @@ export function App() {
                   Lettura del presente e del futuro · chiamata vocale online e
                   di persona a Macerata
                 </p>
-                <address className="not-italic space-y-2 text-[13px] leading-relaxed text-[#C8C0B6]">
-                  <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                    <a
-                      href="mailto:info@tarotitalia.com"
-                      className="text-[#F4F1EA] hover:text-[#D4AF37] transition-colors"
-                    >
-                      info@tarotitalia.com
-                    </a>
-                    <span className="text-[#A39B93]/55" aria-hidden="true">
-                      ·
-                    </span>
+                <div className="space-y-3 max-w-[20rem]">
+                  <div className="flex flex-col gap-2.5">
                     <a
                       href="tel:+393791038253"
-                      className="text-[#F4F1EA] hover:text-[#D4AF37] transition-colors"
+                      className="cta-label inline-flex min-h-[44px] w-full items-center justify-center rounded-lg border border-[#D4AF37]/30 bg-[#12100E]/80 px-4 py-2.5 text-[13px] font-medium text-[#F4F1EA] transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
                     >
                       379 103 82 53
                     </a>
-                  </p>
-                  <p>
+                    <a
+                      href="mailto:info@tarotitalia.com"
+                      className="cta-label inline-flex min-h-[44px] w-full items-center justify-center rounded-lg border border-[#D4AF37]/30 bg-[#12100E]/80 px-4 py-2.5 text-[13px] font-medium text-[#F4F1EA] transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                    >
+                      info@tarotitalia.com
+                    </a>
                     <button
                       type="button"
-                      onClick={() => handleNavigate('contatti')}
-                      className="hover:text-[#D4AF37] transition-colors text-left"
+                      tabIndex={-1}
+                      aria-label="Partita IVA 02136780430"
+                      className="cta-label inline-flex min-h-[44px] w-full cursor-default items-center justify-center rounded-lg border border-[#D4AF37]/25 bg-[#12100E]/70 px-4 py-2.5 text-[12px] font-medium tracking-[0.08em] text-[#C8C0B6]"
                     >
-                      Via Crispi 37, 62100 Macerata
+                      P.IVA 02136780430
                     </button>
+                  </div>
+                  <p className="px-0.5 text-[13px] leading-relaxed text-[#A39B93]">
+                    Via Crispi 37, 62100 Macerata
                   </p>
-                  <p className="pt-0.5 text-[12px] tracking-[0.08em] text-[#A39B93]/90">
-                    P.IVA 02136780430
-                  </p>
-                </address>
+                </div>
                 <SocialShareButtons activeScreen={activeScreen} />
               </div>
 
