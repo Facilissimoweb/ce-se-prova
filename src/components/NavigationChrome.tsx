@@ -69,7 +69,7 @@ const NAV_ITEMS: {
   {
     id: 'news',
     label: 'Blog',
-    subtitle: 'Scritti da Substack @tarotitalia',
+    subtitle: 'Articoli e riflessioni',
     icon: Newspaper,
   },
   {

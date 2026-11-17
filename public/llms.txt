@@ -28,7 +28,7 @@ Every session includes Maggiori and Minori.
 - Consulti: /consulti
 - Dialogo Tarot: /dialogo
 - Corsi (didattica a breve — catalog not open yet): /corsi
-- Blog / News (Substack @tarotitalia): /news
+- Blog / News (placeholder — nuova piattaforma in arrivo): /news
 - Contatti: /contatti
 - Prenota: /prenota
 - Privacy: /privacy

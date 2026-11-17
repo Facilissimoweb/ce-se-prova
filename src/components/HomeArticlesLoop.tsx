@@ -4,9 +4,8 @@ import type { ScreenId } from '../types/handoff';
 import {
   fetchNewsArticles,
   formatArticleDate,
-  SUBSTACK_HOME_URL,
-  type SubstackArticle,
-} from '../lib/substackFeed';
+  type NewsArticle,
+} from '../lib/newsFeed';
 
 type Props = {
   onNavigate: (screen: ScreenId) => void;
@@ -15,11 +14,9 @@ type Props = {
 const ROTATE_MS = 5500;
 
 export function HomeArticlesLoop({ onNavigate }: Props) {
-  const [articles, setArticles] = useState<SubstackArticle[]>([]);
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [index, setIndex] = useState(0);
-  const [status, setStatus] = useState<'loading' | 'ready' | 'empty' | 'error'>(
-    'loading'
-  );
+  const [status, setStatus] = useState<'loading' | 'ready' | 'empty'>('loading');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -29,7 +26,10 @@ export function HomeArticlesLoop({ onNavigate }: Props) {
         setStatus(data.articles.length > 0 ? 'ready' : 'empty');
       })
       .catch(() => {
-        if (!controller.signal.aborted) setStatus('error');
+        if (!controller.signal.aborted) {
+          setArticles([]);
+          setStatus('empty');
+        }
       });
     return () => controller.abort();
   }, []);
@@ -58,11 +58,10 @@ export function HomeArticlesLoop({ onNavigate }: Props) {
             id="home-news-heading"
             className="font-body text-2xl md:text-[28px] md:leading-[36px] font-semibold tracking-[-0.02em] text-[#F4F1EA]"
           >
-            Ultimi scritti da Substack
+            Dal Blog
           </h2>
           <p className="text-sm text-[#A39B93]">
-            Aggiornamenti da Maria Teresa Rogani — si aggiornano automaticamente
-            dal feed pubblico.
+            Scritti e aggiornamenti di Maria Teresa Rogani.
           </p>
         </div>
         <button
@@ -82,26 +81,14 @@ export function HomeArticlesLoop({ onNavigate }: Props) {
           </div>
         )}
 
-        {(status === 'empty' || status === 'error') && (
+        {status === 'empty' && (
           <div className="px-6 py-8 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
             <div className="flex items-start gap-3">
               <Newspaper className="w-5 h-5 text-[#D4AF37] shrink-0 mt-0.5" />
               <div className="space-y-1">
-                <p className="text-sm text-[#F4F1EA]">
-                  {status === 'error'
-                    ? 'Non riesco a leggere il feed in questo momento.'
-                    : 'Gli articoli appariranno qui non appena pubblicati su Substack.'}
-                </p>
+                <p className="text-sm text-[#F4F1EA]">Nuovi articoli in arrivo</p>
                 <p className="text-xs text-[#A39B93]">
-                  Profilo:{' '}
-                  <a
-                    href={SUBSTACK_HOME_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#D4AF37] hover:text-[#E6C65C]"
-                  >
-                    tarotitalia.substack.com
-                  </a>
+                  Stiamo preparando una nuova casa per il Blog.
                 </p>
               </div>
             </div>
@@ -151,7 +138,7 @@ export function HomeArticlesLoop({ onNavigate }: Props) {
                     </p>
                   )}
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#D4AF37] pt-1">
-                    Leggi su Substack
+                    Leggi l&apos;articolo
                     <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                   </span>
                 </div>

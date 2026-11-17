@@ -1,24 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowUpRight, Newspaper } from 'lucide-react';
+import { ArrowLeft, Newspaper } from 'lucide-react';
 import type { ScreenId } from '../types/handoff';
 import {
   fetchNewsArticles,
   formatArticleDate,
-  SUBSTACK_HOME_URL,
-  SUBSTACK_PROFILE_URL,
-  type SubstackArticle,
-} from '../lib/substackFeed';
+  type NewsArticle,
+} from '../lib/newsFeed';
 
 type Props = {
   onNavigate: (screen: ScreenId) => void;
 };
 
 export function NewsScreen({ onNavigate }: Props) {
-  const [articles, setArticles] = useState<SubstackArticle[]>([]);
-  const [status, setStatus] = useState<'loading' | 'ready' | 'empty' | 'error'>(
-    'loading'
-  );
-  const [errorDetail, setErrorDetail] = useState<string | null>(null);
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'empty'>('loading');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -27,10 +22,11 @@ export function NewsScreen({ onNavigate }: Props) {
         setArticles(data.articles);
         setStatus(data.articles.length > 0 ? 'ready' : 'empty');
       })
-      .catch((err: unknown) => {
+      .catch(() => {
         if (controller.signal.aborted) return;
-        setErrorDetail(err instanceof Error ? err.message : String(err));
-        setStatus('error');
+        // Feed disconnesso: preferisci empty state stabile invece di errori.
+        setArticles([]);
+        setStatus('empty');
       });
     return () => controller.abort();
   }, []);
@@ -51,19 +47,11 @@ export function NewsScreen({ onNavigate }: Props) {
           News · Articoli
         </p>
         <h1 className="font-display text-3xl leading-tight text-[#F4F1EA] md:text-4xl">
-          Scritti da Substack
+          Blog
         </h1>
         <p className="max-w-2xl text-sm leading-relaxed text-[#A39B93]">
-          Gli articoli di Maria Teresa Rogani su{' '}
-          <a
-            href={SUBSTACK_PROFILE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#D4AF37] underline decoration-[#D4AF37]/40 underline-offset-2 hover:text-[#E6C65C]"
-          >
-            @tarotitalia
-          </a>{' '}
-          compaiono qui automaticamente dal feed pubblico.
+          Spazio per gli scritti e le riflessioni di Maria Teresa Rogani su
+          tarologia, simboli e percorso evolutivo.
         </p>
       </header>
 
@@ -71,53 +59,21 @@ export function NewsScreen({ onNavigate }: Props) {
         <p className="text-sm text-[#A39B93]">Caricamento articoli…</p>
       )}
 
-      {status === 'error' && (
-        <div className="glass-tier-1 rounded-2xl border border-[#D4AF37]/20 p-6 space-y-3 max-w-2xl">
-          <div className="flex items-center gap-2 text-[#D4AF37]">
-            <Newspaper className="w-4 h-4" />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em]">
-              Feed temporaneamente non raggiungibile
-            </span>
-          </div>
-          <p className="text-sm text-[#A39B93]">
-            {errorDetail || 'Riprova tra poco, oppure apri Substack direttamente.'}
-          </p>
-          <a
-            href={SUBSTACK_HOME_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-[#D4AF37] hover:text-[#E6C65C]"
-          >
-            Apri tarotitalia.substack.com
-            <ArrowUpRight className="w-4 h-4" />
-          </a>
-        </div>
-      )}
-
       {status === 'empty' && (
-        <div className="glass-tier-1 rounded-2xl border border-[#D4AF37]/20 p-6 md:p-8 space-y-4 max-w-2xl">
+        <div className="glass-tier-1 rounded-2xl border border-[#D4AF37]/20 p-6 md:p-8 space-y-3 max-w-2xl">
           <div className="flex items-center gap-2 text-[#D4AF37]">
             <Newspaper className="w-4 h-4" />
             <span className="text-[11px] font-semibold uppercase tracking-[0.08em]">
-              In attesa del primo articolo
+              Presto online
             </span>
           </div>
-          <p className="text-sm leading-relaxed text-[#A39B93]">
-            Il feed{' '}
-            <code className="text-[#F4F1EA]/90">tarotitalia.substack.com/feed</code>{' '}
-            è attivo e risponde, ma non contiene ancora post pubblici. Quando
-            pubblichi su Substack, gli articoli appariranno qui senza altre
-            modifiche al sito.
+          <p className="font-display text-xl text-[#F4F1EA]">
+            Nuovi articoli in arrivo
           </p>
-          <a
-            href={SUBSTACK_HOME_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="cta-label inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30 hover:border-[#D4AF37] text-sm font-medium text-[#F4F1EA]"
-          >
-            Vai a Substack
-            <ArrowUpRight className="w-4 h-4 text-[#D4AF37]" />
-          </a>
+          <p className="text-sm leading-relaxed text-[#A39B93]">
+            Stiamo preparando una nuova casa per il Blog. Torna a trovarci
+            presto: gli scritti di Maria Teresa compariranno qui.
+          </p>
         </div>
       )}
 
@@ -160,8 +116,7 @@ export function NewsScreen({ onNavigate }: Props) {
                     </p>
                   )}
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#D4AF37] pt-1">
-                    Leggi su Substack
-                    <ArrowUpRight className="w-3.5 h-3.5" />
+                    Leggi l&apos;articolo
                   </span>
                 </div>
               </a>
