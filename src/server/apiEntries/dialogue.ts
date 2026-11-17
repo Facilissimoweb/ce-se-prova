@@ -1,8 +1,13 @@
 /**
  * Dialogue group: status, checkout, confirm-stripe, unlock, interact.
  * Subpaths via vercel.json → /api/dialogue?__path=…
- * Bundled by scripts/bundle-api.mjs into api/*.js for Vercel.
+ * Bundled by scripts/bundle-api.mjs into api/dialogue.js.
+ *
+ * Keep free of vercelAdapter / firebase-admin static imports — those crash the
+ * Vercel function as FUNCTION_INVOCATION_FAILED (plain text). Guest sessionKey
+ * dialogue works without Firebase Auth.
  */
+import { ensureSchemaOnce } from '../../db/ensureBookingSchema.ts';
 import {
   getDialogueStatus,
   postDialogueCheckout,
@@ -11,19 +16,21 @@ import {
   postDialogueUnlock,
 } from '../routes/dialogue.ts';
 import {
-  ensureSchemaOnce,
-  methodNotAllowed,
-  optionalUser,
   queryString,
   readBodyObject,
   requestOrigin,
-  sendApiResult,
+  sendJson,
   type NodeLikeReq,
   type NodeLikeRes,
-} from '../vercelAdapter.ts';
-import { groupSubpath, sendJson } from '../vercelEntry.ts';
+} from '../nodeHttp.ts';
+import { groupSubpath } from '../vercelEntry.ts';
 
 export const config = { runtime: 'nodejs', maxDuration: 30 };
+
+function methodNotAllowed(res: NodeLikeRes, allowed: string[]): void {
+  res.setHeader('Allow', allowed.join(', '));
+  sendJson(res, 405, { error: 'Metodo non consentito.', allow: allowed });
+}
 
 export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   try {
@@ -32,72 +39,64 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
     // Non-fatal if Postgres is down — routes return JSON 5xx instead of hanging.
     await ensureSchemaOnce();
 
+    // Guest sessionKey path — no firebase-admin on this function.
+    const user = null;
+
     if (path === 'status') {
       if (method !== 'GET') return methodNotAllowed(res, ['GET']);
-      const user = await optionalUser(req);
-      return sendApiResult(
-        res,
-        await getDialogueStatus({
-          user,
-          sessionKey: queryString(req.query?.sessionKey),
-        })
-      );
+      const result = await getDialogueStatus({
+        user,
+        sessionKey: queryString(req.query?.sessionKey),
+      });
+      return sendJson(res, result.status, result.body);
     }
 
     if (path === 'interact') {
       if (method !== 'POST') return methodNotAllowed(res, ['POST']);
-      const user = await optionalUser(req);
-      return sendApiResult(
-        res,
-        await postDialogueInteract({
-          user,
-          body: readBodyObject(req),
-        })
-      );
+      const result = await postDialogueInteract({
+        user,
+        body: readBodyObject(req),
+      });
+      return sendJson(res, result.status, result.body);
     }
 
     if (path === 'unlock') {
       if (method !== 'POST') return methodNotAllowed(res, ['POST']);
-      const user = await optionalUser(req);
-      return sendApiResult(
-        res,
-        await postDialogueUnlock({
-          user,
-          body: readBodyObject(req),
-        })
-      );
+      const result = await postDialogueUnlock({
+        user,
+        body: readBodyObject(req),
+      });
+      return sendJson(res, result.status, result.body);
     }
 
     if (path === 'checkout') {
       if (method !== 'POST') return methodNotAllowed(res, ['POST']);
-      const user = await optionalUser(req);
-      return sendApiResult(
-        res,
-        await postDialogueCheckout({
-          user,
-          body: readBodyObject(req),
-          origin: requestOrigin(req),
-        })
-      );
+      const result = await postDialogueCheckout({
+        user,
+        body: readBodyObject(req),
+        origin: requestOrigin(req),
+      });
+      return sendJson(res, result.status, result.body);
     }
 
     if (path === 'confirm-stripe') {
       if (method !== 'POST') return methodNotAllowed(res, ['POST']);
-      const user = await optionalUser(req);
-      return sendApiResult(
-        res,
-        await postDialogueConfirmStripe({
-          user,
-          body: readBodyObject(req),
-        })
-      );
+      const result = await postDialogueConfirmStripe({
+        user,
+        body: readBodyObject(req),
+      });
+      return sendJson(res, result.status, result.body);
     }
 
-    return sendJson(res, 404, { error: 'Not found', path, method });
+    return sendJson(res, 404, {
+      error: 'Endpoint dialogo non trovato.',
+      path,
+      method,
+    });
   } catch (error) {
     console.error('api/dialogue handler failed:', error);
     return sendJson(res, 500, {
-      error: 'Internal server error',
+      error: 'Errore interno del server dialogo.',
       detail: error instanceof Error ? error.message : String(error),
     });
   }
