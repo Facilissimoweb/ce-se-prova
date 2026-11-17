@@ -7,6 +7,7 @@
  * Vercel function as FUNCTION_INVOCATION_FAILED (plain text), which Prenota
  * then surfaces as a JSON.parse error.
  */
+import { ensureSchemaOnce } from '../../db/ensureBookingSchema.ts';
 import { getBookingsAvailability } from '../routes/bookings.ts';
 import {
   queryString,
@@ -24,6 +25,9 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
       res.setHeader('Allow', 'GET');
       return sendJson(res, 405, { error: 'Metodo non consentito.' });
     }
+
+    // Light entry: bootstrap schema without vercelAdapter / firebase-admin.
+    await ensureSchemaOnce();
 
     const result = await getBookingsAvailability({
       from: queryString(req.query?.from),

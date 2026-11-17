@@ -4,6 +4,9 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
+// node_modules/drizzle-orm/node-postgres/driver.js
+import pg2 from "pg";
+
 // node_modules/drizzle-orm/entity.js
 var entityKind = /* @__PURE__ */ Symbol.for("drizzle:entityKind");
 function is(value, type) {
@@ -29,6 +32,61 @@ function is(value, type) {
   }
   return false;
 }
+
+// node_modules/drizzle-orm/logger.js
+var ConsoleLogWriter = class {
+  static [entityKind] = "ConsoleLogWriter";
+  write(message) {
+    console.log(message);
+  }
+};
+var DefaultLogger = class {
+  static [entityKind] = "DefaultLogger";
+  writer;
+  constructor(config2) {
+    this.writer = config2?.writer ?? new ConsoleLogWriter();
+  }
+  logQuery(query, params) {
+    const stringifiedParams = params.map((p) => {
+      try {
+        return JSON.stringify(p);
+      } catch {
+        return String(p);
+      }
+    });
+    const paramsStr = stringifiedParams.length ? ` -- params: [${stringifiedParams.join(", ")}]` : "";
+    this.writer.write(`Query: ${query}${paramsStr}`);
+  }
+};
+var NoopLogger = class {
+  static [entityKind] = "NoopLogger";
+  logQuery() {
+  }
+};
+
+// node_modules/drizzle-orm/query-promise.js
+var QueryPromise = class {
+  static [entityKind] = "QueryPromise";
+  [Symbol.toStringTag] = "QueryPromise";
+  catch(onRejected) {
+    return this.then(void 0, onRejected);
+  }
+  finally(onFinally) {
+    return this.then(
+      (value) => {
+        onFinally?.();
+        return value;
+      },
+      (reason) => {
+        onFinally?.();
+        throw reason;
+      }
+    );
+  }
+  then(onFulfilled, onRejected) {
+    return this.execute().then(onFulfilled, onRejected);
+  }
+};
 
 // node_modules/drizzle-orm/column.js
 var Column = class {
@@ -1231,85 +1289,71 @@ function mapColumnsInSQLToAlias(query, alias) {
   }));
 }
 
-// node_modules/drizzle-orm/errors.js
-var DrizzleError = class extends Error {
-  static [entityKind] = "DrizzleError";
-  constructor({ message, cause }) {
-    super(message);
-    this.name = "DrizzleError";
-    this.cause = cause;
-  }
-};
-var DrizzleQueryError = class _DrizzleQueryError extends Error {
-  constructor(query, params, cause) {
-    super(`Failed query: ${query}
-params: ${params}`);
-    this.query = query;
-    this.params = params;
-    this.cause = cause;
-    Error.captureStackTrace(this, _DrizzleQueryError);
-    if (cause) this.cause = cause;
-  }
-};
-var TransactionRollbackError = class extends DrizzleError {
-  static [entityKind] = "TransactionRollbackError";
-  constructor() {
-    super({ message: "Rollback" });
-  }
-};
-
-// node_modules/drizzle-orm/logger.js
-var ConsoleLogWriter = class {
-  static [entityKind] = "ConsoleLogWriter";
-  write(message) {
-    console.log(message);
-  }
-};
-var DefaultLogger = class {
-  static [entityKind] = "DefaultLogger";
-  writer;
+// node_modules/drizzle-orm/selection-proxy.js
+var SelectionProxyHandler = class _SelectionProxyHandler {
+  static [entityKind] = "SelectionProxyHandler";
+  config;
   constructor(config2) {
-    this.writer = config2?.writer ?? new ConsoleLogWriter();
+    this.config = { ...config2 };
   }
-  logQuery(query, params) {
-    const stringifiedParams = params.map((p) => {
-      try {
-        return JSON.stringify(p);
-      } catch {
-        return String(p);
+  get(subquery, prop) {
+    if (prop === "_") {
+      return {
+        ...subquery["_"],
+        selectedFields: new Proxy(
+          subquery._.selectedFields,
+          this
+        )
+      };
+    }
+    if (prop === ViewBaseConfig) {
+      return {
+        ...subquery[ViewBaseConfig],
+        selectedFields: new Proxy(
+          subquery[ViewBaseConfig].selectedFields,
+          this
+        )
+      };
+    }
+    if (typeof prop === "symbol") {
+      return subquery[prop];
+    }
+    const columns = is(subquery, Subquery) ? subquery._.selectedFields : is(subquery, View) ? subquery[ViewBaseConfig].selectedFields : subquery;
+    const value = columns[prop];
+    if (is(value, SQL.Aliased)) {
+      if (this.config.sqlAliasedBehavior === "sql" && !value.isSelectionField) {
+        return value.sql;
       }
-    });
-    const paramsStr = stringifiedParams.length ? ` -- params: [${stringifiedParams.join(", ")}]` : "";
-    this.writer.write(`Query: ${query}${paramsStr}`);
-  }
-};
-var NoopLogger = class {
-  static [entityKind] = "NoopLogger";
-  logQuery() {
-  }
-};
-
-// node_modules/drizzle-orm/query-promise.js
-var QueryPromise = class {
-  static [entityKind] = "QueryPromise";
-  [Symbol.toStringTag] = "QueryPromise";
-  catch(onRejected) {
-    return this.then(void 0, onRejected);
-  }
-  finally(onFinally) {
-    return this.then(
-      (value) => {
-        onFinally?.();
+      const newValue = value.clone();
+      newValue.isSelectionField = true;
+      return newValue;
+    }
+    if (is(value, SQL)) {
+      if (this.config.sqlBehavior === "sql") {
         return value;
-      },
-      (reason) => {
-        onFinally?.();
-        throw reason;
       }
-    );
-  }
-  then(onFulfilled, onRejected) {
-    return this.execute().then(onFulfilled, onRejected);
+      throw new Error(
+        `You tried to reference "${prop}" field from a subquery, which is a raw SQL field, but it doesn't have an alias declared. Please add an alias to the field using ".as('alias')" method.`
+      );
+    }
+    if (is(value, Column)) {
+      if (this.config.alias) {
+        return new Proxy(
+          value,
+          new ColumnAliasProxyHandler(
+            new Proxy(
+              value.table,
+              new TableAliasProxyHandler(this.config.alias, this.config.replaceOriginalName ?? false)
+            )
+          )
+        );
+      }
+      return value;
+    }
+    if (typeof value !== "object" || value === null) {
+      return value;
+    }
+    return new Proxy(value, new _SelectionProxyHandler(this.config));
   }
 };
 
@@ -2876,6 +2920,115 @@ var pgTable = (name, columns, extraConfig) => {
   return pgTableWithSchema(name, columns, extraConfig, void 0);
 };
 
+// node_modules/drizzle-orm/pg-core/indexes.js
+var IndexBuilderOn = class {
+  constructor(unique, name) {
+    this.unique = unique;
+    this.name = name;
+  }
+  static [entityKind] = "PgIndexBuilderOn";
+  on(...columns) {
+    return new IndexBuilder(
+      columns.map((it) => {
+        if (is(it, SQL)) {
+          return it;
+        }
+        it = it;
+        const clonedIndexedColumn = new IndexedColumn(it.name, !!it.keyAsName, it.columnType, it.indexConfig);
+        it.indexConfig = JSON.parse(JSON.stringify(it.defaultConfig));
+        return clonedIndexedColumn;
+      }),
+      this.unique,
+      false,
+      this.name
+    );
+  }
+  onOnly(...columns) {
+    return new IndexBuilder(
+      columns.map((it) => {
+        if (is(it, SQL)) {
+          return it;
+        }
+        it = it;
+        const clonedIndexedColumn = new IndexedColumn(it.name, !!it.keyAsName, it.columnType, it.indexConfig);
+        it.indexConfig = it.defaultConfig;
+        return clonedIndexedColumn;
+      }),
+      this.unique,
+      true,
+      this.name
+    );
+  }
+  /**
+   * Specify what index method to use. Choices are `btree`, `hash`, `gist`, `spgist`, `gin`, `brin`, or user-installed access methods like `bloom`. The default method is `btree.
+   *
+   * If you have the `pg_vector` extension installed in your database, you can use the `hnsw` and `ivfflat` options, which are predefined types.
+   *
+   * **You can always specify any string you want in the method, in case Drizzle doesn't have it natively in its types**
+   *
+   * @param method The name of the index method to be used
+   * @param columns
+   * @returns
+   */
+  using(method, ...columns) {
+    return new IndexBuilder(
+      columns.map((it) => {
+        if (is(it, SQL)) {
+          return it;
+        }
+        it = it;
+        const clonedIndexedColumn = new IndexedColumn(it.name, !!it.keyAsName, it.columnType, it.indexConfig);
+        it.indexConfig = JSON.parse(JSON.stringify(it.defaultConfig));
+        return clonedIndexedColumn;
+      }),
+      this.unique,
+      true,
+      this.name,
+      method
+    );
+  }
+};
+var IndexBuilder = class {
+  static [entityKind] = "PgIndexBuilder";
+  /** @internal */
+  config;
+  constructor(columns, unique, only, name, method = "btree") {
+    this.config = {
+      name,
+      columns,
+      unique,
+      only,
+      method
+    };
+  }
+  concurrently() {
+    this.config.concurrently = true;
+    return this;
+  }
+  with(obj) {
+    this.config.with = obj;
+    return this;
+  }
+  where(condition) {
+    this.config.where = condition;
+    return this;
+  }
+  /** @internal */
+  build(table) {
+    return new Index(this.config, table);
+  }
+};
+var Index = class {
+  static [entityKind] = "PgIndex";
+  config;
+  constructor(config2, table) {
+    this.config = { ...config2, table };
+  }
+};
+function uniqueIndex(name) {
+  return new IndexBuilderOn(true, name);
+}
+
 // node_modules/drizzle-orm/pg-core/primary-keys.js
 var PrimaryKeyBuilder = class {
   static [entityKind] = "PgPrimaryKeyBuilder";
@@ -2903,6 +3056,85 @@ var PrimaryKey = class {
   name;
   getName() {
     return this.name ?? `${this.table[PgTable.Symbol.Name]}_${this.columns.map((column) => column.name).join("_")}_pk`;
+  }
+};
+
+// node_modules/drizzle-orm/casing.js
+function toSnakeCase(input) {
+  const words = input.replace(/['\u2019]/g, "").match(/[\da-z]+|[A-Z]+(?![a-z])|[A-Z][\da-z]+/g) ?? [];
+  return words.map((word) => word.toLowerCase()).join("_");
+}
+function toCamelCase(input) {
+  const words = input.replace(/['\u2019]/g, "").match(/[\da-z]+|[A-Z]+(?![a-z])|[A-Z][\da-z]+/g) ?? [];
+  return words.reduce((acc, word, i) => {
+    const formattedWord = i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.slice(1)}`;
+    return acc + formattedWord;
+  }, "");
+}
+function noopCase(input) {
+  return input;
+}
+var CasingCache = class {
+  static [entityKind] = "CasingCache";
+  /** @internal */
+  cache = {};
+  cachedTables = {};
+  convert;
+  constructor(casing) {
+    this.convert = casing === "snake_case" ? toSnakeCase : casing === "camelCase" ? toCamelCase : noopCase;
+  }
+  getColumnCasing(column) {
+    if (!column.keyAsName) return column.name;
+    const schema = column.table[Table.Symbol.Schema] ?? "public";
+    const tableName = column.table[Table.Symbol.OriginalName];
+    const key = `${schema}.${tableName}.${column.name}`;
+    if (!this.cache[key]) {
+      this.cacheTable(column.table);
+    }
+    return this.cache[key];
+  }
+  cacheTable(table) {
+    const schema = table[Table.Symbol.Schema] ?? "public";
+    const tableName = table[Table.Symbol.OriginalName];
+    const tableKey = `${schema}.${tableName}`;
+    if (!this.cachedTables[tableKey]) {
+      for (const column of Object.values(table[Table.Symbol.Columns])) {
+        const columnKey = `${tableKey}.${column.name}`;
+        this.cache[columnKey] = this.convert(column.name);
+      }
+      this.cachedTables[tableKey] = true;
+    }
+  }
+  clearCache() {
+    this.cache = {};
+    this.cachedTables = {};
+  }
+};
+
+// node_modules/drizzle-orm/errors.js
+var DrizzleError = class extends Error {
+  static [entityKind] = "DrizzleError";
+  constructor({ message, cause }) {
+    super(message);
+    this.name = "DrizzleError";
+    this.cause = cause;
+  }
+};
+var DrizzleQueryError = class _DrizzleQueryError extends Error {
+  constructor(query, params, cause) {
+    super(`Failed query: ${query}
+params: ${params}`);
+    this.query = query;
+    this.params = params;
+    this.cause = cause;
+    Error.captureStackTrace(this, _DrizzleQueryError);
+    if (cause) this.cause = cause;
+  }
+};
+var TransactionRollbackError = class extends DrizzleError {
+  static [entityKind] = "TransactionRollbackError";
+  constructor() {
+    super({ message: "Rollback" });
   }
 };
 
@@ -3300,238 +3532,6 @@ function mapRelationalRow(tablesConfig, tableConfig, row, buildQueryResultSelect
   }
   return result;
 }
-
-// node_modules/drizzle-orm/node-postgres/driver.js
-import pg2 from "pg";
-
-// node_modules/drizzle-orm/selection-proxy.js
-var SelectionProxyHandler = class _SelectionProxyHandler {
-  static [entityKind] = "SelectionProxyHandler";
-  config;
-  constructor(config2) {
-    this.config = { ...config2 };
-  }
-  get(subquery, prop) {
-    if (prop === "_") {
-      return {
-        ...subquery["_"],
-        selectedFields: new Proxy(
-          subquery._.selectedFields,
-          this
-        )
-      };
-    }
-    if (prop === ViewBaseConfig) {
-      return {
-        ...subquery[ViewBaseConfig],
-        selectedFields: new Proxy(
-          subquery[ViewBaseConfig].selectedFields,
-          this
-        )
-      };
-    }
-    if (typeof prop === "symbol") {
-      return subquery[prop];
-    }
-    const columns = is(subquery, Subquery) ? subquery._.selectedFields : is(subquery, View) ? subquery[ViewBaseConfig].selectedFields : subquery;
-    const value = columns[prop];
-    if (is(value, SQL.Aliased)) {
-      if (this.config.sqlAliasedBehavior === "sql" && !value.isSelectionField) {
-        return value.sql;
-      }
-      const newValue = value.clone();
-      newValue.isSelectionField = true;
-      return newValue;
-    }
-    if (is(value, SQL)) {
-      if (this.config.sqlBehavior === "sql") {
-        return value;
-      }
-      throw new Error(
-        `You tried to reference "${prop}" field from a subquery, which is a raw SQL field, but it doesn't have an alias declared. Please add an alias to the field using ".as('alias')" method.`
-      );
-    }
-    if (is(value, Column)) {
-      if (this.config.alias) {
-        return new Proxy(
-          value,
-          new ColumnAliasProxyHandler(
-            new Proxy(
-              value.table,
-              new TableAliasProxyHandler(this.config.alias, this.config.replaceOriginalName ?? false)
-            )
-          )
-        );
-      }
-      return value;
-    }
-    if (typeof value !== "object" || value === null) {
-      return value;
-    }
-    return new Proxy(value, new _SelectionProxyHandler(this.config));
-  }
-};
-
-// node_modules/drizzle-orm/pg-core/indexes.js
-var IndexBuilderOn = class {
-  constructor(unique, name) {
-    this.unique = unique;
-    this.name = name;
-  }
-  static [entityKind] = "PgIndexBuilderOn";
-  on(...columns) {
-    return new IndexBuilder(
-      columns.map((it) => {
-        if (is(it, SQL)) {
-          return it;
-        }
-        it = it;
-        const clonedIndexedColumn = new IndexedColumn(it.name, !!it.keyAsName, it.columnType, it.indexConfig);
-        it.indexConfig = JSON.parse(JSON.stringify(it.defaultConfig));
-        return clonedIndexedColumn;
-      }),
-      this.unique,
-      false,
-      this.name
-    );
-  }
-  onOnly(...columns) {
-    return new IndexBuilder(
-      columns.map((it) => {
-        if (is(it, SQL)) {
-          return it;
-        }
-        it = it;
-        const clonedIndexedColumn = new IndexedColumn(it.name, !!it.keyAsName, it.columnType, it.indexConfig);
-        it.indexConfig = it.defaultConfig;
-        return clonedIndexedColumn;
-      }),
-      this.unique,
-      true,
-      this.name
-    );
-  }
-  /**
-   * Specify what index method to use. Choices are `btree`, `hash`, `gist`, `spgist`, `gin`, `brin`, or user-installed access methods like `bloom`. The default method is `btree.
-   *
-   * If you have the `pg_vector` extension installed in your database, you can use the `hnsw` and `ivfflat` options, which are predefined types.
-   *
-   * **You can always specify any string you want in the method, in case Drizzle doesn't have it natively in its types**
-   *
-   * @param method The name of the index method to be used
-   * @param columns
-   * @returns
-   */
-  using(method, ...columns) {
-    return new IndexBuilder(
-      columns.map((it) => {
-        if (is(it, SQL)) {
-          return it;
-        }
-        it = it;
-        const clonedIndexedColumn = new IndexedColumn(it.name, !!it.keyAsName, it.columnType, it.indexConfig);
-        it.indexConfig = JSON.parse(JSON.stringify(it.defaultConfig));
-        return clonedIndexedColumn;
-      }),
-      this.unique,
-      true,
-      this.name,
-      method
-    );
-  }
-};
-var IndexBuilder = class {
-  static [entityKind] = "PgIndexBuilder";
-  /** @internal */
-  config;
-  constructor(columns, unique, only, name, method = "btree") {
-    this.config = {
-      name,
-      columns,
-      unique,
-      only,
-      method
-    };
-  }
-  concurrently() {
-    this.config.concurrently = true;
-    return this;
-  }
-  with(obj) {
-    this.config.with = obj;
-    return this;
-  }
-  where(condition) {
-    this.config.where = condition;
-    return this;
-  }
-  /** @internal */
-  build(table) {
-    return new Index(this.config, table);
-  }
-};
-var Index = class {
-  static [entityKind] = "PgIndex";
-  config;
-  constructor(config2, table) {
-    this.config = { ...config2, table };
-  }
-};
-function uniqueIndex(name) {
-  return new IndexBuilderOn(true, name);
-}
-
-// node_modules/drizzle-orm/casing.js
-function toSnakeCase(input) {
-  const words = input.replace(/['\u2019]/g, "").match(/[\da-z]+|[A-Z]+(?![a-z])|[A-Z][\da-z]+/g) ?? [];
-  return words.map((word) => word.toLowerCase()).join("_");
-}
-function toCamelCase(input) {
-  const words = input.replace(/['\u2019]/g, "").match(/[\da-z]+|[A-Z]+(?![a-z])|[A-Z][\da-z]+/g) ?? [];
-  return words.reduce((acc, word, i) => {
-    const formattedWord = i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.slice(1)}`;
-    return acc + formattedWord;
-  }, "");
-}
-function noopCase(input) {
-  return input;
-}
-var CasingCache = class {
-  static [entityKind] = "CasingCache";
-  /** @internal */
-  cache = {};
-  cachedTables = {};
-  convert;
-  constructor(casing) {
-    this.convert = casing === "snake_case" ? toSnakeCase : casing === "camelCase" ? toCamelCase : noopCase;
-  }
-  getColumnCasing(column) {
-    if (!column.keyAsName) return column.name;
-    const schema = column.table[Table.Symbol.Schema] ?? "public";
-    const tableName = column.table[Table.Symbol.OriginalName];
-    const key = `${schema}.${tableName}.${column.name}`;
-    if (!this.cache[key]) {
-      this.cacheTable(column.table);
-    }
-    return this.cache[key];
-  }
-  cacheTable(table) {
-    const schema = table[Table.Symbol.Schema] ?? "public";
-    const tableName = table[Table.Symbol.OriginalName];
-    const tableKey = `${schema}.${tableName}`;
-    if (!this.cachedTables[tableKey]) {
-      for (const column of Object.values(table[Table.Symbol.Columns])) {
-        const columnKey = `${tableKey}.${column.name}`;
-        this.cache[columnKey] = this.convert(column.name);
-      }
-      this.cachedTables[tableKey] = true;
-    }
-  }
-  clearCache() {
-    this.cache = {};
-    this.cachedTables = {};
-  }
-};
 
 // node_modules/drizzle-orm/pg-core/view-base.js
 var PgViewBase = class extends View {
@@ -7351,6 +7351,183 @@ var db = new Proxy({}, {
   }
 });
 
+// src/db/ensureBookingSchema.ts
+function isConnectionFailure(error) {
+  if (!error || typeof error !== "object") return false;
+  const code = String(error.code || "");
+  if (code === "ECONNREFUSED" || code === "ENOTFOUND" || code === "ETIMEDOUT" || code === "ECONNRESET" || code === "EAI_AGAIN" || code === "57P01" || // admin_shutdown
+  code === "57P03") {
+    return true;
+  }
+  const message = String(
+    error.message || error
+  ).toLowerCase();
+  return message.includes("timeout exceeded when trying to connect") || message.includes("connection terminated due to connection timeout") || message.includes("connect etimedout") || message.includes("could not connect") || message.includes("connection refused") || message.includes("getaddrinfo");
+}
+function hasDatabaseConfig() {
+  return Boolean(
+    process.env.DATABASE_URL?.trim() || process.env.SQL_HOST?.trim()
+  );
+}
+var SCHEMA_BOOTSTRAP_STATEMENTS = [
+  // --- CREATE (FK order) ---
+  `CREATE TABLE IF NOT EXISTS users (
+    id serial PRIMARY KEY,
+    uid text NOT NULL UNIQUE,
+    email text NOT NULL,
+    display_name text,
+    phone_whatsapp text,
+    created_at timestamp DEFAULT NOW() NOT NULL,
+    updated_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS courses (
+    id serial PRIMARY KEY,
+    slug text NOT NULL UNIQUE,
+    title text NOT NULL,
+    subtitle text NOT NULL,
+    description text NOT NULL,
+    price_eur integer NOT NULL,
+    stripe_price_id text NOT NULL,
+    lessons_count integer NOT NULL,
+    total_hours text NOT NULL,
+    level_label text NOT NULL,
+    sort_order integer NOT NULL,
+    is_published boolean DEFAULT true NOT NULL,
+    created_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS dispense (
+    id serial PRIMARY KEY,
+    course_id integer NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    module_number text NOT NULL,
+    title text NOT NULL,
+    subtitle text NOT NULL,
+    format text NOT NULL,
+    reading_minutes integer NOT NULL,
+    content_markdown text NOT NULL,
+    key_takeaways text NOT NULL,
+    sort_order integer NOT NULL,
+    created_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS course_purchases (
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    course_id integer NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    status text NOT NULL DEFAULT 'active',
+    payment_provider text NOT NULL DEFAULT 'stripe_checkout',
+    stripe_session_id text,
+    amount_paid_eur integer NOT NULL,
+    customer_name text NOT NULL,
+    customer_phone text,
+    purchased_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS dispensa_progress (
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    dispensa_id integer NOT NULL REFERENCES dispense(id) ON DELETE CASCADE,
+    completed boolean DEFAULT false NOT NULL,
+    personal_notes text DEFAULT '' NOT NULL,
+    updated_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS consultation_bookings (
+    id serial PRIMARY KEY,
+    user_id integer REFERENCES users(id) ON DELETE SET NULL,
+    tariff_id text NOT NULL,
+    duration_minutes integer NOT NULL,
+    price_eur integer NOT NULL,
+    scheduled_date text NOT NULL,
+    scheduled_time text NOT NULL,
+    full_name text NOT NULL,
+    email text NOT NULL,
+    phone_whatsapp text NOT NULL,
+    session_intent text DEFAULT '' NOT NULL,
+    deontology_accepted boolean NOT NULL,
+    mode text NOT NULL DEFAULT 'remote',
+    status text NOT NULL DEFAULT 'pending_payment',
+    stripe_session_id text,
+    stripe_payment_intent_id text,
+    google_calendar_event_id text,
+    paid_at timestamp,
+    created_at timestamp DEFAULT NOW() NOT NULL,
+    updated_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS dialogue_sessions (
+    id serial PRIMARY KEY,
+    session_key text NOT NULL UNIQUE,
+    user_id integer REFERENCES users(id) ON DELETE SET NULL,
+    free_trial_started_at timestamp,
+    free_trial_expires_at timestamp,
+    active_pass_expires_at timestamp,
+    active_pack_id text,
+    interactions_count integer DEFAULT 0 NOT NULL,
+    created_at timestamp DEFAULT NOW() NOT NULL,
+    updated_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS dialogue_purchases (
+    id serial PRIMARY KEY,
+    dialogue_session_id integer NOT NULL REFERENCES dialogue_sessions(id) ON DELETE CASCADE,
+    user_id integer REFERENCES users(id) ON DELETE SET NULL,
+    pack_id text NOT NULL,
+    duration_minutes integer NOT NULL,
+    price_eur integer NOT NULL,
+    stripe_price_id text NOT NULL,
+    stripe_session_id text,
+    customer_name text DEFAULT '' NOT NULL,
+    customer_email text DEFAULT '' NOT NULL,
+    expires_at timestamp NOT NULL,
+    created_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  // --- Legacy ALTER (bases that predate booking Stripe/Calendar columns) ---
+  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS mode text NOT NULL DEFAULT 'remote'`,
+  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS stripe_session_id text`,
+  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS stripe_payment_intent_id text`,
+  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS google_calendar_event_id text`,
+  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS paid_at timestamp`,
+  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS updated_at timestamp DEFAULT NOW() NOT NULL`,
+  // --- Indexes (idempotent) ---
+  `CREATE UNIQUE INDEX IF NOT EXISTS dispense_course_module_idx
+     ON dispense (course_id, module_number)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS course_purchases_user_course_idx
+     ON course_purchases (user_id, course_id)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS dispensa_progress_user_dispensa_idx
+     ON dispensa_progress (user_id, dispensa_id)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS consultation_bookings_stripe_session_idx
+     ON consultation_bookings (stripe_session_id)
+     WHERE stripe_session_id IS NOT NULL`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS consultation_bookings_active_slot_idx
+     ON consultation_bookings (scheduled_date, scheduled_time)
+     WHERE status IN ('pending_payment', 'confirmed')`
+];
+async function ensureBookingSchema() {
+  if (!hasDatabaseConfig()) {
+    console.error(
+      "ensureBookingSchema: skipped (set DATABASE_URL TCP or SQL_HOST)"
+    );
+    return;
+  }
+  const pool = createPool();
+  for (const sql2 of SCHEMA_BOOTSTRAP_STATEMENTS) {
+    try {
+      await pool.query(sql2);
+    } catch (error) {
+      console.error("ensureBookingSchema statement failed:", sql2, error);
+      if (isConnectionFailure(error)) {
+        console.error(
+          "ensureBookingSchema: aborting remaining statements (DB unreachable)"
+        );
+        return;
+      }
+    }
+  }
+}
+async function ensureSchemaOnce() {
+  if (!globalThis._ennamoSchemaReady) {
+    globalThis._ennamoSchemaReady = ensureBookingSchema().catch((error) => {
+      console.error("ensureBookingSchema failed (non-fatal):", error);
+    });
+  }
+  await globalThis._ennamoSchemaReady;
+}
+
 // src/db/seedData.ts
 var COURSE_SEED_CATALOG = [
   {
@@ -7845,6 +8022,7 @@ async function handler(req, res) {
       res.setHeader("Allow", "GET");
       return sendJson(res, 405, { error: "Metodo non consentito." });
     }
+    await ensureSchemaOnce();
     const result = await getCourses();
     return sendJson(res, result.status, result.body);
   } catch (error) {
