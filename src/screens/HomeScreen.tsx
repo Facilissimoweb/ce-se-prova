@@ -490,7 +490,7 @@ export function HomeScreen({
       <section aria-labelledby="testimonials-heading" className="space-y-8">
         <div className="space-y-2 max-w-2xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-            Esperienze di Ascolto
+            Google
           </p>
           <h2 id="testimonials-heading" className="font-body text-2xl md:text-[32px] md:leading-[40px] font-semibold tracking-[-0.02em] text-[#F4F1EA]">
             <CopyText entry={siteContent.home.testimonialsHeading} showKeys={showCmsKeys} />
