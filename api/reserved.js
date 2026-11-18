@@ -8916,6 +8916,7 @@ async function handler(req, res) {
       if (method !== "GET") return methodNotAllowed(res, ["GET"]);
       const user = await requireUser(req, res);
       if (!user) return;
+      res.setHeader("Cache-Control", "private, no-store");
       const result = await getReservedOverview(user);
       return sendJson(res, result.status, result.body);
     }

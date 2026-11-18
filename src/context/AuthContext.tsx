@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   onAuthStateChanged,
   signInWithPopup,
@@ -32,7 +39,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const signInWithGoogle = async (): Promise<User | null> => {
+  const clearAuthError = useCallback(() => {
+    setAuthError(null);
+  }, []);
+
+  const signInWithGoogle = useCallback(async (): Promise<User | null> => {
     setAuthError(null);
     try {
       const result = await signInWithPopup(auth, googleAuthProvider);
@@ -56,33 +67,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       return null;
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     setAuthError(null);
     await signOut(auth);
-  };
+  }, []);
 
-  const getIdToken = async (): Promise<string | null> => {
+  // Stable identity so consumers (useReservedArea, booking, dialogue) do not
+  // recreate fetch callbacks on every AuthProvider render.
+  const getIdToken = useCallback(async (): Promise<string | null> => {
     const currentUser = auth.currentUser;
     if (!currentUser) return null;
     return currentUser.getIdToken();
-  };
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      user,
+      loading,
+      authError,
+      clearAuthError,
+      signInWithGoogle,
+      logout,
+      getIdToken,
+    }),
+    [
+      user,
+      loading,
+      authError,
+      clearAuthError,
+      signInWithGoogle,
+      logout,
+      getIdToken,
+    ]
+  );
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        authError,
-        clearAuthError: () => setAuthError(null),
-        signInWithGoogle,
-        logout,
-        getIdToken,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
   );
 }
 
