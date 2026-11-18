@@ -1,5 +1,6 @@
 /**
- * Coming Soon gate (ENN-92) — shared helpers for Edge middleware, Express, and unlock API.
+ * Coming Soon gate (ENN-92/93) — shared helpers for Vercel Routing Middleware,
+ * Express, and unlock API. Web Crypto only (safe on Node middleware + browsers).
  * Cookie is httpOnly; password stays server-side only (never VITE_*).
  */
 

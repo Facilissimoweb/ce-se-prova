@@ -1,6 +1,6 @@
 /**
  * Express Coming Soon gate (local `npm run dev` / `npm start`).
- * Mirrors Vercel `middleware.ts` so Maria can test unlock without deploying.
+ * Mirrors Vercel Routing `middleware.ts` so Maria can test unlock without deploying.
  */
 import fs from 'fs';
 import path from 'path';
