@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Mail, Phone } from 'lucide-react';
 import type { ConsultationTariff, CourseId, ScreenId } from './types/handoff';
 import { AuthProvider } from './context/AuthContext';
@@ -43,6 +43,17 @@ import {
   pathForScreen,
   screenFromPath,
 } from './lib/appPaths';
+import {
+  SCROLL_LANDMARKS,
+  afterNextPaint,
+  captureScrollY,
+  screenFromHash,
+  scrollToId,
+  scrollToIdAfterPaint,
+  scrollToTopAfterPaint,
+  scrollWindowTo,
+  sectionIdFromHash,
+} from './lib/scrollNavigation';
 import { SITE_PIVA, SITE_PIVA_VERIFY_URL } from './lib/siteContacts';
 
 const AUX_SCREENS: ScreenId[] = [
@@ -122,9 +133,18 @@ const FOOTER_LINK_CLASS =
   'text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors';
 
 export function App() {
-  const [activeScreen, setActiveScreen] = useState<ScreenId>(() =>
-    bootstrapScreenFromLocation(window.location.pathname, window.location.search)
-  );
+  const [activeScreen, setActiveScreen] = useState<ScreenId>(() => {
+    const fromPath = bootstrapScreenFromLocation(
+      window.location.pathname,
+      window.location.search
+    );
+    // Legacy / marketing hashes: `/#corsi`, `/#dialogo` open the matching screen.
+    if (fromPath === 'home' || fromPath === 'not-found') {
+      const fromHash = screenFromHash(window.location.hash);
+      if (fromHash === 'corsi' || fromHash === 'chat') return fromHash;
+    }
+    return fromPath;
+  });
   const [selectedTariffId, setSelectedTariffId] =
     useState<ConsultationTariff['id']>('60m');
   const [selectedCourseId, setSelectedCourseId] =
@@ -134,25 +154,104 @@ export function App() {
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [legalNotice, setLegalNotice] = useState<LegalKind | null>(null);
 
-  const handleNavigate = useCallback((screen: ScreenId) => {
-    setActiveScreen(screen);
-    navigatePath(screen);
-  }, []);
+  const scrollPositionsRef = useRef<Partial<Record<ScreenId, number>>>({});
+  const pendingFocusIdRef = useRef<string | null>(null);
+  const navigationKindRef = useRef<'push' | 'pop' | 'boot'>('boot');
+  const activeScreenRef = useRef(activeScreen);
+  activeScreenRef.current = activeScreen;
 
-  // Always land at the top when the active screen changes (nav click, CTA, back/forward).
+  const handleNavigate = useCallback(
+    (screen: ScreenId, options?: { focusId?: string }) => {
+      const focusId =
+        options?.focusId ??
+        (screen === 'corsi'
+          ? SCROLL_LANDMARKS.corsi
+          : screen === 'chat'
+            ? SCROLL_LANDMARKS.dialogo
+            : null);
+
+      // Re-tapping the active route still recenters (mobile menu / footer CTAs).
+      if (screen === activeScreenRef.current) {
+        navigatePath(screen);
+        if (focusId) {
+          scrollToIdAfterPaint(focusId, { behavior: 'auto' });
+        } else {
+          scrollToTopAfterPaint('auto');
+        }
+        return;
+      }
+
+      scrollPositionsRef.current[activeScreenRef.current] = captureScrollY();
+      navigationKindRef.current = 'push';
+      pendingFocusIdRef.current = focusId;
+      setActiveScreen(screen);
+      navigatePath(screen);
+    },
+    []
+  );
+
+  // Land on the right spot after SPA paint (avoids sticky-header + menu-unlock races).
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    const kind = navigationKindRef.current;
+    navigationKindRef.current = 'push';
+
+    if (kind === 'boot') {
+      const sectionFromHash = sectionIdFromHash(window.location.hash);
+      if (sectionFromHash) {
+        return scrollToIdAfterPaint(sectionFromHash, { behavior: 'auto' });
+      }
+      return scrollToTopAfterPaint('auto');
+    }
+
+    if (kind === 'pop') {
+      const y = scrollPositionsRef.current[activeScreen] ?? 0;
+      return afterNextPaint(() => scrollWindowTo(y, 'auto'));
+    }
+
+    const focusId = pendingFocusIdRef.current;
+    pendingFocusIdRef.current = null;
+    if (focusId) {
+      return scrollToIdAfterPaint(focusId, { behavior: 'auto' });
+    }
+    return scrollToTopAfterPaint('auto');
   }, [activeScreen]);
 
   // Sync screen from URL on load / browser back-forward; rewrite legacy Stripe root returns.
   // Unknown paths keep the URL and show the 404 screen (no silent redirect to home).
   // Blog detail URLs (`/news/:slug`) stay as-is — do not collapse to `/news`.
   useEffect(() => {
-    const syncFromLocation = () => {
-      const next = bootstrapScreenFromLocation(
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
+    const applyLocation = (kind: 'push' | 'pop' | 'boot') => {
+      let next = bootstrapScreenFromLocation(
         window.location.pathname,
         window.location.search
       );
+      const hashScreen = screenFromHash(window.location.hash);
+      if (
+        hashScreen &&
+        (next === 'home' || next === 'not-found') &&
+        (hashScreen === 'corsi' || hashScreen === 'chat')
+      ) {
+        next = hashScreen;
+        const expected = pathForScreen(next);
+        window.history.replaceState(
+          {},
+          '',
+          `${expected}${window.location.search}`
+        );
+      }
+
+      navigationKindRef.current = kind;
+      if (kind === 'push' || kind === 'boot') {
+        const section = sectionIdFromHash(window.location.hash);
+        if (section) pendingFocusIdRef.current = section;
+        else if (next === 'corsi') pendingFocusIdRef.current = SCROLL_LANDMARKS.corsi;
+        else if (next === 'chat') pendingFocusIdRef.current = SCROLL_LANDMARKS.dialogo;
+      }
+
       setActiveScreen(next);
       if (next === 'not-found') {
         return;
@@ -174,10 +273,37 @@ export function App() {
       }
     };
 
+    const syncFromLocation = () => applyLocation('boot');
+    const onPopState = () => {
+      scrollPositionsRef.current[activeScreenRef.current] = captureScrollY();
+      applyLocation('pop');
+    };
+    const onHashChange = () => {
+      const hashScreen = screenFromHash(window.location.hash);
+      if (hashScreen === 'corsi' || hashScreen === 'chat') {
+        handleNavigate(hashScreen);
+        return;
+      }
+      const section = sectionIdFromHash(window.location.hash);
+      if (section) {
+        if (activeScreenRef.current === 'home' || section.startsWith('home-')) {
+          if (activeScreenRef.current !== 'home') {
+            handleNavigate('home', { focusId: section });
+          } else {
+            afterNextPaint(() => scrollToId(section, { behavior: 'smooth' }));
+          }
+        }
+      }
+    };
+
     syncFromLocation();
-    window.addEventListener('popstate', syncFromLocation);
-    return () => window.removeEventListener('popstate', syncFromLocation);
-  }, []);
+    window.addEventListener('popstate', onPopState);
+    window.addEventListener('hashchange', onHashChange);
+    return () => {
+      window.removeEventListener('popstate', onPopState);
+      window.removeEventListener('hashchange', onHashChange);
+    };
+  }, [handleNavigate]);
 
   const handleSelectTariffAndBook = (tariffId: ConsultationTariff['id']) => {
     setSelectedTariffId(tariffId);
@@ -186,7 +312,7 @@ export function App() {
 
   const handleSelectCourseAndNavigate = (courseId: CourseId) => {
     setSelectedCourseId(courseId);
-    handleNavigate('corsi');
+    handleNavigate('corsi', { focusId: SCROLL_LANDMARKS.corsi });
   };
 
   const isAuxScreen = AUX_SCREENS.includes(activeScreen);
