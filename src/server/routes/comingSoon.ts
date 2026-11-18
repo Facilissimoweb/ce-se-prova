@@ -3,8 +3,9 @@ import {
   buildUnlockSetCookieHeader,
   createUnlockToken,
   isComingSoonActiveForHost,
-  isValidUnlockCookie,
+  listComingSoonUnlockPaths,
   readComingSoonEnv,
+  isValidUnlockCookie,
   verifyComingSoonPassword,
   type ComingSoonEnv,
 } from '../../lib/comingSoon.ts';
@@ -33,6 +34,9 @@ export function getComingSoonStatus(input: {
       active,
       unlocked: active ? unlocked : true,
       secretPath: env.secretPath,
+      unlockPaths: listComingSoonUnlockPaths(env),
+      unlockLinkConfigured: Boolean(env.unlockToken),
+      passwordConfigured: Boolean(env.password || env.passwordHash),
     },
   }));
 }

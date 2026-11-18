@@ -6,11 +6,15 @@ import fs from 'fs';
 import path from 'path';
 import type { NextFunction, Request, Response } from 'express';
 import {
+  buildUnlockSetCookieHeader,
+  createUnlockToken,
   isComingSoonActiveForHost,
   isComingSoonAllowlistedPath,
   isComingSoonSecretPath,
   isValidUnlockCookie,
   readComingSoonEnv,
+  readComingSoonLinkToken,
+  verifyComingSoonUnlockLinkToken,
 } from '../lib/comingSoon.ts';
 
 function sendComingSoonHtml(
@@ -28,10 +32,14 @@ function sendComingSoonHtml(
     }
     let body = html;
     if (unlock) {
-      // Ensure unlock form shows even if the static file was requested without ?mode=
+      // Ensure unlock form shows even without client JS (?mode= / rewrite).
       body = body.replace(
-        '<body',
-        '<body data-coming-soon-mode="unlock"'
+        /<body([^>]*)>/i,
+        '<body$1 class="is-unlock" data-coming-soon-mode="unlock">'
+      );
+      body = body.replace(
+        /(<div\s+class="unlock-panel"[^>]*?)\s+hidden([^>]*>)/i,
+        '$1$2'
       );
     }
     res.status(200).type('html').send(body);
@@ -75,6 +83,23 @@ export function createComingSoonGate(comingSoonHtmlPath: string) {
     }
 
     if (isComingSoonSecretPath(pathname, env)) {
+      const linkToken = readComingSoonLinkToken(
+        new URL(req.originalUrl || req.url, 'http://localhost').searchParams
+      );
+      if (verifyComingSoonUnlockLinkToken(linkToken, env)) {
+        const cookieToken = await createUnlockToken(env);
+        if (cookieToken) {
+          const secure =
+            Boolean(req.secure) ||
+            String(req.headers['x-forwarded-proto'] || '') === 'https' ||
+            process.env.VERCEL === '1';
+          res.setHeader(
+            'Set-Cookie',
+            buildUnlockSetCookieHeader(cookieToken, { secure })
+          );
+          return res.redirect(302, '/');
+        }
+      }
       return sendComingSoonHtml(res, comingSoonHtmlPath, true);
     }
 

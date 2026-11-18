@@ -1,21 +1,38 @@
 // src/lib/comingSoon.ts
 var COMING_SOON_COOKIE = "ti_atelier_unlock";
 var COMING_SOON_DEFAULT_PATH = "/preview-atelier";
+var COMING_SOON_FRIENDLY_PATH = "/admin/com";
+var COMING_SOON_BUILTIN_UNLOCK_PATHS = [
+  COMING_SOON_DEFAULT_PATH,
+  COMING_SOON_FRIENDLY_PATH
+];
 var COMING_SOON_COOKIE_MAX_AGE_SEC = 60 * 60 * 24 * 30;
 var TOKEN_PAYLOAD = "tarot-italia-atelier-v1";
 var PRODUCTION_HOSTS = /* @__PURE__ */ new Set([
   "www.tarotitalia.com",
   "tarotitalia.com"
 ]);
+function resolveComingSoonSecretPath(rawPath) {
+  const trimmed = (rawPath || "").trim();
+  if (!trimmed) return COMING_SOON_DEFAULT_PATH;
+  if (!trimmed.startsWith("/") || /\s/.test(trimmed) || trimmed.length > 128 || /^(sk|pk|rk|whsec)_/i.test(trimmed)) {
+    console.warn(
+      "[coming-soon] COMING_SOON_SECRET_PATH is not a valid URL path; using default /preview-atelier"
+    );
+    return COMING_SOON_DEFAULT_PATH;
+  }
+  const normalized = normalizePath(trimmed);
+  if (normalized === "/") return COMING_SOON_DEFAULT_PATH;
+  return normalized;
+}
 function readComingSoonEnv(env = process.env) {
-  const rawPath = (env.COMING_SOON_SECRET_PATH || COMING_SOON_DEFAULT_PATH).trim();
-  const secretPath = normalizePath(rawPath || COMING_SOON_DEFAULT_PATH);
   return {
     enabled: env.COMING_SOON_ENABLED === "true",
     allHosts: env.COMING_SOON_ALL_HOSTS === "true",
-    secretPath,
+    secretPath: resolveComingSoonSecretPath(env.COMING_SOON_SECRET_PATH || ""),
     password: (env.COMING_SOON_PASSWORD || "").trim(),
-    passwordHash: (env.COMING_SOON_PASSWORD_HASH || "").trim().toLowerCase()
+    passwordHash: (env.COMING_SOON_PASSWORD_HASH || "").trim().toLowerCase(),
+    unlockToken: (env.COMING_SOON_UNLOCK_TOKEN || "").trim()
   };
 }
 function normalizePath(pathname) {
@@ -32,6 +49,13 @@ function isComingSoonActiveForHost(hostHeader, env = readComingSoonEnv()) {
   if (env.allHosts) return true;
   const host = hostWithoutPort(hostHeader);
   return PRODUCTION_HOSTS.has(host);
+}
+function listComingSoonUnlockPaths(env = readComingSoonEnv()) {
+  const paths = new Set(
+    COMING_SOON_BUILTIN_UNLOCK_PATHS.map((p) => normalizePath(p))
+  );
+  paths.add(normalizePath(env.secretPath));
+  return [...paths];
 }
 function timingSafeEqualString(a, b) {
   if (a.length !== b.length) return false;
@@ -64,6 +88,7 @@ async function hmacSha256Hex(secret, message) {
 function cookieSigningMaterial(env) {
   if (env.password) return `pwd:${env.password}`;
   if (env.passwordHash) return `hash:${env.passwordHash}`;
+  if (env.unlockToken) return `tok:${env.unlockToken}`;
   return null;
 }
 async function createUnlockToken(env = readComingSoonEnv()) {
@@ -129,7 +154,10 @@ function getComingSoonStatus(input) {
       enabled: env.enabled,
       active,
       unlocked: active ? unlocked : true,
-      secretPath: env.secretPath
+      secretPath: env.secretPath,
+      unlockPaths: listComingSoonUnlockPaths(env),
+      unlockLinkConfigured: Boolean(env.unlockToken),
+      passwordConfigured: Boolean(env.password || env.passwordHash)
     }
   }));
 }

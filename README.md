@@ -63,8 +63,9 @@ Vedi `.env.example`. Sintesi:
 | `TAROTITALIACHATGENERICAGROQ_API_KEY` | Chat FAB generica via Groq (server-only; opzionale) |
 | `GROQ_CHAT_MODEL` | Override modello chat (default `openai/gpt-oss-20b`) |
 | `COMING_SOON_ENABLED=true` | Coming Soon gate (www di default) |
-| `COMING_SOON_PASSWORD` / `COMING_SOON_PASSWORD_HASH` | Password sblocco (o SHA-256 hex) |
-| `COMING_SOON_SECRET_PATH` | Path sblocco (default `/preview-atelier`) |
+| `COMING_SOON_UNLOCK_TOKEN` | Stringa random per link one-click `/admin/com?t=…` |
+| `COMING_SOON_PASSWORD` / `COMING_SOON_PASSWORD_HASH` | Password form (backup opzionale) |
+| `COMING_SOON_SECRET_PATH` | Path extra (default `/preview-atelier`; must be a URL path, never an API key) |
 | `COMING_SOON_ALL_HOSTS=true` | Gate anche su preview/localhost |
 | `ALLOW_DIRECT_UNLOCK=true` | Solo non-prod |
 
