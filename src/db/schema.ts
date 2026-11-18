@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm';
 import {
   boolean,
+  index,
   integer,
   pgTable,
   serial,
@@ -171,6 +172,24 @@ export const dialoguePurchases = pgTable('dialogue_purchases', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// 9. Appunti liberi dell'utente (Area Riservata · tab Appunti) — indipendenti dai corsi
+export const userNotes = pgTable(
+  'user_notes',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id')
+      .references(() => users.id, { onDelete: 'cascade' })
+      .notNull(),
+    title: text('title').default('').notNull(),
+    body: text('body').default('').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('user_notes_user_id_idx').on(table.userId),
+  ]
+);
+
 // Relazioni Drizzle
 export const usersRelations = relations(users, ({ many }) => ({
   purchases: many(coursePurchases),
@@ -178,6 +197,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   bookings: many(consultationBookings),
   dialogueSessions: many(dialogueSessions),
   dialoguePurchases: many(dialoguePurchases),
+  notes: many(userNotes),
 }));
 
 export const coursesRelations = relations(courses, ({ many }) => ({
@@ -237,6 +257,13 @@ export const dialoguePurchasesRelations = relations(dialoguePurchases, ({ one })
   }),
   user: one(users, {
     fields: [dialoguePurchases.userId],
+    references: [users.id],
+  }),
+}));
+
+export const userNotesRelations = relations(userNotes, ({ one }) => ({
+  user: one(users, {
+    fields: [userNotes.userId],
     references: [users.id],
   }),
 }));

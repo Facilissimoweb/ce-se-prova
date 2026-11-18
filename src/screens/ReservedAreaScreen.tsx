@@ -14,6 +14,7 @@ import { useAuth } from '../context/AuthContext';
 import { CheckoutReturnBanner } from '../components/CheckoutReturnBanner';
 import { FormattedDispensaBody } from '../components/reserved/FormattedDispensaBody';
 import { ReservedLoginGate } from '../components/reserved/ReservedLoginGate';
+import { ReservedNotesPanel } from '../components/reserved/ReservedNotesPanel';
 import { useReservedArea } from '../hooks/useReservedArea';
 
 interface ReservedAreaScreenProps {
@@ -155,6 +156,19 @@ export function ReservedAreaScreen({
           <button
             type="button"
             role="tab"
+            aria-selected={activeTab === 'appunti'}
+            onClick={() => setActiveTab('appunti')}
+            className={`px-4 py-2 min-h-[40px] rounded-lg text-xs md:text-sm font-medium whitespace-nowrap transition-colors ${
+              activeTab === 'appunti'
+                ? 'bg-[#D4AF37] text-[#12100E] font-semibold'
+                : 'text-[#A39B93] hover:text-[#F4F1EA]'
+            }`}
+          >
+            Appunti
+          </button>
+          <button
+            type="button"
+            role="tab"
             aria-selected={activeTab === 'consulti'}
             onClick={() => setActiveTab('consulti')}
             className={`px-4 py-2 min-h-[40px] rounded-lg text-xs md:text-sm font-medium whitespace-nowrap transition-colors ${
@@ -184,7 +198,9 @@ export function ReservedAreaScreen({
         </div>
       )}
 
-      {loadingData && !overview ? (
+      {activeTab === 'appunti' ? (
+        <ReservedNotesPanel getIdToken={getIdToken} />
+      ) : loadingData && !overview ? (
         <div className="glass-tier-1 rounded-2xl p-10 text-center text-sm text-[#A39B93]">
           Caricamento dei percorsi e delle dispense riservate...
         </div>

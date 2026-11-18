@@ -117,6 +117,16 @@ CREATE TABLE IF NOT EXISTS dialogue_purchases (
   created_at timestamp DEFAULT NOW() NOT NULL
 );
 
+-- ENN-98 — appunti liberi (tab Appunti), indipendenti dai corsi
+CREATE TABLE IF NOT EXISTS user_notes (
+  id serial PRIMARY KEY,
+  user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title text DEFAULT '' NOT NULL,
+  body text DEFAULT '' NOT NULL,
+  created_at timestamp DEFAULT NOW() NOT NULL,
+  updated_at timestamp DEFAULT NOW() NOT NULL
+);
+
 -- --- Legacy ALTER (safe on fresh tables; upgrades older bases) ---
 ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS mode text NOT NULL DEFAULT 'remote';
 ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS stripe_session_id text;
@@ -138,3 +148,5 @@ CREATE UNIQUE INDEX IF NOT EXISTS consultation_bookings_stripe_session_idx
 CREATE UNIQUE INDEX IF NOT EXISTS consultation_bookings_active_slot_idx
   ON consultation_bookings (scheduled_date, scheduled_time)
   WHERE status IN ('pending_payment', 'confirmed');
+CREATE INDEX IF NOT EXISTS user_notes_user_id_idx
+  ON user_notes (user_id);

@@ -23,10 +23,14 @@ import {
   postComingSoonUnlockWithGoogle,
 } from './src/server/routes/comingSoon.ts';
 import {
+  deleteUserNoteRoute,
   getReservedOverview,
+  getUserNotes,
   postReservedConfirmStripe,
   postReservedEnroll,
+  postUserNote,
   putDispensaProgress,
+  putUserNote,
 } from './src/server/routes/reserved.ts';
 import {
   getBookingsAvailability,
@@ -220,6 +224,66 @@ async function startServer() {
           user,
           dispensaId: Number(req.params.dispensaId),
           body: bodyRecord(req),
+        })
+      );
+    }
+  );
+
+  app.get('/api/reserved/notes', requireAuth, async (req: AuthRequest, res) => {
+    const user = toApiUserFromAuth(req);
+    if (!user) {
+      return res.status(401).json({ error: 'Autenticazione richiesta.' });
+    }
+    res.setHeader('Cache-Control', 'private, no-store');
+    sendResult(res, await getUserNotes(user));
+  });
+
+  app.post('/api/reserved/notes', requireAuth, async (req: AuthRequest, res) => {
+    const user = toApiUserFromAuth(req);
+    if (!user) {
+      return res.status(401).json({ error: 'Autenticazione richiesta.' });
+    }
+    sendResult(
+      res,
+      await postUserNote({
+        user,
+        body: bodyRecord(req),
+      })
+    );
+  });
+
+  app.put(
+    '/api/reserved/notes/:noteId',
+    requireAuth,
+    async (req: AuthRequest, res) => {
+      const user = toApiUserFromAuth(req);
+      if (!user) {
+        return res.status(401).json({ error: 'Autenticazione richiesta.' });
+      }
+      sendResult(
+        res,
+        await putUserNote({
+          user,
+          noteId: Number(req.params.noteId),
+          body: bodyRecord(req),
+        })
+      );
+    }
+  );
+
+  app.delete(
+    '/api/reserved/notes/:noteId',
+    requireAuth,
+    async (req: AuthRequest, res) => {
+      const user = toApiUserFromAuth(req);
+      if (!user) {
+        return res.status(401).json({ error: 'Autenticazione richiesta.' });
+      }
+      sendResult(
+        res,
+        await deleteUserNoteRoute({
+          user,
+          noteId: Number(req.params.noteId),
         })
       );
     }

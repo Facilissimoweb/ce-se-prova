@@ -1,5 +1,5 @@
 /**
- * Reserved (“serve”) group: overview, enroll, confirm-stripe, dispensa progress.
+ * Reserved (“serve”) group: overview, enroll, confirm-stripe, dispensa progress, notes.
  * Multi-segment paths via vercel.json → /api/reserved?__path=…
  * Bundled by scripts/bundle-api.mjs into api/reserved.js.
  *
@@ -10,10 +10,14 @@
  */
 import { ensureSchemaOnce } from '../../db/ensureBookingSchema.ts';
 import {
+  deleteUserNoteRoute,
   getReservedOverview,
+  getUserNotes,
   postReservedConfirmStripe,
   postReservedEnroll,
+  postUserNote,
   putDispensaProgress,
+  putUserNote,
 } from '../routes/reserved.ts';
 import { verifyBearerToken } from '../authToken.ts';
 import {
@@ -107,6 +111,49 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
         body: readBodyObject(req),
       });
       return sendJson(res, result.status, result.body);
+    }
+
+    // ENN-98 — free notes (independent of course unlock)
+    if (path === 'notes') {
+      if (method === 'GET') {
+        const user = await requireUser(req, res);
+        if (!user) return;
+        res.setHeader('Cache-Control', 'private, no-store');
+        const result = await getUserNotes(user);
+        return sendJson(res, result.status, result.body);
+      }
+      if (method === 'POST') {
+        const user = await requireUser(req, res);
+        if (!user) return;
+        const result = await postUserNote({
+          user,
+          body: readBodyObject(req),
+        });
+        return sendJson(res, result.status, result.body);
+      }
+      return methodNotAllowed(res, ['GET', 'POST']);
+    }
+
+    const noteById = path.match(/^notes\/([^/]+)$/);
+    if (noteById) {
+      const noteId = Number(noteById[1]);
+      if (method === 'PUT') {
+        const user = await requireUser(req, res);
+        if (!user) return;
+        const result = await putUserNote({
+          user,
+          noteId,
+          body: readBodyObject(req),
+        });
+        return sendJson(res, result.status, result.body);
+      }
+      if (method === 'DELETE') {
+        const user = await requireUser(req, res);
+        if (!user) return;
+        const result = await deleteUserNoteRoute({ user, noteId });
+        return sendJson(res, result.status, result.body);
+      }
+      return methodNotAllowed(res, ['PUT', 'DELETE']);
     }
 
     return sendJson(res, 404, { error: 'Not found', path, method });

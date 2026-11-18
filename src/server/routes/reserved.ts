@@ -1,8 +1,12 @@
 import {
+  createUserNote,
+  deleteUserNote,
   enrollUserInCourse,
   findCourseBySlug,
   getReservedAreaOverview,
+  listUserNotes,
   updateDispensaProgress,
+  updateUserNote,
 } from '../../db/repository.ts';
 import { COURSE_SEED_CATALOG } from '../../db/seedData.ts';
 import {
@@ -271,6 +275,101 @@ export async function putDispensaProgress(params: {
     return mapSafeError(error, 'Errore nel salvataggio del progresso.', {
       notFound: 'non trovata',
       forbidden: 'Acquisto richiesto',
+    });
+  }
+}
+
+/** GET /api/reserved/notes — elenco appunti liberi (nessun corso richiesto). */
+export async function getUserNotes(user: ApiUser): Promise<ApiResult> {
+  try {
+    if (!user.uid) {
+      return json(401, { error: 'Autenticazione richiesta.' });
+    }
+    const notes = await listUserNotes({
+      uid: user.uid,
+      email: user.email || '',
+      displayName: user.name ?? null,
+    });
+    return json(200, { notes });
+  } catch (error) {
+    return mapSafeError(error, 'Impossibile caricare gli appunti.');
+  }
+}
+
+/** POST /api/reserved/notes */
+export async function postUserNote(params: {
+  user: ApiUser;
+  body: Record<string, unknown>;
+}): Promise<ApiResult> {
+  try {
+    const { user, body } = params;
+    if (!user.uid) {
+      return json(401, { error: 'Autenticazione richiesta.' });
+    }
+    const note = await createUserNote({
+      uid: user.uid,
+      email: user.email || '',
+      displayName: user.name ?? null,
+      title: typeof body.title === 'string' ? body.title : undefined,
+      body: typeof body.body === 'string' ? body.body : undefined,
+    });
+    return json(201, { note });
+  } catch (error) {
+    return mapSafeError(error, 'Impossibile creare l’appunto.');
+  }
+}
+
+/** PUT /api/reserved/notes/:noteId */
+export async function putUserNote(params: {
+  user: ApiUser;
+  noteId: number;
+  body: Record<string, unknown>;
+}): Promise<ApiResult> {
+  try {
+    const { user, noteId, body } = params;
+    if (!user.uid) {
+      return json(401, { error: 'Autenticazione richiesta.' });
+    }
+    if (!Number.isInteger(noteId) || noteId <= 0) {
+      return json(400, { error: 'Identificativo appunto non valido.' });
+    }
+    const note = await updateUserNote({
+      uid: user.uid,
+      email: user.email || '',
+      noteId,
+      title: typeof body.title === 'string' ? body.title : undefined,
+      body: typeof body.body === 'string' ? body.body : undefined,
+    });
+    return json(200, { note });
+  } catch (error) {
+    return mapSafeError(error, 'Impossibile salvare l’appunto.', {
+      notFound: 'non trovato',
+    });
+  }
+}
+
+/** DELETE /api/reserved/notes/:noteId */
+export async function deleteUserNoteRoute(params: {
+  user: ApiUser;
+  noteId: number;
+}): Promise<ApiResult> {
+  try {
+    const { user, noteId } = params;
+    if (!user.uid) {
+      return json(401, { error: 'Autenticazione richiesta.' });
+    }
+    if (!Number.isInteger(noteId) || noteId <= 0) {
+      return json(400, { error: 'Identificativo appunto non valido.' });
+    }
+    const result = await deleteUserNote({
+      uid: user.uid,
+      email: user.email || '',
+      noteId,
+    });
+    return json(200, result);
+  } catch (error) {
+    return mapSafeError(error, 'Impossibile eliminare l’appunto.', {
+      notFound: 'non trovato',
     });
   }
 }
