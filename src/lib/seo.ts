@@ -1,5 +1,6 @@
 import type { ScreenId } from '../types/handoff';
-import { pathForScreen } from './appPaths';
+import { blogSlugFromPath, pathForBlogPost, pathForScreen } from './appPaths';
+import { getBlogPostBySlug, type BlogPost } from './blogPosts';
 import { holisticFaqs, consultiFaqs } from '../data/siteContent';
 import { SITE_EMAIL, SITE_PHONE_E164, SITE_PIVA } from './siteContacts';
 
@@ -223,28 +224,69 @@ function faqJsonLd(
   };
 }
 
-/** Apply classic SEO tags for the active SPA screen (client-side). */
-export function applyDocumentSeo(screen: ScreenId): void {
-  if (typeof document === 'undefined') return;
+function articleJsonLd(post: BlogPost, pageUrl: string, origin: string) {
+  const image = post.cover
+    ? absoluteUrl(post.cover, origin)
+    : absoluteUrl(SEO_DEFAULT_OG_IMAGE, origin);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.description || undefined,
+    datePublished: post.publishedAt || undefined,
+    image,
+    url: pageUrl || undefined,
+    inLanguage: 'it-IT',
+    author: {
+      '@type': 'Person',
+      name: 'Maria Teresa Rogani',
+      jobTitle: 'Operatore Olistico',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: SEO_SITE_NAME,
+      logo: {
+        '@type': 'ImageObject',
+        url: absoluteUrl('/brand/tarot-italia-logo.png', origin),
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': pageUrl || undefined,
+    },
+    keywords: [post.category, ...post.tags].filter(Boolean).join(', ') || undefined,
+    articleSection: post.category || undefined,
+  };
+}
 
-  const seo = pageSeoForScreen(screen);
+function applySeoPayload(options: {
+  title: string;
+  description: string;
+  path: string;
+  ogType?: string;
+  imagePath?: string | null;
+  noindex?: boolean;
+  article?: BlogPost | null;
+}): void {
   const origin = getSiteOrigin();
-  const path = canonicalPathForScreen(screen);
-  const canonical = absoluteUrl(path, origin);
-  const image = absoluteUrl(SEO_DEFAULT_OG_IMAGE, origin);
+  const canonical = absoluteUrl(options.path, origin);
+  const image = absoluteUrl(
+    options.imagePath || SEO_DEFAULT_OG_IMAGE,
+    origin
+  );
 
-  document.title = seo.title;
-  upsertMeta({ attr: 'name', key: 'description' }, seo.description);
+  document.title = options.title;
+  upsertMeta({ attr: 'name', key: 'description' }, options.description);
   upsertMeta(
     { attr: 'name', key: 'robots' },
-    seo.noindex
+    options.noindex
       ? 'noindex, nofollow'
       : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1'
   );
 
-  upsertMeta({ attr: 'property', key: 'og:title' }, seo.title);
-  upsertMeta({ attr: 'property', key: 'og:description' }, seo.description);
-  upsertMeta({ attr: 'property', key: 'og:type' }, 'website');
+  upsertMeta({ attr: 'property', key: 'og:title' }, options.title);
+  upsertMeta({ attr: 'property', key: 'og:description' }, options.description);
+  upsertMeta({ attr: 'property', key: 'og:type' }, options.ogType || 'website');
   upsertMeta({ attr: 'property', key: 'og:site_name' }, SEO_SITE_NAME);
   upsertMeta({ attr: 'property', key: 'og:locale' }, 'it_IT');
   upsertMeta({ attr: 'property', key: 'og:image' }, image);
@@ -252,15 +294,70 @@ export function applyDocumentSeo(screen: ScreenId): void {
     upsertMeta({ attr: 'property', key: 'og:url' }, canonical);
     upsertLink('canonical', canonical);
   } else {
-    upsertLink('canonical', path);
+    upsertLink('canonical', options.path);
   }
 
   upsertMeta({ attr: 'name', key: 'twitter:card' }, 'summary_large_image');
-  upsertMeta({ attr: 'name', key: 'twitter:title' }, seo.title);
-  upsertMeta({ attr: 'name', key: 'twitter:description' }, seo.description);
+  upsertMeta({ attr: 'name', key: 'twitter:title' }, options.title);
+  upsertMeta({ attr: 'name', key: 'twitter:description' }, options.description);
   upsertMeta({ attr: 'name', key: 'twitter:image' }, image);
 
   upsertJsonLd('json-ld-organization', organizationJsonLd(origin));
+
+  if (options.article) {
+    upsertJsonLd(
+      'json-ld-article',
+      articleJsonLd(
+        options.article,
+        canonical.startsWith('http') ? canonical : absoluteUrl(options.path, origin),
+        origin
+      )
+    );
+  } else {
+    document.getElementById('json-ld-article')?.remove();
+  }
+}
+
+/** Apply classic SEO tags for the active SPA screen (client-side). */
+export function applyDocumentSeo(screen: ScreenId): void {
+  if (typeof document === 'undefined') return;
+
+  // Per-article SEO when on /news/<slug>
+  if (screen === 'news' && typeof window !== 'undefined') {
+    const slug = blogSlugFromPath(window.location.pathname);
+    if (slug) {
+      const post = getBlogPostBySlug(slug);
+      if (post) {
+        const title = `${post.title} — Tarot Italia`;
+        const description =
+          post.description ||
+          pageSeoForScreen('news').description;
+        applySeoPayload({
+          title,
+          description,
+          path: pathForBlogPost(post.slug),
+          ogType: 'article',
+          imagePath: post.cover,
+          article: post,
+        });
+        document.getElementById('json-ld-faq')?.remove();
+        return;
+      }
+    }
+  }
+
+  const seo = pageSeoForScreen(screen);
+  const path = canonicalPathForScreen(screen);
+  const origin = getSiteOrigin();
+  const canonical = absoluteUrl(path, origin);
+
+  applySeoPayload({
+    title: seo.title,
+    description: seo.description,
+    path,
+    noindex: seo.noindex,
+    article: null,
+  });
 
   if (screen === 'home') {
     upsertJsonLd(

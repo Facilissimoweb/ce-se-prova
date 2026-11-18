@@ -2,7 +2,10 @@
 title: Benvenuto nel Blog di Tarot Italia
 date: 2026-11-18
 description: Un piccolo scritto di prova per presentare il nuovo Blog ospitato sul sito — Maria può sostituirlo con i suoi articoli.
-draft: false
+draft: true
+category: Storia
+tags:
+  - esempio
 ---
 
 Questo è un **articolo di esempio**. Serve solo a mostrare come funziona il Blog sul sito: niente Substack, solo file nel repository.
