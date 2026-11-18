@@ -1,10 +1,9 @@
 /**
- * Vercel Routing Middleware — Coming Soon gate (ENN-93).
+ * Vercel Routing Middleware — Coming Soon gate (ENN-93/94).
  *
  * Vite SPA (not Next.js). Helpers from `@vercel/functions` on Node runtime.
  * Gate logic is inlined (no ./src imports) so the Vercel middleware bundler
- * cannot fail resolving TypeScript path/extension imports — that previously
- * contributed to MIDDLEWARE_INVOCATION_FAILED on www.
+ * cannot fail resolving TypeScript path/extension imports.
  *
  * Keep behaviour in sync with src/lib/comingSoon.ts (Express + unlock API).
  */
@@ -17,7 +16,10 @@ export const config = {
 
 const COOKIE = 'ti_atelier_unlock';
 const DEFAULT_PATH = '/preview-atelier';
+const FRIENDLY_PATH = '/admin/com';
+const BUILTIN_UNLOCK_PATHS = [DEFAULT_PATH, FRIENDLY_PATH];
 const TOKEN_PAYLOAD = 'tarot-italia-atelier-v1';
+const COOKIE_MAX_AGE_SEC = 60 * 60 * 24 * 30;
 const PRODUCTION_HOSTS = new Set(['www.tarotitalia.com', 'tarotitalia.com']);
 
 type GateEnv = {
@@ -26,18 +28,38 @@ type GateEnv = {
   secretPath: string;
   password: string;
   passwordHash: string;
+  unlockToken: string;
 };
+
+/** Reject non-paths (e.g. pasted API keys). Never log the raw value. */
+function resolveSecretPath(rawPath: string): string {
+  const trimmed = (rawPath || '').trim();
+  if (!trimmed) return DEFAULT_PATH;
+  if (
+    !trimmed.startsWith('/') ||
+    /\s/.test(trimmed) ||
+    trimmed.length > 128 ||
+    /^(sk|pk|rk|whsec)_/i.test(trimmed)
+  ) {
+    console.warn(
+      '[coming-soon] COMING_SOON_SECRET_PATH is not a valid URL path; using default /preview-atelier'
+    );
+    return DEFAULT_PATH;
+  }
+  const normalized = normalizePath(trimmed);
+  if (normalized === '/') return DEFAULT_PATH;
+  return normalized;
+}
 
 function envOf(): GateEnv {
   const e = process.env;
-  const raw = (e.COMING_SOON_SECRET_PATH || DEFAULT_PATH).trim();
-  const secretPath = normalizePath(raw || DEFAULT_PATH);
   return {
     enabled: e.COMING_SOON_ENABLED === 'true',
     allHosts: e.COMING_SOON_ALL_HOSTS === 'true',
-    secretPath,
+    secretPath: resolveSecretPath(e.COMING_SOON_SECRET_PATH || ''),
     password: (e.COMING_SOON_PASSWORD || '').trim(),
     passwordHash: (e.COMING_SOON_PASSWORD_HASH || '').trim().toLowerCase(),
+    unlockToken: (e.COMING_SOON_UNLOCK_TOKEN || '').trim(),
   };
 }
 
@@ -46,6 +68,16 @@ function normalizePath(pathname: string): string {
   if (raw === '/') return '/';
   const withSlash = raw.startsWith('/') ? raw : `/${raw}`;
   return withSlash.replace(/\/+$/, '').toLowerCase() || '/';
+}
+
+function unlockPaths(env: GateEnv): string[] {
+  const paths = new Set(BUILTIN_UNLOCK_PATHS.map(normalizePath));
+  paths.add(normalizePath(env.secretPath));
+  return [...paths];
+}
+
+function isUnlockPath(pathname: string, env: GateEnv): boolean {
+  return unlockPaths(env).includes(normalizePath(pathname));
 }
 
 function hostWithoutPort(hostHeader: string): string {
@@ -117,16 +149,22 @@ async function hmacSha256Hex(secret: string, message: string): Promise<string> {
 function signingMaterial(env: GateEnv): string | null {
   if (env.password) return `pwd:${env.password}`;
   if (env.passwordHash) return `hash:${env.passwordHash}`;
+  if (env.unlockToken) return `tok:${env.unlockToken}`;
   return null;
+}
+
+async function cookieValue(env: GateEnv): Promise<string | null> {
+  const material = signingMaterial(env);
+  if (!material) return null;
+  return hmacSha256Hex(material, TOKEN_PAYLOAD);
 }
 
 async function isValidUnlockCookie(
   cookieHeader: string | null,
   env: GateEnv
 ): Promise<boolean> {
-  const material = signingMaterial(env);
-  if (!material) return false;
-  const expected = await hmacSha256Hex(material, TOKEN_PAYLOAD);
+  const expected = await cookieValue(env);
+  if (!expected) return false;
   const raw = cookieHeader || '';
   const match = raw
     .split(';')
@@ -137,6 +175,17 @@ async function isValidUnlockCookie(
   return timingSafeEqualString(value, expected);
 }
 
+function linkTokenMatches(url: URL, env: GateEnv): boolean {
+  if (!env.unlockToken) return false;
+  const candidate = (
+    url.searchParams.get('t') ||
+    url.searchParams.get('token') ||
+    ''
+  ).trim();
+  if (!candidate) return false;
+  return timingSafeEqualString(candidate, env.unlockToken);
+}
+
 function requestHost(request: Request, url: URL): string {
   return (
     request.headers.get('x-forwarded-host') ||
@@ -145,10 +194,61 @@ function requestHost(request: Request, url: URL): string {
   );
 }
 
-function comingSoonRewrite(request: Request, unlock: boolean): Response {
-  const dest = new URL('/coming-soon.html', request.url);
-  if (unlock) dest.searchParams.set('mode', 'unlock');
-  return rewrite(dest);
+function comingSoonRewrite(request: Request): Response {
+  return rewrite(new URL('/coming-soon.html', request.url));
+}
+
+function unlockRedirect(request: Request, cookie: string): Response {
+  const secure =
+    request.url.startsWith('https:') || process.env.VERCEL === '1';
+  const parts = [
+    `${COOKIE}=${cookie}`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax',
+    `Max-Age=${COOKIE_MAX_AGE_SEC}`,
+  ];
+  if (secure) parts.push('Secure');
+  const headers = new Headers();
+  headers.set('Location', new URL('/', request.url).toString());
+  headers.set('Set-Cookie', parts.join('; '));
+  headers.set('Cache-Control', 'no-store');
+  return new Response(null, { status: 302, headers });
+}
+
+/**
+ * Serve Coming Soon HTML with unlock UI enabled (password backup).
+ * Rewrite to `?mode=unlock` does NOT change window.location (ENN-94).
+ */
+async function comingSoonUnlockResponse(request: Request): Promise<Response> {
+  const htmlUrl = new URL('/coming-soon.html', request.url);
+  const upstream = await fetch(htmlUrl);
+  if (!upstream.ok) {
+    return Response.redirect(
+      new URL('/coming-soon.html?mode=unlock', request.url),
+      302
+    );
+  }
+  let html = await upstream.text();
+  // Only inspect the <body> tag — the same strings appear in CSS/JS source.
+  if (!/<body[^>]*data-coming-soon-mode\s*=\s*["']unlock["']/i.test(html)) {
+    html = html.replace(
+      /<body([^>]*)>/i,
+      '<body$1 class="is-unlock" data-coming-soon-mode="unlock">'
+    );
+  }
+  html = html.replace(
+    /(<div\s+class="unlock-panel"[^>]*?)\s+hidden([^>]*>)/i,
+    '$1$2'
+  );
+  return new Response(html, {
+    status: 200,
+    headers: {
+      'content-type': 'text/html; charset=utf-8',
+      'cache-control': 'no-store',
+      'x-robots-tag': 'noindex, nofollow',
+    },
+  });
 }
 
 export default async function middleware(request: Request): Promise<Response> {
@@ -169,18 +269,26 @@ export default async function middleware(request: Request): Promise<Response> {
       return next();
     }
 
-    if (normalizePath(url.pathname) === env.secretPath) {
-      return comingSoonRewrite(request, true);
+    if (isUnlockPath(url.pathname, env)) {
+      // One-click unlock: /admin/com?t=<COMING_SOON_UNLOCK_TOKEN>
+      if (linkTokenMatches(url, env)) {
+        const cookie = await cookieValue(env);
+        if (cookie) {
+          return unlockRedirect(request, cookie);
+        }
+      }
+      // Password form backup (no token / wrong token / token unset)
+      return comingSoonUnlockResponse(request);
     }
 
-    return comingSoonRewrite(request, false);
+    return comingSoonRewrite(request);
   } catch (err) {
     console.error('[coming-soon] middleware failed', err);
     try {
       const url = new URL(request.url);
       const env = envOf();
       if (isActive(requestHost(request, url), env)) {
-        return comingSoonRewrite(request, false);
+        return comingSoonRewrite(request);
       }
     } catch {
       /* ignore */

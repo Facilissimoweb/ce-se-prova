@@ -243,17 +243,27 @@
       .unlock-panel {
         display: none;
         width: min(100%, 22rem);
-        margin-top: 2rem;
+        margin-top: 1.25rem;
         text-align: left;
         animation: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
       }
 
-      body.is-unlock .public-copy {
+      /* Unlock without waiting on JS (server injects data-coming-soon-mode). */
+      body.is-unlock .public-copy,
+      body[data-coming-soon-mode='unlock'] .public-copy {
         display: none;
       }
 
-      body.is-unlock .unlock-panel {
-        display: block;
+      body.is-unlock .brand-mark,
+      body[data-coming-soon-mode='unlock'] .brand-mark {
+        width: min(42vw, 9.5rem);
+        margin-bottom: 0.75rem;
+      }
+
+      body.is-unlock .unlock-panel,
+      body[data-coming-soon-mode='unlock'] .unlock-panel {
+        /* Override UA [hidden] { display: none !important } when server forgot to strip it. */
+        display: block !important;
       }
 
       .unlock-panel h2 {
@@ -426,13 +436,16 @@
 
     <script>
       (function () {
-        var params = new URLSearchParams(window.location.search);
-        var unlock =
-          params.get('mode') === 'unlock' ||
-          document.body.getAttribute('data-coming-soon-mode') === 'unlock';
+        function normalizePath(pathname) {
+          var raw = String(pathname || '/').split('?')[0].split('#')[0].trim() || '/';
+          if (raw === '/') return '/';
+          var withSlash = raw.charAt(0) === '/' ? raw : '/' + raw;
+          return withSlash.replace(/\/+$/, '').toLowerCase() || '/';
+        }
 
-        if (unlock) {
+        function showUnlock() {
           document.body.classList.add('is-unlock');
+          document.body.setAttribute('data-coming-soon-mode', 'unlock');
           var panel = document.getElementById('unlock-panel');
           if (panel) {
             panel.hidden = false;
@@ -444,6 +457,45 @@
               input.focus();
             }, 120);
           }
+        }
+
+        var params = new URLSearchParams(window.location.search);
+        var unlock =
+          params.get('mode') === 'unlock' ||
+          document.body.getAttribute('data-coming-soon-mode') === 'unlock';
+
+        if (unlock) {
+          showUnlock();
+        } else {
+          // Vercel rewrite keeps the secret path in the address bar without
+          // ?mode=unlock — confirm via status API (ENN-94).
+          fetch('/api/coming-soon', {
+            method: 'GET',
+            headers: { Accept: 'application/json' },
+            credentials: 'same-origin',
+          })
+            .then(function (res) {
+              return res.ok ? res.json() : null;
+            })
+            .then(function (status) {
+              if (!status || !status.active || status.unlocked) return;
+              var path = normalizePath(window.location.pathname);
+              var paths = Array.isArray(status.unlockPaths)
+                ? status.unlockPaths.map(normalizePath)
+                : [];
+              if (!paths.length) {
+                paths = [
+                  normalizePath(status.secretPath || '/preview-atelier'),
+                  '/admin/com',
+                ];
+              }
+              if (paths.indexOf(path) !== -1) {
+                showUnlock();
+              }
+            })
+            .catch(function () {
+              /* keep public Coming Soon */
+            });
         }
 
         var form = document.getElementById('unlock-form');

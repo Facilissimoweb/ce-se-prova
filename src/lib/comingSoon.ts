@@ -1,11 +1,17 @@
 /**
- * Coming Soon gate (ENN-92/93) — shared helpers for Vercel Routing Middleware,
+ * Coming Soon gate (ENN-92/93/94) — shared helpers for Vercel Routing Middleware,
  * Express, and unlock API. Web Crypto only (safe on Node middleware + browsers).
- * Cookie is httpOnly; password stays server-side only (never VITE_*).
+ * Cookie is httpOnly; secrets stay server-side only (never VITE_*).
  */
 
 export const COMING_SOON_COOKIE = 'ti_atelier_unlock';
 export const COMING_SOON_DEFAULT_PATH = '/preview-atelier';
+/** Friendly alias — always works when the gate is on (no env path required). */
+export const COMING_SOON_FRIENDLY_PATH = '/admin/com';
+export const COMING_SOON_BUILTIN_UNLOCK_PATHS = [
+  COMING_SOON_DEFAULT_PATH,
+  COMING_SOON_FRIENDLY_PATH,
+] as const;
 export const COMING_SOON_COOKIE_MAX_AGE_SEC = 60 * 60 * 24 * 30; // 30 days
 const TOKEN_PAYLOAD = 'tarot-italia-atelier-v1';
 
@@ -17,10 +23,37 @@ const PRODUCTION_HOSTS = new Set([
 export type ComingSoonEnv = {
   enabled: boolean;
   allHosts: boolean;
+  /** Validated COMING_SOON_SECRET_PATH (or default). Never a pasted API key. */
   secretPath: string;
   password: string;
   passwordHash: string;
+  /** One-click unlock query value (COMING_SOON_UNLOCK_TOKEN). */
+  unlockToken: string;
 };
+
+/**
+ * COMING_SOON_SECRET_PATH must be a site path (e.g. `/preview-atelier`).
+ * Reject pasted credentials / non-paths and fall back to the default — never
+ * log the raw value (it may be a secret).
+ */
+export function resolveComingSoonSecretPath(rawPath: string): string {
+  const trimmed = (rawPath || '').trim();
+  if (!trimmed) return COMING_SOON_DEFAULT_PATH;
+  if (
+    !trimmed.startsWith('/') ||
+    /\s/.test(trimmed) ||
+    trimmed.length > 128 ||
+    /^(sk|pk|rk|whsec)_/i.test(trimmed)
+  ) {
+    console.warn(
+      '[coming-soon] COMING_SOON_SECRET_PATH is not a valid URL path; using default /preview-atelier'
+    );
+    return COMING_SOON_DEFAULT_PATH;
+  }
+  const normalized = normalizePath(trimmed);
+  if (normalized === '/') return COMING_SOON_DEFAULT_PATH;
+  return normalized;
+}
 
 export function readComingSoonEnv(
   env: Record<string, string | undefined> = process.env as Record<
@@ -28,14 +61,13 @@ export function readComingSoonEnv(
     string | undefined
   >
 ): ComingSoonEnv {
-  const rawPath = (env.COMING_SOON_SECRET_PATH || COMING_SOON_DEFAULT_PATH).trim();
-  const secretPath = normalizePath(rawPath || COMING_SOON_DEFAULT_PATH);
   return {
     enabled: env.COMING_SOON_ENABLED === 'true',
     allHosts: env.COMING_SOON_ALL_HOSTS === 'true',
-    secretPath,
+    secretPath: resolveComingSoonSecretPath(env.COMING_SOON_SECRET_PATH || ''),
     password: (env.COMING_SOON_PASSWORD || '').trim(),
     passwordHash: (env.COMING_SOON_PASSWORD_HASH || '').trim().toLowerCase(),
+    unlockToken: (env.COMING_SOON_UNLOCK_TOKEN || '').trim(),
   };
 }
 
@@ -59,6 +91,20 @@ export function isComingSoonActiveForHost(
   if (env.allHosts) return true;
   const host = hostWithoutPort(hostHeader);
   return PRODUCTION_HOSTS.has(host);
+}
+
+/**
+ * Built-in unlock routes + optional valid SECRET_PATH.
+ * Built-ins always work so Maria is not blocked by a bad SECRET_PATH env.
+ */
+export function listComingSoonUnlockPaths(
+  env: ComingSoonEnv = readComingSoonEnv()
+): string[] {
+  const paths = new Set<string>(
+    COMING_SOON_BUILTIN_UNLOCK_PATHS.map((p) => normalizePath(p))
+  );
+  paths.add(normalizePath(env.secretPath));
+  return [...paths];
 }
 
 /**
@@ -100,7 +146,27 @@ export function isComingSoonSecretPath(
   pathname: string,
   env: ComingSoonEnv = readComingSoonEnv()
 ): boolean {
-  return normalizePath(pathname) === env.secretPath;
+  const path = normalizePath(pathname);
+  return listComingSoonUnlockPaths(env).includes(path);
+}
+
+/** Query `t` or `token` on an unlock path. */
+export function readComingSoonLinkToken(
+  searchParams: URLSearchParams | { get(name: string): string | null }
+): string {
+  return (
+    (searchParams.get('t') || searchParams.get('token') || '').trim()
+  );
+}
+
+export function verifyComingSoonUnlockLinkToken(
+  candidate: string,
+  env: ComingSoonEnv = readComingSoonEnv()
+): boolean {
+  const expected = env.unlockToken;
+  const value = candidate.trim();
+  if (!expected || !value) return false;
+  return timingSafeEqualString(value, expected);
 }
 
 function timingSafeEqualString(a: string, b: string): boolean {
@@ -138,10 +204,11 @@ async function hmacSha256Hex(secret: string, message: string): Promise<string> {
     .join('');
 }
 
-/** Material used to sign the unlock cookie (password or hash must be set). */
+/** Material used to sign the unlock cookie. */
 function cookieSigningMaterial(env: ComingSoonEnv): string | null {
   if (env.password) return `pwd:${env.password}`;
   if (env.passwordHash) return `hash:${env.passwordHash}`;
+  if (env.unlockToken) return `tok:${env.unlockToken}`;
   return null;
 }
 
