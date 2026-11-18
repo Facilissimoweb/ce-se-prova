@@ -12,6 +12,10 @@ export const COMING_SOON_BUILTIN_UNLOCK_PATHS = [
   COMING_SOON_DEFAULT_PATH,
   COMING_SOON_FRIENDLY_PATH,
 ] as const;
+/** Hardcoded owner emails (ENN-95). Env COMING_SOON_OWNER_EMAILS may add more. */
+export const COMING_SOON_DEFAULT_OWNER_EMAILS = [
+  'mariateresarogani@gmail.com',
+] as const;
 export const COMING_SOON_COOKIE_MAX_AGE_SEC = 60 * 60 * 24 * 30; // 30 days
 const TOKEN_PAYLOAD = 'tarot-italia-atelier-v1';
 
@@ -29,6 +33,8 @@ export type ComingSoonEnv = {
   passwordHash: string;
   /** One-click unlock query value (COMING_SOON_UNLOCK_TOKEN). */
   unlockToken: string;
+  /** Extra owner emails from COMING_SOON_OWNER_EMAILS (comma-separated). */
+  ownerEmailsExtra: string[];
 };
 
 /**
@@ -55,6 +61,13 @@ export function resolveComingSoonSecretPath(rawPath: string): string {
   return normalized;
 }
 
+function parseOwnerEmailsExtra(raw: string): string[] {
+  return raw
+    .split(/[,;\s]+/)
+    .map((e) => e.trim().toLowerCase())
+    .filter((e) => e.includes('@'));
+}
+
 export function readComingSoonEnv(
   env: Record<string, string | undefined> = process.env as Record<
     string,
@@ -68,7 +81,30 @@ export function readComingSoonEnv(
     password: (env.COMING_SOON_PASSWORD || '').trim(),
     passwordHash: (env.COMING_SOON_PASSWORD_HASH || '').trim().toLowerCase(),
     unlockToken: (env.COMING_SOON_UNLOCK_TOKEN || '').trim(),
+    ownerEmailsExtra: parseOwnerEmailsExtra(
+      env.COMING_SOON_OWNER_EMAILS || ''
+    ),
   };
+}
+
+/** Owner Google allowlist: hardcoded defaults + optional env extras. */
+export function listComingSoonOwnerEmails(
+  env: ComingSoonEnv = readComingSoonEnv()
+): string[] {
+  const set = new Set<string>(
+    COMING_SOON_DEFAULT_OWNER_EMAILS.map((e) => e.toLowerCase())
+  );
+  for (const e of env.ownerEmailsExtra) set.add(e);
+  return [...set];
+}
+
+export function isComingSoonOwnerEmail(
+  email: string | null | undefined,
+  env: ComingSoonEnv = readComingSoonEnv()
+): boolean {
+  const normalized = (email || '').trim().toLowerCase();
+  if (!normalized) return false;
+  return listComingSoonOwnerEmails(env).includes(normalized);
 }
 
 export function normalizePath(pathname: string): string {
@@ -204,11 +240,28 @@ async function hmacSha256Hex(secret: string, message: string): Promise<string> {
     .join('');
 }
 
-/** Material used to sign the unlock cookie. */
+/**
+ * Material used to sign the unlock cookie.
+ * Prefer dedicated Coming Soon secrets; fall back to Firebase service-account
+ * key id so Google owner bypass works without COMING_SOON_PASSWORD.
+ */
 function cookieSigningMaterial(env: ComingSoonEnv): string | null {
   if (env.password) return `pwd:${env.password}`;
   if (env.passwordHash) return `hash:${env.passwordHash}`;
   if (env.unlockToken) return `tok:${env.unlockToken}`;
+  const saRaw = process.env.FIREBASE_SERVICE_ACCOUNT || '';
+  if (saRaw) {
+    try {
+      const sa = JSON.parse(saRaw) as {
+        private_key_id?: string;
+        project_id?: string;
+      };
+      if (sa.private_key_id) return `sa:${sa.private_key_id}`;
+      if (sa.project_id) return `sa-proj:${sa.project_id}`;
+    } catch {
+      /* ignore malformed SA JSON */
+    }
+  }
   return null;
 }
 

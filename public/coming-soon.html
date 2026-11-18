@@ -240,6 +240,80 @@
         color: var(--gold-hover);
       }
 
+      .owner-gate {
+        width: min(100%, 22rem);
+        margin-top: 1.75rem;
+        text-align: center;
+        animation: rise 1s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+      }
+
+      .owner-gate-label {
+        margin: 0 0 0.65rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(163, 155, 147, 0.9);
+      }
+
+      .google-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        width: 100%;
+        min-height: 2.85rem;
+        padding: 0.65rem 1rem;
+        border-radius: 0.65rem;
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        background: rgba(212, 175, 55, 0.14);
+        color: var(--gold-hover);
+        font-family: var(--font-sans);
+        font-weight: 650;
+        font-size: 0.9rem;
+        letter-spacing: 0.03em;
+        cursor: pointer;
+        transition: background 180ms ease, border-color 180ms ease;
+      }
+
+      .google-btn:hover:not(:disabled),
+      .google-btn:focus-visible {
+        background: rgba(212, 175, 55, 0.26);
+        border-color: rgba(212, 175, 55, 0.7);
+        outline: none;
+      }
+
+      .google-btn:disabled {
+        opacity: 0.55;
+        cursor: wait;
+      }
+
+      .google-btn svg {
+        flex-shrink: 0;
+      }
+
+      .owner-divider {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 1.15rem 0 0.85rem;
+        color: rgba(163, 155, 147, 0.75);
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .owner-divider::before,
+      .owner-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: rgba(163, 155, 147, 0.22);
+      }
+
+      body:not(.is-unlock):not([data-coming-soon-mode='unlock']) .password-backup {
+        display: none;
+      }
+
       .unlock-panel {
         display: none;
         width: min(100%, 22rem);
@@ -410,25 +484,51 @@
         </div>
       </div>
 
-      <div class="unlock-panel" id="unlock-panel" hidden>
-        <h2>Anteprima atelier</h2>
-        <p>Inserisci la password per aprire il sito completo su questo browser.</p>
-        <form id="unlock-form" autocomplete="current-password">
-          <label for="password">Password</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            minlength="1"
-            autocomplete="current-password"
-            enterkeyhint="go"
-          />
-          <div class="unlock-actions">
-            <button type="submit" id="unlock-submit">Entra</button>
+      <div class="owner-gate" id="owner-gate">
+        <p class="owner-gate-label">Accesso atelier</p>
+        <button type="button" class="google-btn" id="google-unlock">
+          <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+            <path
+              fill="#FFC107"
+              d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.2 6.1 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.3-.4-3.5z"
+            />
+            <path
+              fill="#FF3D00"
+              d="M6.3 14.7 12.9 19.6C14.7 15.1 18.9 12 24 12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.2 6.1 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"
+            />
+            <path
+              fill="#4CAF50"
+              d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.1 35.2 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.6 39.6 16.2 44 24 44z"
+            />
+            <path
+              fill="#1976D2"
+              d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l.0.0 6.2 5.2C39.2 36.9 44 32 44 24c0-1.2-.1-2.3-.4-3.5z"
+            />
+          </svg>
+          Entra con Google
+        </button>
+        <p class="error" id="google-error" role="alert" aria-live="polite"></p>
+
+        <div class="unlock-panel" id="unlock-panel" hidden>
+          <div class="password-backup" id="password-backup">
+            <p class="owner-divider">oppure password</p>
+            <form id="unlock-form" autocomplete="current-password">
+              <label for="password">Password</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                minlength="1"
+                autocomplete="current-password"
+                enterkeyhint="go"
+              />
+              <div class="unlock-actions">
+                <button type="submit" id="unlock-submit">Entra</button>
+              </div>
+              <p class="error" id="unlock-error" role="alert" aria-live="polite"></p>
+            </form>
           </div>
-          <p class="error" id="unlock-error" role="alert" aria-live="polite"></p>
-        </form>
+        </div>
       </div>
 
       <p class="footnote">Macerata · Operatore olistico</p>
@@ -451,12 +551,6 @@
             panel.hidden = false;
           }
           document.title = 'Tarot Italia — Anteprima atelier';
-          var input = document.getElementById('password');
-          if (input) {
-            setTimeout(function () {
-              input.focus();
-            }, 120);
-          }
         }
 
         var params = new URLSearchParams(window.location.search);
@@ -499,62 +593,141 @@
         }
 
         var form = document.getElementById('unlock-form');
-        if (!form) return;
+        if (form) {
+          form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            var passwordEl = document.getElementById('password');
+            var errorEl = document.getElementById('unlock-error');
+            var submitEl = document.getElementById('unlock-submit');
+            var password =
+              passwordEl && passwordEl.value ? passwordEl.value : '';
+            if (errorEl) errorEl.textContent = '';
+            if (submitEl) {
+              submitEl.disabled = true;
+              submitEl.textContent = 'Apertura…';
+            }
 
-        form.addEventListener('submit', function (event) {
-          event.preventDefault();
-          var passwordEl = document.getElementById('password');
-          var errorEl = document.getElementById('unlock-error');
-          var submitEl = document.getElementById('unlock-submit');
-          var password = passwordEl && passwordEl.value ? passwordEl.value : '';
-          if (errorEl) errorEl.textContent = '';
-          if (submitEl) {
-            submitEl.disabled = true;
-            submitEl.textContent = 'Apertura…';
-          }
-
-          fetch('/api/coming-soon/unlock', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({ password: password }),
-          })
-            .then(function (res) {
-              return res.json().then(function (body) {
-                return { ok: res.ok, status: res.status, body: body || {} };
+            fetch('/api/coming-soon/unlock', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+              },
+              credentials: 'same-origin',
+              body: JSON.stringify({ password: password }),
+            })
+              .then(function (res) {
+                return res.json().then(function (body) {
+                  return { ok: res.ok, status: res.status, body: body || {} };
+                });
+              })
+              .then(function (result) {
+                if (result.ok && result.body && result.body.ok) {
+                  window.location.href = result.body.redirect || '/';
+                  return;
+                }
+                if (errorEl) {
+                  errorEl.textContent =
+                    (result.body && result.body.error) ||
+                    'Password non corretta. Riprova.';
+                }
+                if (submitEl) {
+                  submitEl.disabled = false;
+                  submitEl.textContent = 'Entra';
+                }
+                if (passwordEl) {
+                  passwordEl.focus();
+                  passwordEl.select();
+                }
+              })
+              .catch(function () {
+                if (errorEl) {
+                  errorEl.textContent =
+                    'Connessione non disponibile. Riprova tra poco.';
+                }
+                if (submitEl) {
+                  submitEl.disabled = false;
+                  submitEl.textContent = 'Entra';
+                }
               });
-            })
-            .then(function (result) {
-              if (result.ok && result.body && result.body.ok) {
-                window.location.href = result.body.redirect || '/';
-                return;
-              }
-              if (errorEl) {
-                errorEl.textContent =
-                  (result.body && result.body.error) ||
-                  'Password non corretta. Riprova.';
-              }
-              if (submitEl) {
-                submitEl.disabled = false;
-                submitEl.textContent = 'Entra';
-              }
-              if (passwordEl) {
-                passwordEl.focus();
-                passwordEl.select();
-              }
-            })
-            .catch(function () {
-              if (errorEl) {
-                errorEl.textContent =
-                  'Connessione non disponibile. Riprova tra poco.';
-              }
-              if (submitEl) {
-                submitEl.disabled = false;
-                submitEl.textContent = 'Entra';
-              }
-            });
-        });
+          });
+        }
       })();
+    </script>
+
+    <!-- Owner Google unlock (ENN-95): Firebase client from CDN + existing applet config -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
+      import {
+        getAuth,
+        GoogleAuthProvider,
+        signInWithPopup,
+      } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
+
+      const firebaseConfig = {
+        projectId: 'gen-lang-client-0853491667',
+        appId: '1:9386426759:web:a7195d3ae0e62315771322',
+        apiKey: 'AIzaSyBY6t3-t2Z7GbF1UuW7ZDYoZF8kW7Sytpo',
+        authDomain: 'gen-lang-client-0853491667.firebaseapp.com',
+        storageBucket: 'gen-lang-client-0853491667.firebasestorage.app',
+        messagingSenderId: '9386426759',
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+
+      const btn = document.getElementById('google-unlock');
+      const errEl = document.getElementById('google-error');
+      if (btn) {
+        const labelHtml = btn.innerHTML;
+        btn.addEventListener('click', async () => {
+          if (errEl) errEl.textContent = '';
+          btn.disabled = true;
+          btn.textContent = 'Accesso Google…';
+          try {
+            const result = await signInWithPopup(auth, provider);
+            const idToken = await result.user.getIdToken();
+            const res = await fetch('/api/coming-soon/unlock', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+              },
+              credentials: 'same-origin',
+              body: JSON.stringify({ idToken }),
+            });
+            const body = await res.json().catch(() => ({}));
+            if (res.ok && body && body.ok) {
+              window.location.href = body.redirect || '/';
+              return;
+            }
+            if (errEl) {
+              errEl.textContent =
+                (body && body.error) ||
+                'Accesso non autorizzato. Usa l’account Google dell’atelier.';
+            }
+          } catch (err) {
+            const code = err && err.code ? String(err.code) : '';
+            if (errEl) {
+              if (
+                code === 'auth/popup-closed-by-user' ||
+                code === 'auth/cancelled-popup-request'
+              ) {
+                errEl.textContent = 'Accesso annullato.';
+              } else {
+                errEl.textContent =
+                  'Impossibile completare l’accesso Google. Riprova.';
+              }
+            }
+            console.error('[coming-soon] Google unlock failed', err);
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = labelHtml;
+          }
+        });
+      }
     </script>
   </body>
 </html>

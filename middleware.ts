@@ -150,6 +150,19 @@ function signingMaterial(env: GateEnv): string | null {
   if (env.password) return `pwd:${env.password}`;
   if (env.passwordHash) return `hash:${env.passwordHash}`;
   if (env.unlockToken) return `tok:${env.unlockToken}`;
+  const saRaw = process.env.FIREBASE_SERVICE_ACCOUNT || '';
+  if (saRaw) {
+    try {
+      const sa = JSON.parse(saRaw) as {
+        private_key_id?: string;
+        project_id?: string;
+      };
+      if (sa.private_key_id) return `sa:${sa.private_key_id}`;
+      if (sa.project_id) return `sa-proj:${sa.project_id}`;
+    } catch {
+      /* ignore */
+    }
+  }
   return null;
 }
 
