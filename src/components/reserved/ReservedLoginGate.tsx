@@ -117,8 +117,8 @@ export function ReservedLoginGate({
             <li className="flex items-start gap-3">
               <FileText className="w-4 h-4 text-[#D4AF37] shrink-0 mt-1" />
               <span>
-                <strong className="text-[#F4F1EA]">Quaderno Appunti</strong> personale
-                salvato su ogni modulo studiato e completato.
+                <strong className="text-[#F4F1EA]">Appunti liberi</strong> nel tuo
+                quaderno personale, più note sui moduli dei corsi sbloccati.
               </span>
             </li>
             <li className="flex items-start gap-3">

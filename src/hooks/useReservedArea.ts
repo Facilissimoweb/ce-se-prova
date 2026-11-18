@@ -30,7 +30,9 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
   const [loadingData, setLoadingData] = useState(() => Boolean(userUid));
   const [dataError, setDataError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'dispense' | 'consulti'>('dispense');
+  const [activeTab, setActiveTab] = useState<
+    'dispense' | 'consulti' | 'appunti'
+  >('dispense');
   const [activeCourseSlug, setActiveCourseSlug] =
     useState<CourseId>('arcani-maggiori');
   const [activeDispensaId, setActiveDispensaId] = useState<number | null>(null);

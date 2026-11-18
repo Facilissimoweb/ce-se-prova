@@ -20,6 +20,7 @@ export const SAFE_CLIENT_ERRORS = new Set([
   'SLOT_TAKEN',
   'Prenotazione non trovata.',
   'Prenotazione annullata.',
+  'Appunto non trovato.',
 ]);
 
 export function json(status: number, body: unknown): ApiResult {

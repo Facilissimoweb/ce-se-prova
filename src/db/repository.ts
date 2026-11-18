@@ -8,6 +8,7 @@ import {
   dialogueSessions,
   dispensaProgress,
   dispense,
+  userNotes,
   users,
 } from './schema.ts';
 import type {
@@ -321,6 +322,182 @@ export async function enrollUserInCourse(params: {
       'Errore durante la registrazione dell’acquisto del percorso.',
       { cause: error }
     );
+  }
+}
+
+function serializeUserNote(row: typeof userNotes.$inferSelect) {
+  return {
+    id: row.id,
+    title: row.title,
+    body: row.body,
+    createdAt:
+      row.createdAt instanceof Date
+        ? row.createdAt.toISOString()
+        : String(row.createdAt),
+    updatedAt:
+      row.updatedAt instanceof Date
+        ? row.updatedAt.toISOString()
+        : String(row.updatedAt),
+  };
+}
+
+export async function listUserNotes(params: {
+  uid: string;
+  email: string;
+  displayName?: string | null;
+}) {
+  try {
+    const dbUser = await getOrCreateUser(
+      params.uid,
+      params.email,
+      params.displayName
+    );
+    const rows = await db
+      .select()
+      .from(userNotes)
+      .where(eq(userNotes.userId, dbUser.id))
+      .orderBy(desc(userNotes.updatedAt));
+    return rows.map(serializeUserNote);
+  } catch (error) {
+    if (isDbConnectionFailure(error)) {
+      resetDbPool();
+    }
+    console.error('Failed to list user notes:', error);
+    throw new Error('Errore durante il caricamento degli appunti.', {
+      cause: error,
+    });
+  }
+}
+
+export async function createUserNote(params: {
+  uid: string;
+  email: string;
+  displayName?: string | null;
+  title?: string;
+  body?: string;
+}) {
+  try {
+    const dbUser = await getOrCreateUser(
+      params.uid,
+      params.email,
+      params.displayName
+    );
+    const title =
+      typeof params.title === 'string' ? params.title.trim().slice(0, 200) : '';
+    const body = typeof params.body === 'string' ? params.body.slice(0, 50000) : '';
+    const now = new Date();
+    const saved = await db
+      .insert(userNotes)
+      .values({
+        userId: dbUser.id,
+        title: title || 'Nuovo appunto',
+        body,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+    return serializeUserNote(saved[0]);
+  } catch (error) {
+    if (isDbConnectionFailure(error)) {
+      resetDbPool();
+    }
+    console.error('Failed to create user note:', error);
+    throw new Error('Errore durante la creazione dell’appunto.', {
+      cause: error,
+    });
+  }
+}
+
+export async function updateUserNote(params: {
+  uid: string;
+  email: string;
+  noteId: number;
+  title?: string;
+  body?: string;
+}) {
+  try {
+    const dbUser = await getOrCreateUser(params.uid, params.email);
+    const existing = await db
+      .select()
+      .from(userNotes)
+      .where(
+        and(eq(userNotes.id, params.noteId), eq(userNotes.userId, dbUser.id))
+      )
+      .limit(1);
+    if (!existing[0]) {
+      throw new Error('Appunto non trovato.');
+    }
+
+    const nextTitle =
+      typeof params.title === 'string'
+        ? params.title.trim().slice(0, 200)
+        : existing[0].title;
+    const nextBody =
+      typeof params.body === 'string'
+        ? params.body.slice(0, 50000)
+        : existing[0].body;
+
+    const saved = await db
+      .update(userNotes)
+      .set({
+        title: nextTitle || 'Senza titolo',
+        body: nextBody,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(eq(userNotes.id, params.noteId), eq(userNotes.userId, dbUser.id))
+      )
+      .returning();
+
+    return serializeUserNote(saved[0]);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === 'Appunto non trovato.'
+    ) {
+      throw error;
+    }
+    if (isDbConnectionFailure(error)) {
+      resetDbPool();
+    }
+    console.error('Failed to update user note:', error);
+    throw new Error('Errore durante il salvataggio dell’appunto.', {
+      cause: error,
+    });
+  }
+}
+
+export async function deleteUserNote(params: {
+  uid: string;
+  email: string;
+  noteId: number;
+}) {
+  try {
+    const dbUser = await getOrCreateUser(params.uid, params.email);
+    const deleted = await db
+      .delete(userNotes)
+      .where(
+        and(eq(userNotes.id, params.noteId), eq(userNotes.userId, dbUser.id))
+      )
+      .returning();
+    if (!deleted[0]) {
+      throw new Error('Appunto non trovato.');
+    }
+    return { ok: true as const, id: deleted[0].id };
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === 'Appunto non trovato.'
+    ) {
+      throw error;
+    }
+    if (isDbConnectionFailure(error)) {
+      resetDbPool();
+    }
+    console.error('Failed to delete user note:', error);
+    throw new Error('Errore durante l’eliminazione dell’appunto.', {
+      cause: error,
+    });
   }
 }
 

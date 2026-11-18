@@ -132,6 +132,15 @@ export const SCHEMA_BOOTSTRAP_STATEMENTS: string[] = [
     expires_at timestamp NOT NULL,
     created_at timestamp DEFAULT NOW() NOT NULL
   )`,
+  // ENN-98 — appunti liberi (tab Appunti), indipendenti dai corsi
+  `CREATE TABLE IF NOT EXISTS user_notes (
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title text DEFAULT '' NOT NULL,
+    body text DEFAULT '' NOT NULL,
+    created_at timestamp DEFAULT NOW() NOT NULL,
+    updated_at timestamp DEFAULT NOW() NOT NULL
+  )`,
 
   // --- Legacy ALTER (bases that predate booking Stripe/Calendar columns) ---
   `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS mode text NOT NULL DEFAULT 'remote'`,
@@ -154,6 +163,8 @@ export const SCHEMA_BOOTSTRAP_STATEMENTS: string[] = [
   `CREATE UNIQUE INDEX IF NOT EXISTS consultation_bookings_active_slot_idx
      ON consultation_bookings (scheduled_date, scheduled_time)
      WHERE status IN ('pending_payment', 'confirmed')`,
+  `CREATE INDEX IF NOT EXISTS user_notes_user_id_idx
+     ON user_notes (user_id)`,
 ];
 
 export async function ensureBookingSchema(): Promise<void> {

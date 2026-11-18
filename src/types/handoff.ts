@@ -116,6 +116,15 @@ export interface ReservedDialoguePassItem {
   createdAt: string;
 }
 
+/** Appunti liberi (tab Appunti) — indipendenti dai corsi / dispense. */
+export interface UserNoteItem {
+  id: number;
+  title: string;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ReservedAreaOverview {
   user: {
     id: number;
