@@ -8553,14 +8553,14 @@ import { getAuth } from "firebase-admin/auth";
 
 // firebase-applet-config.json
 var firebase_applet_config_default = {
-  projectId: "gen-lang-client-0720467504",
-  appId: "1:1047401794154:web:aa75f229bfcf6d7cd89813",
-  apiKey: "AIzaSyA_dxXXBJWBWJBx5pQ68xlUhvSKmI_ki9Q",
-  authDomain: "gen-lang-client-0720467504.firebaseapp.com",
-  storageBucket: "gen-lang-client-0720467504.firebasestorage.app",
-  messagingSenderId: "1047401794154",
+  projectId: "gen-lang-client-0853491667",
+  appId: "1:9386426759:web:a7195d3ae0e62315771322",
+  apiKey: "AIzaSyBY6t3-t2Z7GbF1UuW7ZDYoZF8kW7Sytpo",
+  authDomain: "gen-lang-client-0853491667.firebaseapp.com",
+  storageBucket: "gen-lang-client-0853491667.firebasestorage.app",
+  messagingSenderId: "9386426759",
   measurementId: "",
-  oAuthClientId: "1047401794154-fdg833gsf1h9bken88krg5ge383j9sa5.apps.googleusercontent.com",
+  oAuthClientId: "",
   recaptchaSiteKey: ""
 };
 
