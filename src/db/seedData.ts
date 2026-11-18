@@ -1,3 +1,5 @@
+import { ARCANI_MAGGIORI_DISPENSE } from '../data/courses/arcaniMaggioriDispense.ts';
+
 export interface CourseSeedEntry {
   slug: 'arcani-maggiori' | 'arcani-minori' | 'metodi-stesura';
   title: string;
@@ -24,9 +26,9 @@ export const COURSE_SEED_CATALOG: CourseSeedEntry[] = [
   {
     slug: 'arcani-maggiori',
     title: 'Arcani Maggiori',
-    subtitle: 'Il Viaggio Archetipico da 0 a XXI · Presente e Previsione',
+    subtitle: 'Primo Step · Tre Settenari da 0 a XXI · Presente e Previsione',
     description:
-      'Studio approfondito dei 22 Trionfi: iconografia tradizionale, struttura numerologica, lettura in luce e ombra e interpretazione previsionale delle grandi svolte.',
+      'Dispensa formativa completa del Primo Step: mappa dei Tre Settenari, studio dei 22 Trionfi dal Matto al Mondo, lettura in chiave previsionale ed esercizi di verifica.',
     priceEur: 190,
     stripePriceId:
       process.env.STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI ||
@@ -35,110 +37,7 @@ export const COURSE_SEED_CATALOG: CourseSeedEntry[] = [
     totalHours: '8h 30m video',
     levelLabel: 'Livello Base e Intermedio',
     sortOrder: 1,
-    dispense: [
-      {
-        moduleNumber: '01',
-        title: 'Struttura del Mazzo e Primo Settenario (0 – VII)',
-        subtitle: 'Dal potenziale originario del Matto alla direzione del Carro',
-        format: 'Dispensa PDF + Scheda Archetipica',
-        readingMinutes: 22,
-        keyTakeaways: [
-          'Il Matto (0) come soglia fuori dal numero e principio di libertà.',
-          'Polarità attiva e ricettiva tra Il Bagatto (I) e La Papessa (II).',
-          'Lettura previsionale del Carro (VII): accelerazione, spostamenti e vittoria disciplinata.',
-        ],
-        contentMarkdown: `## Il Primo Settenario: Identità e Radicamento nel Mondo
-
-I primi sette Arcani Maggiori descrivono la formazione della coscienza individuale e la capacità di agire nella realtà concreta.
-
-### 1. Il Matto (0) e l'inizio non condizionato
-Quando compare in lettura, segnala uno slancio genuino, una partenza imminente o un salto di fiducia ancora privo di schema rigido. In chiave previsionale anticipa un cambiamento improvviso di rotta o una novità che richiede coraggio.
-
-### 2. La diade creativa: Bagatto (I) e Papessa (II)
-- **Il Bagatto**: strumenti sul tavolo, iniziativa immediata, talento da mettere all'opera nei prossimi giorni.
-- **La Papessa**: gestazione silenziosa, verità intuita prima che detta, attesa fertile.
-
-### 3. Imperatrice (III), Imperatore (IV), Papa (V), Innamorati (VI) e Carro (VII)
-Dal fiorire creativo alla struttura, fino al patto etico (V), alla scelta del cuore (VI) e al movimento deciso del Carro (VII), che in previsione indica sblocco rapido di trattative o viaggi.`,
-      },
-      {
-        moduleNumber: '02',
-        title: 'Secondo Settenario: Prove Interiori e Destino (VIII – XIV)',
-        subtitle: 'Giustizia, Eremita, Ruota della Fortuna e Temperanza',
-        format: 'Dispensa PDF + Mappa Cicli',
-        readingMinutes: 25,
-        keyTakeaways: [
-          'La Giustizia (VIII/XI) e il bilancio oggettivo di accordi e contratti.',
-          'L’Eremita (IX) come ricerca della lanterna interiore e maturità dei tempi.',
-          'La Ruota della Fortuna (X) e la Temperanza (XIV): leggere il cambio di stagione.',
-        ],
-        contentMarkdown: `## Il Secondo Settenario: Il Confronto con la Legge del Tempo
-
-In questa fascia centrale degli Arcani Maggiori il consultante impara a distinguere ciò che dipende dalla volontà da ciò che appartiene ai cicli più ampi.
-
-### La Giustizia e La Forza
-La Giustizia chiede chiarezza contrattuale e coerenza morale; sul piano futuro anticipa firme, verifiche o riequilibri meritati. La Forza sostituisce la durezza con la padronanza calma dell'istinto.
-
-### L'Eremita (IX) e La Ruota (X)
-- **L'Eremita**: invita a non forzare i tempi; mostra un periodo di discernimento che precede una decisione stabile.
-- **La Ruota della Fortuna**: segnala una svolta esterna imminente, un ritorno ciclico o un'opportunità che chiede prontezza.
-
-### Appeso (XII), Arcano XIII e Temperanza (XIV)
-L'Appeso sospende l'azione per cambiare sguardo; l'Arcano XIII chiude ciò che ha esaurito la sua funzione; la Temperanza ricompone gli opposti con misura e guarigione graduale.`,
-      },
-      {
-        moduleNumber: '03',
-        title: 'Terzo Settenario: Ombra, Luce e Compimento (XV – XXI)',
-        subtitle: 'Dal Diavolo e la Torre fino alle Stelle, Sole e Mondo',
-        format: 'Dispensa PDF + Atlante Simbolico',
-        readingMinutes: 28,
-        keyTakeaways: [
-          'Leggere Il Diavolo (XV) e La Torre (XVI) senza fatalismo ma come verità liberatorie.',
-          'Le Stelle (XVII) e La Luna (XVIII): discernere speranza autentica da proiezione.',
-          'Il Sole (XIX), Il Giudizio (XX) e Il Mondo (XXI) nelle previsioni di realizzazione.',
-        ],
-        contentMarkdown: `## Il Terzo Settenario: La Trasformazione Profonda
-
-Gli ultimi sette Arcani conducono oltre i legami dell'ego verso una visione aperta e integrata.
-
-### Ombra e Rottura Costruttiva (XV – XVI)
-Il Diavolo porta alla luce attaccamenti, desideri intensi o accordi squilibrati. La Torre non punisce: abbatte costruzioni ormai fragili per liberare spazio autentico nel futuro prossimo.
-
-### Le Luci del Cielo (XVII – XIX)
-- **Le Stelle**: protezione, vocazione limpida, fidatezza dei progetti a medio termine.
-- **La Luna**: sogni, memorie familiari, zone non ancora chiarite dove muoversi con cautela.
-- **Il Sole**: chiarezza meridiana, riconoscimento pubblico, intesa affettiva e riuscita concreta.
-
-### Rinascita e Sintesi (XX – XXI)
-Il Giudizio annuncia una chiamata o notizia decisiva; Il Mondo sancisce il compimento di un ciclo e l'apertura di un nuovo orizzonte.`,
-      },
-      {
-        moduleNumber: '04',
-        title: 'Dialoghi tra Arcani e Formulazione Previsionale Etica',
-        subtitle: 'Combinazioni binarie, libero arbitrio e codice deontologico',
-        format: 'Quaderno Esercizi + Casi Studio',
-        readingMinutes: 20,
-        keyTakeaways: [
-          'Come il secondo Arcano orienta la direzione evolutiva del primo.',
-          'Linguaggio deontologico per esprimere scenari futuri senza togliere autonomia.',
-          'Protocollo di verifica su amore, lavoro e scelte personali.',
-        ],
-        contentMarkdown: `## Combinare Due Arcani Maggiori in Chiave Previsionale
-
-Una carta isolata descrive un archetipo; due carte accostate mostrano un movimento nel tempo.
-
-### Regola della Direzione (Carta A → Carta B)
-1. **Carta A** fotografa la radice attiva nel presente.
-2. **Carta B** mostra dove converge l'energia nei mesi successivi se il consultante mantiene la rotta.
-
-### Esempio Pratico
-- **Eremita + Carro**: dopo una fase di studio riservato o attesa riflessiva, arriva una ripartenza veloce con obiettivi definiti.
-- **Torre + Stelle**: una ristrutturazione improvvisa libera risorse per un progetto più fedele alla propria vocazione.
-
-### Confine Etico (Legge 4/2013)
-La previsione olistica traccia tendenze reali e punti di snodo lasciando sempre al consultante la responsabilità delle proprie scelte; restano escluse diagnosi mediche o pronostici sanitari.`,
-      },
-    ],
+    dispense: ARCANI_MAGGIORI_DISPENSE,
   },
   {
     slug: 'arcani-minori',

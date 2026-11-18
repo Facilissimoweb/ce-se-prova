@@ -41,6 +41,16 @@ export function FormattedDispensaBody({ markdown }: { markdown: string }) {
             </h5>
           );
         }
+        if (line.startsWith('#### ')) {
+          return (
+            <h6
+              key={idx}
+              className="font-body font-semibold text-sm text-[#E6C65C] pt-2"
+            >
+              {line.slice(5)}
+            </h6>
+          );
+        }
         if (line.startsWith('- ') || /^\d+\.\s/.test(line)) {
           const clean = line.startsWith('- ')
             ? line.slice(2)

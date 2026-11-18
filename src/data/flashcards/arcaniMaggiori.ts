@@ -314,13 +314,24 @@ export const ARCANI_MAGGIORI_MODULE_01_FLASHCARDS: StudyFlashcard[] = [
   },
 ];
 
+const MAGGIORI_SEAL_META = {
+  courseSlug: 'arcani-maggiori' as const,
+  title: 'Sigillo di apprendimento · Arcani Maggiori',
+  cards: ARCANI_MAGGIORI_MODULE_01_FLASHCARDS,
+};
+
 export const FLASHCARD_DECKS: CourseModuleFlashcardDeck[] = [
   {
-    courseSlug: 'arcani-maggiori',
+    ...MAGGIORI_SEAL_META,
     moduleNumber: '01',
-    title: 'Sigillo di apprendimento · Arcani Maggiori',
-    subtitle: 'Ripassa i Trionfi (0–XXI) con domande e risposte dopo la prima dispensa.',
-    cards: ARCANI_MAGGIORI_MODULE_01_FLASHCARDS,
+    subtitle:
+      'Ripassa i Trionfi (0–XXI) dopo la prima dispensa del Primo Step (architettura e Primo Settenario).',
+  },
+  {
+    ...MAGGIORI_SEAL_META,
+    moduleNumber: '04',
+    subtitle:
+      'Chiusura del Primo Step: ripassa i Trionfi (0–XXI) dopo il laboratorio pratico e i protocolli di verifica.',
   },
 ];
 
