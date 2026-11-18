@@ -45,7 +45,15 @@
       "destination": "/api/chat"
     },
     {
-      "source": "/((?!api(?:/|$)|privacy\\.html|sitemap\\.xml|robots\\.txt|llms\\.txt|llms-full\\.txt).*)",
+      "source": "/api/coming-soon",
+      "destination": "/api/coming-soon"
+    },
+    {
+      "source": "/api/coming-soon/(.*)",
+      "destination": "/api/coming-soon?__path=$1"
+    },
+    {
+      "source": "/((?!api(?:/|$)|privacy\\.html|coming-soon\\.html|sitemap\\.xml|robots\\.txt|llms\\.txt|llms-full\\.txt).*)",
       "destination": "/index.html"
     }
   ]

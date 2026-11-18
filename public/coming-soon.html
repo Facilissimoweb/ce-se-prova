@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="it" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Tarot Italia — Coming Soon</title>
+    <meta
+      name="description"
+      content="Tarot Italia di Maria Teresa Rogani. Lo spazio sacro online è in preparazione — a breve."
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#12100E" />
+    <link rel="icon" href="/brand/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/brand/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --obsidian: #12100e;
+        --obsidian-soft: #151311;
+        --parchment: #f4f1ea;
+        --quartz: #a39b93;
+        --gold: #d4af37;
+        --gold-hover: #e6c65c;
+        --font-display: "Cinzel", Georgia, serif;
+        --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        min-height: 100dvh;
+        background: var(--obsidian);
+        color: var(--parchment);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body {
+        overflow-x: clip;
+        padding:
+          max(1.25rem, env(safe-area-inset-top, 0px))
+          max(1.25rem, env(safe-area-inset-right, 0px))
+          max(1.25rem, env(safe-area-inset-bottom, 0px))
+          max(1.25rem, env(safe-area-inset-left, 0px));
+      }
+
+      .atmosphere {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(ellipse 90% 55% at 50% -10%, rgba(212, 175, 55, 0.14), transparent 55%),
+          radial-gradient(ellipse 60% 45% at 85% 90%, rgba(45, 90, 70, 0.18), transparent 50%),
+          radial-gradient(ellipse 50% 40% at 10% 80%, rgba(212, 175, 55, 0.06), transparent 45%),
+          linear-gradient(165deg, #0f0d0b 0%, #12100e 45%, #161310 100%);
+      }
+
+      .atmosphere::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0.35;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
+        mix-blend-mode: soft-light;
+        animation: grain 8s steps(6) infinite;
+      }
+
+      @keyframes grain {
+        0%,
+        100% {
+          transform: translate(0, 0);
+        }
+        20% {
+          transform: translate(-1%, 1%);
+        }
+        40% {
+          transform: translate(1%, -0.5%);
+        }
+        60% {
+          transform: translate(-0.5%, -1%);
+        }
+        80% {
+          transform: translate(0.5%, 0.5%);
+        }
+      }
+
+      .halo {
+        position: absolute;
+        left: 50%;
+        top: 18%;
+        width: min(72vw, 28rem);
+        height: min(72vw, 28rem);
+        transform: translate(-50%, -30%);
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(212, 175, 55, 0.16) 0%,
+          rgba(212, 175, 55, 0.04) 42%,
+          transparent 70%
+        );
+        animation: breathe 7s ease-in-out infinite;
+      }
+
+      @keyframes breathe {
+        0%,
+        100% {
+          opacity: 0.7;
+          transform: translate(-50%, -30%) scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: translate(-50%, -30%) scale(1.06);
+        }
+      }
+
+      .shell {
+        position: relative;
+        z-index: 1;
+        min-height: calc(100dvh - 2.5rem);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        max-width: 40rem;
+        margin: 0 auto;
+      }
+
+      .brand-mark {
+        width: min(72vw, 17.5rem);
+        height: auto;
+        display: block;
+        margin: 0 auto 1.25rem;
+        filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.45));
+        animation: rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(18px) scale(0.97);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .kicker {
+        font-family: var(--font-display);
+        font-size: 0.7rem;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin: 0 0 0.65rem;
+        animation: rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+      }
+
+      .brand-name {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: clamp(2rem, 8vw, 3.15rem);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--parchment);
+        margin: 0;
+        line-height: 1.15;
+        animation: rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+      }
+
+      .message {
+        margin: 1.15rem 0 0;
+        font-size: clamp(0.95rem, 2.6vw, 1.05rem);
+        line-height: 1.65;
+        color: var(--quartz);
+        max-width: 28rem;
+        animation: rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+        margin-top: 1.75rem;
+        animation: rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+      }
+
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 2.75rem;
+        padding: 0.65rem 1.15rem;
+        border-radius: 0.65rem;
+        border: 1px solid rgba(212, 175, 55, 0.28);
+        background: rgba(18, 16, 14, 0.55);
+        color: var(--parchment);
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        transition:
+          border-color 180ms ease,
+          background 180ms ease,
+          color 180ms ease;
+      }
+
+      .cta:hover,
+      .cta:focus-visible {
+        border-color: rgba(212, 175, 55, 0.55);
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--gold-hover);
+        outline: none;
+      }
+
+      .cta:focus-visible {
+        box-shadow: 0 0 0 2px var(--gold);
+      }
+
+      .cta-primary {
+        border-color: rgba(212, 175, 55, 0.45);
+        background: rgba(212, 175, 55, 0.12);
+        color: var(--gold-hover);
+      }
+
+      .unlock-panel {
+        display: none;
+        width: min(100%, 22rem);
+        margin-top: 2rem;
+        text-align: left;
+        animation: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+      }
+
+      body.is-unlock .public-copy {
+        display: none;
+      }
+
+      body.is-unlock .unlock-panel {
+        display: block;
+      }
+
+      .unlock-panel h2 {
+        font-family: var(--font-display);
+        font-size: 1.05rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin: 0 0 0.35rem;
+      }
+
+      .unlock-panel p {
+        margin: 0 0 1rem;
+        font-size: 0.875rem;
+        color: var(--quartz);
+        line-height: 1.5;
+      }
+
+      label {
+        display: block;
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--quartz);
+        margin-bottom: 0.4rem;
+      }
+
+      input[type="password"] {
+        width: 100%;
+        min-height: 2.75rem;
+        padding: 0.65rem 0.85rem;
+        border-radius: 0.65rem;
+        border: 1px solid rgba(163, 155, 147, 0.28);
+        background: rgba(18, 16, 14, 0.85);
+        color: var(--parchment);
+        font-family: var(--font-sans);
+        font-size: 1rem;
+      }
+
+      input[type="password"]:focus {
+        outline: none;
+        border-color: rgba(212, 175, 55, 0.55);
+        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.25);
+      }
+
+      .unlock-actions {
+        margin-top: 0.9rem;
+        display: flex;
+        gap: 0.65rem;
+        align-items: center;
+      }
+
+      button[type="submit"] {
+        flex: 1;
+        min-height: 2.75rem;
+        border: 1px solid rgba(212, 175, 55, 0.45);
+        border-radius: 0.65rem;
+        background: rgba(212, 175, 55, 0.16);
+        color: var(--gold-hover);
+        font-family: var(--font-sans);
+        font-weight: 650;
+        font-size: 0.9rem;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        transition: background 180ms ease, border-color 180ms ease;
+      }
+
+      button[type="submit"]:hover:not(:disabled),
+      button[type="submit"]:focus-visible {
+        background: rgba(212, 175, 55, 0.28);
+        border-color: rgba(212, 175, 55, 0.7);
+        outline: none;
+      }
+
+      button[type="submit"]:disabled {
+        opacity: 0.55;
+        cursor: wait;
+      }
+
+      .error {
+        margin: 0.75rem 0 0;
+        min-height: 1.25rem;
+        font-size: 0.8125rem;
+        color: #e8a0a0;
+      }
+
+      .footnote {
+        margin-top: 2.5rem;
+        font-size: 0.75rem;
+        color: rgba(163, 155, 147, 0.85);
+        letter-spacing: 0.04em;
+        animation: rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .atmosphere::after,
+        .halo,
+        .brand-mark,
+        .kicker,
+        .brand-name,
+        .message,
+        .cta-row,
+        .unlock-panel,
+        .footnote {
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true">
+      <div class="halo"></div>
+    </div>
+
+    <main class="shell">
+      <img
+        class="brand-mark"
+        src="/brand/tarot-italia-home-hero.png"
+        width="1024"
+        height="1024"
+        alt="Tarot Italia"
+        decoding="async"
+      />
+
+      <p class="kicker">Maria Teresa Rogani</p>
+      <h1 class="brand-name">Tarot Italia</h1>
+
+      <div class="public-copy">
+        <p class="message">
+          Lo spazio sacro online è in preparazione. A breve potrai prenotare
+          consulti, esplorare i percorsi e leggere gli articoli — con la stessa
+          cura di sempre.
+        </p>
+        <div class="cta-row">
+          <a
+            class="cta cta-primary"
+            href="https://wa.me/393791038253?text=Ciao%20Maria%20Teresa%2C%20ti%20scrivo%20dal%20sito%20Tarot%20Italia."
+          >
+            WhatsApp
+          </a>
+          <a class="cta" href="mailto:info@tarotitalia.com">
+            info@tarotitalia.com
+          </a>
+        </div>
+      </div>
+
+      <div class="unlock-panel" id="unlock-panel" hidden>
+        <h2>Anteprima atelier</h2>
+        <p>Inserisci la password per aprire il sito completo su questo browser.</p>
+        <form id="unlock-form" autocomplete="current-password">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            minlength="1"
+            autocomplete="current-password"
+            enterkeyhint="go"
+          />
+          <div class="unlock-actions">
+            <button type="submit" id="unlock-submit">Entra</button>
+          </div>
+          <p class="error" id="unlock-error" role="alert" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <p class="footnote">Macerata · Operatore olistico</p>
+    </main>
+
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var unlock =
+          params.get('mode') === 'unlock' ||
+          document.body.getAttribute('data-coming-soon-mode') === 'unlock';
+
+        if (unlock) {
+          document.body.classList.add('is-unlock');
+          var panel = document.getElementById('unlock-panel');
+          if (panel) {
+            panel.hidden = false;
+          }
+          document.title = 'Tarot Italia — Anteprima atelier';
+          var input = document.getElementById('password');
+          if (input) {
+            setTimeout(function () {
+              input.focus();
+            }, 120);
+          }
+        }
+
+        var form = document.getElementById('unlock-form');
+        if (!form) return;
+
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+          var passwordEl = document.getElementById('password');
+          var errorEl = document.getElementById('unlock-error');
+          var submitEl = document.getElementById('unlock-submit');
+          var password = passwordEl && passwordEl.value ? passwordEl.value : '';
+          if (errorEl) errorEl.textContent = '';
+          if (submitEl) {
+            submitEl.disabled = true;
+            submitEl.textContent = 'Apertura…';
+          }
+
+          fetch('/api/coming-soon/unlock', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ password: password }),
+          })
+            .then(function (res) {
+              return res.json().then(function (body) {
+                return { ok: res.ok, status: res.status, body: body || {} };
+              });
+            })
+            .then(function (result) {
+              if (result.ok && result.body && result.body.ok) {
+                window.location.href = result.body.redirect || '/';
+                return;
+              }
+              if (errorEl) {
+                errorEl.textContent =
+                  (result.body && result.body.error) ||
+                  'Password non corretta. Riprova.';
+              }
+              if (submitEl) {
+                submitEl.disabled = false;
+                submitEl.textContent = 'Entra';
+              }
+              if (passwordEl) {
+                passwordEl.focus();
+                passwordEl.select();
+              }
+            })
+            .catch(function () {
+              if (errorEl) {
+                errorEl.textContent =
+                  'Connessione non disponibile. Riprova tra poco.';
+              }
+              if (submitEl) {
+                submitEl.disabled = false;
+                submitEl.textContent = 'Entra';
+              }
+            });
+        });
+      })();
+    </script>
+  </body>
+</html>
