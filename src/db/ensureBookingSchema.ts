@@ -1,36 +1,12 @@
-import { createPool } from './index.ts';
+import {
+  createPool,
+  isDbConnectionFailure,
+  resetDbPool,
+} from './index.ts';
 
 declare global {
   // eslint-disable-next-line no-var
   var _ennamoSchemaReady: Promise<void> | undefined;
-}
-
-function isConnectionFailure(error: unknown): boolean {
-  if (!error || typeof error !== 'object') return false;
-  const code = String((error as { code?: unknown }).code || '');
-  if (
-    code === 'ECONNREFUSED' ||
-    code === 'ENOTFOUND' ||
-    code === 'ETIMEDOUT' ||
-    code === 'ECONNRESET' ||
-    code === 'EAI_AGAIN' ||
-    code === '57P01' || // admin_shutdown
-    code === '57P03' // cannot_connect_now
-  ) {
-    return true;
-  }
-  // node-pg connectionTimeoutMillis often has no errno — match the message.
-  const message = String(
-    (error as { message?: unknown }).message || error
-  ).toLowerCase();
-  return (
-    message.includes('timeout exceeded when trying to connect') ||
-    message.includes('connection terminated due to connection timeout') ||
-    message.includes('connect etimedout') ||
-    message.includes('could not connect') ||
-    message.includes('connection refused') ||
-    message.includes('getaddrinfo')
-  );
 }
 
 function hasDatabaseConfig(): boolean {
@@ -195,10 +171,11 @@ export async function ensureBookingSchema(): Promise<void> {
       await pool.query(sql);
     } catch (error) {
       console.error('ensureBookingSchema statement failed:', sql, error);
-      if (isConnectionFailure(error)) {
+      if (isDbConnectionFailure(error)) {
         console.error(
           'ensureBookingSchema: aborting remaining statements (DB unreachable)'
         );
+        resetDbPool();
         return;
       }
     }

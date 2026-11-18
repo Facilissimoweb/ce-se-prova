@@ -7077,6 +7077,56 @@ function drizzle(...params) {
 // src/db/index.ts
 import { Pool as Pool2 } from "pg";
 
+// src/db/databaseUrl.ts
+function describeDatabaseUrl(raw) {
+  try {
+    const url = new URL(raw);
+    const host = url.hostname || "";
+    const port = url.port || (url.protocol === "postgresql:" ? "5432" : "");
+    const pgbouncer = url.searchParams.get("pgbouncer") === "true" || url.searchParams.get("pgbouncer") === "1";
+    const looksLikeSupabaseDirect = /^db\.[a-z0-9]+\.supabase\.co$/i.test(host);
+    const looksLikeSupabasePooler = /\.pooler\.supabase\.com$/i.test(host);
+    return {
+      host,
+      port,
+      database: url.pathname.replace(/^\//, "") || "postgres",
+      pgbouncer,
+      looksLikeSupabaseDirect,
+      looksLikeSupabasePooler,
+      looksLikeTransactionPooler: looksLikeSupabasePooler && (port === "6543" || pgbouncer)
+    };
+  } catch {
+    return {
+      host: "(unparseable)",
+      port: "",
+      database: "",
+      pgbouncer: false,
+      looksLikeSupabaseDirect: false,
+      looksLikeSupabasePooler: false,
+      looksLikeTransactionPooler: false
+    };
+  }
+}
+function normalizeDatabaseUrl(raw) {
+  const trimmed = raw.trim();
+  if (!trimmed) return trimmed;
+  try {
+    const url = new URL(trimmed);
+    const host = url.hostname || "";
+    const port = url.port || "";
+    const isPooler = /\.pooler\.supabase\.com$/i.test(host);
+    if (isPooler && (port === "6543" || !port)) {
+      if (!url.port) url.port = "6543";
+      if (url.searchParams.get("pgbouncer") !== "true" && url.searchParams.get("pgbouncer") !== "1") {
+        url.searchParams.set("pgbouncer", "true");
+      }
+    }
+    return url.toString();
+  } catch {
+    return trimmed;
+  }
+}
+
 // src/db/schema.ts
 var schema_exports = {};
 __export(schema_exports, {
@@ -7297,12 +7347,57 @@ var dialoguePurchasesRelations = relations(dialoguePurchases, ({ one }) => ({
 }));
 
 // src/db/index.ts
+function isDbConnectionFailure(error) {
+  if (!error || typeof error !== "object") return false;
+  const code = String(error.code || "");
+  if (code === "ECONNREFUSED" || code === "ENOTFOUND" || code === "ETIMEDOUT" || code === "ECONNRESET" || code === "EAI_AGAIN" || code === "57P01" || // admin_shutdown
+  code === "57P03") {
+    return true;
+  }
+  const message = String(
+    error.message || error
+  ).toLowerCase();
+  return message.includes("timeout exceeded when trying to connect") || message.includes("connection terminated due to connection timeout") || message.includes("connect etimedout") || message.includes("could not connect") || message.includes("connection refused") || message.includes("getaddrinfo");
+}
+function resetDbPool() {
+  if (global._postgresPoolResetting) return;
+  global._postgresPoolResetting = true;
+  const existing = global._postgresPool;
+  global._postgresPool = void 0;
+  global._ennamoDb = void 0;
+  global._postgresPoolLogged = void 0;
+  try {
+    if (existing) {
+      void existing.end().catch((err) => {
+        console.error("SQL pool end after reset failed:", err);
+      });
+    }
+  } finally {
+    global._postgresPoolResetting = false;
+  }
+}
 function poolMax() {
   if (process.env.SQL_POOL_MAX) {
     return Number(process.env.SQL_POOL_MAX) || 1;
   }
   if (process.env.VERCEL) return 1;
   return 10;
+}
+function connectionTimeoutMillis() {
+  if (process.env.SQL_CONNECTION_TIMEOUT_MS) {
+    const parsed = Number(process.env.SQL_CONNECTION_TIMEOUT_MS);
+    if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  }
+  if (process.env.VERCEL) return 1e4;
+  return 15e3;
+}
+function idleTimeoutMillis() {
+  if (process.env.SQL_IDLE_TIMEOUT_MS) {
+    const parsed = Number(process.env.SQL_IDLE_TIMEOUT_MS);
+    if (Number.isFinite(parsed) && parsed >= 0) return parsed;
+  }
+  if (process.env.VERCEL) return 5e3;
+  return 1e4;
 }
 function sslOption() {
   if (process.env.SQL_SSL === "false") return void 0;
@@ -7313,16 +7408,33 @@ function sslOption() {
 }
 var createPool = () => {
   if (!global._postgresPool) {
-    const connectionString = process.env.DATABASE_URL?.trim();
+    const rawConnectionString = process.env.DATABASE_URL?.trim();
+    const connectionString = rawConnectionString ? normalizeDatabaseUrl(rawConnectionString) : void 0;
     const config2 = {
       max: poolMax(),
-      // Serverless: fail fast so ensureSchema / handlers return JSON 5xx
-      // instead of burning maxDuration (FUNCTION_INVOCATION_FAILED).
-      connectionTimeoutMillis: process.env.VERCEL ? 5e3 : 15e3,
+      connectionTimeoutMillis: connectionTimeoutMillis(),
+      idleTimeoutMillis: idleTimeoutMillis(),
+      // Let the Node event loop exit when the only clients are idle (Vercel).
+      allowExitOnIdle: Boolean(process.env.VERCEL),
+      keepAlive: true,
       ssl: sslOption()
     };
     if (connectionString) {
       config2.connectionString = connectionString;
+      if (!global._postgresPoolLogged) {
+        global._postgresPoolLogged = true;
+        const desc2 = describeDatabaseUrl(connectionString);
+        console.info("SQL pool init:", desc2);
+        if (desc2.looksLikeSupabaseDirect) {
+          console.warn(
+            "DATABASE_URL looks like Supabase Direct (db.*.supabase.co). On Vercel prefer Transaction pooler host *.pooler.supabase.com:6543?pgbouncer=true (ENN-65 / ENN-89)."
+          );
+        } else if (desc2.looksLikeSupabasePooler && !desc2.looksLikeTransactionPooler) {
+          console.warn(
+            "DATABASE_URL looks like Supabase pooler but not Transaction mode (:6543 + pgbouncer). Session mode (:5432) can exhaust connections on Vercel."
+          );
+        }
+      }
     } else {
       const host = process.env.SQL_HOST;
       config2.host = host;
@@ -7330,9 +7442,15 @@ var createPool = () => {
       config2.password = process.env.SQL_PASSWORD;
       config2.database = process.env.SQL_DB_NAME;
     }
-    global._postgresPool = new Pool2(config2);
-    global._postgresPool.on("error", (err) => {
+    const pool = new Pool2(config2);
+    global._postgresPool = pool;
+    pool.on("error", (err) => {
       console.error("Unexpected error on idle SQL pool client:", err);
+      if (global._postgresPool === pool) {
+        global._postgresPool = void 0;
+        global._ennamoDb = void 0;
+        global._postgresPoolLogged = void 0;
+      }
     });
   }
   return global._postgresPool;
@@ -7352,18 +7470,6 @@ var db = new Proxy({}, {
 });
 
 // src/db/ensureBookingSchema.ts
-function isConnectionFailure(error) {
-  if (!error || typeof error !== "object") return false;
-  const code = String(error.code || "");
-  if (code === "ECONNREFUSED" || code === "ENOTFOUND" || code === "ETIMEDOUT" || code === "ECONNRESET" || code === "EAI_AGAIN" || code === "57P01" || // admin_shutdown
-  code === "57P03") {
-    return true;
-  }
-  const message = String(
-    error.message || error
-  ).toLowerCase();
-  return message.includes("timeout exceeded when trying to connect") || message.includes("connection terminated due to connection timeout") || message.includes("connect etimedout") || message.includes("could not connect") || message.includes("connection refused") || message.includes("getaddrinfo");
-}
 function hasDatabaseConfig() {
   return Boolean(
     process.env.DATABASE_URL?.trim() || process.env.SQL_HOST?.trim()
@@ -7510,10 +7616,11 @@ async function ensureBookingSchema() {
       await pool.query(sql2);
     } catch (error) {
       console.error("ensureBookingSchema statement failed:", sql2, error);
-      if (isConnectionFailure(error)) {
+      if (isDbConnectionFailure(error)) {
         console.error(
           "ensureBookingSchema: aborting remaining statements (DB unreachable)"
         );
+        resetDbPool();
         return;
       }
     }
@@ -7881,7 +7988,12 @@ async function getOrCreateUser(uid, email, displayName) {
     }).returning();
     return result[0];
   } catch (error) {
-    console.error("Failed to upsert user:", error);
+    if (isDbConnectionFailure(error)) {
+      resetDbPool();
+      console.error("Failed to upsert user (DB connect timeout/unreachable):", error);
+    } else {
+      console.error("Failed to upsert user:", error);
+    }
     throw new Error("Errore durante la sincronizzazione del profilo utente.", {
       cause: error
     });
