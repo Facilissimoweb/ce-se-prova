@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import {
   ArrowRight,
   Check,
@@ -18,6 +18,16 @@ import { ReservedLoginGate } from '../components/reserved/ReservedLoginGate';
 import { ReservedNotesPanel } from '../components/reserved/ReservedNotesPanel';
 import { getFlashcardDeck } from '../data/flashcards/arcaniMaggiori';
 import { useReservedArea } from '../hooks/useReservedArea';
+import {
+  SCROLL_LANDMARKS,
+  scrollToIdAfterPaint,
+} from '../lib/scrollNavigation';
+
+type ReservedScrollTarget =
+  | 'percorsi'
+  | 'dispense-list'
+  | 'dispensa-content'
+  | null;
 
 interface ReservedAreaScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -84,6 +94,70 @@ export function ReservedAreaScreen({
     if (!activeCourse || !activeDispensa) return null;
     return getFlashcardDeck(activeCourse.slug, activeDispensa.moduleNumber);
   }, [activeCourse, activeDispensa]);
+
+  const pendingScrollRef = useRef<ReservedScrollTarget>(null);
+
+  const nextDispensa = useMemo(() => {
+    if (!activeCourse?.isUnlocked || !activeDispensa) return null;
+    const list = activeCourse.unlockedDispense;
+    const idx = list.findIndex((d) => d.id === activeDispensa.id);
+    if (idx < 0 || idx >= list.length - 1) return null;
+    return list[idx + 1] ?? null;
+  }, [activeCourse, activeDispensa]);
+
+  const scrollLandmarkFor = (target: ReservedScrollTarget): string | null => {
+    if (target === 'percorsi') return SCROLL_LANDMARKS.reservedPercorsi;
+    if (target === 'dispense-list') return SCROLL_LANDMARKS.reservedDispenseList;
+    if (target === 'dispensa-content')
+      return SCROLL_LANDMARKS.reservedDispensaContent;
+    return null;
+  };
+
+  useEffect(() => {
+    const target = pendingScrollRef.current;
+    if (!target) return;
+    pendingScrollRef.current = null;
+    const landmark = scrollLandmarkFor(target);
+    if (!landmark) return;
+    return scrollToIdAfterPaint(landmark, { behavior: 'smooth' });
+  }, [activeCourse?.slug, activeDispensa?.id, activeCourse?.isUnlocked]);
+
+  const selectCourse = (slug: CourseId) => {
+    pendingScrollRef.current = 'dispense-list';
+    setEnrollMessage(null);
+    if (slug === activeCourse?.slug) {
+      // Same percorso: still land on the dispense list (mobile).
+      scrollToIdAfterPaint(SCROLL_LANDMARKS.reservedDispenseList, {
+        behavior: 'smooth',
+      });
+      return;
+    }
+    setActiveCourseSlug(slug);
+  };
+
+  const selectDispensa = (id: number) => {
+    pendingScrollRef.current = 'dispensa-content';
+    if (id === activeDispensa?.id) {
+      scrollToIdAfterPaint(SCROLL_LANDMARKS.reservedDispensaContent, {
+        behavior: 'smooth',
+      });
+      return;
+    }
+    setActiveDispensaId(id);
+  };
+
+  const goToNextDispensa = () => {
+    if (!nextDispensa) return;
+    selectDispensa(nextDispensa.id);
+  };
+
+  const returnToPercorsi = () => {
+    pendingScrollRef.current = 'percorsi';
+    // Re-trigger scroll even if course/dispensa ids are unchanged.
+    scrollToIdAfterPaint(SCROLL_LANDMARKS.reservedPercorsi, {
+      behavior: 'smooth',
+    });
+  };
 
   if (authLoading || !user) {
     return (
@@ -227,17 +301,17 @@ export function ReservedAreaScreen({
       ) : activeTab === 'dispense' && activeCourse ? (
         <div className="space-y-8">
           {/* Course Selector Strip */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div
+            id={SCROLL_LANDMARKS.reservedPercorsi}
+            className="grid grid-cols-1 md:grid-cols-3 gap-4 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
+          >
             {overview.courses.map((course, idx) => {
               const isSelected = course.slug === activeCourse.slug;
               return (
                 <button
                   key={course.id}
                   type="button"
-                  onClick={() => {
-                    setActiveCourseSlug(course.slug);
-                    setEnrollMessage(null);
-                  }}
+                  onClick={() => selectCourse(course.slug)}
                   aria-pressed={isSelected}
                   className={`rounded-2xl p-5 text-left border transition-all duration-150 flex flex-col justify-between gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
                     isSelected
@@ -286,7 +360,10 @@ export function ReservedAreaScreen({
           {activeCourse.isUnlocked ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Left Column: 4 Dispense Navigation */}
-              <aside className="lg:col-span-4 space-y-3">
+              <aside
+                id={SCROLL_LANDMARKS.reservedDispenseList}
+                className="lg:col-span-4 space-y-3 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
+              >
                 <div className="space-y-1 px-1">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
                     Dispense del Percorso
@@ -303,7 +380,7 @@ export function ReservedAreaScreen({
                       <button
                         key={dispensa.id}
                         type="button"
-                        onClick={() => setActiveDispensaId(dispensa.id)}
+                        onClick={() => selectDispensa(dispensa.id)}
                         aria-pressed={isCurrent}
                         className={`w-full text-left rounded-xl p-4 border transition-all space-y-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
                           isCurrent
@@ -336,7 +413,10 @@ export function ReservedAreaScreen({
 
               {/* Right Column: Dispensa Content + Study Notes */}
               {activeDispensa && (
-                <article className="lg:col-span-8 glass-tier-1 rounded-2xl p-6 md:p-8 space-y-6">
+                <article
+                  id={SCROLL_LANDMARKS.reservedDispensaContent}
+                  className="lg:col-span-8 glass-tier-1 rounded-2xl p-6 md:p-8 space-y-6 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
+                >
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-[#D4AF37]/15 pb-5">
                     <div className="space-y-1.5">
                       <div className="flex flex-wrap items-center gap-2 text-xs text-[#D4AF37]">
@@ -459,6 +539,36 @@ export function ReservedAreaScreen({
                         {savingNotes ? 'Salvataggio...' : 'Salva Appunti'}
                       </button>
                     </div>
+                  </div>
+
+                  <div className="gold-divider" aria-hidden="true" />
+
+                  {/* End-of-module: next dispensa or back to percorsi */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                    <p className="text-xs text-[#A39B93]">
+                      {nextDispensa
+                        ? `Fine modulo ${activeDispensa.moduleNumber}. Continua con la dispensa successiva.`
+                        : `Ultimo modulo del percorso ${activeCourse.title}.`}
+                    </p>
+                    {nextDispensa ? (
+                      <button
+                        type="button"
+                        onClick={goToNextDispensa}
+                        className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+                      >
+                        Prosegui a dispensa {nextDispensa.moduleNumber}
+                        <ArrowRight className="w-4 h-4 shrink-0" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={returnToPercorsi}
+                        className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/10 hover:border-[#D4AF37] hover:bg-[#D4AF37]/18 text-[#F4F1EA] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                      >
+                        Torna ai percorsi
+                        <ArrowRight className="w-4 h-4 shrink-0 text-[#D4AF37]" />
+                      </button>
+                    )}
                   </div>
                 </article>
               )}

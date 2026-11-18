@@ -14,6 +14,10 @@ export const SCROLL_LANDMARKS = {
   homeDidattica: 'home-didattica',
   corsiWorkbench: 'corsi-workbench',
   corsiCheckout: 'corsi-checkout',
+  /** Area Riservata — course strip / dispense list / active dispensa reader */
+  reservedPercorsi: 'reserved-percorsi',
+  reservedDispenseList: 'reserved-dispense-list',
+  reservedDispensaContent: 'reserved-dispensa-content',
 } as const;
 
 export type ScrollLandmarkId =

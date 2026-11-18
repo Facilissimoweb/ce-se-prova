@@ -13,6 +13,10 @@ import {
   type User,
 } from 'firebase/auth';
 import { auth, googleAuthProvider } from '../lib/firebase';
+import {
+  RESERVED_DEMO_UID,
+  isReservedDemoRequested,
+} from '../lib/reservedDemo';
 
 interface AuthContextValue {
   user: User | null;
@@ -26,12 +30,50 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/** Minimal stand-in for local Area Riservata demos (DEV + ?demo_reserved=1). */
+function buildReservedDemoAuthUser(): User {
+  return {
+    uid: RESERVED_DEMO_UID,
+    email: 'demo@tarotitalia.local',
+    displayName: 'Demo Corsista',
+    emailVerified: true,
+    isAnonymous: false,
+    metadata: {},
+    providerData: [],
+    refreshToken: '',
+    tenantId: null,
+    delete: async () => undefined,
+    getIdToken: async () => 'demo-reserved-token',
+    getIdTokenResult: async () =>
+      ({
+        token: 'demo-reserved-token',
+        expirationTime: '',
+        issuedAtTime: '',
+        authTime: '',
+        signInProvider: 'custom',
+        signInSecondFactor: null,
+        claims: {},
+      }) as Awaited<ReturnType<User['getIdTokenResult']>>,
+    reload: async () => undefined,
+    toJSON: () => ({}),
+    phoneNumber: null,
+    photoURL: null,
+    providerId: 'firebase',
+  } as User;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isReservedDemoRequested()) {
+      setUser(buildReservedDemoAuthUser());
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
@@ -77,10 +119,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Stable identity so consumers (useReservedArea, booking, dialogue) do not
   // recreate fetch callbacks on every AuthProvider render.
   const getIdToken = useCallback(async (): Promise<string | null> => {
+    if (user?.uid === RESERVED_DEMO_UID) return 'demo-reserved-token';
     const currentUser = auth.currentUser;
     if (!currentUser) return null;
     return currentUser.getIdToken();
-  }, []);
+  }, [user?.uid]);
 
   const value = useMemo(
     () => ({
