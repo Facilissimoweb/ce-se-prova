@@ -4,6 +4,7 @@ import {
   getReservedAreaOverview,
   updateDispensaProgress,
 } from '../../db/repository.ts';
+import { COURSE_SEED_CATALOG } from '../../db/seedData.ts';
 import {
   allowDirectUnlock,
   checkoutLineItemFromCatalog,
@@ -19,17 +20,75 @@ import {
   type ApiUser,
 } from '../http.ts';
 
+const OVERVIEW_DEGRADED_NOTICE =
+  'Area Riservata in modalità ridotta: non riusciamo a sincronizzare corsi e prenotazioni con il database in questo momento. Puoi restare autenticata; riprova tra poco.';
+
+/** Locked catalog from in-repo seed — used when Postgres is unreachable. */
+function degradedOverviewFromSeed(user: ApiUser) {
+  return {
+    user: {
+      id: 0,
+      uid: user.uid,
+      email: user.email || '',
+      displayName: user.name ?? null,
+      phoneWhatsapp: null,
+    },
+    courses: COURSE_SEED_CATALOG.map((course, index) => ({
+      id: -(index + 1),
+      slug: course.slug,
+      title: course.title,
+      subtitle: course.subtitle,
+      description: course.description,
+      priceEur: course.priceEur,
+      stripePriceId: course.stripePriceId,
+      lessonsCount: course.lessonsCount,
+      totalHours: course.totalHours,
+      levelLabel: course.levelLabel,
+      sortOrder: course.sortOrder,
+      isUnlocked: false,
+      purchasedAt: null,
+      amountPaidEur: null,
+      dispenseCount: course.dispense.length,
+      dispenseOutline: course.dispense.map((d, i) => ({
+        id: -(index * 100 + i + 1),
+        courseId: -(index + 1),
+        moduleNumber: d.moduleNumber,
+        title: d.title,
+        subtitle: d.subtitle,
+        format: d.format,
+        readingMinutes: d.readingMinutes,
+        sortOrder: i + 1,
+      })),
+      unlockedDispense: [],
+    })),
+    bookings: [],
+    dialoguePasses: [],
+    degraded: true,
+    notice: OVERVIEW_DEGRADED_NOTICE,
+  };
+}
+
 export async function getReservedOverview(user: ApiUser): Promise<ApiResult> {
   try {
     if (!user.uid) {
-      return json(401, { error: 'Identità utente non valida.' });
+      return json(401, { error: 'Identità utente non valida.', code: 'AUTH_INVALID' });
     }
-    const overview = await getReservedAreaOverview(
-      user.uid,
-      user.email || '',
-      user.name ?? null
-    );
-    return json(200, overview);
+    try {
+      const overview = await getReservedAreaOverview(
+        user.uid,
+        user.email || '',
+        user.name ?? null
+      );
+      return json(200, overview);
+    } catch (error) {
+      // Soft-fail like bookings availability: never bare 500 / plain-text crash.
+      console.error('getReservedOverview soft-fail (seed catalog):', error);
+      return json(200, {
+        ...degradedOverviewFromSeed(user),
+        detail: error instanceof Error ? error.message : String(error),
+        code: 'OVERVIEW_DEGRADED',
+      });
+    }
   } catch (error) {
     return mapSafeError(error, 'Impossibile aprire l’Area Riservata.');
   }

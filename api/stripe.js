@@ -8836,60 +8836,6 @@ async function ensureSchemaOnce() {
   await globalThis._ennamoSchemaReady;
 }
 
-// src/lib/firebase-admin.ts
-import { cert, getApps, initializeApp } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
-
-// firebase-applet-config.json
-var firebase_applet_config_default = {
-  projectId: "gen-lang-client-0853491667",
-  appId: "1:9386426759:web:a7195d3ae0e62315771322",
-  apiKey: "AIzaSyBY6t3-t2Z7GbF1UuW7ZDYoZF8kW7Sytpo",
-  authDomain: "gen-lang-client-0853491667.firebaseapp.com",
-  storageBucket: "gen-lang-client-0853491667.firebasestorage.app",
-  messagingSenderId: "9386426759",
-  measurementId: "",
-  oAuthClientId: "",
-  recaptchaSiteKey: ""
-};
-
-// src/lib/firebase-admin.ts
-function buildOptions() {
-  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim();
-  if (raw) {
-    try {
-      const serviceAccount = JSON.parse(raw);
-      return {
-        credential: cert(serviceAccount),
-        projectId: serviceAccount.project_id || firebase_applet_config_default.projectId
-      };
-    } catch (error) {
-      console.error(
-        "FIREBASE_SERVICE_ACCOUNT_JSON non valido \u2014 fallback projectId only:",
-        error
-      );
-    }
-  }
-  return { projectId: firebase_applet_config_default.projectId };
-}
-var app;
-var auth;
-function ensureApp() {
-  if (!app) {
-    app = getApps().length ? getApps()[0] : initializeApp(buildOptions());
-  }
-  return app;
-}
-var adminAuth = new Proxy({}, {
-  get(_target, prop, receiver) {
-    if (!auth) {
-      auth = getAuth(ensureApp());
-    }
-    const value = Reflect.get(auth, prop, receiver);
-    return typeof value === "function" ? value.bind(auth) : value;
-  }
-});
-
 // src/server/nodeHttp.ts
 function sendJson(res, status, body) {
   if (typeof res.status === "function" && typeof res.json === "function") {

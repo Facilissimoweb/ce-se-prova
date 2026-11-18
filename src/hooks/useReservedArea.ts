@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { readJsonResponse } from '../lib/readJsonResponse';
 import type {
   CourseId,
   ReservedAreaOverview,
@@ -7,6 +8,9 @@ import type {
 } from '../types/handoff';
 
 type GetIdToken = () => Promise<string | null>;
+
+const FALLBACK_OVERVIEW_ERROR =
+  'Impossibile caricare i contenuti riservati. Riprova tra poco.';
 
 interface UseReservedAreaParams {
   user: {
@@ -49,15 +53,31 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
       const res = await fetch('/api/reserved/overview', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const json = await res.json();
+      // Vercel FUNCTION_INVOCATION_FAILED returns plain text — never res.json().
+      const json = await readJsonResponse<{
+        user?: ReservedAreaOverview['user'];
+        courses?: ReservedAreaOverview['courses'];
+        bookings?: ReservedAreaOverview['bookings'];
+        dialoguePasses?: ReservedAreaOverview['dialoguePasses'];
+        degraded?: boolean;
+        notice?: string;
+        error?: string;
+      }>(res, FALLBACK_OVERVIEW_ERROR);
       if (!res.ok) {
-        throw new Error(json.error || 'Impossibile caricare i contenuti riservati.');
+        throw new Error(json.error || FALLBACK_OVERVIEW_ERROR);
       }
-      setOverview(json as ReservedAreaOverview);
+      const overviewPayload = json as ReservedAreaOverview;
+      setOverview(overviewPayload);
+      if (overviewPayload.degraded || overviewPayload.notice) {
+        setDataError(overviewPayload.notice || FALLBACK_OVERVIEW_ERROR);
+      }
       setEnrollName(
-        (prev) => prev || json.user?.displayName || user.displayName || ''
+        (prev) =>
+          prev || overviewPayload.user?.displayName || user.displayName || ''
       );
-      setEnrollPhone((prev) => prev || json.user?.phoneWhatsapp || '');
+      setEnrollPhone(
+        (prev) => prev || overviewPayload.user?.phoneWhatsapp || ''
+      );
     } catch (err) {
       setDataError(
         err instanceof Error
