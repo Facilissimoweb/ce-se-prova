@@ -163,8 +163,17 @@ export function pathForBlogPost(slug: string): string {
   return `/news/${encodeURIComponent(slug)}`;
 }
 
+/** Fired after SPA pushState so SEO / screens can re-sync without a full remount. */
+export const PATH_CHANGE_EVENT = 'tarot:pathchange';
+
+export function notifyPathChange(): void {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new Event(PATH_CHANGE_EVENT));
+}
+
 export function navigateBlogPost(slug: string): void {
   window.history.pushState({}, '', pathForBlogPost(slug));
+  notifyPathChange();
 }
 
 export function screenFromPath(pathname: string): ScreenId {
@@ -210,4 +219,5 @@ export function navigatePath(screen: ScreenId, search = ''): void {
   const path = pathForScreen(screen);
   const url = search ? `${path}${search.startsWith('?') ? search : `?${search}`}` : path;
   window.history.pushState({}, '', url);
+  notifyPathChange();
 }

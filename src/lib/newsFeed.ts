@@ -7,6 +7,8 @@ export type NewsArticle = {
   publishedAt: string | null;
   summary: string;
   imageUrl: string | null;
+  category?: string | null;
+  tags?: string[];
 };
 
 export type NewsApiResponse = {

@@ -2,6 +2,19 @@
 
 Maria pubblica gli articoli **aggiungendo un file Markdown** in questa cartella e facendo deploy (commit / PR). Non serve Substack.
 
+## Macro aree (ENN-84)
+
+Ogni pezzo appartiene a **una** di queste categorie (`category` nel frontmatter):
+
+| Valore frontmatter | Etichetta in UI |
+|--------------------|-----------------|
+| `Storia` | Storia |
+| `Autori` | Autori |
+| `A. Maggiori` | A. Maggiori |
+| `A. Minori` | A. Minori |
+
+I tag (`tags[]`) sono liberi (es. Rider-Waite-Smith, Golden Dawn) e filtrabili in lista.
+
 ## Nuovo articolo
 
 1. Crea un file, es. `il-mio-titolo.md` (lo slug URL sarà `/news/il-mio-titolo`).
@@ -13,6 +26,10 @@ title: Titolo dell'articolo
 date: 2026-11-18
 description: Breve anteprima per elenco e SEO.
 draft: false
+category: Storia
+tags:
+  - Rider-Waite-Smith
+  - Golden Dawn
 ---
 ```
 
@@ -30,3 +47,5 @@ Opzionale: `cover: /brand/mia-immagine.png` (path sotto `public/`).
 
 Lista: `/news`, `/blog`, `/articoli`  
 Dettaglio: `/news/<slug>` (stessi alias).
+
+In dettaglio: condivisione (WhatsApp, Telegram, Facebook, X), SEO/Open Graph/JSON-LD Article, CTA Prenota / Dialogo.

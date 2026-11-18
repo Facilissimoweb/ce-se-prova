@@ -2,7 +2,10 @@
 title: Ascoltare gli Arcani senza fretta
 date: 2026-11-17
 description: Secondo articolo di esempio — una nota breve sulla lettura lenta dei Tarocchi. Sostituibile liberamente.
-draft: false
+draft: true
+category: A. Maggiori
+tags:
+  - esempio
 ---
 
 Secondo **campione** del Blog in-repo. Puoi cancellarlo o riscriverlo interamente: non è contenuto ufficiale definitivo.
