@@ -51,7 +51,7 @@ const PAGE_SEO: Record<ScreenId, PageSeo> = {
   news: {
     title: 'Blog / News — Tarot Italia',
     description:
-      'Articoli e riflessioni di Tarot Italia su Substack @tarotitalia: tarologia, simboli e percorso evolutivo.',
+      'Articoli e riflessioni di Tarot Italia: tarologia, simboli e percorso evolutivo. Nuovi articoli in arrivo.',
   },
   contatti: {
     title: 'Contatti — Tarot Italia · Macerata',

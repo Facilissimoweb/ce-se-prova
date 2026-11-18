@@ -95,7 +95,7 @@ export const SITEMAP_ENTRIES: {
     screen: 'news',
     path: '/news',
     label: 'News / Articoli',
-    description: 'Articoli da Substack @tarotitalia',
+    description: 'Articoli e riflessioni di Tarot Italia',
   },
   {
     screen: 'contatti',

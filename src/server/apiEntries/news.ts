@@ -1,5 +1,5 @@
 /**
- * News group — GET /api/news (proxy RSS Substack, cache breve).
+ * News group — GET /api/news (placeholder vuoto; Substack disconnesso).
  * Bundled by scripts/bundle-api.mjs into api/news.js.
  */
 import { getNewsArticles } from '../routes/news.ts';
