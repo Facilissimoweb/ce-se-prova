@@ -1,3 +1,86 @@
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __esm = (fn, res, err) => function __init() {
+  if (err) throw err[0];
+  try {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  } catch (e) {
+    throw err = [e], e;
+  }
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+
+// firebase-applet-config.json
+var firebase_applet_config_default;
+var init_firebase_applet_config = __esm({
+  "firebase-applet-config.json"() {
+    firebase_applet_config_default = {
+      projectId: "gen-lang-client-0853491667",
+      appId: "1:9386426759:web:a7195d3ae0e62315771322",
+      apiKey: "AIzaSyBY6t3-t2Z7GbF1UuW7ZDYoZF8kW7Sytpo",
+      authDomain: "gen-lang-client-0853491667.firebaseapp.com",
+      storageBucket: "gen-lang-client-0853491667.firebasestorage.app",
+      messagingSenderId: "9386426759",
+      measurementId: "",
+      oAuthClientId: "",
+      recaptchaSiteKey: ""
+    };
+  }
+});
+
+// src/lib/firebase-admin.ts
+var firebase_admin_exports = {};
+__export(firebase_admin_exports, {
+  getAdminAuth: () => getAdminAuth
+});
+function buildOptions(certFn) {
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim();
+  if (raw) {
+    try {
+      const serviceAccount = JSON.parse(raw);
+      return {
+        credential: certFn(serviceAccount),
+        projectId: serviceAccount.project_id || firebase_applet_config_default.projectId
+      };
+    } catch (error) {
+      console.error(
+        "FIREBASE_SERVICE_ACCOUNT_JSON non valido \u2014 fallback projectId only:",
+        error
+      );
+    }
+  }
+  return { projectId: firebase_applet_config_default.projectId };
+}
+async function getAdminAuth() {
+  if (auth) return auth;
+  if (!initPromise) {
+    initPromise = (async () => {
+      const [{ cert, getApps, initializeApp }, { getAuth }] = await Promise.all([
+        import("firebase-admin/app"),
+        import("firebase-admin/auth")
+      ]);
+      if (!app) {
+        app = getApps().length ? getApps()[0] : initializeApp(buildOptions(cert));
+      }
+      auth = getAuth(app);
+      return auth;
+    })().catch((error) => {
+      initPromise = void 0;
+      throw error;
+    });
+  }
+  return initPromise;
+}
+var app, auth, initPromise;
+var init_firebase_admin = __esm({
+  "src/lib/firebase-admin.ts"() {
+    init_firebase_applet_config();
+  }
+});
+
 // src/lib/comingSoon.ts
 var COMING_SOON_COOKIE = "ti_atelier_unlock";
 var COMING_SOON_DEFAULT_PATH = "/preview-atelier";
@@ -5,6 +88,9 @@ var COMING_SOON_FRIENDLY_PATH = "/admin/com";
 var COMING_SOON_BUILTIN_UNLOCK_PATHS = [
   COMING_SOON_DEFAULT_PATH,
   COMING_SOON_FRIENDLY_PATH
+];
+var COMING_SOON_DEFAULT_OWNER_EMAILS = [
+  "mariateresarogani@gmail.com"
 ];
 var COMING_SOON_COOKIE_MAX_AGE_SEC = 60 * 60 * 24 * 30;
 var TOKEN_PAYLOAD = "tarot-italia-atelier-v1";
@@ -25,6 +111,9 @@ function resolveComingSoonSecretPath(rawPath) {
   if (normalized === "/") return COMING_SOON_DEFAULT_PATH;
   return normalized;
 }
+function parseOwnerEmailsExtra(raw) {
+  return raw.split(/[,;\s]+/).map((e) => e.trim().toLowerCase()).filter((e) => e.includes("@"));
+}
 function readComingSoonEnv(env = process.env) {
   return {
     enabled: env.COMING_SOON_ENABLED === "true",
@@ -32,8 +121,23 @@ function readComingSoonEnv(env = process.env) {
     secretPath: resolveComingSoonSecretPath(env.COMING_SOON_SECRET_PATH || ""),
     password: (env.COMING_SOON_PASSWORD || "").trim(),
     passwordHash: (env.COMING_SOON_PASSWORD_HASH || "").trim().toLowerCase(),
-    unlockToken: (env.COMING_SOON_UNLOCK_TOKEN || "").trim()
+    unlockToken: (env.COMING_SOON_UNLOCK_TOKEN || "").trim(),
+    ownerEmailsExtra: parseOwnerEmailsExtra(
+      env.COMING_SOON_OWNER_EMAILS || ""
+    )
   };
+}
+function listComingSoonOwnerEmails(env = readComingSoonEnv()) {
+  const set = new Set(
+    COMING_SOON_DEFAULT_OWNER_EMAILS.map((e) => e.toLowerCase())
+  );
+  for (const e of env.ownerEmailsExtra) set.add(e);
+  return [...set];
+}
+function isComingSoonOwnerEmail(email, env = readComingSoonEnv()) {
+  const normalized = (email || "").trim().toLowerCase();
+  if (!normalized) return false;
+  return listComingSoonOwnerEmails(env).includes(normalized);
 }
 function normalizePath(pathname) {
   const raw = (pathname.split("?")[0].split("#")[0] || "/").trim() || "/";
@@ -89,6 +193,15 @@ function cookieSigningMaterial(env) {
   if (env.password) return `pwd:${env.password}`;
   if (env.passwordHash) return `hash:${env.passwordHash}`;
   if (env.unlockToken) return `tok:${env.unlockToken}`;
+  const saRaw = process.env.FIREBASE_SERVICE_ACCOUNT || "";
+  if (saRaw) {
+    try {
+      const sa = JSON.parse(saRaw);
+      if (sa.private_key_id) return `sa:${sa.private_key_id}`;
+      if (sa.project_id) return `sa-proj:${sa.project_id}`;
+    } catch {
+    }
+  }
   return null;
 }
 async function createUnlockToken(env = readComingSoonEnv()) {
@@ -157,7 +270,9 @@ function getComingSoonStatus(input) {
       secretPath: env.secretPath,
       unlockPaths: listComingSoonUnlockPaths(env),
       unlockLinkConfigured: Boolean(env.unlockToken),
-      passwordConfigured: Boolean(env.password || env.passwordHash)
+      passwordConfigured: Boolean(env.password || env.passwordHash),
+      googleOwnerUnlock: true,
+      ownerEmailCount: listComingSoonOwnerEmails(env).length
     }
   }));
 }
@@ -173,7 +288,7 @@ async function postComingSoonUnlock(input) {
     return {
       status: 503,
       body: {
-        error: "Password Coming Soon non configurata. Imposta COMING_SOON_PASSWORD su Vercel."
+        error: "Password Coming Soon non configurata. Usa \xABEntra con Google\xBB oppure imposta COMING_SOON_UNLOCK_TOKEN."
       }
     };
   }
@@ -193,7 +308,67 @@ async function postComingSoonUnlock(input) {
   }
   return {
     status: 200,
-    body: { ok: true, redirect: "/" },
+    body: { ok: true, redirect: "/", method: "password" },
+    setCookie: buildUnlockSetCookieHeader(token, {
+      secure: secureCookie(input.origin)
+    })
+  };
+}
+async function postComingSoonUnlockWithGoogle(input) {
+  const env = input.env ?? readComingSoonEnv();
+  if (!env.enabled) {
+    return {
+      status: 400,
+      body: { error: "Coming Soon non \xE8 attivo su questo ambiente." }
+    };
+  }
+  const idToken = input.idToken.trim();
+  if (!idToken) {
+    return {
+      status: 400,
+      body: { error: "Token Google mancante." }
+    };
+  }
+  let email;
+  try {
+    const { getAdminAuth: getAdminAuth2 } = await Promise.resolve().then(() => (init_firebase_admin(), firebase_admin_exports));
+    const adminAuth = await getAdminAuth2();
+    const decoded = await adminAuth.verifyIdToken(idToken);
+    email = decoded.email;
+  } catch (error) {
+    console.error("[coming-soon] Google unlock verify failed:", error);
+    return {
+      status: 401,
+      body: {
+        error: "Accesso Google non valido o scaduto. Riprova con \xABEntra con Google\xBB."
+      }
+    };
+  }
+  if (!isComingSoonOwnerEmail(email, env)) {
+    return {
+      status: 403,
+      body: {
+        error: "Questo account Google non \xE8 autorizzato ad aprire l\u2019anteprima."
+      }
+    };
+  }
+  const token = await createUnlockToken(env);
+  if (!token) {
+    return {
+      status: 503,
+      body: {
+        error: "Impossibile creare la sessione di anteprima. Controlla FIREBASE_SERVICE_ACCOUNT su Vercel."
+      }
+    };
+  }
+  return {
+    status: 200,
+    body: {
+      ok: true,
+      redirect: "/",
+      method: "google",
+      email: (email || "").toLowerCase()
+    },
     setCookie: buildUnlockSetCookieHeader(token, {
       secure: secureCookie(input.origin)
     })
@@ -284,8 +459,9 @@ async function handler(req, res) {
     }
     if (method === "POST" && (path === "" || path === "unlock")) {
       const body = readBodyObject(req);
+      const idToken = typeof body.idToken === "string" ? body.idToken : typeof body.id_token === "string" ? body.id_token : "";
       const password = typeof body.password === "string" ? body.password : "";
-      const result = await postComingSoonUnlock({ password, origin });
+      const result = idToken ? await postComingSoonUnlockWithGoogle({ idToken, origin }) : await postComingSoonUnlock({ password, origin });
       if (result.setCookie) {
         res.setHeader("Set-Cookie", result.setCookie);
       }

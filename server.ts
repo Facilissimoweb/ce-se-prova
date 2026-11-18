@@ -20,6 +20,7 @@ import {
   getComingSoonStatus,
   postComingSoonLock,
   postComingSoonUnlock,
+  postComingSoonUnlockWithGoogle,
 } from './src/server/routes/comingSoon.ts';
 import {
   getReservedOverview,
@@ -97,12 +98,18 @@ async function startServer() {
   });
 
   app.post('/api/coming-soon', async (req, res) => {
+    const origin = expressOrigin(req, PORT);
+    const idToken =
+      typeof req.body?.idToken === 'string'
+        ? req.body.idToken
+        : typeof req.body?.id_token === 'string'
+          ? req.body.id_token
+          : '';
     const password =
       typeof req.body?.password === 'string' ? req.body.password : '';
-    const result = await postComingSoonUnlock({
-      password,
-      origin: expressOrigin(req, PORT),
-    });
+    const result = idToken
+      ? await postComingSoonUnlockWithGoogle({ idToken, origin })
+      : await postComingSoonUnlock({ password, origin });
     if (result.setCookie) {
       res.setHeader('Set-Cookie', result.setCookie);
     }
@@ -110,12 +117,18 @@ async function startServer() {
   });
 
   app.post('/api/coming-soon/unlock', async (req, res) => {
+    const origin = expressOrigin(req, PORT);
+    const idToken =
+      typeof req.body?.idToken === 'string'
+        ? req.body.idToken
+        : typeof req.body?.id_token === 'string'
+          ? req.body.id_token
+          : '';
     const password =
       typeof req.body?.password === 'string' ? req.body.password : '';
-    const result = await postComingSoonUnlock({
-      password,
-      origin: expressOrigin(req, PORT),
-    });
+    const result = idToken
+      ? await postComingSoonUnlockWithGoogle({ idToken, origin })
+      : await postComingSoonUnlock({ password, origin });
     if (result.setCookie) {
       res.setHeader('Set-Cookie', result.setCookie);
     }

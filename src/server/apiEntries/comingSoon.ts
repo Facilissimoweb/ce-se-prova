@@ -1,12 +1,13 @@
 /**
- * Coming Soon unlock — GET status, POST unlock, POST lock.
+ * Coming Soon unlock — GET status, POST unlock (password | Google idToken), POST lock.
  * Bundled by scripts/bundle-api.mjs into api/coming-soon.js.
- * Keep free of firebase/pg (Hobby cold-start friendly).
+ * firebase-admin is loaded only on Google unlock (dynamic import in route).
  */
 import {
   getComingSoonStatus,
   postComingSoonLock,
   postComingSoonUnlock,
+  postComingSoonUnlockWithGoogle,
 } from '../routes/comingSoon.ts';
 import {
   queryString,
@@ -60,9 +61,18 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
 
     if (method === 'POST' && (path === '' || path === 'unlock')) {
       const body = readBodyObject(req);
+      const idToken =
+        typeof body.idToken === 'string'
+          ? body.idToken
+          : typeof body.id_token === 'string'
+            ? body.id_token
+            : '';
       const password =
         typeof body.password === 'string' ? body.password : '';
-      const result = await postComingSoonUnlock({ password, origin });
+
+      const result = idToken
+        ? await postComingSoonUnlockWithGoogle({ idToken, origin })
+        : await postComingSoonUnlock({ password, origin });
       if (result.setCookie) {
         res.setHeader('Set-Cookie', result.setCookie);
       }
