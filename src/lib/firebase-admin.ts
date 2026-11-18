@@ -4,6 +4,10 @@
  * Never static-import `firebase-admin/*` from Vercel API entries. A top-level
  * import crashes the function as FUNCTION_INVOCATION_FAILED (plain text) before
  * the handler can return JSON (same pattern as ENN-64 / ENN-76 on bookings).
+ *
+ * Pin firebase-admin@13.x (not 14+): v14 pulls jwks-rsa@4 → jose@6 (ESM-only).
+ * Vercel Node runs with require(ESM) disabled, so jwks-rsa’s require('jose')
+ * throws ERR_REQUIRE_ESM on verifyIdToken (ENN-88). 13.x keeps jwks-rsa@3 + jose@4.
  */
 import type { App, AppOptions } from 'firebase-admin/app';
 import type { Auth } from 'firebase-admin/auth';
