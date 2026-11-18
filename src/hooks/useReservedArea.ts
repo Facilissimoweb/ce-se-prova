@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { readJsonResponse } from '../lib/readJsonResponse';
+import {
+  RESERVED_DEMO_UID,
+  buildReservedDemoOverview,
+} from '../lib/reservedDemo';
 import type {
   CourseId,
   ReservedAreaOverview,
@@ -62,6 +66,13 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
     setLoadingData(true);
     setDataError(null);
     try {
+      if (currentUser.uid === RESERVED_DEMO_UID) {
+        if (signal?.aborted || requestId !== overviewRequestIdRef.current) return;
+        setOverview(buildReservedDemoOverview());
+        setEnrollName((prev) => prev || currentUser.displayName || 'Demo Corsista');
+        return;
+      }
+
       const token = await getIdTokenRef.current();
       if (signal?.aborted || requestId !== overviewRequestIdRef.current) return;
       if (!token) {
