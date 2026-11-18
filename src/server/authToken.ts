@@ -1,5 +1,5 @@
 import type { DecodedIdToken } from 'firebase-admin/auth';
-import { adminAuth } from '../lib/firebase-admin.ts';
+import { getAdminAuth } from '../lib/firebase-admin.ts';
 import type { ApiUser } from './http.ts';
 
 export function toApiUser(token: DecodedIdToken): ApiUser {
@@ -30,6 +30,23 @@ export async function verifyBearerToken(
   }
 
   const token = authorization.slice('Bearer '.length);
+
+  let adminAuth;
+  try {
+    adminAuth = await getAdminAuth();
+  } catch (error) {
+    if (mode === 'optional') {
+      return { ok: true, user: null };
+    }
+    console.error('Firebase Admin init failed:', error);
+    return {
+      ok: false,
+      status: 503,
+      error:
+        'Servizio autenticazione non disponibile. Riprova tra poco.',
+    };
+  }
+
   try {
     const decoded = await adminAuth.verifyIdToken(token);
     return { ok: true, user: toApiUser(decoded) };

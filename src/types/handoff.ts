@@ -127,6 +127,11 @@ export interface ReservedAreaOverview {
   courses: ReservedCourseItem[];
   bookings: ReservedBookingItem[];
   dialoguePasses?: ReservedDialoguePassItem[];
+  /** True when Postgres/catalog failed and seed catalog was returned instead. */
+  degraded?: boolean;
+  notice?: string;
+  code?: string;
+  detail?: string;
 }
 
 export interface CopyEntry {

@@ -4,6 +4,9 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
+// node_modules/drizzle-orm/node-postgres/driver.js
+import pg2 from "pg";
+
 // node_modules/drizzle-orm/entity.js
 var entityKind = /* @__PURE__ */ Symbol.for("drizzle:entityKind");
 function is(value, type) {
@@ -29,6 +32,61 @@ function is(value, type) {
   }
   return false;
 }
+
+// node_modules/drizzle-orm/logger.js
+var ConsoleLogWriter = class {
+  static [entityKind] = "ConsoleLogWriter";
+  write(message) {
+    console.log(message);
+  }
+};
+var DefaultLogger = class {
+  static [entityKind] = "DefaultLogger";
+  writer;
+  constructor(config2) {
+    this.writer = config2?.writer ?? new ConsoleLogWriter();
+  }
+  logQuery(query, params) {
+    const stringifiedParams = params.map((p) => {
+      try {
+        return JSON.stringify(p);
+      } catch {
+        return String(p);
+      }
+    });
+    const paramsStr = stringifiedParams.length ? ` -- params: [${stringifiedParams.join(", ")}]` : "";
+    this.writer.write(`Query: ${query}${paramsStr}`);
+  }
+};
+var NoopLogger = class {
+  static [entityKind] = "NoopLogger";
+  logQuery() {
+  }
+};
+
+// node_modules/drizzle-orm/query-promise.js
+var QueryPromise = class {
+  static [entityKind] = "QueryPromise";
+  [Symbol.toStringTag] = "QueryPromise";
+  catch(onRejected) {
+    return this.then(void 0, onRejected);
+  }
+  finally(onFinally) {
+    return this.then(
+      (value) => {
+        onFinally?.();
+        return value;
+      },
+      (reason) => {
+        onFinally?.();
+        throw reason;
+      }
+    );
+  }
+  then(onFulfilled, onRejected) {
+    return this.execute().then(onFulfilled, onRejected);
+  }
+};
 
 // node_modules/drizzle-orm/column.js
 var Column = class {
@@ -1231,85 +1289,71 @@ function mapColumnsInSQLToAlias(query, alias) {
   }));
 }
 
-// node_modules/drizzle-orm/errors.js
-var DrizzleError = class extends Error {
-  static [entityKind] = "DrizzleError";
-  constructor({ message, cause }) {
-    super(message);
-    this.name = "DrizzleError";
-    this.cause = cause;
-  }
-};
-var DrizzleQueryError = class _DrizzleQueryError extends Error {
-  constructor(query, params, cause) {
-    super(`Failed query: ${query}
-params: ${params}`);
-    this.query = query;
-    this.params = params;
-    this.cause = cause;
-    Error.captureStackTrace(this, _DrizzleQueryError);
-    if (cause) this.cause = cause;
-  }
-};
-var TransactionRollbackError = class extends DrizzleError {
-  static [entityKind] = "TransactionRollbackError";
-  constructor() {
-    super({ message: "Rollback" });
-  }
-};
-
-// node_modules/drizzle-orm/logger.js
-var ConsoleLogWriter = class {
-  static [entityKind] = "ConsoleLogWriter";
-  write(message) {
-    console.log(message);
-  }
-};
-var DefaultLogger = class {
-  static [entityKind] = "DefaultLogger";
-  writer;
+// node_modules/drizzle-orm/selection-proxy.js
+var SelectionProxyHandler = class _SelectionProxyHandler {
+  static [entityKind] = "SelectionProxyHandler";
+  config;
   constructor(config2) {
-    this.writer = config2?.writer ?? new ConsoleLogWriter();
+    this.config = { ...config2 };
   }
-  logQuery(query, params) {
-    const stringifiedParams = params.map((p) => {
-      try {
-        return JSON.stringify(p);
-      } catch {
-        return String(p);
+  get(subquery, prop) {
+    if (prop === "_") {
+      return {
+        ...subquery["_"],
+        selectedFields: new Proxy(
+          subquery._.selectedFields,
+          this
+        )
+      };
+    }
+    if (prop === ViewBaseConfig) {
+      return {
+        ...subquery[ViewBaseConfig],
+        selectedFields: new Proxy(
+          subquery[ViewBaseConfig].selectedFields,
+          this
+        )
+      };
+    }
+    if (typeof prop === "symbol") {
+      return subquery[prop];
+    }
+    const columns = is(subquery, Subquery) ? subquery._.selectedFields : is(subquery, View) ? subquery[ViewBaseConfig].selectedFields : subquery;
+    const value = columns[prop];
+    if (is(value, SQL.Aliased)) {
+      if (this.config.sqlAliasedBehavior === "sql" && !value.isSelectionField) {
+        return value.sql;
       }
-    });
-    const paramsStr = stringifiedParams.length ? ` -- params: [${stringifiedParams.join(", ")}]` : "";
-    this.writer.write(`Query: ${query}${paramsStr}`);
-  }
-};
-var NoopLogger = class {
-  static [entityKind] = "NoopLogger";
-  logQuery() {
-  }
-};
-
-// node_modules/drizzle-orm/query-promise.js
-var QueryPromise = class {
-  static [entityKind] = "QueryPromise";
-  [Symbol.toStringTag] = "QueryPromise";
-  catch(onRejected) {
-    return this.then(void 0, onRejected);
-  }
-  finally(onFinally) {
-    return this.then(
-      (value) => {
-        onFinally?.();
+      const newValue = value.clone();
+      newValue.isSelectionField = true;
+      return newValue;
+    }
+    if (is(value, SQL)) {
+      if (this.config.sqlBehavior === "sql") {
         return value;
-      },
-      (reason) => {
-        onFinally?.();
-        throw reason;
       }
-    );
-  }
-  then(onFulfilled, onRejected) {
-    return this.execute().then(onFulfilled, onRejected);
+      throw new Error(
+        `You tried to reference "${prop}" field from a subquery, which is a raw SQL field, but it doesn't have an alias declared. Please add an alias to the field using ".as('alias')" method.`
+      );
+    }
+    if (is(value, Column)) {
+      if (this.config.alias) {
+        return new Proxy(
+          value,
+          new ColumnAliasProxyHandler(
+            new Proxy(
+              value.table,
+              new TableAliasProxyHandler(this.config.alias, this.config.replaceOriginalName ?? false)
+            )
+          )
+        );
+      }
+      return value;
+    }
+    if (typeof value !== "object" || value === null) {
+      return value;
+    }
+    return new Proxy(value, new _SelectionProxyHandler(this.config));
   }
 };
 
@@ -2876,6 +2920,115 @@ var pgTable = (name, columns, extraConfig) => {
   return pgTableWithSchema(name, columns, extraConfig, void 0);
 };
 
+// node_modules/drizzle-orm/pg-core/indexes.js
+var IndexBuilderOn = class {
+  constructor(unique, name) {
+    this.unique = unique;
+    this.name = name;
+  }
+  static [entityKind] = "PgIndexBuilderOn";
+  on(...columns) {
+    return new IndexBuilder(
+      columns.map((it) => {
+        if (is(it, SQL)) {
+          return it;
+        }
+        it = it;
+        const clonedIndexedColumn = new IndexedColumn(it.name, !!it.keyAsName, it.columnType, it.indexConfig);
+        it.indexConfig = JSON.parse(JSON.stringify(it.defaultConfig));
+        return clonedIndexedColumn;
+      }),
+      this.unique,
+      false,
+      this.name
+    );
+  }
+  onOnly(...columns) {
+    return new IndexBuilder(
+      columns.map((it) => {
+        if (is(it, SQL)) {
+          return it;
+        }
+        it = it;
+        const clonedIndexedColumn = new IndexedColumn(it.name, !!it.keyAsName, it.columnType, it.indexConfig);
+        it.indexConfig = it.defaultConfig;
+        return clonedIndexedColumn;
+      }),
+      this.unique,
+      true,
+      this.name
+    );
+  }
+  /**
+   * Specify what index method to use. Choices are `btree`, `hash`, `gist`, `spgist`, `gin`, `brin`, or user-installed access methods like `bloom`. The default method is `btree.
+   *
+   * If you have the `pg_vector` extension installed in your database, you can use the `hnsw` and `ivfflat` options, which are predefined types.
+   *
+   * **You can always specify any string you want in the method, in case Drizzle doesn't have it natively in its types**
+   *
+   * @param method The name of the index method to be used
+   * @param columns
+   * @returns
+   */
+  using(method, ...columns) {
+    return new IndexBuilder(
+      columns.map((it) => {
+        if (is(it, SQL)) {
+          return it;
+        }
+        it = it;
+        const clonedIndexedColumn = new IndexedColumn(it.name, !!it.keyAsName, it.columnType, it.indexConfig);
+        it.indexConfig = JSON.parse(JSON.stringify(it.defaultConfig));
+        return clonedIndexedColumn;
+      }),
+      this.unique,
+      true,
+      this.name,
+      method
+    );
+  }
+};
+var IndexBuilder = class {
+  static [entityKind] = "PgIndexBuilder";
+  /** @internal */
+  config;
+  constructor(columns, unique, only, name, method = "btree") {
+    this.config = {
+      name,
+      columns,
+      unique,
+      only,
+      method
+    };
+  }
+  concurrently() {
+    this.config.concurrently = true;
+    return this;
+  }
+  with(obj) {
+    this.config.with = obj;
+    return this;
+  }
+  where(condition) {
+    this.config.where = condition;
+    return this;
+  }
+  /** @internal */
+  build(table) {
+    return new Index(this.config, table);
+  }
+};
+var Index = class {
+  static [entityKind] = "PgIndex";
+  config;
+  constructor(config2, table) {
+    this.config = { ...config2, table };
+  }
+};
+function uniqueIndex(name) {
+  return new IndexBuilderOn(true, name);
+}
+
 // node_modules/drizzle-orm/pg-core/primary-keys.js
 var PrimaryKeyBuilder = class {
   static [entityKind] = "PgPrimaryKeyBuilder";
@@ -2903,6 +3056,85 @@ var PrimaryKey = class {
   name;
   getName() {
     return this.name ?? `${this.table[PgTable.Symbol.Name]}_${this.columns.map((column) => column.name).join("_")}_pk`;
+  }
+};
+
+// node_modules/drizzle-orm/casing.js
+function toSnakeCase(input) {
+  const words = input.replace(/['\u2019]/g, "").match(/[\da-z]+|[A-Z]+(?![a-z])|[A-Z][\da-z]+/g) ?? [];
+  return words.map((word) => word.toLowerCase()).join("_");
+}
+function toCamelCase(input) {
+  const words = input.replace(/['\u2019]/g, "").match(/[\da-z]+|[A-Z]+(?![a-z])|[A-Z][\da-z]+/g) ?? [];
+  return words.reduce((acc, word, i) => {
+    const formattedWord = i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.slice(1)}`;
+    return acc + formattedWord;
+  }, "");
+}
+function noopCase(input) {
+  return input;
+}
+var CasingCache = class {
+  static [entityKind] = "CasingCache";
+  /** @internal */
+  cache = {};
+  cachedTables = {};
+  convert;
+  constructor(casing) {
+    this.convert = casing === "snake_case" ? toSnakeCase : casing === "camelCase" ? toCamelCase : noopCase;
+  }
+  getColumnCasing(column) {
+    if (!column.keyAsName) return column.name;
+    const schema = column.table[Table.Symbol.Schema] ?? "public";
+    const tableName = column.table[Table.Symbol.OriginalName];
+    const key = `${schema}.${tableName}.${column.name}`;
+    if (!this.cache[key]) {
+      this.cacheTable(column.table);
+    }
+    return this.cache[key];
+  }
+  cacheTable(table) {
+    const schema = table[Table.Symbol.Schema] ?? "public";
+    const tableName = table[Table.Symbol.OriginalName];
+    const tableKey = `${schema}.${tableName}`;
+    if (!this.cachedTables[tableKey]) {
+      for (const column of Object.values(table[Table.Symbol.Columns])) {
+        const columnKey = `${tableKey}.${column.name}`;
+        this.cache[columnKey] = this.convert(column.name);
+      }
+      this.cachedTables[tableKey] = true;
+    }
+  }
+  clearCache() {
+    this.cache = {};
+    this.cachedTables = {};
+  }
+};
+
+// node_modules/drizzle-orm/errors.js
+var DrizzleError = class extends Error {
+  static [entityKind] = "DrizzleError";
+  constructor({ message, cause }) {
+    super(message);
+    this.name = "DrizzleError";
+    this.cause = cause;
+  }
+};
+var DrizzleQueryError = class _DrizzleQueryError extends Error {
+  constructor(query, params, cause) {
+    super(`Failed query: ${query}
+params: ${params}`);
+    this.query = query;
+    this.params = params;
+    this.cause = cause;
+    Error.captureStackTrace(this, _DrizzleQueryError);
+    if (cause) this.cause = cause;
+  }
+};
+var TransactionRollbackError = class extends DrizzleError {
+  static [entityKind] = "TransactionRollbackError";
+  constructor() {
+    super({ message: "Rollback" });
   }
 };
 
@@ -3300,238 +3532,6 @@ function mapRelationalRow(tablesConfig, tableConfig, row, buildQueryResultSelect
   }
   return result;
 }
-
-// node_modules/drizzle-orm/node-postgres/driver.js
-import pg2 from "pg";
-
-// node_modules/drizzle-orm/selection-proxy.js
-var SelectionProxyHandler = class _SelectionProxyHandler {
-  static [entityKind] = "SelectionProxyHandler";
-  config;
-  constructor(config2) {
-    this.config = { ...config2 };
-  }
-  get(subquery, prop) {
-    if (prop === "_") {
-      return {
-        ...subquery["_"],
-        selectedFields: new Proxy(
-          subquery._.selectedFields,
-          this
-        )
-      };
-    }
-    if (prop === ViewBaseConfig) {
-      return {
-        ...subquery[ViewBaseConfig],
-        selectedFields: new Proxy(
-          subquery[ViewBaseConfig].selectedFields,
-          this
-        )
-      };
-    }
-    if (typeof prop === "symbol") {
-      return subquery[prop];
-    }
-    const columns = is(subquery, Subquery) ? subquery._.selectedFields : is(subquery, View) ? subquery[ViewBaseConfig].selectedFields : subquery;
-    const value = columns[prop];
-    if (is(value, SQL.Aliased)) {
-      if (this.config.sqlAliasedBehavior === "sql" && !value.isSelectionField) {
-        return value.sql;
-      }
-      const newValue = value.clone();
-      newValue.isSelectionField = true;
-      return newValue;
-    }
-    if (is(value, SQL)) {
-      if (this.config.sqlBehavior === "sql") {
-        return value;
-      }
-      throw new Error(
-        `You tried to reference "${prop}" field from a subquery, which is a raw SQL field, but it doesn't have an alias declared. Please add an alias to the field using ".as('alias')" method.`
-      );
-    }
-    if (is(value, Column)) {
-      if (this.config.alias) {
-        return new Proxy(
-          value,
-          new ColumnAliasProxyHandler(
-            new Proxy(
-              value.table,
-              new TableAliasProxyHandler(this.config.alias, this.config.replaceOriginalName ?? false)
-            )
-          )
-        );
-      }
-      return value;
-    }
-    if (typeof value !== "object" || value === null) {
-      return value;
-    }
-    return new Proxy(value, new _SelectionProxyHandler(this.config));
-  }
-};
-
-// node_modules/drizzle-orm/pg-core/indexes.js
-var IndexBuilderOn = class {
-  constructor(unique, name) {
-    this.unique = unique;
-    this.name = name;
-  }
-  static [entityKind] = "PgIndexBuilderOn";
-  on(...columns) {
-    return new IndexBuilder(
-      columns.map((it) => {
-        if (is(it, SQL)) {
-          return it;
-        }
-        it = it;
-        const clonedIndexedColumn = new IndexedColumn(it.name, !!it.keyAsName, it.columnType, it.indexConfig);
-        it.indexConfig = JSON.parse(JSON.stringify(it.defaultConfig));
-        return clonedIndexedColumn;
-      }),
-      this.unique,
-      false,
-      this.name
-    );
-  }
-  onOnly(...columns) {
-    return new IndexBuilder(
-      columns.map((it) => {
-        if (is(it, SQL)) {
-          return it;
-        }
-        it = it;
-        const clonedIndexedColumn = new IndexedColumn(it.name, !!it.keyAsName, it.columnType, it.indexConfig);
-        it.indexConfig = it.defaultConfig;
-        return clonedIndexedColumn;
-      }),
-      this.unique,
-      true,
-      this.name
-    );
-  }
-  /**
-   * Specify what index method to use. Choices are `btree`, `hash`, `gist`, `spgist`, `gin`, `brin`, or user-installed access methods like `bloom`. The default method is `btree.
-   *
-   * If you have the `pg_vector` extension installed in your database, you can use the `hnsw` and `ivfflat` options, which are predefined types.
-   *
-   * **You can always specify any string you want in the method, in case Drizzle doesn't have it natively in its types**
-   *
-   * @param method The name of the index method to be used
-   * @param columns
-   * @returns
-   */
-  using(method, ...columns) {
-    return new IndexBuilder(
-      columns.map((it) => {
-        if (is(it, SQL)) {
-          return it;
-        }
-        it = it;
-        const clonedIndexedColumn = new IndexedColumn(it.name, !!it.keyAsName, it.columnType, it.indexConfig);
-        it.indexConfig = JSON.parse(JSON.stringify(it.defaultConfig));
-        return clonedIndexedColumn;
-      }),
-      this.unique,
-      true,
-      this.name,
-      method
-    );
-  }
-};
-var IndexBuilder = class {
-  static [entityKind] = "PgIndexBuilder";
-  /** @internal */
-  config;
-  constructor(columns, unique, only, name, method = "btree") {
-    this.config = {
-      name,
-      columns,
-      unique,
-      only,
-      method
-    };
-  }
-  concurrently() {
-    this.config.concurrently = true;
-    return this;
-  }
-  with(obj) {
-    this.config.with = obj;
-    return this;
-  }
-  where(condition) {
-    this.config.where = condition;
-    return this;
-  }
-  /** @internal */
-  build(table) {
-    return new Index(this.config, table);
-  }
-};
-var Index = class {
-  static [entityKind] = "PgIndex";
-  config;
-  constructor(config2, table) {
-    this.config = { ...config2, table };
-  }
-};
-function uniqueIndex(name) {
-  return new IndexBuilderOn(true, name);
-}
-
-// node_modules/drizzle-orm/casing.js
-function toSnakeCase(input) {
-  const words = input.replace(/['\u2019]/g, "").match(/[\da-z]+|[A-Z]+(?![a-z])|[A-Z][\da-z]+/g) ?? [];
-  return words.map((word) => word.toLowerCase()).join("_");
-}
-function toCamelCase(input) {
-  const words = input.replace(/['\u2019]/g, "").match(/[\da-z]+|[A-Z]+(?![a-z])|[A-Z][\da-z]+/g) ?? [];
-  return words.reduce((acc, word, i) => {
-    const formattedWord = i === 0 ? word.toLowerCase() : `${word[0].toUpperCase()}${word.slice(1)}`;
-    return acc + formattedWord;
-  }, "");
-}
-function noopCase(input) {
-  return input;
-}
-var CasingCache = class {
-  static [entityKind] = "CasingCache";
-  /** @internal */
-  cache = {};
-  cachedTables = {};
-  convert;
-  constructor(casing) {
-    this.convert = casing === "snake_case" ? toSnakeCase : casing === "camelCase" ? toCamelCase : noopCase;
-  }
-  getColumnCasing(column) {
-    if (!column.keyAsName) return column.name;
-    const schema = column.table[Table.Symbol.Schema] ?? "public";
-    const tableName = column.table[Table.Symbol.OriginalName];
-    const key = `${schema}.${tableName}.${column.name}`;
-    if (!this.cache[key]) {
-      this.cacheTable(column.table);
-    }
-    return this.cache[key];
-  }
-  cacheTable(table) {
-    const schema = table[Table.Symbol.Schema] ?? "public";
-    const tableName = table[Table.Symbol.OriginalName];
-    const tableKey = `${schema}.${tableName}`;
-    if (!this.cachedTables[tableKey]) {
-      for (const column of Object.values(table[Table.Symbol.Columns])) {
-        const columnKey = `${tableKey}.${column.name}`;
-        this.cache[columnKey] = this.convert(column.name);
-      }
-      this.cachedTables[tableKey] = true;
-    }
-  }
-  clearCache() {
-    this.cache = {};
-    this.cachedTables = {};
-  }
-};
 
 // node_modules/drizzle-orm/pg-core/view-base.js
 var PgViewBase = class extends View {
@@ -6656,19 +6656,19 @@ var PgPreparedQuery = class {
   /** @internal */
   joinsNotNullableMap;
   /** @internal */
-  async queryWithCache(queryString2, params, query) {
+  async queryWithCache(queryString, params, query) {
     if (this.cache === void 0 || is(this.cache, NoopCache) || this.queryMetadata === void 0) {
       try {
         return await query();
       } catch (e) {
-        throw new DrizzleQueryError(queryString2, params, e);
+        throw new DrizzleQueryError(queryString, params, e);
       }
     }
     if (this.cacheConfig && !this.cacheConfig.enable) {
       try {
         return await query();
       } catch (e) {
-        throw new DrizzleQueryError(queryString2, params, e);
+        throw new DrizzleQueryError(queryString, params, e);
       }
     }
     if ((this.queryMetadata.type === "insert" || this.queryMetadata.type === "update" || this.queryMetadata.type === "delete") && this.queryMetadata.tables.length > 0) {
@@ -6679,19 +6679,19 @@ var PgPreparedQuery = class {
         ]);
         return res;
       } catch (e) {
-        throw new DrizzleQueryError(queryString2, params, e);
+        throw new DrizzleQueryError(queryString, params, e);
       }
     }
     if (!this.cacheConfig) {
       try {
         return await query();
       } catch (e) {
-        throw new DrizzleQueryError(queryString2, params, e);
+        throw new DrizzleQueryError(queryString, params, e);
       }
     }
     if (this.queryMetadata.type === "select") {
       const fromCache = await this.cache.get(
-        this.cacheConfig.tag ?? await hashQuery(queryString2, params),
+        this.cacheConfig.tag ?? await hashQuery(queryString, params),
         this.queryMetadata.tables,
         this.cacheConfig.tag !== void 0,
         this.cacheConfig.autoInvalidate
@@ -6701,10 +6701,10 @@ var PgPreparedQuery = class {
         try {
           result = await query();
         } catch (e) {
-          throw new DrizzleQueryError(queryString2, params, e);
+          throw new DrizzleQueryError(queryString, params, e);
         }
         await this.cache.put(
-          this.cacheConfig.tag ?? await hashQuery(queryString2, params),
+          this.cacheConfig.tag ?? await hashQuery(queryString, params),
           result,
           // make sure we send tables that were used in a query only if user wants to invalidate it on each write
           this.cacheConfig.autoInvalidate ? this.queryMetadata.tables : [],
@@ -6718,7 +6718,7 @@ var PgPreparedQuery = class {
     try {
       return await query();
     } catch (e) {
-      throw new DrizzleQueryError(queryString2, params, e);
+      throw new DrizzleQueryError(queryString, params, e);
     }
   }
 };
@@ -6789,10 +6789,10 @@ var PgTransaction = class extends PgDatabase {
 // node_modules/drizzle-orm/node-postgres/session.js
 var { Pool, types } = pg;
 var NodePgPreparedQuery = class extends PgPreparedQuery {
-  constructor(client, queryString2, params, logger, cache, queryMetadata, cacheConfig, fields, name, _isResponseInArrayMode, customResultMapper) {
-    super({ sql: queryString2, params }, cache, queryMetadata, cacheConfig);
+  constructor(client, queryString, params, logger, cache, queryMetadata, cacheConfig, fields, name, _isResponseInArrayMode, customResultMapper) {
+    super({ sql: queryString, params }, cache, queryMetadata, cacheConfig);
     this.client = client;
-    this.queryString = queryString2;
+    this.queryString = queryString;
     this.params = params;
     this.logger = logger;
     this.fields = fields;
@@ -6800,7 +6800,7 @@ var NodePgPreparedQuery = class extends PgPreparedQuery {
     this.customResultMapper = customResultMapper;
     this.rawQueryConfig = {
       name,
-      text: queryString2,
+      text: queryString,
       types: {
         // @ts-ignore
         getTypeParser: (typeId, format) => {
@@ -6837,7 +6837,7 @@ var NodePgPreparedQuery = class extends PgPreparedQuery {
     };
     this.queryConfig = {
       name,
-      text: queryString2,
+      text: queryString,
       rowMode: "array",
       types: {
         // @ts-ignore
@@ -7350,6 +7350,183 @@ var db = new Proxy({}, {
     return typeof value === "function" ? value.bind(real2) : value;
   }
 });
+
+// src/db/ensureBookingSchema.ts
+function isConnectionFailure(error) {
+  if (!error || typeof error !== "object") return false;
+  const code = String(error.code || "");
+  if (code === "ECONNREFUSED" || code === "ENOTFOUND" || code === "ETIMEDOUT" || code === "ECONNRESET" || code === "EAI_AGAIN" || code === "57P01" || // admin_shutdown
+  code === "57P03") {
+    return true;
+  }
+  const message = String(
+    error.message || error
+  ).toLowerCase();
+  return message.includes("timeout exceeded when trying to connect") || message.includes("connection terminated due to connection timeout") || message.includes("connect etimedout") || message.includes("could not connect") || message.includes("connection refused") || message.includes("getaddrinfo");
+}
+function hasDatabaseConfig() {
+  return Boolean(
+    process.env.DATABASE_URL?.trim() || process.env.SQL_HOST?.trim()
+  );
+}
+var SCHEMA_BOOTSTRAP_STATEMENTS = [
+  // --- CREATE (FK order) ---
+  `CREATE TABLE IF NOT EXISTS users (
+    id serial PRIMARY KEY,
+    uid text NOT NULL UNIQUE,
+    email text NOT NULL,
+    display_name text,
+    phone_whatsapp text,
+    created_at timestamp DEFAULT NOW() NOT NULL,
+    updated_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS courses (
+    id serial PRIMARY KEY,
+    slug text NOT NULL UNIQUE,
+    title text NOT NULL,
+    subtitle text NOT NULL,
+    description text NOT NULL,
+    price_eur integer NOT NULL,
+    stripe_price_id text NOT NULL,
+    lessons_count integer NOT NULL,
+    total_hours text NOT NULL,
+    level_label text NOT NULL,
+    sort_order integer NOT NULL,
+    is_published boolean DEFAULT true NOT NULL,
+    created_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS dispense (
+    id serial PRIMARY KEY,
+    course_id integer NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    module_number text NOT NULL,
+    title text NOT NULL,
+    subtitle text NOT NULL,
+    format text NOT NULL,
+    reading_minutes integer NOT NULL,
+    content_markdown text NOT NULL,
+    key_takeaways text NOT NULL,
+    sort_order integer NOT NULL,
+    created_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS course_purchases (
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    course_id integer NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    status text NOT NULL DEFAULT 'active',
+    payment_provider text NOT NULL DEFAULT 'stripe_checkout',
+    stripe_session_id text,
+    amount_paid_eur integer NOT NULL,
+    customer_name text NOT NULL,
+    customer_phone text,
+    purchased_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS dispensa_progress (
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    dispensa_id integer NOT NULL REFERENCES dispense(id) ON DELETE CASCADE,
+    completed boolean DEFAULT false NOT NULL,
+    personal_notes text DEFAULT '' NOT NULL,
+    updated_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS consultation_bookings (
+    id serial PRIMARY KEY,
+    user_id integer REFERENCES users(id) ON DELETE SET NULL,
+    tariff_id text NOT NULL,
+    duration_minutes integer NOT NULL,
+    price_eur integer NOT NULL,
+    scheduled_date text NOT NULL,
+    scheduled_time text NOT NULL,
+    full_name text NOT NULL,
+    email text NOT NULL,
+    phone_whatsapp text NOT NULL,
+    session_intent text DEFAULT '' NOT NULL,
+    deontology_accepted boolean NOT NULL,
+    mode text NOT NULL DEFAULT 'remote',
+    status text NOT NULL DEFAULT 'pending_payment',
+    stripe_session_id text,
+    stripe_payment_intent_id text,
+    google_calendar_event_id text,
+    paid_at timestamp,
+    created_at timestamp DEFAULT NOW() NOT NULL,
+    updated_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS dialogue_sessions (
+    id serial PRIMARY KEY,
+    session_key text NOT NULL UNIQUE,
+    user_id integer REFERENCES users(id) ON DELETE SET NULL,
+    free_trial_started_at timestamp,
+    free_trial_expires_at timestamp,
+    active_pass_expires_at timestamp,
+    active_pack_id text,
+    interactions_count integer DEFAULT 0 NOT NULL,
+    created_at timestamp DEFAULT NOW() NOT NULL,
+    updated_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS dialogue_purchases (
+    id serial PRIMARY KEY,
+    dialogue_session_id integer NOT NULL REFERENCES dialogue_sessions(id) ON DELETE CASCADE,
+    user_id integer REFERENCES users(id) ON DELETE SET NULL,
+    pack_id text NOT NULL,
+    duration_minutes integer NOT NULL,
+    price_eur integer NOT NULL,
+    stripe_price_id text NOT NULL,
+    stripe_session_id text,
+    customer_name text DEFAULT '' NOT NULL,
+    customer_email text DEFAULT '' NOT NULL,
+    expires_at timestamp NOT NULL,
+    created_at timestamp DEFAULT NOW() NOT NULL
+  )`,
+  // --- Legacy ALTER (bases that predate booking Stripe/Calendar columns) ---
+  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS mode text NOT NULL DEFAULT 'remote'`,
+  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS stripe_session_id text`,
+  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS stripe_payment_intent_id text`,
+  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS google_calendar_event_id text`,
+  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS paid_at timestamp`,
+  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS updated_at timestamp DEFAULT NOW() NOT NULL`,
+  // --- Indexes (idempotent) ---
+  `CREATE UNIQUE INDEX IF NOT EXISTS dispense_course_module_idx
+     ON dispense (course_id, module_number)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS course_purchases_user_course_idx
+     ON course_purchases (user_id, course_id)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS dispensa_progress_user_dispensa_idx
+     ON dispensa_progress (user_id, dispensa_id)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS consultation_bookings_stripe_session_idx
+     ON consultation_bookings (stripe_session_id)
+     WHERE stripe_session_id IS NOT NULL`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS consultation_bookings_active_slot_idx
+     ON consultation_bookings (scheduled_date, scheduled_time)
+     WHERE status IN ('pending_payment', 'confirmed')`
+];
+async function ensureBookingSchema() {
+  if (!hasDatabaseConfig()) {
+    console.error(
+      "ensureBookingSchema: skipped (set DATABASE_URL TCP or SQL_HOST)"
+    );
+    return;
+  }
+  const pool = createPool();
+  for (const sql2 of SCHEMA_BOOTSTRAP_STATEMENTS) {
+    try {
+      await pool.query(sql2);
+    } catch (error) {
+      console.error("ensureBookingSchema statement failed:", sql2, error);
+      if (isConnectionFailure(error)) {
+        console.error(
+          "ensureBookingSchema: aborting remaining statements (DB unreachable)"
+        );
+        return;
+      }
+    }
+  }
+}
+async function ensureSchemaOnce() {
+  if (!globalThis._ennamoSchemaReady) {
+    globalThis._ennamoSchemaReady = ensureBookingSchema().catch((error) => {
+      console.error("ensureBookingSchema failed (non-fatal):", error);
+    });
+  }
+  await globalThis._ennamoSchemaReady;
+}
 
 // src/db/seedData.ts
 var COURSE_SEED_CATALOG = [
@@ -8212,17 +8389,70 @@ function mapSafeError(error, fallback, statusHints) {
 }
 
 // src/server/routes/reserved.ts
+var OVERVIEW_DEGRADED_NOTICE = "Area Riservata in modalit\xE0 ridotta: non riusciamo a sincronizzare corsi e prenotazioni con il database in questo momento. Puoi restare autenticata; riprova tra poco.";
+function degradedOverviewFromSeed(user) {
+  return {
+    user: {
+      id: 0,
+      uid: user.uid,
+      email: user.email || "",
+      displayName: user.name ?? null,
+      phoneWhatsapp: null
+    },
+    courses: COURSE_SEED_CATALOG.map((course, index) => ({
+      id: -(index + 1),
+      slug: course.slug,
+      title: course.title,
+      subtitle: course.subtitle,
+      description: course.description,
+      priceEur: course.priceEur,
+      stripePriceId: course.stripePriceId,
+      lessonsCount: course.lessonsCount,
+      totalHours: course.totalHours,
+      levelLabel: course.levelLabel,
+      sortOrder: course.sortOrder,
+      isUnlocked: false,
+      purchasedAt: null,
+      amountPaidEur: null,
+      dispenseCount: course.dispense.length,
+      dispenseOutline: course.dispense.map((d, i) => ({
+        id: -(index * 100 + i + 1),
+        courseId: -(index + 1),
+        moduleNumber: d.moduleNumber,
+        title: d.title,
+        subtitle: d.subtitle,
+        format: d.format,
+        readingMinutes: d.readingMinutes,
+        sortOrder: i + 1
+      })),
+      unlockedDispense: []
+    })),
+    bookings: [],
+    dialoguePasses: [],
+    degraded: true,
+    notice: OVERVIEW_DEGRADED_NOTICE
+  };
+}
 async function getReservedOverview(user) {
   try {
     if (!user.uid) {
-      return json2(401, { error: "Identit\xE0 utente non valida." });
+      return json2(401, { error: "Identit\xE0 utente non valida.", code: "AUTH_INVALID" });
     }
-    const overview = await getReservedAreaOverview(
-      user.uid,
-      user.email || "",
-      user.name ?? null
-    );
-    return json2(200, overview);
+    try {
+      const overview = await getReservedAreaOverview(
+        user.uid,
+        user.email || "",
+        user.name ?? null
+      );
+      return json2(200, overview);
+    } catch (error) {
+      console.error("getReservedOverview soft-fail (seed catalog):", error);
+      return json2(200, {
+        ...degradedOverviewFromSeed(user),
+        detail: error instanceof Error ? error.message : String(error),
+        code: "OVERVIEW_DEGRADED"
+      });
+    }
   } catch (error) {
     return mapSafeError(error, "Impossibile aprire l\u2019Area Riservata.");
   }
@@ -8370,187 +8600,6 @@ async function putDispensaProgress(params) {
   }
 }
 
-// src/db/ensureBookingSchema.ts
-function isConnectionFailure(error) {
-  if (!error || typeof error !== "object") return false;
-  const code = String(error.code || "");
-  if (code === "ECONNREFUSED" || code === "ENOTFOUND" || code === "ETIMEDOUT" || code === "ECONNRESET" || code === "EAI_AGAIN" || code === "57P01" || // admin_shutdown
-  code === "57P03") {
-    return true;
-  }
-  const message = String(
-    error.message || error
-  ).toLowerCase();
-  return message.includes("timeout exceeded when trying to connect") || message.includes("connection terminated due to connection timeout") || message.includes("connect etimedout") || message.includes("could not connect") || message.includes("connection refused") || message.includes("getaddrinfo");
-}
-function hasDatabaseConfig() {
-  return Boolean(
-    process.env.DATABASE_URL?.trim() || process.env.SQL_HOST?.trim()
-  );
-}
-var SCHEMA_BOOTSTRAP_STATEMENTS = [
-  // --- CREATE (FK order) ---
-  `CREATE TABLE IF NOT EXISTS users (
-    id serial PRIMARY KEY,
-    uid text NOT NULL UNIQUE,
-    email text NOT NULL,
-    display_name text,
-    phone_whatsapp text,
-    created_at timestamp DEFAULT NOW() NOT NULL,
-    updated_at timestamp DEFAULT NOW() NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS courses (
-    id serial PRIMARY KEY,
-    slug text NOT NULL UNIQUE,
-    title text NOT NULL,
-    subtitle text NOT NULL,
-    description text NOT NULL,
-    price_eur integer NOT NULL,
-    stripe_price_id text NOT NULL,
-    lessons_count integer NOT NULL,
-    total_hours text NOT NULL,
-    level_label text NOT NULL,
-    sort_order integer NOT NULL,
-    is_published boolean DEFAULT true NOT NULL,
-    created_at timestamp DEFAULT NOW() NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS dispense (
-    id serial PRIMARY KEY,
-    course_id integer NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-    module_number text NOT NULL,
-    title text NOT NULL,
-    subtitle text NOT NULL,
-    format text NOT NULL,
-    reading_minutes integer NOT NULL,
-    content_markdown text NOT NULL,
-    key_takeaways text NOT NULL,
-    sort_order integer NOT NULL,
-    created_at timestamp DEFAULT NOW() NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS course_purchases (
-    id serial PRIMARY KEY,
-    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    course_id integer NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-    status text NOT NULL DEFAULT 'active',
-    payment_provider text NOT NULL DEFAULT 'stripe_checkout',
-    stripe_session_id text,
-    amount_paid_eur integer NOT NULL,
-    customer_name text NOT NULL,
-    customer_phone text,
-    purchased_at timestamp DEFAULT NOW() NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS dispensa_progress (
-    id serial PRIMARY KEY,
-    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    dispensa_id integer NOT NULL REFERENCES dispense(id) ON DELETE CASCADE,
-    completed boolean DEFAULT false NOT NULL,
-    personal_notes text DEFAULT '' NOT NULL,
-    updated_at timestamp DEFAULT NOW() NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS consultation_bookings (
-    id serial PRIMARY KEY,
-    user_id integer REFERENCES users(id) ON DELETE SET NULL,
-    tariff_id text NOT NULL,
-    duration_minutes integer NOT NULL,
-    price_eur integer NOT NULL,
-    scheduled_date text NOT NULL,
-    scheduled_time text NOT NULL,
-    full_name text NOT NULL,
-    email text NOT NULL,
-    phone_whatsapp text NOT NULL,
-    session_intent text DEFAULT '' NOT NULL,
-    deontology_accepted boolean NOT NULL,
-    mode text NOT NULL DEFAULT 'remote',
-    status text NOT NULL DEFAULT 'pending_payment',
-    stripe_session_id text,
-    stripe_payment_intent_id text,
-    google_calendar_event_id text,
-    paid_at timestamp,
-    created_at timestamp DEFAULT NOW() NOT NULL,
-    updated_at timestamp DEFAULT NOW() NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS dialogue_sessions (
-    id serial PRIMARY KEY,
-    session_key text NOT NULL UNIQUE,
-    user_id integer REFERENCES users(id) ON DELETE SET NULL,
-    free_trial_started_at timestamp,
-    free_trial_expires_at timestamp,
-    active_pass_expires_at timestamp,
-    active_pack_id text,
-    interactions_count integer DEFAULT 0 NOT NULL,
-    created_at timestamp DEFAULT NOW() NOT NULL,
-    updated_at timestamp DEFAULT NOW() NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS dialogue_purchases (
-    id serial PRIMARY KEY,
-    dialogue_session_id integer NOT NULL REFERENCES dialogue_sessions(id) ON DELETE CASCADE,
-    user_id integer REFERENCES users(id) ON DELETE SET NULL,
-    pack_id text NOT NULL,
-    duration_minutes integer NOT NULL,
-    price_eur integer NOT NULL,
-    stripe_price_id text NOT NULL,
-    stripe_session_id text,
-    customer_name text DEFAULT '' NOT NULL,
-    customer_email text DEFAULT '' NOT NULL,
-    expires_at timestamp NOT NULL,
-    created_at timestamp DEFAULT NOW() NOT NULL
-  )`,
-  // --- Legacy ALTER (bases that predate booking Stripe/Calendar columns) ---
-  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS mode text NOT NULL DEFAULT 'remote'`,
-  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS stripe_session_id text`,
-  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS stripe_payment_intent_id text`,
-  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS google_calendar_event_id text`,
-  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS paid_at timestamp`,
-  `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS updated_at timestamp DEFAULT NOW() NOT NULL`,
-  // --- Indexes (idempotent) ---
-  `CREATE UNIQUE INDEX IF NOT EXISTS dispense_course_module_idx
-     ON dispense (course_id, module_number)`,
-  `CREATE UNIQUE INDEX IF NOT EXISTS course_purchases_user_course_idx
-     ON course_purchases (user_id, course_id)`,
-  `CREATE UNIQUE INDEX IF NOT EXISTS dispensa_progress_user_dispensa_idx
-     ON dispensa_progress (user_id, dispensa_id)`,
-  `CREATE UNIQUE INDEX IF NOT EXISTS consultation_bookings_stripe_session_idx
-     ON consultation_bookings (stripe_session_id)
-     WHERE stripe_session_id IS NOT NULL`,
-  `CREATE UNIQUE INDEX IF NOT EXISTS consultation_bookings_active_slot_idx
-     ON consultation_bookings (scheduled_date, scheduled_time)
-     WHERE status IN ('pending_payment', 'confirmed')`
-];
-async function ensureBookingSchema() {
-  if (!hasDatabaseConfig()) {
-    console.error(
-      "ensureBookingSchema: skipped (set DATABASE_URL TCP or SQL_HOST)"
-    );
-    return;
-  }
-  const pool = createPool();
-  for (const sql2 of SCHEMA_BOOTSTRAP_STATEMENTS) {
-    try {
-      await pool.query(sql2);
-    } catch (error) {
-      console.error("ensureBookingSchema statement failed:", sql2, error);
-      if (isConnectionFailure(error)) {
-        console.error(
-          "ensureBookingSchema: aborting remaining statements (DB unreachable)"
-        );
-        return;
-      }
-    }
-  }
-}
-async function ensureSchemaOnce() {
-  if (!globalThis._ennamoSchemaReady) {
-    globalThis._ennamoSchemaReady = ensureBookingSchema().catch((error) => {
-      console.error("ensureBookingSchema failed (non-fatal):", error);
-    });
-  }
-  await globalThis._ennamoSchemaReady;
-}
-
-// src/lib/firebase-admin.ts
-import { cert, getApps, initializeApp } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
-
 // firebase-applet-config.json
 var firebase_applet_config_default = {
   projectId: "gen-lang-client-0853491667",
@@ -8565,13 +8614,16 @@ var firebase_applet_config_default = {
 };
 
 // src/lib/firebase-admin.ts
-function buildOptions() {
+var app;
+var auth;
+var initPromise;
+function buildOptions(certFn) {
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim();
   if (raw) {
     try {
       const serviceAccount = JSON.parse(raw);
       return {
-        credential: cert(serviceAccount),
+        credential: certFn(serviceAccount),
         projectId: serviceAccount.project_id || firebase_applet_config_default.projectId
       };
     } catch (error) {
@@ -8583,23 +8635,26 @@ function buildOptions() {
   }
   return { projectId: firebase_applet_config_default.projectId };
 }
-var app;
-var auth;
-function ensureApp() {
-  if (!app) {
-    app = getApps().length ? getApps()[0] : initializeApp(buildOptions());
+async function getAdminAuth() {
+  if (auth) return auth;
+  if (!initPromise) {
+    initPromise = (async () => {
+      const [{ cert, getApps, initializeApp }, { getAuth }] = await Promise.all([
+        import("firebase-admin/app"),
+        import("firebase-admin/auth")
+      ]);
+      if (!app) {
+        app = getApps().length ? getApps()[0] : initializeApp(buildOptions(cert));
+      }
+      auth = getAuth(app);
+      return auth;
+    })().catch((error) => {
+      initPromise = void 0;
+      throw error;
+    });
   }
-  return app;
+  return initPromise;
 }
-var adminAuth = new Proxy({}, {
-  get(_target, prop, receiver) {
-    if (!auth) {
-      auth = getAuth(ensureApp());
-    }
-    const value = Reflect.get(auth, prop, receiver);
-    return typeof value === "function" ? value.bind(auth) : value;
-  }
-});
 
 // src/server/authToken.ts
 function toApiUser(token) {
@@ -8621,6 +8676,20 @@ async function verifyBearerToken(authorization, mode) {
     return { ok: true, user: null };
   }
   const token = authorization.slice("Bearer ".length);
+  let adminAuth;
+  try {
+    adminAuth = await getAdminAuth();
+  } catch (error) {
+    if (mode === "optional") {
+      return { ok: true, user: null };
+    }
+    console.error("Firebase Admin init failed:", error);
+    return {
+      ok: false,
+      status: 503,
+      error: "Servizio autenticazione non disponibile. Riprova tra poco."
+    };
+  }
   try {
     const decoded = await adminAuth.verifyIdToken(token);
     return { ok: true, user: toApiUser(decoded) };
@@ -8679,47 +8748,7 @@ function requestOrigin(req) {
   return (process.env.APP_URL || "http://localhost:3000").replace(/\/$/, "");
 }
 
-// src/server/vercelAdapter.ts
-function sendApiResult(res, result) {
-  sendJson(res, result.status, result.body);
-}
-async function requireUser(req, res) {
-  const auth2 = await verifyBearerToken(
-    readHeaderSafe(req, "authorization") || void 0,
-    "required"
-  );
-  if (!auth2.ok) {
-    sendJson(res, auth2.status, { error: auth2.error });
-    return null;
-  }
-  return auth2.user;
-}
-function methodNotAllowed(res, allowed) {
-  res.setHeader("Allow", allowed.join(", "));
-  sendJson(res, 405, { error: "Metodo non consentito." });
-}
-function readHeaderSafe(req, name) {
-  const target = name.toLowerCase();
-  for (const [key, value] of Object.entries(req.headers || {})) {
-    if (key.toLowerCase() !== target) continue;
-    return (Array.isArray(value) ? value[0] : value)?.trim() ?? "";
-  }
-  return "";
-}
-
 // src/server/vercelEntry.ts
-function sendJson2(res, status, body) {
-  if (typeof res.status === "function" && typeof res.json === "function") {
-    const withStatus = res.status(status);
-    if (typeof withStatus.json === "function") {
-      withStatus.json(body);
-      return;
-    }
-  }
-  res.statusCode = status;
-  res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.end(JSON.stringify(body));
-}
 function groupSubpath(req, prefix) {
   const fromQuery = req.query?.__path;
   if (typeof fromQuery === "string" && fromQuery.trim()) {
@@ -8741,6 +8770,28 @@ function groupSubpath(req, prefix) {
 
 // src/server/apiEntries/reserved.ts
 var config = { runtime: "nodejs", maxDuration: 30 };
+function methodNotAllowed(res, allowed) {
+  res.setHeader("Allow", allowed.join(", "));
+  sendJson(res, 405, { error: "Metodo non consentito.", allow: allowed });
+}
+async function requireUser(req, res) {
+  const authHeader = (() => {
+    for (const [key, value] of Object.entries(req.headers || {})) {
+      if (key.toLowerCase() !== "authorization") continue;
+      return (Array.isArray(value) ? value[0] : value)?.trim() ?? "";
+    }
+    return "";
+  })();
+  const auth2 = await verifyBearerToken(authHeader || void 0, "required");
+  if (!auth2.ok) {
+    sendJson(res, auth2.status, {
+      error: auth2.error,
+      code: "AUTH_REQUIRED"
+    });
+    return null;
+  }
+  return auth2.user;
+}
 async function handler(req, res) {
   try {
     const method = (req.method || "GET").toUpperCase();
@@ -8750,52 +8801,48 @@ async function handler(req, res) {
       if (method !== "GET") return methodNotAllowed(res, ["GET"]);
       const user = await requireUser(req, res);
       if (!user) return;
-      return sendApiResult(res, await getReservedOverview(user));
+      const result = await getReservedOverview(user);
+      return sendJson(res, result.status, result.body);
     }
     if (path === "enroll") {
       if (method !== "POST") return methodNotAllowed(res, ["POST"]);
       const user = await requireUser(req, res);
       if (!user) return;
-      return sendApiResult(
-        res,
-        await postReservedEnroll({
-          user,
-          body: readBodyObject(req),
-          origin: requestOrigin(req)
-        })
-      );
+      const result = await postReservedEnroll({
+        user,
+        body: readBodyObject(req),
+        origin: requestOrigin(req)
+      });
+      return sendJson(res, result.status, result.body);
     }
     if (path === "confirm-stripe") {
       if (method !== "POST") return methodNotAllowed(res, ["POST"]);
       const user = await requireUser(req, res);
       if (!user) return;
-      return sendApiResult(
-        res,
-        await postReservedConfirmStripe({
-          user,
-          body: readBodyObject(req)
-        })
-      );
+      const result = await postReservedConfirmStripe({
+        user,
+        body: readBodyObject(req)
+      });
+      return sendJson(res, result.status, result.body);
     }
     const dispensaProgress2 = path.match(/^dispense\/([^/]+)\/progress$/);
     if (dispensaProgress2) {
       if (method !== "PUT") return methodNotAllowed(res, ["PUT"]);
       const user = await requireUser(req, res);
       if (!user) return;
-      return sendApiResult(
-        res,
-        await putDispensaProgress({
-          user,
-          dispensaId: Number(dispensaProgress2[1]),
-          body: readBodyObject(req)
-        })
-      );
+      const result = await putDispensaProgress({
+        user,
+        dispensaId: Number(dispensaProgress2[1]),
+        body: readBodyObject(req)
+      });
+      return sendJson(res, result.status, result.body);
     }
-    return sendJson2(res, 404, { error: "Not found", path, method });
+    return sendJson(res, 404, { error: "Not found", path, method });
   } catch (error) {
     console.error("api/reserved handler failed:", error);
-    return sendJson2(res, 500, {
-      error: "Internal server error",
+    return sendJson(res, 500, {
+      error: "Impossibile aprire l\u2019Area Riservata.",
+      code: "RESERVED_HANDLER_FAILED",
       detail: error instanceof Error ? error.message : String(error)
     });
   }
