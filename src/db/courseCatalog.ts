@@ -3,7 +3,7 @@
  * Used by /api/courses so the Vercel function stays small and cold-start safe.
  */
 import { asc, eq } from 'drizzle-orm';
-import { db } from './index.ts';
+import { db, isDbConnectionFailure, resetDbPool } from './index.ts';
 import { courses, dispense } from './schema.ts';
 import { COURSE_SEED_CATALOG } from './seedData.ts';
 
@@ -83,6 +83,9 @@ export async function ensureCatalogSeeded(): Promise<void> {
         }
       } catch (error) {
         seedPromise = null;
+        if (isDbConnectionFailure(error)) {
+          resetDbPool();
+        }
         console.error('Catalog seeding failed:', error);
         throw new Error('Impossibile inizializzare il catalogo corsi e dispense.', {
           cause: error,

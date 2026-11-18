@@ -1,5 +1,5 @@
 import { and, asc, desc, eq, gte, inArray, lte, ne, or } from 'drizzle-orm';
-import { db } from './index.ts';
+import { db, isDbConnectionFailure, resetDbPool } from './index.ts';
 import {
   consultationBookings,
   coursePurchases,
@@ -54,7 +54,14 @@ export async function getOrCreateUser(
 
     return result[0];
   } catch (error) {
-    console.error('Failed to upsert user:', error);
+    if (isDbConnectionFailure(error)) {
+      // Spotty Vercel↔Supabase connects: drop the poisoned pool so the next
+      // warm request can reconnect (reserved overview soft-fails to seed).
+      resetDbPool();
+      console.error('Failed to upsert user (DB connect timeout/unreachable):', error);
+    } else {
+      console.error('Failed to upsert user:', error);
+    }
     throw new Error('Errore durante la sincronizzazione del profilo utente.', {
       cause: error,
     });
