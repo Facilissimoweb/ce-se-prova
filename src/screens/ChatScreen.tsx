@@ -25,6 +25,7 @@ import { ChatThreadPanel } from '../components/chat/ChatThreadPanel';
 import { useAuth } from '../context/AuthContext';
 import { useDialogueAccess } from '../hooks/useDialogueAccess';
 import { nowTimeLabel } from '../lib/dialogueSession';
+import { SCROLL_LANDMARKS } from '../lib/scrollNavigation';
 import { whatsappHref as buildWhatsappHref } from '../lib/siteContacts';
 
 interface ChatScreenProps {
@@ -196,7 +197,10 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
   const whatsappHref = buildWhatsappHref(whatsappContextText);
 
   return (
-    <div className="pt-6 md:pt-10 pb-8 space-y-6">
+    <div
+      id={SCROLL_LANDMARKS.dialogo}
+      className="scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] pt-6 md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))] md:pt-10 pb-8 space-y-6"
+    >
       <CheckoutReturnBanner variant="dialogue" />
       <div className="glass-tier-1 rounded-2xl overflow-hidden">
         <div className="px-5 md:px-6 py-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">

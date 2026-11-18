@@ -25,6 +25,14 @@
     max-width: 100%;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    /* Sticky top bar — keep in sync with NavigationChrome HEADER_HEIGHT_CLASS */
+    --site-header-offset: calc(4.75rem + env(safe-area-inset-top, 0px));
+  }
+
+  @media (min-width: 768px) {
+    html {
+      --site-header-offset: calc(5rem + env(safe-area-inset-top, 0px));
+    }
   }
 
   body {

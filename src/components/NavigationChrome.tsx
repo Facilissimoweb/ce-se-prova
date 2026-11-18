@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import type { ScreenId } from '../types/handoff';
+import { afterNextPaint, scrollWindowTo } from '../lib/scrollNavigation';
 import { whatsappHref } from '../lib/siteContacts';
 import { TarotNavLogo } from './TarotEmblem';
 
@@ -134,12 +135,15 @@ export function TopBar({
       document.body.style.position = previous.position;
       document.body.style.top = previous.top;
       document.body.style.width = previous.width;
-      if (skipScrollRestoreRef.current) {
+      const skipRestore = skipScrollRestoreRef.current;
+      if (skipRestore) {
         skipScrollRestoreRef.current = false;
-        window.scrollTo(0, 0);
-      } else {
-        window.scrollTo(0, scrollY);
       }
+      // Instant jump after unlock — CSS `scroll-behavior: smooth` + body-fixed
+      // unlock otherwise leaves mid-page on the *new* SPA screen (Corsi/Dialogo).
+      const targetY = skipRestore ? 0 : scrollY;
+      scrollWindowTo(targetY, 'auto');
+      afterNextPaint(() => scrollWindowTo(targetY, 'auto'));
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isMobileMenuOpen]);
@@ -166,6 +170,7 @@ export function TopBar({
   return (
     <>
       <header
+        data-site-header
         className={`${
           isMobileMenuOpen
             ? 'fixed inset-x-0 top-0 z-[60]'

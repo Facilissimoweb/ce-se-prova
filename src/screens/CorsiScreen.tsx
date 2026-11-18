@@ -24,6 +24,7 @@ import {
   isValidFullName,
   isValidPhone,
 } from '../lib/formValidation';
+import { SCROLL_LANDMARKS, scrollToElement } from '../lib/scrollNavigation';
 import { whatsappHref } from '../lib/siteContacts';
 
 interface CorsiScreenProps {
@@ -88,12 +89,12 @@ export function CorsiScreen({
 
   const handleExploreCourse = (courseId: CourseId) => {
     onChangeCourseId(courseId);
-    workbenchSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    scrollToElement(workbenchSectionRef.current, { behavior: 'smooth' });
   };
 
   const handleEnrollCourse = (courseId: CourseId) => {
     onChangeCourseId(courseId);
-    checkoutSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    scrollToElement(checkoutSectionRef.current, { behavior: 'smooth' });
   };
 
   const handlePrepareCourseCheckout = async (e: React.FormEvent) => {
@@ -191,9 +192,12 @@ export function CorsiScreen({
     SAMPLE_MAJOR_ARCANA[sampleArcanaIdx] ?? SAMPLE_MAJOR_ARCANA[0];
 
   return (
-    <div className="relative isolate pt-6 md:pt-10 pb-8">
+    <div
+      id={SCROLL_LANDMARKS.corsi}
+      className="relative isolate scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] pt-6 md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))] md:pt-10 pb-8"
+    >
       {/* Sticky notice — stays readable while scrolling; site nav remains outside this screen */}
-      <div className="sticky top-20 z-30 flex justify-center px-1 sm:px-2 mb-6 md:mb-8">
+      <div className="sticky top-[calc(4.75rem+env(safe-area-inset-top,0px)+0.5rem)] z-30 flex justify-center px-1 sm:px-2 mb-6 md:top-[calc(5rem+env(safe-area-inset-top,0px)+0.5rem)] md:mb-8">
         <div
           role="status"
           aria-live="polite"
@@ -433,9 +437,10 @@ export function CorsiScreen({
 
       {/* Interactive Syllabus + Visual Workbench */}
       <section
+        id={SCROLL_LANDMARKS.corsiWorkbench}
         ref={workbenchSectionRef}
         aria-labelledby="workbench-heading"
-        className="glass-tier-1 rounded-2xl p-6 md:p-8 space-y-8 scroll-mt-20"
+        className="glass-tier-1 rounded-2xl p-6 md:p-8 space-y-8 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
       >
         {/* Interactive Pillar Tabs */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#D4AF37]/15 pb-6">
@@ -590,9 +595,10 @@ export function CorsiScreen({
 
       {/* Paid Course Enrollment & Stripe Checkout Handoff */}
       <section
+        id={SCROLL_LANDMARKS.corsiCheckout}
         ref={checkoutSectionRef}
         aria-labelledby="course-checkout-heading"
-        className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start scroll-mt-20"
+        className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
       >
         <form
           onSubmit={handlePrepareCourseCheckout}

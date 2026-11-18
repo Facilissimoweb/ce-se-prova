@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BookOpen, Sparkles } from 'lucide-react';
+import { scrollToId } from '../lib/scrollNavigation';
 
 export const HOME_CONSULTI_SECTION_ID = 'home-consulti';
 export const HOME_DIDATTICA_SECTION_ID = 'home-didattica';
@@ -27,9 +28,8 @@ const BOOKMARKS: BookmarkTarget[] = [
 ];
 
 function scrollToSection(id: string) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Clear sticky header + the home bookmark chip strip (~3.25rem).
+  scrollToId(id, { behavior: 'smooth', extraOffset: 52 });
 }
 
 type Props = {
@@ -80,7 +80,7 @@ export function HomeSectionBookmarks({ visible }: Props) {
   return (
     <>
       {/* Horizontal bookmark strip — Home only */}
-      <div className="pointer-events-none sticky top-14 z-20 -mx-1 mb-2 md:top-16">
+      <div className="pointer-events-none sticky top-[calc(4.75rem+env(safe-area-inset-top,0px))] z-20 -mx-1 mb-2 md:top-[calc(5rem+env(safe-area-inset-top,0px))]">
         <div className="pointer-events-auto flex justify-center px-1 py-2">
           <nav
             aria-label="Segnalibri sezioni Home"
