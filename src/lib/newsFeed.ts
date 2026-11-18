@@ -1,4 +1,4 @@
-/** Tipi e client per GET /api/news (articoli Blog). Fonte esterna disconnessa. */
+/** Tipi e client per GET /api/news (articoli Blog da content/blog). */
 
 export type NewsArticle = {
   id: string;

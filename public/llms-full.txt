@@ -29,7 +29,7 @@ Didattica a breve: training paths are in preparation. Catalog and enrollment are
 /dialogo is an interactive space with the 22 Major Arcana for guided reflection. It does not replace a human consultation with Maria Teresa.
 
 ## Blog
-/news is the Blog page; the previous Substack feed is disconnected — placeholder until a new platform is chosen.
+/news is the Blog page; articles live as Markdown in the repo (`content/blog/`) and are published via commit/deploy.
 
 ## FAQ highlights (official site copy)
 Home ethics FAQ:

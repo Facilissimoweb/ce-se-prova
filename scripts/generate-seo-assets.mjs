@@ -60,9 +60,28 @@ function resolveSiteOrigin() {
   return '';
 }
 
+function loadBlogPostPaths() {
+  const blogDir = path.join(root, 'content', 'blog');
+  if (!fs.existsSync(blogDir)) return [];
+  return fs
+    .readdirSync(blogDir)
+    .filter(
+      (name) =>
+        /\.(md|mdx)$/i.test(name) && !/^readme\.(md|mdx)$/i.test(name)
+    )
+    .map((name) => {
+      const raw = fs.readFileSync(path.join(blogDir, name), 'utf8');
+      if (/^draft:\s*true\b/m.test(raw.replace(/^\uFEFF/, ''))) return null;
+      const slug = name.replace(/\.(md|mdx)$/i, '');
+      return { path: `/news/${slug}`, changefreq: 'monthly', priority: '0.6' };
+    })
+    .filter(Boolean);
+}
+
 function buildSitemap(origin) {
   const today = new Date().toISOString().slice(0, 10);
-  const urls = PUBLIC_URLS.map((entry) => {
+  const entries = [...PUBLIC_URLS, ...loadBlogPostPaths()];
+  const urls = entries.map((entry) => {
     const loc = origin
       ? `${origin}${entry.path === '/' ? '/' : entry.path}`
       : entry.path;

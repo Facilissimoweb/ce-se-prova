@@ -139,8 +139,37 @@ export function pathForScreen(screen: ScreenId): string {
   return SCREEN_PATHS[screen];
 }
 
+const BLOG_PREFIXES = ['/news', '/blog', '/articoli'] as const;
+
+/** Slug articolo da path tipo `/news/mio-articolo` (alias `/blog`, `/articoli`). */
+export function blogSlugFromPath(pathname: string): string | null {
+  const normalized = (pathname.replace(/\/+$/, '') || '/').toLowerCase();
+  for (const prefix of BLOG_PREFIXES) {
+    if (normalized === prefix) return null;
+    if (normalized.startsWith(`${prefix}/`)) {
+      const rest = normalized.slice(prefix.length + 1);
+      if (!rest || rest.includes('/')) return null;
+      try {
+        return decodeURIComponent(rest);
+      } catch {
+        return rest;
+      }
+    }
+  }
+  return null;
+}
+
+export function pathForBlogPost(slug: string): string {
+  return `/news/${encodeURIComponent(slug)}`;
+}
+
+export function navigateBlogPost(slug: string): void {
+  window.history.pushState({}, '', pathForBlogPost(slug));
+}
+
 export function screenFromPath(pathname: string): ScreenId {
   const normalized = (pathname.replace(/\/+$/, '') || '/').toLowerCase();
+  if (blogSlugFromPath(normalized)) return 'news';
   return PATH_ALIASES[normalized] ?? 'not-found';
 }
 

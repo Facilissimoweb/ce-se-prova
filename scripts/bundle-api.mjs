@@ -7,10 +7,16 @@ import * as esbuild from 'esbuild';
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildBlogPosts } from './build-blog.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const entriesDir = path.join(root, 'src', 'server', 'apiEntries');
 const outDir = path.join(root, 'api');
+
+const blog = buildBlogPosts();
+console.log(
+  `[blog] ${blog.published}/${blog.count} post(s) → ${path.relative(root, blog.outFile)}`
+);
 
 /** Output basename under api/ → source file under apiEntries/ */
 const entries = {
