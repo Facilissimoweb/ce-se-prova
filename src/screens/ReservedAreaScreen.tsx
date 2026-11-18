@@ -13,8 +13,10 @@ import type { CourseId, ScreenId } from '../types/handoff';
 import { useAuth } from '../context/AuthContext';
 import { CheckoutReturnBanner } from '../components/CheckoutReturnBanner';
 import { FormattedDispensaBody } from '../components/reserved/FormattedDispensaBody';
+import { DispensaFlashcards } from '../components/reserved/DispensaFlashcards';
 import { ReservedLoginGate } from '../components/reserved/ReservedLoginGate';
 import { ReservedNotesPanel } from '../components/reserved/ReservedNotesPanel';
+import { getFlashcardDeck } from '../data/flashcards/arcaniMaggiori';
 import { useReservedArea } from '../hooks/useReservedArea';
 
 interface ReservedAreaScreenProps {
@@ -47,17 +49,6 @@ export function ReservedAreaScreen({
     getIdToken,
   });
 
-  if (authLoading || !user) {
-    return (
-      <ReservedLoginGate
-        authLoading={authLoading}
-        authError={authError}
-        onSignIn={signInWithGoogle}
-        onNavigate={onNavigate}
-      />
-    );
-  }
-
   const {
     overview,
     loadingData,
@@ -88,6 +79,22 @@ export function ReservedAreaScreen({
     completedDispenseCount,
     totalDispenseCount,
   } = area;
+
+  const activeFlashcardDeck = useMemo(() => {
+    if (!activeCourse || !activeDispensa) return null;
+    return getFlashcardDeck(activeCourse.slug, activeDispensa.moduleNumber);
+  }, [activeCourse, activeDispensa]);
+
+  if (authLoading || !user) {
+    return (
+      <ReservedLoginGate
+        authLoading={authLoading}
+        authError={authError}
+        onSignIn={signInWithGoogle}
+        onNavigate={onNavigate}
+      />
+    );
+  }
 
   return (
     <div className="space-y-10 pt-6 md:pt-10 pb-10">
@@ -409,6 +416,13 @@ export function ReservedAreaScreen({
 
                   {/* Formatted Dispensa Body */}
                   <FormattedDispensaBody markdown={activeDispensa.contentMarkdown} />
+
+                  {activeFlashcardDeck && (
+                    <>
+                      <div className="gold-divider" aria-hidden="true" />
+                      <DispensaFlashcards deck={activeFlashcardDeck} />
+                    </>
+                  )}
 
                   <div className="gold-divider" aria-hidden="true" />
 
