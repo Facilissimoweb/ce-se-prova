@@ -8,10 +8,19 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { requireAuth, optionalAuth, type AuthRequest } from './src/middleware/auth.ts';
+import {
+  createComingSoonGate,
+  resolveComingSoonHtmlPath,
+} from './src/middleware/comingSoonGate.ts';
 import { ensureBookingSchema } from './src/db/ensureBookingSchema.ts';
 import { getCourses } from './src/server/routes/courses.ts';
 import { getNewsArticles } from './src/server/routes/news.ts';
 import { getChatStatus, postChatMessage } from './src/server/routes/chat.ts';
+import {
+  getComingSoonStatus,
+  postComingSoonLock,
+  postComingSoonUnlock,
+} from './src/server/routes/comingSoon.ts';
 import {
   getReservedOverview,
   postReservedConfirmStripe,
@@ -64,6 +73,64 @@ async function startServer() {
   );
 
   app.use(express.json());
+
+  app.get('/api/coming-soon', async (req, res) => {
+    const result = await getComingSoonStatus({
+      host:
+        (req.headers['x-forwarded-host'] as string | undefined) ||
+        req.headers.host ||
+        'localhost',
+      cookieHeader: req.headers.cookie,
+    });
+    sendResult(res, result);
+  });
+
+  app.get('/api/coming-soon/status', async (req, res) => {
+    const result = await getComingSoonStatus({
+      host:
+        (req.headers['x-forwarded-host'] as string | undefined) ||
+        req.headers.host ||
+        'localhost',
+      cookieHeader: req.headers.cookie,
+    });
+    sendResult(res, result);
+  });
+
+  app.post('/api/coming-soon', async (req, res) => {
+    const password =
+      typeof req.body?.password === 'string' ? req.body.password : '';
+    const result = await postComingSoonUnlock({
+      password,
+      origin: expressOrigin(req, PORT),
+    });
+    if (result.setCookie) {
+      res.setHeader('Set-Cookie', result.setCookie);
+    }
+    sendResult(res, { status: result.status, body: result.body });
+  });
+
+  app.post('/api/coming-soon/unlock', async (req, res) => {
+    const password =
+      typeof req.body?.password === 'string' ? req.body.password : '';
+    const result = await postComingSoonUnlock({
+      password,
+      origin: expressOrigin(req, PORT),
+    });
+    if (result.setCookie) {
+      res.setHeader('Set-Cookie', result.setCookie);
+    }
+    sendResult(res, { status: result.status, body: result.body });
+  });
+
+  app.post('/api/coming-soon/lock', async (req, res) => {
+    const result = postComingSoonLock({
+      origin: expressOrigin(req, PORT),
+    });
+    if (result.setCookie) {
+      res.setHeader('Set-Cookie', result.setCookie);
+    }
+    sendResult(res, { status: result.status, body: result.body });
+  });
 
   app.get('/api/courses', async (_req, res) => {
     sendResult(res, await getCourses());
@@ -247,8 +314,14 @@ async function startServer() {
     }
   );
 
+  // Coming Soon gate before SPA/static (mirrors Vercel Edge middleware.ts)
+  const comingSoonHtml = resolveComingSoonHtmlPath(__dirname);
+  app.use(createComingSoonGate(comingSoonHtml));
+
   // Frontend Vite middleware (dev) or static dist (production / non-Vercel host)
   if (process.env.NODE_ENV !== 'production') {
+    // Serve public/coming-soon.html and brand assets before Vite when gated.
+    app.use(express.static(path.resolve(__dirname, 'public')));
     const vite = await createViteServer({
       server: {
         middlewareMode: true,

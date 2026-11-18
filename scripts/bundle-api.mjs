@@ -28,6 +28,7 @@ const entries = {
   dialogue: 'dialogue.ts',
   news: 'news.ts',
   chat: 'chat.ts',
+  'coming-soon': 'comingSoon.ts',
 };
 
 mkdirSync(outDir, { recursive: true });

@@ -10,7 +10,8 @@ SPA React (Vite) + API: Firebase Auth, Postgres/Drizzle, contenuti editoriali in
 | Dati | PostgreSQL + Drizzle (`src/db/*`) |
 | UI | React 19 + Vite 8 + Tailwind 4 |
 | API (locale) | Express in `server.ts` — stessi handler di Vercel |
-| API (produzione consigliata) | **Vercel Serverless** — 8 funzioni: `api/health.ts` + esbuild `api/{courses,bookings,stripe,reserved,dialogue,news,chat}.js` da `src/server/apiEntries/*` (≤12 Hobby) |
+| API (produzione consigliata) | **Vercel Serverless** — 10 funzioni: `api/health.ts` + esbuild `api/{courses,bookings,booking-availability,stripe,reserved,dialogue,news,chat,coming-soon}.js` da `src/server/apiEntries/*` (≤12 Hobby) |
+| Coming Soon | Edge `middleware.ts` + `public/coming-soon.html` + `/api/coming-soon` (password → cookie httpOnly) |
 | Pagamenti | Stripe Checkout + webhook / confirm-session |
 | Prenotazioni | Zoho SMTP + Google Calendar (opzionali) |
 
@@ -34,7 +35,8 @@ npm run lint     # tsc --noEmit
    - `FIREBASE_SERVICE_ACCOUNT_JSON`
    - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
    - `APP_URL` (URL pubblico, es. preview o `https://www.tarotitalia.com`)
-3. Deploy: SPA in `dist/` + **8** funzioni Serverless (`api/health.ts` + **committed** `api/{courses,bookings,stripe,reserved,dialogue,news,chat}.js` from `npm run build:api`). Vercel only discovers functions present in the repo `api/` tree — generated-only JS was 404. Refresh bundles with `npm run build:api` before commit when entries change. Sotto-path via rewrite `?__path=`. Hobby: max 12. SPA rewrite skips `/api` and `privacy.html`. `GET /api/news` serves published posts from `content/blog/*.{md,mdx}` (compiled into `src/data/blogPosts.generated.ts`). `GET|POST /api/chat` is the generic FAB chat (Groq) when `TAROTITALIACHATGENERICAGROQ_API_KEY` is set (server-only).
+   - Per Coming Soon su www: `COMING_SOON_ENABLED=true` + `COMING_SOON_PASSWORD` (o `COMING_SOON_PASSWORD_HASH`) — vedi doc ENN-92 nel Project Context
+3. Deploy: SPA in `dist/` + **10** funzioni Serverless (`api/health.ts` + **committed** `api/{courses,bookings,booking-availability,stripe,reserved,dialogue,news,chat,coming-soon}.js` from `npm run build:api`). Vercel only discovers functions present in the repo `api/` tree — generated-only JS was 404. Refresh bundles with `npm run build:api` before commit when entries change. Sotto-path via rewrite `?__path=`. Hobby: max 12. SPA rewrite skips `/api`, `privacy.html`, `coming-soon.html`. Edge `middleware.ts` gates document routes when Coming Soon is on. `GET /api/news` serves published posts from `content/blog/*.{md,mdx}` (compiled into `src/data/blogPosts.generated.ts`). `GET|POST /api/chat` is the generic FAB chat (Groq) when `TAROTITALIACHATGENERICAGROQ_API_KEY` is set (server-only).
 
 ### Blog (articoli in-repo)
 
@@ -60,6 +62,10 @@ Vedi `.env.example`. Sintesi:
 | `ZOHO_*` / `GOOGLE_*` | Email e Calendar prenotazioni |
 | `TAROTITALIACHATGENERICAGROQ_API_KEY` | Chat FAB generica via Groq (server-only; opzionale) |
 | `GROQ_CHAT_MODEL` | Override modello chat (default `openai/gpt-oss-20b`) |
+| `COMING_SOON_ENABLED=true` | Coming Soon gate (www di default) |
+| `COMING_SOON_PASSWORD` / `COMING_SOON_PASSWORD_HASH` | Password sblocco (o SHA-256 hex) |
+| `COMING_SOON_SECRET_PATH` | Path sblocco (default `/preview-atelier`) |
+| `COMING_SOON_ALL_HOSTS=true` | Gate anche su preview/localhost |
 | `ALLOW_DIRECT_UNLOCK=true` | Solo non-prod |
 
 La config client Firebase è in `firebase-applet-config.json`.
