@@ -6,12 +6,13 @@
   "scripts": {
     "dev": "tsx server.ts",
     "start": "NODE_ENV=production tsx server.ts",
-    "build": "vite build && node scripts/bundle-api.mjs",
+    "build": "node scripts/build-blog.mjs && vite build && node scripts/bundle-api.mjs",
     "build:api": "node scripts/bundle-api.mjs",
+    "build:blog": "node scripts/build-blog.mjs",
     "seo:generate": "node scripts/generate-seo-assets.mjs",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js api/courses.js api/bookings.js api/booking-availability.js api/stripe.js api/reserved.js api/dialogue.js api/news.js api/chat.js",
-    "lint": "tsc --noEmit"
+    "lint": "npm run build:blog && tsc --noEmit"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

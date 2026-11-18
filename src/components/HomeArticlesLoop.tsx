@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { ArrowRight, Newspaper } from 'lucide-react';
 import type { ScreenId } from '../types/handoff';
 import {
-  fetchNewsArticles,
-  formatArticleDate,
-  type NewsArticle,
-} from '../lib/newsFeed';
+  listNewsArticlesFromBlog,
+} from '../lib/blogPosts';
+import { formatArticleDate, type NewsArticle } from '../lib/newsFeed';
+import { navigateBlogPost, navigatePath } from '../lib/appPaths';
 
 type Props = {
   onNavigate: (screen: ScreenId) => void;
@@ -19,19 +19,9 @@ export function HomeArticlesLoop({ onNavigate }: Props) {
   const [status, setStatus] = useState<'loading' | 'ready' | 'empty'>('loading');
 
   useEffect(() => {
-    const controller = new AbortController();
-    fetchNewsArticles(controller.signal)
-      .then((data) => {
-        setArticles(data.articles);
-        setStatus(data.articles.length > 0 ? 'ready' : 'empty');
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setArticles([]);
-          setStatus('empty');
-        }
-      });
-    return () => controller.abort();
+    const list = listNewsArticlesFromBlog();
+    setArticles(list);
+    setStatus(list.length > 0 ? 'ready' : 'empty');
   }, []);
 
   useEffect(() => {
@@ -44,19 +34,31 @@ export function HomeArticlesLoop({ onNavigate }: Props) {
 
   const current = articles[index];
 
+  const openArticle = (article: NewsArticle) => {
+    const match = article.link.match(/\/(?:news|blog|articoli)\/([^/?#]+)/i);
+    if (match?.[1]) {
+      const slug = decodeURIComponent(match[1]);
+      navigateBlogPost(slug);
+      onNavigate('news');
+      return;
+    }
+    navigatePath('news');
+    onNavigate('news');
+  };
+
   return (
     <section
       aria-labelledby="home-news-heading"
       className="space-y-5 border-t border-[#D4AF37]/15 pt-10"
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-2 max-w-2xl">
+        <div className="max-w-2xl space-y-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
             News · Articoli
           </p>
           <h2
             id="home-news-heading"
-            className="font-body text-2xl md:text-[28px] md:leading-[36px] font-semibold tracking-[-0.02em] text-[#F4F1EA]"
+            className="font-body text-2xl font-semibold tracking-[-0.02em] text-[#F4F1EA] md:text-[28px] md:leading-[36px]"
           >
             Dal Blog
           </h2>
@@ -67,10 +69,10 @@ export function HomeArticlesLoop({ onNavigate }: Props) {
         <button
           type="button"
           onClick={() => onNavigate('news')}
-          className="text-sm font-medium text-[#D4AF37] hover:text-[#E6C65C] inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 self-start sm:self-auto"
+          className="inline-flex shrink-0 items-center gap-1.5 self-start whitespace-nowrap text-sm font-medium text-[#D4AF37] hover:text-[#E6C65C] sm:self-auto"
         >
           Vai a News
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="h-4 w-4" />
         </button>
       </div>
 
@@ -82,23 +84,23 @@ export function HomeArticlesLoop({ onNavigate }: Props) {
         )}
 
         {status === 'empty' && (
-          <div className="px-6 py-8 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+          <div className="flex flex-col justify-between gap-4 px-6 py-8 sm:flex-row sm:items-center">
             <div className="flex items-start gap-3">
-              <Newspaper className="w-5 h-5 text-[#D4AF37] shrink-0 mt-0.5" />
+              <Newspaper className="mt-0.5 h-5 w-5 shrink-0 text-[#D4AF37]" />
               <div className="space-y-1">
                 <p className="text-sm text-[#F4F1EA]">Nuovi articoli in arrivo</p>
                 <p className="text-xs text-[#A39B93]">
-                  Stiamo preparando una nuova casa per il Blog.
+                  Gli scritti compariranno qui non appena pubblicati.
                 </p>
               </div>
             </div>
             <button
               type="button"
               onClick={() => onNavigate('news')}
-              className="cta-label px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs font-medium text-[#F4F1EA] inline-flex items-center gap-2 shrink-0"
+              className="cta-label inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-4 py-2.5 text-xs font-medium text-[#F4F1EA] hover:border-[#D4AF37]"
             >
               Apri pagina News
-              <ArrowRight className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <ArrowRight className="h-3.5 w-3.5 text-[#D4AF37]" />
             </button>
           </div>
         )}
@@ -108,13 +110,15 @@ export function HomeArticlesLoop({ onNavigate }: Props) {
             <a
               key={current.id}
               href={current.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block px-6 py-7 md:px-8 md:py-8 animate-home-article-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#D4AF37]"
+              onClick={(event) => {
+                event.preventDefault();
+                openArticle(current);
+              }}
+              className="group block animate-home-article-in px-6 py-7 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#D4AF37] md:px-8 md:py-8"
             >
-              <div className="flex flex-col md:flex-row md:items-center gap-5 md:gap-8">
+              <div className="flex flex-col gap-5 md:flex-row md:items-center md:gap-8">
                 {current.imageUrl ? (
-                  <div className="w-full md:w-40 shrink-0 overflow-hidden rounded-xl border border-[#D4AF37]/20 bg-[#12100E]">
+                  <div className="w-full shrink-0 overflow-hidden rounded-xl border border-[#D4AF37]/20 bg-[#12100E] md:w-40">
                     <img
                       src={current.imageUrl}
                       alt=""
@@ -129,17 +133,17 @@ export function HomeArticlesLoop({ onNavigate }: Props) {
                       {formatArticleDate(current.publishedAt)}
                     </p>
                   )}
-                  <h3 className="font-display text-lg md:text-xl text-[#F4F1EA] group-hover:text-[#D4AF37] transition-colors">
+                  <h3 className="font-display text-lg text-[#F4F1EA] transition-colors group-hover:text-[#D4AF37] md:text-xl">
                     {current.title}
                   </h3>
                   {current.summary && (
-                    <p className="text-sm leading-relaxed text-[#A39B93] line-clamp-2">
+                    <p className="line-clamp-2 text-sm leading-relaxed text-[#A39B93]">
                       {current.summary}
                     </p>
                   )}
-                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#D4AF37] pt-1">
+                  <span className="inline-flex items-center gap-1.5 pt-1 text-xs font-medium text-[#D4AF37]">
                     Leggi l&apos;articolo
-                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                   </span>
                 </div>
               </div>

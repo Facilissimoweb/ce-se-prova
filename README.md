@@ -1,6 +1,6 @@
 # Tarot Italia / Ennamo (`ce-se-prova`)
 
-SPA React (Vite) + API: Firebase Auth, Postgres/Drizzle, contenuti editoriali in `src/data/`.
+SPA React (Vite) + API: Firebase Auth, Postgres/Drizzle, contenuti editoriali in `src/data/`, Blog in `content/blog/`.
 
 ## Stack runtime
 
@@ -34,7 +34,13 @@ npm run lint     # tsc --noEmit
    - `FIREBASE_SERVICE_ACCOUNT_JSON`
    - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
    - `APP_URL` (URL pubblico, es. preview o `https://www.tarotitalia.com`)
-3. Deploy: SPA in `dist/` + **8** funzioni Serverless (`api/health.ts` + **committed** `api/{courses,bookings,stripe,reserved,dialogue,news,chat}.js` from `npm run build:api`). Vercel only discovers functions present in the repo `api/` tree — generated-only JS was 404. Refresh bundles with `npm run build:api` before commit when entries change. Sotto-path via rewrite `?__path=`. Hobby: max 12. SPA rewrite skips `/api` and `privacy.html`. `GET /api/news` returns an empty Blog placeholder (Substack feed disconnected; new platform TBD). `GET|POST /api/chat` is the generic FAB chat (Groq) when `TAROTITALIACHATGENERICAGROQ_API_KEY` is set (server-only).
+3. Deploy: SPA in `dist/` + **8** funzioni Serverless (`api/health.ts` + **committed** `api/{courses,bookings,stripe,reserved,dialogue,news,chat}.js` from `npm run build:api`). Vercel only discovers functions present in the repo `api/` tree — generated-only JS was 404. Refresh bundles with `npm run build:api` before commit when entries change. Sotto-path via rewrite `?__path=`. Hobby: max 12. SPA rewrite skips `/api` and `privacy.html`. `GET /api/news` serves published posts from `content/blog/*.{md,mdx}` (compiled into `src/data/blogPosts.generated.ts`). `GET|POST /api/chat` is the generic FAB chat (Groq) when `TAROTITALIACHATGENERICAGROQ_API_KEY` is set (server-only).
+
+### Blog (articoli in-repo)
+
+1. Aggiungi `content/blog/mio-articolo.md` con frontmatter `title`, `date`, `description`, opzionale `cover` / `draft`.
+2. `npm run build:blog` (anche incluso in `npm run build` / Vite) aggiorna `src/data/blogPosts.generated.ts`.
+3. Commit + deploy Vercel. Dettaglio: `/news/mio-articolo`. Guida: `content/blog/README.md`.
 4. Webhook Stripe: `https://<deployment>/api/stripe/webhook` (raw body; `bodyParser: false` on `api/stripe.js`).
 5. Solo dopo smoke delle API: aggiungi il dominio custom (`www.tarotitalia.com`) — vedi docs cutover nel Project Context.
 

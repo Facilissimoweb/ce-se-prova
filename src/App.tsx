@@ -146,6 +146,7 @@ export function App() {
 
   // Sync screen from URL on load / browser back-forward; rewrite legacy Stripe root returns.
   // Unknown paths keep the URL and show the 404 screen (no silent redirect to home).
+  // Blog detail URLs (`/news/:slug`) stay as-is — do not collapse to `/news`.
   useEffect(() => {
     const syncFromLocation = () => {
       const next = bootstrapScreenFromLocation(
@@ -156,10 +157,17 @@ export function App() {
       if (next === 'not-found') {
         return;
       }
+      const pathname = window.location.pathname;
+      const isBlogDetail =
+        next === 'news' &&
+        /^\/(news|blog|articoli)\/[^/]+\/?$/i.test(pathname);
+      if (isBlogDetail) {
+        return;
+      }
       const expected = pathForScreen(next);
       if (
-        screenFromPath(window.location.pathname) !== next ||
-        window.location.pathname !== expected
+        screenFromPath(pathname) !== next ||
+        pathname !== expected
       ) {
         const search = window.location.search;
         window.history.replaceState({}, '', `${expected}${search}`);

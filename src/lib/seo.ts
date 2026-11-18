@@ -51,7 +51,7 @@ const PAGE_SEO: Record<ScreenId, PageSeo> = {
   news: {
     title: 'Blog / News — Tarot Italia',
     description:
-      'Articoli e riflessioni di Tarot Italia: tarologia, simboli e percorso evolutivo. Nuovi articoli in arrivo.',
+      'Articoli e riflessioni di Tarot Italia: tarologia, simboli e percorso evolutivo, pubblicati sul sito.',
   },
   contatti: {
     title: 'Contatti — Tarot Italia · Macerata',

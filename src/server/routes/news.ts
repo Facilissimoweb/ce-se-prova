@@ -1,6 +1,7 @@
-import type { NewsApiResponse, NewsArticle } from '../../lib/newsFeed.ts';
+import { listNewsArticlesFromBlog } from '../../lib/blogPosts.ts';
+import type { NewsApiResponse } from '../../lib/newsFeed.ts';
 
-/** Blog feed disconnesso da Substack; risposta vuota stabile finché non arriva una nuova piattaforma. */
+/** Blog feed da articoli Markdown in-repo (`content/blog`). */
 export type NewsRouteResult = {
   status: number;
   body: NewsApiResponse | { error: string; detail?: string };
@@ -8,17 +9,15 @@ export type NewsRouteResult = {
 };
 
 export async function getNewsArticles(): Promise<NewsRouteResult> {
-  const articles: NewsArticle[] = [];
+  const articles = listNewsArticlesFromBlog();
   return {
     status: 200,
     cacheControl: 'public, s-maxage=300, stale-while-revalidate=600',
     body: {
-      source: null,
+      source: 'content/blog',
       feedUrl: null,
       fetchedAt: new Date().toISOString(),
       articles,
-      status: 'placeholder',
-      message: 'Nuovi articoli in arrivo',
     },
   };
 }

@@ -1,5 +1,5 @@
 /**
- * News group — GET /api/news (placeholder vuoto; Substack disconnesso).
+ * News group — GET /api/news (articoli da content/blog via blogPosts.generated).
  * Bundled by scripts/bundle-api.mjs into api/news.js.
  */
 import { getNewsArticles } from '../routes/news.ts';
