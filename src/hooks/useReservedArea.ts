@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { readJsonResponse } from '../lib/readJsonResponse';
 import type {
   CourseId,
@@ -22,8 +22,12 @@ interface UseReservedAreaParams {
 }
 
 export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
+  const userUid = user?.uid ?? null;
+
   const [overview, setOverview] = useState<ReservedAreaOverview | null>(null);
-  const [loadingData, setLoadingData] = useState(false);
+  // Start loading when the screen mounts with an authenticated user so SPA
+  // remounts (leave Area Riservata → return) never flash an empty shell.
+  const [loadingData, setLoadingData] = useState(() => Boolean(userUid));
   const [dataError, setDataError] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<'dispense' | 'consulti'>('dispense');
@@ -40,19 +44,35 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
   const [enrolling, setEnrolling] = useState(false);
   const [enrollMessage, setEnrollMessage] = useState<string | null>(null);
 
-  const loadOverview = useCallback(async () => {
-    if (!user) return;
+  // Keep latest identity for async work without putting the whole user object
+  // in callback deps (parent often recreates `{ uid, email, displayName }`).
+  const userRef = useRef(user);
+  userRef.current = user;
+  const getIdTokenRef = useRef(getIdToken);
+  getIdTokenRef.current = getIdToken;
+  const overviewRequestIdRef = useRef(0);
+
+  const loadOverview = useCallback(async (signal?: AbortSignal) => {
+    const currentUser = userRef.current;
+    if (!currentUser) return;
+
+    const requestId = ++overviewRequestIdRef.current;
     setLoadingData(true);
     setDataError(null);
     try {
-      const token = await getIdToken();
+      const token = await getIdTokenRef.current();
+      if (signal?.aborted || requestId !== overviewRequestIdRef.current) return;
       if (!token) {
         setDataError('Sessione non disponibile. Riprova ad accedere.');
         return;
       }
       const res = await fetch('/api/reserved/overview', {
         headers: { Authorization: `Bearer ${token}` },
+        // Avoid serving a cached soft-seed / failed overview after SPA remount.
+        cache: 'no-store',
+        signal,
       });
+      if (signal?.aborted || requestId !== overviewRequestIdRef.current) return;
       // Vercel FUNCTION_INVOCATION_FAILED returns plain text — never res.json().
       const json = await readJsonResponse<{
         user?: ReservedAreaOverview['user'];
@@ -63,6 +83,7 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
         notice?: string;
         error?: string;
       }>(res, FALLBACK_OVERVIEW_ERROR);
+      if (signal?.aborted || requestId !== overviewRequestIdRef.current) return;
       if (!res.ok) {
         throw new Error(json.error || FALLBACK_OVERVIEW_ERROR);
       }
@@ -73,29 +94,45 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
       }
       setEnrollName(
         (prev) =>
-          prev || overviewPayload.user?.displayName || user.displayName || ''
+          prev ||
+          overviewPayload.user?.displayName ||
+          currentUser.displayName ||
+          ''
       );
       setEnrollPhone(
         (prev) => prev || overviewPayload.user?.phoneWhatsapp || ''
       );
     } catch (err) {
+      if (signal?.aborted || requestId !== overviewRequestIdRef.current) return;
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       setDataError(
         err instanceof Error
           ? err.message
           : 'Errore di caricamento dell’Area Riservata.'
       );
     } finally {
-      setLoadingData(false);
+      if (!signal?.aborted && requestId === overviewRequestIdRef.current) {
+        setLoadingData(false);
+      }
     }
-  }, [user, getIdToken]);
+  }, []);
 
+  // Refetch whenever Area Riservata mounts / remounts or auth uid becomes ready.
   useEffect(() => {
-    if (user) {
-      loadOverview();
-    } else {
+    if (!userUid) {
+      overviewRequestIdRef.current += 1;
       setOverview(null);
+      setLoadingData(false);
+      setDataError(null);
+      return;
     }
-  }, [user, loadOverview]);
+
+    const controller = new AbortController();
+    void loadOverview(controller.signal);
+    return () => {
+      controller.abort();
+    };
+  }, [userUid, loadOverview]);
 
   const activeCourse: ReservedCourseItem | null = useMemo(() => {
     if (!overview) return null;
@@ -188,13 +225,17 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
     URL.revokeObjectURL(url);
   };
 
+  const reloadOverview = useCallback(() => {
+    void loadOverview();
+  }, [loadOverview]);
+
   const confirmCourseStripeSession = useCallback(
     async (stripeSessionId: string) => {
-      if (!user) return;
+      if (!userUid) return;
       setEnrolling(true);
       setEnrollMessage(null);
       try {
-        const token = await getIdToken();
+        const token = await getIdTokenRef.current();
         if (!token) throw new Error('Sessione non valida.');
         const res = await fetch('/api/reserved/confirm-stripe', {
           method: 'POST',
@@ -220,18 +261,18 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
         setEnrolling(false);
       }
     },
-    [user, getIdToken, loadOverview]
+    [userUid, loadOverview]
   );
 
   useEffect(() => {
-    if (!user) return;
+    if (!userUid) return;
     const params = new URLSearchParams(window.location.search);
     const stripeSessionId = params.get('course_stripe_session_id');
     if (!stripeSessionId) return;
     void confirmCourseStripeSession(stripeSessionId).finally(() => {
       window.history.replaceState({}, '', window.location.pathname);
     });
-  }, [user, confirmCourseStripeSession]);
+  }, [userUid, confirmCourseStripeSession]);
 
   const handleUnlockCourse = async (e: FormEvent) => {
     e.preventDefault();
@@ -294,7 +335,7 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
     overview,
     loadingData,
     dataError,
-    loadOverview,
+    loadOverview: reloadOverview,
     activeTab,
     setActiveTab,
     activeCourseSlug,

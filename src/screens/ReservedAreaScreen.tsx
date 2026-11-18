@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   ArrowRight,
   Check,
@@ -28,10 +28,21 @@ export function ReservedAreaScreen({
   const { user, loading: authLoading, authError, signInWithGoogle, logout, getIdToken } =
     useAuth();
 
+  // Stable identity for the hook — avoid a fresh object every render.
+  const reservedUser = useMemo(
+    () =>
+      user
+        ? {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+          }
+        : null,
+    [user]
+  );
+
   const area = useReservedArea({
-    user: user
-      ? { uid: user.uid, email: user.email, displayName: user.displayName }
-      : null,
+    user: reservedUser,
     getIdToken,
   });
 
@@ -177,7 +188,20 @@ export function ReservedAreaScreen({
         <div className="glass-tier-1 rounded-2xl p-10 text-center text-sm text-[#A39B93]">
           Caricamento dei percorsi e delle dispense riservate...
         </div>
-      ) : activeTab === 'dispense' && overview && activeCourse ? (
+      ) : !overview ? (
+        <div className="glass-tier-1 rounded-2xl p-10 text-center space-y-4">
+          <p className="text-sm text-[#A39B93]">
+            I contenuti riservati non sono ancora disponibili.
+          </p>
+          <button
+            type="button"
+            onClick={loadOverview}
+            className="px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37] text-[#12100E] text-xs font-semibold"
+          >
+            Ricarica Area Riservata
+          </button>
+        </div>
+      ) : activeTab === 'dispense' && activeCourse ? (
         <div className="space-y-8">
           {/* Course Selector Strip */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -67,6 +67,8 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
       if (method !== 'GET') return methodNotAllowed(res, ['GET']);
       const user = await requireUser(req, res);
       if (!user) return;
+      // Auth-scoped; never cache soft-seed / degraded 200s across SPA remounts.
+      res.setHeader('Cache-Control', 'private, no-store');
       const result = await getReservedOverview(user);
       return sendJson(res, result.status, result.body);
     }
