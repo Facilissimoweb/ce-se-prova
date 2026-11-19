@@ -22,6 +22,9 @@
  *
  * ENN-121 — Sigillo sezione Il Papa (21 carte CSV Maria), inline dopo
  * `{{scheda-visiva:il-papa}}` in Dispensa 01 (marker `{{sigillo:il-papa}}`).
+ *
+ * ENN-122 — Sigillo sezione Gli Amanti (50 carte CSV Maria), inline dopo
+ * `{{scheda-visiva:gli-amanti}}` in Dispensa 01 (marker `{{sigillo:gli-amanti}}`).
  */
 
 import type { CourseId } from '../../types/handoff';
@@ -47,7 +50,8 @@ export type InlineFlashcardSectionId =
   | 'la-papessa'
   | 'l-imperatrice'
   | 'l-imperatore'
-  | 'il-papa';
+  | 'il-papa'
+  | 'gli-amanti';
 
 export const ARCANI_MAGGIORI_MODULE_01_FLASHCARDS: StudyFlashcard[] = [
   {
@@ -1377,6 +1381,354 @@ export const IL_PAPA_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
   cards: IL_PAPA_SECTION_FLASHCARDS,
 };
 
+
+/** ENN-122 — flashcard Gli Amanti (CSV Maria), dopo scheda-visiva in Dispensa 01. */
+export const GLI_AMANTI_SECTION_FLASHCARDS: StudyFlashcard[] = [
+  {
+    id: 1,
+    question: "Quale posizione occupa la lama de Gli Innamorati (VI) nei Tarocchi?",
+    answer: "Rappresenta la sesta lama del Primo Settenario.",
+  },
+  {
+    id: 2,
+    question:
+      "Qual è l'essenza archetipica principale della carta de Gli Innamorati (VI)?",
+    answer:
+      "Incarna il bivio fondamentale, l'incontro tra polarità, la prova dell'allineamento interiore e la scelta consapevole del cuore.",
+  },
+  {
+    id: 3,
+    question:
+      "Oltre alla dimensione sentimentale, quale significato profondo esprime la carta de Gli Innamorati?",
+    answer:
+      "La necessità di optare con maturità per una strada escludendo le altre e assumendosi la responsabilità della propria direzione esistenziale ed emotiva.",
+  },
+  {
+    id: 4,
+    question:
+      "Quale trasformazione del desiderio promuove l'archetipo de Gli Innamorati?",
+    answer: "Trasforma il desiderio indistinto in un impegno libero e consapevole.",
+  },
+  {
+    id: 5,
+    question:
+      "In una lettura in chiave previsionale, cosa segnala la comparsa de Gli Innamorati?",
+    answer:
+      "Segnala decisioni cruciali, crocevia affettivi o professionali, incontri significativi e la necessità di scegliere con trasparenza.",
+  },
+  {
+    id: 6,
+    question:
+      "Quale atteggiamento suggeriscono Gli Innamorati nei confronti delle decisioni personali?",
+    answer:
+      "Invita a non rimanere nell'ambiguità e a optare con coraggio per ciò che risuona autenticamente con i propri valori profondi.",
+  },
+  {
+    id: 7,
+    question: "Chi ha illustrato la versione de Gli Innamorati nel mazzo Waite-Smith?",
+    answer: "Pamela Colman Smith.",
+  },
+  {
+    id: 8,
+    question:
+      "Quali figure umane sono al centro dell'iconografia de Gli Innamorati nel mazzo Waite-Smith?",
+    answer: "Due figure umane nude, ovvero un uomo e una donna.",
+  },
+  {
+    id: 9,
+    question:
+      "Quale albero sorge alle spalle della figura femminile nella carta de Gli Innamorati (Waite-Smith)?",
+    answer: "L'Albero della Conoscenza con un serpente attorcigliato.",
+  },
+  {
+    id: 10,
+    question:
+      "Quale albero si trova alle spalle della figura maschile nella carta de Gli Innamorati (Waite-Smith)?",
+    answer: "L'Albero della Vita recante dodici fiamme.",
+  },
+  {
+    id: 11,
+    question:
+      "Quale figura angelica appare in alto nel cielo nell'illustrazione de Gli Innamorati (Waite-Smith)?",
+    answer: "L'Arcangelo Raffaele con le braccia aperte per benedire la coppia.",
+  },
+  {
+    id: 12,
+    question:
+      "Quale elemento del paesaggio si innalza sullo sfondo della carta de Gli Innamorati (Waite-Smith)?",
+    answer: "Una montagna viola.",
+  },
+  {
+    id: 13,
+    question:
+      "Cosa simboleggiano l'Arcangelo Raffaele e il sole radioso nella carta de Gli Innamorati?",
+    answer:
+      "Simboleggiano la protezione divina, la guarigione delle ferite emotive e l'ispirazione superiore che guida l'unione consapevole.",
+  },
+  {
+    id: 14,
+    question:
+      "Nella simbologia de Gli Innamorati, cosa rappresenta l'Albero della Conoscenza?",
+    answer: "Le forze della sensibilità e dell'intuizione femminile.",
+  },
+  {
+    id: 15,
+    question:
+      "Nella simbologia de Gli Innamorati, cosa rappresenta l'Albero della Vita con le sue dodici fiamme?",
+    answer: "Le forze della passione e della volontà maschile.",
+  },
+  {
+    id: 16,
+    question:
+      "Che cosa evoca il serpente attorcigliato all'Albero della Conoscenza ne Gli Innamorati?",
+    answer: "La prova del desiderio e l'insorgere della consapevolezza.",
+  },
+  {
+    id: 17,
+    question:
+      "Qual è la direzione degli sguardi nel «triangolo dello sguardo» nella carta de Gli Innamorati?",
+    answer: "La donna guarda l'angelo, mentre l'uomo guarda la donna.",
+  },
+  {
+    id: 18,
+    question:
+      "Qual è il significato ermeneutico del triangolo dello sguardo ne Gli Innamorati?",
+    answer:
+      "Indica che l'azione cosciente (maschile) deve poggiare sull'intuizione profonda (femminile) per elevarsi alla grazia spirituale.",
+  },
+  {
+    id: 19,
+    question: "Che cosa simboleggia la montagna viola sullo sfondo de Gli Innamorati?",
+    answer:
+      "Rappresenta la meta elevata e impegnativa che attende la coppia dopo la scelta compiuta.",
+  },
+  {
+    id: 20,
+    question:
+      "In una stesa, quale sintesi operativa esprime la carta de Gli Innamorati?",
+    answer:
+      "Esorta a chiarire le proprie intenzioni, a superare l'esitazione e a scegliere con il cuore accettando le relative responsabilità.",
+  },
+  {
+    id: 21,
+    question:
+      "Nel settore della crescita personale, quale rischio interiore evidenzia la carta de Gli Innamorati?",
+    answer:
+      "Il rischio di mantenere un'ambiguità interiore o dividersi tra due strade per evitare il peso di una rinuncia.",
+  },
+  {
+    id: 22,
+    question:
+      "Quale micro-esercizio pratico di crescita personale fa riferimento all'archetipo de Gli Innamorati?",
+    answer:
+      "Chiarire su carta le due opzioni di un dubbio ed esplicitare il valore guida che rende una via più affine alla propria verità.",
+  },
+  {
+    id: 23,
+    question:
+      "In ambito lavorativo, quale tipico bivio professionale segnala l'archetipo de Gli Innamorati?",
+    answer:
+      "La scelta tra una soluzione comoda ma poco stimolante e un progetto aderente alle proprie inclinazioni.",
+  },
+  {
+    id: 24,
+    question:
+      "Come si esegue il micro-esercizio pratico de Gli Innamorati per la carriera professionale?",
+    answer:
+      "Valutando un'offerta o decisione verificando l'allineamento con i propri valori etici personali per procedere senza rimpianti.",
+  },
+  {
+    id: 25,
+    question:
+      "Nell'ambito relazionale, quale distinzione fondamentale pone la carta de Gli Innamorati?",
+    answer:
+      "La differenza tra un'attrazione superficiale o condizionata e una scelta relazionale matura basata sulla reciproca libertà.",
+  },
+  {
+    id: 26,
+    question:
+      "Quale micro-esercizio relazionale è consigliato per applicare l'energia de Gli Innamorati?",
+    answer:
+      "Rinnovare la propria presenza in un rapporto tramite un gesto spontaneo d'intesa che confermi la chiarezza del legame.",
+  },
+  {
+    id: 27,
+    question:
+      "In che modo Gli Innamorati (VI) trasformano il percorso aperto dalla carta precedente del Papa (V)?",
+    answer:
+      "Trasformano le regole e la trasmissione esterna del Papa in una decisione personale e autonoma dettata dalla propria coscienza.",
+  },
+  {
+    id: 28,
+    question:
+      "Come differisce l'origine della regola etica tra Il Papa (V) e Gli Innamorati (VI)?",
+    answer:
+      "Nel Papa l'etica proviene da una trasmissione o autorità esterna, mentre negli Innamorati deriva dall'allineamento interiore e dalla scelta individuale.",
+  },
+  {
+    id: 29,
+    question:
+      "Come si distingue in stesa se Gli Innamorati indicano un'evoluzione favorevole?",
+    answer:
+      "Si manifestano come un'armoniosa unione d'intenti e una scelta chiara dettata dall'allineamento dei valori.",
+  },
+  {
+    id: 30,
+    question:
+      "Come si manifesta la carta de Gli Innamorati in stesa in presenza di un blocco evolutivo?",
+    answer:
+      "Si presenta come una paralisi decisionale causata dal timore di dover escludere un'alternativa.",
+  },
+  {
+    id: 31,
+    question:
+      "Quale lama conclude il Primo Settenario e completa la fase della Formazione dell'Identità dopo Gli Innamorati?",
+    answer: "Il Carro (VII).",
+  },
+  {
+    id: 32,
+    question:
+      "Qual è il tema cardine su cui si focalizza il Primo Settenario dei Tarocchi?",
+    answer: "La Formazione dell'Identità.",
+  },
+  {
+    id: 33,
+    question:
+      "Perché il concetto di rinuncia è fondamentale nell'archetipo de Gli Innamorati?",
+    answer:
+      "Perché compiere una scelta consapevole richiede necessariamente l'esclusione definitiva delle opzioni non selezionate.",
+  },
+  {
+    id: 34,
+    question:
+      "Cosa distingue il desiderio indistinto dalla scelta consapevole secondo l'archetipo de Gli Innamorati?",
+    answer:
+      "Il desiderio è passivo e indistinto, mentre la scelta richiede l'assunzione di responsabilità e la volontà libera di impegnarsi.",
+  },
+  {
+    id: 35,
+    question:
+      "Cosa simboleggia la nudità delle due figure umane nella carta de Gli Innamorati?",
+    answer:
+      "Rappresenta la trasparenza, la vulnerabilità e la verità priva di sovrastrutture o inganni.",
+  },
+  {
+    id: 36,
+    question:
+      "In che modo l'azione cosciente trae vantaggio dall'intuizione profonda nella simbologia de Gli Innamorati?",
+    answer:
+      "L'azione (maschile) poggia sull'intuizione (femminile) per aprirsi alla guida dell'ispirazione divina ed evitare decisioni puramente egoiche.",
+  },
+  {
+    id: 37,
+    question:
+      "Qual è il ruolo dell'Arcangelo Raffaele nel processo della scelta affettiva?",
+    answer:
+      "Offre guarigione alle ferite emotive e l'ispirazione necessaria affinché l'unione sia consapevole e spiritualmente elevata.",
+  },
+  {
+    id: 38,
+    question:
+      "Per quale motivo la montagna sullo sfondo de Gli Innamorati è raffigurata in colore viola?",
+    answer:
+      "Il viola rappresenta la spiritualità e la natura elevata ed exigent della meta da raggiungere dopo la decisione.",
+  },
+  {
+    id: 39,
+    question:
+      "Qual è la conseguenza interiore del rimanere nell'ambiguità quando si affronta l'archetipo de Gli Innamorati?",
+    answer:
+      "Si genera una paralisi energetica ed emotiva derivante dal tentativo sterile di evitare ogni rinuncia.",
+  },
+  {
+    id: 40,
+    question:
+      "Come si definisce la responsabilità affettiva secondo la carta de Gli Innamorati?",
+    answer:
+      "La capacità di impegnarsi in un legame autentico accettando liberamente i doveri emotivi e le conseguenze della propria scelta.",
+  },
+  {
+    id: 41,
+    question:
+      "Che cosa simboleggia il sole radioso sullo sfondo della carta de Gli Innamorati?",
+    answer:
+      "Simboleggia la luce della consapevolezza, la chiarezza d'intenti e l'energia vitale che benedice la scelta compiuta.",
+  },
+  {
+    id: 42,
+    question:
+      "Come interagiscono le polarità maschile e femminile nella visione archetipica de Gli Innamorati?",
+    answer:
+      "Si integrano reciprocamente, legando l'energia della passione e della volontà all'energia della ricettività e dell'intuizione.",
+  },
+  {
+    id: 43,
+    question:
+      "Nel micro-esercizio di crescita personale, come agisce il «valore guida» per sciogliere un dubbio?",
+    answer:
+      "Funziona come criterio prioritario per rendere evidente l'opzione che risuona maggiormente con la propria verità interiore.",
+  },
+  {
+    id: 44,
+    question:
+      "Cosa significa agire «senza rimpianti» in ambito professionale secondo l'insegnamento de Gli Innamorati?",
+    answer:
+      "Effettuare decisioni lavorative previa verifica dell'allineamento con la propria etica, accettando consapevolmente i compromessi o i benefici della via scelta.",
+  },
+  {
+    id: 45,
+    question:
+      "Quale elemento distingue un'attrazione condizionata da una scelta relazionale matura?",
+    answer:
+      "L'attrazione condizionata nasce da bisogni o pressioni superficiali, mentre la scelta relazionale matura si fonda sulla reciproca e libera volontà.",
+  },
+  {
+    id: 46,
+    question:
+      "Per quale motivo l'Albero della Vita nella carta de Gli Innamorati reca dodici fiamme?",
+    answer:
+      "Le dodici fiamme simboleggiano la molteplicità e la pienezza della forza vitale, della passione e della volontà attiva.",
+  },
+  {
+    id: 47,
+    question:
+      "Qual è il compito evolutivo dell'individuo nel passaggio dalla quinta (Il Papa) alla sesta lama (Gli Innamorati)?",
+    answer:
+      "Interiorizzare l'insegnamento ricevuto ed esercitare il libero arbitrio compiendo una scelta etica autonoma.",
+  },
+  {
+    id: 48,
+    question:
+      "Come influisce l'esitazione sul potenziale energetico rappresentato da Gli Innamorati?",
+    answer:
+      "Blocca la forza decisionale della carta e trattiene l'individuo in una condizione di stasi e ambiguità emotiva.",
+  },
+  {
+    id: 49,
+    question:
+      "Quale rapporto sussiste tra la coscienza individuale e le regole esterne nell'archetipo de Gli Innamorati?",
+    answer:
+      "La coscienza individuale assume la responsabilità della scelta, superando l'adesione passiva ai dogmi o alle norme esterne.",
+  },
+  {
+    id: 50,
+    question:
+      "Quale messaggio trasmettono le braccia aperte dell'Arcangelo Raffaele sopra la coppia?",
+    answer:
+      "Indicano che le unioni e le decisioni nate dalla trasparenza del cuore ricevono benedizione, protezione e continuità spirituale.",
+  },
+];
+
+export const GLI_AMANTI_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
+  courseSlug: 'arcani-maggiori',
+  /** Distinct from module-end seals (`01` / `04`) — section-scoped deck. */
+  moduleNumber: '01-gli-amanti',
+  title: 'Sigillo di apprendimento · Gli Amanti',
+  subtitle:
+    'Ripassa Gli Amanti (VI) subito dopo la scheda visiva: scelta, polarità e chiave previsionale.',
+  cards: GLI_AMANTI_SECTION_FLASHCARDS,
+};
+
 const INLINE_FLASHCARD_DECKS: Record<
   InlineFlashcardSectionId,
   CourseModuleFlashcardDeck
@@ -1387,6 +1739,7 @@ const INLINE_FLASHCARD_DECKS: Record<
   'l-imperatrice': L_IMPERATRICE_FLASHCARD_DECK,
   'l-imperatore': L_IMPERATORE_FLASHCARD_DECK,
   'il-papa': IL_PAPA_FLASHCARD_DECK,
+  'gli-amanti': GLI_AMANTI_FLASHCARD_DECK,
 };
 
 export function getFlashcardDeck(

@@ -2,6 +2,7 @@
  * Registry of inline schede visive (Dispensa embeds `{{scheda-visiva:<id>}}`).
  */
 
+import { SCHEDA_VISIVA_GLI_AMANTI } from './gliAmanti';
 import { SCHEDA_VISIVA_IL_BAGATTO } from './ilBagatto';
 import { SCHEDA_VISIVA_IL_MATTO } from './ilMatto';
 import { SCHEDA_VISIVA_IL_PAPA } from './ilPapa';
@@ -17,6 +18,7 @@ export { SCHEDA_VISIVA_LA_PAPESSA } from './laPapessa';
 export { SCHEDA_VISIVA_L_IMPERATRICE } from './lImperatrice';
 export { SCHEDA_VISIVA_L_IMPERATORE } from './lImperatore';
 export { SCHEDA_VISIVA_IL_PAPA } from './ilPapa';
+export { SCHEDA_VISIVA_GLI_AMANTI } from './gliAmanti';
 
 const BY_ID: Record<string, SchedaVisivaContent> = {
   'il-matto': SCHEDA_VISIVA_IL_MATTO,
@@ -25,6 +27,7 @@ const BY_ID: Record<string, SchedaVisivaContent> = {
   'l-imperatrice': SCHEDA_VISIVA_L_IMPERATRICE,
   'l-imperatore': SCHEDA_VISIVA_L_IMPERATORE,
   'il-papa': SCHEDA_VISIVA_IL_PAPA,
+  'gli-amanti': SCHEDA_VISIVA_GLI_AMANTI,
 };
 
 export function getSchedaVisiva(id: string): SchedaVisivaContent | undefined {
