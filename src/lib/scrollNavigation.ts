@@ -14,6 +14,8 @@ export const SCROLL_LANDMARKS = {
   homeDidattica: 'home-didattica',
   corsiWorkbench: 'corsi-workbench',
   corsiCheckout: 'corsi-checkout',
+  /** Public Maggiori teaser — Dispensa 01 · Il Matto (ENN-126) */
+  corsiMaggioriPreview: 'corsi-maggiori-preview',
   /** Area Riservata — course strip / dispense list / active dispensa reader */
   reservedPercorsi: 'reserved-percorsi',
   reservedDispenseList: 'reserved-dispense-list',
@@ -32,6 +34,9 @@ const HASH_SCREEN_ALIASES: Record<string, 'corsi' | 'chat' | 'home'> = {
   didattica: 'home',
   'home-consulti': 'home',
   'home-didattica': 'home',
+  /** ENN-126 — public Maggiori · Il Matto teaser */
+  'maggiori-preview': 'corsi',
+  'matto-preview': 'corsi',
 };
 
 const HASH_SECTION_ALIASES: Record<string, string> = {
@@ -41,6 +46,8 @@ const HASH_SECTION_ALIASES: Record<string, string> = {
   'home-didattica': SCROLL_LANDMARKS.homeDidattica,
   workbench: SCROLL_LANDMARKS.corsiWorkbench,
   checkout: SCROLL_LANDMARKS.corsiCheckout,
+  'maggiori-preview': SCROLL_LANDMARKS.corsiMaggioriPreview,
+  'matto-preview': SCROLL_LANDMARKS.corsiMaggioriPreview,
   corsi: SCROLL_LANDMARKS.corsi,
   dialogo: SCROLL_LANDMARKS.dialogo,
 };

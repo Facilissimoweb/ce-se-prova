@@ -319,11 +319,15 @@ export function App() {
     };
     const onHashChange = () => {
       const hashScreen = screenFromHash(window.location.hash);
+      const sectionFromHash = sectionIdFromHash(window.location.hash);
       if (hashScreen === 'corsi' || hashScreen === 'chat') {
-        handleNavigate(hashScreen);
+        handleNavigate(
+          hashScreen,
+          sectionFromHash ? { focusId: sectionFromHash } : undefined
+        );
         return;
       }
-      const section = sectionIdFromHash(window.location.hash);
+      const section = sectionFromHash;
       if (section) {
         if (activeScreenRef.current === 'home' || section.startsWith('home-')) {
           if (activeScreenRef.current !== 'home') {
