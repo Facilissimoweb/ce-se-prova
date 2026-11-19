@@ -25,6 +25,9 @@
  *
  * ENN-122 — Sigillo sezione Gli Amanti (50 carte CSV Maria), inline dopo
  * `{{scheda-visiva:gli-amanti}}` in Dispensa 01 (marker `{{sigillo:gli-amanti}}`).
+ *
+ * ENN-123 — Sigillo sezione Il Carro (25 carte CSV Maria), inline dopo
+ * `{{scheda-visiva:il-carro}}` in Dispensa 01 (marker `{{sigillo:il-carro}}`).
  */
 
 import type { CourseId } from '../../types/handoff';
@@ -51,7 +54,8 @@ export type InlineFlashcardSectionId =
   | 'l-imperatrice'
   | 'l-imperatore'
   | 'il-papa'
-  | 'gli-amanti';
+  | 'gli-amanti'
+  | 'il-carro';
 
 export const ARCANI_MAGGIORI_MODULE_01_FLASHCARDS: StudyFlashcard[] = [
   {
@@ -1729,6 +1733,184 @@ export const GLI_AMANTI_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
   cards: GLI_AMANTI_SECTION_FLASHCARDS,
 };
 
+/** ENN-123 — flashcard Il Carro (CSV Maria), dopo scheda-visiva in Dispensa 01. */
+export const IL_CARRO_SECTION_FLASHCARDS: StudyFlashcard[] = [
+  {
+    id: 1,
+    question: 'Quale Arcano dei Tarocchi rappresenta Il Carro e quale fase chiude?',
+    answer:
+      "Rappresenta il settimo Arcano (VII) e conclude il Primo Settenario (La Formazione dell'Identità).",
+  },
+  {
+    id: 2,
+    question:
+      "Quali sono i tre concetti chiave definiti dall'essenza archetipica del Carro (VII)?",
+    answer:
+      "L'azione coordinata, la vittoria disciplinata e la conquista della direzione.",
+  },
+  {
+    id: 3,
+    question:
+      "Come si collega l'azione del Carro (VII) al percorso dell'Arcano VI (Gli Innamorati)?",
+    answer:
+      'Traduce la scelta consapevole compiuta con Gli Innamorati in un movimento vittorioso verso la conquista del mondo fisico.',
+  },
+  {
+    id: 4,
+    question:
+      'Secondo la simbologia profonda del Carro (VII), da cosa nasce la vera vittoria?',
+    answer:
+      "Dalla disciplina interiore e dalla chiarezza d'intenti, non dalla forza bruta.",
+  },
+  {
+    id: 5,
+    question:
+      'In chiave previsionale, cosa indica la comparsa del Carro (VII) in una stesa?',
+    answer:
+      "Uno sblocco rapido di trattative, viaggi o spostamenti e un'accelerazione verso i propri obiettivi.",
+  },
+  {
+    id: 6,
+    question:
+      'Nel mazzo Waite-Smith, di quale materiale è costituito il carro guidato dal condottiero?',
+    answer: 'Pietra (ha una struttura cubica di pietra).',
+  },
+  {
+    id: 7,
+    question:
+      "Da cosa è protetto la parte superiore del carro nell'iconografia di Waite-Smith?",
+    answer: 'Da un baldacchino azzurro decorato con stelle dorate.',
+  },
+  {
+    id: 8,
+    question: "Cosa impugna nella mano destra il condottiero dell'Arcano VII?",
+    answer: 'Uno scettro.',
+  },
+  {
+    id: 9,
+    question:
+      'Quali due simboli figurano sul fronte del Carro nel mazzo Waite-Smith?',
+    answer: 'Uno scudo alato e il simbolo alchemico della trottola (lingam-yoni).',
+  },
+  {
+    id: 10,
+    question:
+      'Quali creature trainano Il Carro e quale particolarità hanno nel loro orientamento?',
+    answer:
+      'Due sfingi accucciate, una nera e una bianca, che guardano in direzioni opposte.',
+  },
+  {
+    id: 11,
+    question:
+      'Cosa simboleggiano le due sfingi (nera e bianca) visibili sul fronte del Carro?',
+    answer: 'Le polarità istintive, emotive e concettuali opposte.',
+  },
+  {
+    id: 12,
+    question:
+      'In assenza di briglie, in che modo il condottiero domina le due sfingi?',
+    answer:
+      'Attraverso il magnetismo della volontà e della mente disciplinata, anziché con la coercizione fisica.',
+  },
+  {
+    id: 13,
+    question:
+      "Cosa simboleggiano la corona e il baldacchino stellato nell'iconografia del Carro?",
+    answer:
+      "La protezione delle forze celesti e la connessione con l'ispirazione superiore.",
+  },
+  {
+    id: 14,
+    question:
+      "Quale significato simbolico hanno l'armatura del condottiero e la struttura cubica di pietra?",
+    answer:
+      "Il solido radicamento materiale e la protezione dell'identità conquistata nel Primo Settenario.",
+  },
+  {
+    id: 15,
+    question:
+      'Sul piano della crescita personale, qual è lo spunto di riflessione principale associato al Carro?',
+    answer:
+      'Osservare se le proprie energie procedano in modo concordato verso un unico obiettivo o se vi siano distrazioni che la frammentano.',
+  },
+  {
+    id: 16,
+    question:
+      "Qual è il micro-esercizio pratico per la crescita personale legato all'energia del Carro?",
+    answer:
+      'Definire la priorità principale della settimana e tracciare due azioni concrete per mantenerne il controllo.',
+  },
+  {
+    id: 17,
+    question:
+      'In che modo Il Carro (VII) trova applicazione pratica nel settore Lavoro e Carriera?',
+    answer:
+      "Indica l'opportunità di imprimere un'accelerazione decisiva a un progetto prendendo la guida con determinazione.",
+  },
+  {
+    id: 18,
+    question:
+      "Quale micro-esercizio professionale permette di sollecitare l'archetipo del Carro?",
+    answer:
+      'Coordinare un passaggio bloccato o sollecitare un aggiornamento operativo con tono fermo e proattivo.',
+  },
+  {
+    id: 19,
+    question:
+      "Nell'ambito delle relazioni affettive e sociali, cosa esprime l'archetipo del Carro?",
+    answer:
+      'La capacità di procedere affiancati verso mete comuni, orientando le differenze caratteriali verso una crescita condivisa.',
+  },
+  {
+    id: 20,
+    question:
+      "Qual è l'esercizio pratico suggerito dal Carro per l'ambito relazionale?",
+    answer:
+      "Proporre un'iniziativa o uno spostamento condiviso, assumendosi l'organizzazione dei dettagli.",
+  },
+  {
+    id: 21,
+    question:
+      "In che modo Il Carro porta a compimento la traiettoria aperta dall'Arcano 0 (Il Matto)?",
+    answer:
+      "Trasforma l'esplorazione libera e istintiva del Matto in una direzione disciplinata e in un trionfo manifesto dell'identità.",
+  },
+  {
+    id: 22,
+    question:
+      'Nelle letture previsionali, quale rischio potenziale del Carro occorre valutare con attenzione?',
+    answer:
+      "Il rischio di un'avanzata troppo fiduciosa, rigida o priva di flessibilità.",
+  },
+  {
+    id: 23,
+    question: "Quale modulo di studio si conclude con l'Arcano VII (Il Carro)?",
+    answer: "Il Modulo 1 (Il Primo Settenario: La Formazione dell'Identità).",
+  },
+  {
+    id: 24,
+    question:
+      'Qual è il primo Arcano del Secondo Settenario che segue Il Carro (VII)?',
+    answer: 'La Giustizia (VIII).',
+  },
+  {
+    id: 25,
+    question:
+      'Qual è il tema centrale espresso dal Secondo Settenario dei Tarocchi?',
+    answer: "La Prova Etica e l'Interiorizzazione.",
+  },
+];
+
+export const IL_CARRO_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
+  courseSlug: 'arcani-maggiori',
+  /** Distinct from module-end seals (`01` / `04`) — section-scoped deck. */
+  moduleNumber: '01-il-carro',
+  title: 'Sigillo di apprendimento · Il Carro',
+  subtitle:
+    'Ripassa Il Carro (VII) subito dopo la scheda visiva: direzione, polarità e chiave previsionale.',
+  cards: IL_CARRO_SECTION_FLASHCARDS,
+};
+
 const INLINE_FLASHCARD_DECKS: Record<
   InlineFlashcardSectionId,
   CourseModuleFlashcardDeck
@@ -1740,6 +1922,7 @@ const INLINE_FLASHCARD_DECKS: Record<
   'l-imperatore': L_IMPERATORE_FLASHCARD_DECK,
   'il-papa': IL_PAPA_FLASHCARD_DECK,
   'gli-amanti': GLI_AMANTI_FLASHCARD_DECK,
+  'il-carro': IL_CARRO_FLASHCARD_DECK,
 };
 
 export function getFlashcardDeck(

@@ -128,6 +128,10 @@ La progressione conduce dalla fioritura creativa fino all'accelerazione e alla v
 - **Significato Profondo**: azione coordinata, controllo sapiente delle polarità energetiche, vittoria grazie a determinazione e rigore.
 - **In Chiave Previsionale**: sblocco rapido di trattative o situazioni stagnanti, viaggi, spostamenti materiali, accelerazione decisiva e trionfante verso gli obiettivi.
 
+{{scheda-visiva:il-carro}}
+
+{{sigillo:il-carro}}
+
 ### Sintesi Didattica del Modulo 1
 
 1. Il Matto (0) garantisce la libertà originaria e l'apertura incondizionata al mutamento.

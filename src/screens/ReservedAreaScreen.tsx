@@ -125,6 +125,7 @@ export function ReservedAreaScreen({
       'l-imperatore',
       'il-papa',
       'gli-amanti',
+      'il-carro',
     ] as const) {
       const scheda = getSchedaVisiva(schedaId);
       if (scheda) {
@@ -141,6 +142,7 @@ export function ReservedAreaScreen({
       'l-imperatore',
       'il-papa',
       'gli-amanti',
+      'il-carro',
     ] as const) {
       const deck = getInlineFlashcardDeck(sigilloId);
       if (deck) {

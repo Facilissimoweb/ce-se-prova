@@ -4,6 +4,7 @@
 
 import { SCHEDA_VISIVA_GLI_AMANTI } from './gliAmanti';
 import { SCHEDA_VISIVA_IL_BAGATTO } from './ilBagatto';
+import { SCHEDA_VISIVA_IL_CARRO } from './ilCarro';
 import { SCHEDA_VISIVA_IL_MATTO } from './ilMatto';
 import { SCHEDA_VISIVA_IL_PAPA } from './ilPapa';
 import { SCHEDA_VISIVA_L_IMPERATORE } from './lImperatore';
@@ -19,6 +20,7 @@ export { SCHEDA_VISIVA_L_IMPERATRICE } from './lImperatrice';
 export { SCHEDA_VISIVA_L_IMPERATORE } from './lImperatore';
 export { SCHEDA_VISIVA_IL_PAPA } from './ilPapa';
 export { SCHEDA_VISIVA_GLI_AMANTI } from './gliAmanti';
+export { SCHEDA_VISIVA_IL_CARRO } from './ilCarro';
 
 const BY_ID: Record<string, SchedaVisivaContent> = {
   'il-matto': SCHEDA_VISIVA_IL_MATTO,
@@ -28,6 +30,7 @@ const BY_ID: Record<string, SchedaVisivaContent> = {
   'l-imperatore': SCHEDA_VISIVA_L_IMPERATORE,
   'il-papa': SCHEDA_VISIVA_IL_PAPA,
   'gli-amanti': SCHEDA_VISIVA_GLI_AMANTI,
+  'il-carro': SCHEDA_VISIVA_IL_CARRO,
 };
 
 export function getSchedaVisiva(id: string): SchedaVisivaContent | undefined {
