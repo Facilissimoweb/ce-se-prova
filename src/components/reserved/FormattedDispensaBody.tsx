@@ -14,14 +14,18 @@ function renderInlineBold(text: string): React.ReactNode {
   });
 }
 
-const SIGILLO_EMBED_RE = /^\{\{sigillo:([\w-]+)\}\}$/;
+/** Matches `{{sigillo:il-matto}}`, `{{scheda-visiva:il-matto}}`, etc. */
+const EMBED_RE = /^\{\{([\w-]+):([\w-]+)\}\}$/;
 
 export function FormattedDispensaBody({
   markdown,
   embeds,
 }: {
   markdown: string;
-  /** Rendered when the markdown contains `{{sigillo:<id>}}` (ENN-113+). */
+  /**
+   * Mid-dispensa embeds keyed as `<type>:<id>`
+   * (e.g. `scheda-visiva:il-matto`, `sigillo:il-matto` — ENN-113 / ENN-114).
+   */
   embeds?: Record<string, React.ReactNode>;
 }) {
   const lines = markdown.split('\n');
@@ -31,10 +35,10 @@ export function FormattedDispensaBody({
         const line = rawLine.trim();
         if (!line) return <div key={idx} className="h-1" aria-hidden="true" />;
 
-        const embedMatch = line.match(SIGILLO_EMBED_RE);
+        const embedMatch = line.match(EMBED_RE);
         if (embedMatch) {
-          const embedId = embedMatch[1];
-          const node = embeds?.[embedId];
+          const embedKey = `${embedMatch[1]}:${embedMatch[2]}`;
+          const node = embeds?.[embedKey];
           if (!node) return null;
           return (
             <div key={idx} className="py-2">

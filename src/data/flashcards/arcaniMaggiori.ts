@@ -5,7 +5,8 @@
  * Contenuto in-repo: nessuna tabella DB.
  *
  * ENN-113 — Sigillo sezione Il Matto (14 carte CSV Maria), inline dopo
- * la scheda «### 0. Il Matto» in Dispensa 01 (marker `{{sigillo:il-matto}}`).
+ * la scheda «### 0. Il Matto» in Dispensa 01, dopo `{{scheda-visiva:il-matto}}`
+ * (marker `{{sigillo:il-matto}}` — ENN-113 / ordine ENN-114).
  */
 
 import type { CourseId } from '../../types/handoff';
@@ -478,7 +479,7 @@ export function getInlineFlashcardDeck(
 /** Strip embed markers from plain-text downloads / exports. */
 export function stripFlashcardEmbedMarkers(markdown: string): string {
   return markdown
-    .replace(/^\{\{sigillo:[\w-]+\}\}\s*$/gm, '')
+    .replace(/^\{\{(?:sigillo|scheda-visiva):[\w-]+\}\}\s*$/gm, '')
     .replace(/\n{3,}/g, '\n\n');
 }
 
