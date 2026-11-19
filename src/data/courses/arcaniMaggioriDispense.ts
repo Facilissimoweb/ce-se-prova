@@ -108,6 +108,10 @@ La progressione conduce dalla fioritura creativa fino all'accelerazione e alla v
 - **Significato Profondo**: patto etico, trasmissione della sapienza, mediazione illuminata; alleanza tra aspirazioni individuali e tradizione o struttura sociale.
 - **In Chiave Previsionale**: contratti chiari e trasparenti, mediazioni riuscite, consulenze autorevoli, alleanze basate sulla fiducia, rispetto delle norme etiche.
 
+{{scheda-visiva:il-papa}}
+
+{{sigillo:il-papa}}
+
 ### 6. Gli Innamorati (VI) – Il Bivio Fondamentale e la Scelta del Cuore
 
 - **Simbologia ed Essenza**: la figura umana al bivio, di fronte all'incontro, all'affetto e alla responsabilità della decisione.
