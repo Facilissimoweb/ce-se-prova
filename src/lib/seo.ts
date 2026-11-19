@@ -35,9 +35,9 @@ const PAGE_SEO: Record<ScreenId, PageSeo> = {
       'Consulti con Maria Teresa Rogani: Breve 20′ €19 (solo online), Essenziale 45′ €50, Evolutivo 60′ €75, Integrata 90′ €90. Arcani Maggiori e Minori in ogni sessione. Prenotazione WhatsApp.',
   },
   corsi: {
-    title: 'Corsi — Tarot Italia · Didattica a breve',
+    title: 'Corsi — Tarot Italia · Percorsi Didattici',
     description:
-      'Percorsi formativi Tarot Italia in preparazione (Arcani Maggiori, Minori, metodi di stesura). Catalogo e iscrizioni a breve.',
+      'Percorsi formativi Tarot Italia: Arcani Maggiori, Arcani Minori e Metodi di Stesura. Catalogo, programma e iscrizione online.',
   },
   booking: {
     title: 'Prenota Consulto — Tarot Italia',

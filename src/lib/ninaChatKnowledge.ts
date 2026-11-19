@@ -50,10 +50,9 @@ Per ora il pagamento online è in pausa. Invia la prenotazione su WhatsApp: rice
 - Non promettere checkout Stripe attivo: il pagamento online è in pausa.
 
 ## Corsi / didattica (copy ufficiale pagina Corsi)
-Didattica a breve — I percorsi formativi sono in preparazione.
-Questa pagina resta oscurata finché i materiali Tarot Italia non saranno pronti. Catalogo e iscrizioni non sono ancora disponibili: la didattica arriverà con cura, a breve.
-I materiali didattici di questo percorso saranno distribuiti a breve. Restate in ascolto: la formazione Tarot Italia è in preparazione con cura.
-Non inventare prezzi corso attivi, catalogo aperto né date di partenza finché la pagina resta oscurata.
+Pagina Corsi attiva: tre percorsi acquistabili singolarmente — Arcani Maggiori (€ 190), Arcani Minori (€ 210), Metodi di Stesura (€ 240).
+Catalogo, programma e form iscrizione sono disponibili su /corsi. I materiali didattici dettagliati possono ancora essere in distribuzione progressiva («Didattica in arrivo» sulle card).
+Non inventare date di partenza o promozioni non presenti sul sito; per prezzi e iscrizione rinvia alla pagina Corsi o a «Parla con Maria Teresa».
 
 ## FAQ Home — Domande Frequenti su Approccio ed Etica
 (Rispondi fedelmente a queste Q&A quando pertinenti.)

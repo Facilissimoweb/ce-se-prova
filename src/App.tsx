@@ -411,7 +411,6 @@ export function App() {
               onChangeCourseId={setSelectedCourseId}
               onOpenChat={() => handleNavigate('chat')}
               onOpenReservedArea={() => handleNavigate('area-riservata')}
-              onNavigate={handleNavigate}
             />
           )}
 
