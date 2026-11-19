@@ -98,6 +98,10 @@ La progressione conduce dalla fioritura creativa fino all'accelerazione e alla v
 - **Significato Profondo**: autorità saggia, protezione, governo della realtà senza tentennamenti; forza strutturale per dare durata e confini certi a quanto creato.
 - **In Chiave Previsionale**: consolidamento di progetti lavorativi o finanziari, basi solide, referente autorevole o protettivo, gestione metodica ed efficace della materia.
 
+{{scheda-visiva:l-imperatore}}
+
+{{sigillo:l-imperatore}}
+
 ### 5. Il Papa (V) – Il Patto Etico e la Guida Spettabile
 
 - **Simbologia ed Essenza**: guida spirituale o professionale; maestro che trasmette valori condivisi e facilita l'adesione a regole e principi codificati.
