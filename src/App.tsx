@@ -38,6 +38,7 @@ import { SocialShareButtons } from './components/SocialShareButtons';
 import { DocumentSeo } from './components/DocumentSeo';
 import { legalContent } from './data/legalContent';
 import {
+  PATH_CHANGE_EVENT,
   bootstrapScreenFromLocation,
   navigatePath,
   pathForScreen,
@@ -159,6 +160,12 @@ export function App() {
   const navigationKindRef = useRef<'push' | 'pop' | 'boot'>('boot');
   const activeScreenRef = useRef(activeScreen);
   activeScreenRef.current = activeScreen;
+  /** Track pathname so same-screen SPA jumps (e.g. /news → /news/slug) still scroll to top. */
+  const lastPathnameRef = useRef(
+    typeof window !== 'undefined' ? window.location.pathname : '/'
+  );
+  /** Per-path scroll memory for browser back within the same ScreenId (blog). */
+  const scrollByPathRef = useRef<Record<string, number>>({});
 
   const handleNavigate = useCallback(
     (screen: ScreenId, options?: { focusId?: string }) => {
@@ -194,6 +201,7 @@ export function App() {
   useEffect(() => {
     const kind = navigationKindRef.current;
     navigationKindRef.current = 'push';
+    lastPathnameRef.current = window.location.pathname;
 
     if (kind === 'boot') {
       const sectionFromHash = sectionIdFromHash(window.location.hash);
@@ -215,6 +223,26 @@ export function App() {
     }
     return scrollToTopAfterPaint('auto');
   }, [activeScreen]);
+
+  // Same ScreenId, new path (blog article, etc.): always return to top unless a
+  // deep-link focus/hash is pending (ENN-102/103 intentional landings).
+  useEffect(() => {
+    const onPathChange = () => {
+      const nextPath = window.location.pathname;
+      const prevPath = lastPathnameRef.current;
+      if (nextPath === prevPath) return;
+      scrollByPathRef.current[prevPath] = captureScrollY();
+      lastPathnameRef.current = nextPath;
+
+      if (pendingFocusIdRef.current) return;
+      if (sectionIdFromHash(window.location.hash)) return;
+
+      scrollToTopAfterPaint('auto');
+    };
+
+    window.addEventListener(PATH_CHANGE_EVENT, onPathChange);
+    return () => window.removeEventListener(PATH_CHANGE_EVENT, onPathChange);
+  }, []);
 
   // Sync screen from URL on load / browser back-forward; rewrite legacy Stripe root returns.
   // Unknown paths keep the URL and show the 404 screen (no silent redirect to home).
@@ -276,7 +304,17 @@ export function App() {
     const syncFromLocation = () => applyLocation('boot');
     const onPopState = () => {
       scrollPositionsRef.current[activeScreenRef.current] = captureScrollY();
+      const pathBefore = lastPathnameRef.current;
+      const screenBefore = activeScreenRef.current;
+      scrollByPathRef.current[pathBefore] = captureScrollY();
       applyLocation('pop');
+      const pathAfter = window.location.pathname;
+      lastPathnameRef.current = pathAfter;
+      // Blog detail ↔ list keeps ScreenId `news` — activeScreen effect may not run.
+      if (screenBefore === activeScreenRef.current && pathBefore !== pathAfter) {
+        const y = scrollByPathRef.current[pathAfter] ?? 0;
+        afterNextPaint(() => scrollWindowTo(y, 'auto'));
+      }
     };
     const onHashChange = () => {
       const hashScreen = screenFromHash(window.location.hash);
