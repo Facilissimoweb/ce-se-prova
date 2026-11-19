@@ -102,43 +102,44 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
         </p>
       </button>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => go(-1)}
-            className="px-3.5 py-2 min-h-[40px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs font-medium text-[#F4F1EA] inline-flex items-center gap-1.5"
-          >
-            <ChevronLeft className="w-3.5 h-3.5 text-[#D4AF37]" />
-            Precedente
-          </button>
-          <button
-            type="button"
-            onClick={() => go(1)}
-            className="px-3.5 py-2 min-h-[40px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs font-medium text-[#F4F1EA] inline-flex items-center gap-1.5"
-          >
-            Successiva
-            <ChevronRight className="w-3.5 h-3.5 text-[#D4AF37]" />
-          </button>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={handleShuffle}
-            className="px-3.5 py-2 min-h-[40px] rounded-lg bg-[#D4AF37]/12 border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs font-medium text-[#F4F1EA] inline-flex items-center gap-1.5"
-          >
-            <Shuffle className="w-3.5 h-3.5 text-[#D4AF37]" />
-            Mescola
-          </button>
-          <button
-            type="button"
-            onClick={handleReset}
-            className="px-3.5 py-2 min-h-[40px] rounded-lg border border-[#A39B93]/25 hover:border-[#D4AF37] text-xs font-medium text-[#A39B93] hover:text-[#F4F1EA] inline-flex items-center gap-1.5"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            Dall&apos;inizio
-          </button>
-        </div>
+      {/* Mobile-first toolbar: 2×2 grid (template for other courses’ flashcard UI) */}
+      <div
+        className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-2.5"
+        role="toolbar"
+        aria-label="Controlli flashcard"
+      >
+        <button
+          type="button"
+          onClick={() => go(-1)}
+          className="min-h-[44px] w-full px-3 py-2.5 rounded-lg border border-[#D4AF37]/30 bg-[#151311]/80 hover:border-[#D4AF37] text-xs font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+        >
+          <ChevronLeft className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+          Precedente
+        </button>
+        <button
+          type="button"
+          onClick={() => go(1)}
+          className="min-h-[44px] w-full px-3 py-2.5 rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+        >
+          Successiva
+          <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+        </button>
+        <button
+          type="button"
+          onClick={handleShuffle}
+          className="min-h-[44px] w-full px-3 py-2.5 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/10 hover:border-[#D4AF37] hover:bg-[#D4AF37]/16 text-xs font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+        >
+          <Shuffle className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+          Mescola
+        </button>
+        <button
+          type="button"
+          onClick={handleReset}
+          className="min-h-[44px] w-full px-3 py-2.5 rounded-lg border border-[#A39B93]/30 bg-[#151311]/60 hover:border-[#D4AF37] hover:text-[#F4F1EA] text-xs font-medium text-[#A39B93] inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+        >
+          <RotateCcw className="w-3.5 h-3.5 shrink-0" />
+          Dall&apos;inizio
+        </button>
       </div>
     </section>
   );
