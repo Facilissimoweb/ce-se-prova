@@ -118,6 +118,10 @@ La progressione conduce dalla fioritura creativa fino all'accelerazione e alla v
 - **Significato Profondo**: scelta consapevole del cuore e responsabilità verso la propria direzione emotiva ed esistenziale; optare con convinzione per una strada escludendo le altre.
 - **In Chiave Previsionale**: decisioni sentimentali o professionali ineludibili; scelta d'amore o di valore chiara; allineamento autentico con i desideri profondi.
 
+{{scheda-visiva:gli-amanti}}
+
+{{sigillo:gli-amanti}}
+
 ### 7. Il Carro (VII) – L'Azione Coordinata e la Vittoria Disciplinata
 
 - **Simbologia ed Essenza**: il condottiero guida il Carro trionfale e governa con maestria le forze opposte che muovono il veicolo.
