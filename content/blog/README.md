@@ -35,6 +35,26 @@ tags:
 
 Opzionale: `cover: /brand/mia-immagine.png` (path sotto `public/`).
 
+### Articolo gated Maggiori (ENN-131)
+
+Per legare un pezzo al corso (Phase 1: unlock = acquisto Arcani Maggiori, non Stripe per articolo):
+
+```yaml
+gated: true
+requiresCourse: arcani-maggiori
+moduleLink: '01'
+```
+
+Nel corpo, marca il taglio pubblico / riservato con:
+
+```markdown
+Testo intro SEO (sempre visibile)…
+
+<!-- gated -->
+
+Approfondimento (solo corsisti Maggiori)…
+```
+
 3. Corpo in Markdown semplice (`##`, `###`, elenchi, `**grassetto**`, link `[testo](url)`).
 4. Con `draft: true` l’articolo **non** compare sul sito né in `GET /api/news`.
 5. In locale: `npm run build:blog` (anche automatico in `npm run build` / Vite). Poi commit di:

@@ -10,8 +10,9 @@ type InlinePart =
   | { type: 'bold'; value: string }
   | { type: 'link'; href: string; label: string };
 
+/** Absolute http(s)/mailto or same-site paths (optional query/hash). */
 const ALLOWED_HREF =
-  /^(https?:\/\/|mailto:|\/[a-z0-9][-a-z0-9/]*)/i;
+  /^(https?:\/\/|mailto:|\/[a-z0-9][-a-z0-9/]*(?:[?#][^\s]*)?)$/i;
 
 function sanitizeHref(raw: string): string | null {
   const href = raw.trim();
