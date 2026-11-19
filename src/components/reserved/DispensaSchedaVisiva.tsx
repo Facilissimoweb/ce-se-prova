@@ -1,6 +1,6 @@
 import React, { useId, useState } from 'react';
 import { ChevronDown, Eye } from 'lucide-react';
-import type { SchedaVisivaContent } from '../../data/schedeVisive/ilMatto';
+import type { SchedaVisivaContent } from '../../data/schedeVisive/types';
 
 type SectionId = 'mappa' | 'decodifica' | 'griglia' | 'sintesi';
 
@@ -109,7 +109,7 @@ export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
           />
         </div>
         <figcaption className="mt-2.5 text-center text-[11px] text-[#A39B93]">
-          Il Matto · Waite-Smith
+          {content.imageCaption}
         </figcaption>
       </figure>
 

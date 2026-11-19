@@ -22,7 +22,7 @@ import {
   getFlashcardDeck,
   getInlineFlashcardDeck,
 } from '../data/flashcards/arcaniMaggiori';
-import { SCHEDA_VISIVA_IL_MATTO } from '../data/schedeVisive/ilMatto';
+import { getSchedaVisiva } from '../data/schedeVisive';
 import { useReservedArea } from '../hooks/useReservedArea';
 import {
   SCROLL_LANDMARKS,
@@ -102,8 +102,8 @@ export function ReservedAreaScreen({
   }, [activeCourse, activeDispensa]);
 
   /**
-   * ENN-113 / ENN-114 — mid-dispensa embeds for Maggiori Dispensa 01.
-   * Order in markdown: scheda-visiva → sigillo (visual widget before flashcards).
+   * ENN-113 / ENN-114 / ENN-115 — mid-dispensa embeds for Maggiori Dispensa 01.
+   * Order in markdown: scheda-visiva → sigillo when both exist (visual before flashcards).
    * Embed keys are `<type>:<id>` (see FormattedDispensaBody).
    */
   const dispensaFlashcardEmbeds = useMemo(() => {
@@ -115,16 +115,20 @@ export function ReservedAreaScreen({
     ) {
       return undefined;
     }
+    const embeds: Record<string, React.ReactNode> = {};
+    for (const schedaId of ['il-matto', 'il-bagatto'] as const) {
+      const scheda = getSchedaVisiva(schedaId);
+      if (scheda) {
+        embeds[`scheda-visiva:${schedaId}`] = (
+          <DispensaSchedaVisiva content={scheda} />
+        );
+      }
+    }
     const mattoDeck = getInlineFlashcardDeck('il-matto');
-    const embeds: Record<string, React.ReactNode> = {
-      'scheda-visiva:il-matto': (
-        <DispensaSchedaVisiva content={SCHEDA_VISIVA_IL_MATTO} />
-      ),
-    };
     if (mattoDeck) {
       embeds['sigillo:il-matto'] = <DispensaFlashcards deck={mattoDeck} />;
     }
-    return embeds;
+    return Object.keys(embeds).length > 0 ? embeds : undefined;
   }, [activeCourse, activeDispensa]);
 
   const pendingScrollRef = useRef<ReservedScrollTarget>(null);
