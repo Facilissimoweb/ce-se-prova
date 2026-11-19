@@ -543,61 +543,134 @@ export interface SpreadDrawItem {
   card: ArcanaCard;
 }
 
+/** Ambito esplicito del dialogo (chip / sessione); Fase A. */
+export type DialogueDomain = 'love' | 'work' | 'general' | 'future';
+
+export interface BuildArcanaDialogueOptions {
+  /** Dominio forzato dai chip o dalla sessione; ha priorità sulla sola regex. */
+  domain?: DialogueDomain | null;
+}
+
+const LOVE_QUERY_RE =
+  /amor|relazion|coppia|cuore|sentimen|partner|lui|lei|matrimon|innamor/;
+const WORK_QUERY_RE =
+  /lavor|carrier|progett|soldi|econom|azienda|studio|ufficio|collabor|contratt/;
+const FUTURE_QUERY_RE =
+  /futur|succed|preved|previs|domani|mesi|anno|prossim|evolv|andrà|esito|svilupp/;
+const GENERAL_QUERY_RE =
+  /percorso\s+general|in\s+general|general[ei]|complessiv|nel\s+complesso|sintesi\s+general/;
+
+/** Inferisce un ambito dal testo; `null` se non c’è segnale chiaro (maieutiche generiche). */
+export function detectDialogueDomain(userQuery: string): DialogueDomain | null {
+  const q = userQuery.toLowerCase();
+  const asksLove = LOVE_QUERY_RE.test(q);
+  const asksWork = WORK_QUERY_RE.test(q);
+  if (asksLove && !asksWork) return 'love';
+  if (asksWork && !asksLove) return 'work';
+  if (asksLove && asksWork) {
+    // Ambiguità: preferisci la prima keyword che compare nel testo
+    const loveIdx = q.search(LOVE_QUERY_RE);
+    const workIdx = q.search(WORK_QUERY_RE);
+    return loveIdx <= workIdx ? 'love' : 'work';
+  }
+  if (GENERAL_QUERY_RE.test(q)) return 'general';
+  if (FUTURE_QUERY_RE.test(q)) return 'future';
+  return null;
+}
+
+function softenLead(text: string): string {
+  const trimmed = text.trim();
+  if (!trimmed) return trimmed;
+  return trimmed.charAt(0).toLowerCase() + trimmed.slice(1);
+}
+
+/** Parafrasi soft di futuro/consiglio per ambito finché non arrivano campi dedicati (Fase B). */
+function domainFutureBlock(domain: 'love' | 'work', card: ArcanaCard): string {
+  const core = softenLead(card.futureTendency);
+  if (domain === 'love') {
+    return `Tendenza in amore: In chiave affettiva, ${core}`;
+  }
+  return `Tendenza nel lavoro: Sul piano professionale e dei progetti, ${core}`;
+}
+
+function domainAdviceBlock(domain: 'love' | 'work', card: ArcanaCard): string {
+  const core = softenLead(card.advice);
+  if (domain === 'love') {
+    return `Orientamento affettivo: Nelle relazioni, ${core}`;
+  }
+  return `Orientamento professionale: Nei progetti e nel lavoro, ${core}`;
+}
+
 /**
  * Genera una risposta contestuale autentica per il dialogo con qualsiasi dei 22 Arcani Maggiori,
  * integrando lettura del presente, tendenza previsionale del futuro, ambito (amore/lavoro) e consiglio.
+ * In amore/lavoro non riusa i blocchi grezzi di futuro/consiglio del percorso generale.
  */
 export function buildArcanaDialogueReply(
   userQuery: string,
   activeCard: ArcanaCard,
-  spread?: SpreadDrawItem[] | null
+  spread?: SpreadDrawItem[] | null,
+  options?: BuildArcanaDialogueOptions
 ): string {
-  const q = userQuery.toLowerCase();
-  const asksFuture =
-    /futur|succed|preved|previs|domani|mesi|anno|prossim|evolv|andrà|esito|svilupp/.test(q);
-  const asksLove =
-    /amor|relazion|coppia|cuore|sentimen|partner|lui|lei|matrimon|innamor/.test(q);
-  const asksWork =
-    /lavor|carrier|progett|soldi|econom|azienda|studio|ufficio|collabor|contratt/.test(q);
+  const inferred = detectDialogueDomain(userQuery);
+  const domain: DialogueDomain =
+    options?.domain ?? inferred ?? 'general';
 
   if (spread && spread.length === 3) {
     const [past, present, future] = spread;
-    const domainNote = asksLove
-      ? activeCard.loveReading
-      : asksWork
-        ? activeCard.workReading
-        : activeCard.advice;
+    const domainNote =
+      domain === 'love'
+        ? activeCard.loveReading
+        : domain === 'work'
+          ? activeCard.workReading
+          : activeCard.advice;
+    const domainLabel =
+      domain === 'love'
+        ? 'Amore'
+        : domain === 'work'
+          ? 'Lavoro'
+          : domain === 'future'
+            ? 'Futuro'
+            : 'Generale';
 
     return [
-      `Nella tua stesa a tre Arcani sul tema "${userQuery.trim()}":`,
+      `Nella tua stesa a tre Arcani (ambito: ${domainLabel}) sul tema "${userQuery.trim()}":`,
       `• ${past.position} (${past.card.name} · ${past.card.numeral}): mostra da dove nasce la situazione (${past.card.keywords.slice(0, 2).join(', ').toLowerCase()}).`,
       `• ${present.position} (${present.card.name} · ${present.card.numeral}): ${present.card.synthesis}`,
       `• ${future.position} (${future.card.name} · ${future.card.numeral}): ${future.card.futureTendency}`,
-      `Indicazione sintetica: ${domainNote}`,
+      domain === 'love' || domain === 'work'
+        ? `Indicazione per ${domainLabel.toLowerCase()}: ${domainNote}`
+        : `Indicazione sintetica: ${domainNote}`,
     ].join('\n\n');
   }
 
   const parts: string[] = [];
+  const domainHeader =
+    domain === 'love'
+      ? 'Amore'
+      : domain === 'work'
+        ? 'Lavoro'
+        : domain === 'future'
+          ? 'Futuro'
+          : 'Generale';
 
   parts.push(
-    `In dialogo con ${activeCard.name} (${activeCard.numeral} · ${activeCard.archetype}):`
+    `Ambito: ${domainHeader} · In dialogo con ${activeCard.name} (${activeCard.numeral} · ${activeCard.archetype}):`
   );
 
-  if (asksLove) {
-    parts.push(`Sfera affettiva: ${activeCard.loveReading}`);
-  } else if (asksWork) {
-    parts.push(`Ambito professionale e progetti: ${activeCard.workReading}`);
+  if (domain === 'love') {
+    parts.push(`Lettura affettiva: ${activeCard.loveReading}`);
+    parts.push(domainFutureBlock('love', activeCard));
+    parts.push(domainAdviceBlock('love', activeCard));
+  } else if (domain === 'work') {
+    parts.push(`Lettura professionale: ${activeCard.workReading}`);
+    parts.push(domainFutureBlock('work', activeCard));
+    parts.push(domainAdviceBlock('work', activeCard));
   } else {
     parts.push(`Lettura del presente: ${activeCard.synthesis}`);
-  }
-
-  if (asksFuture || (!asksLove && !asksWork)) {
     parts.push(`Linea previsionale (futuro): ${activeCard.futureTendency}`);
-  } else {
-    parts.push(`Tendenza evolutiva: ${activeCard.futureTendency}`);
+    parts.push(`Orientamento pratico: ${activeCard.advice}`);
   }
-
-  parts.push(`Orientamento pratico: ${activeCard.advice}`);
 
   return parts.join('\n\n');
 }
