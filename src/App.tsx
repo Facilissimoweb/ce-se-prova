@@ -26,7 +26,6 @@ import { ConsultiScreen } from './screens/ConsultiScreen';
 import { CorsiScreen } from './screens/CorsiScreen';
 import { ReservedAreaScreen } from './screens/ReservedAreaScreen';
 import { ApprofondimentiTerzoSettenarioScreen } from './screens/ApprofondimentiTerzoSettenarioScreen';
-import { LaboratorioArcaniMaggioriScreen } from './screens/LaboratorioArcaniMaggioriScreen';
 import { BookingScreen } from './screens/BookingScreen';
 import { ChatScreen } from './screens/ChatScreen';
 import { PrivacyScreen } from './screens/PrivacyScreen';
@@ -356,13 +355,10 @@ export function App() {
   };
 
   const isAuxScreen = AUX_SCREENS.includes(activeScreen);
-  /** Fullscreen Maggiori lab — hide site chrome; thin back bar lives in the screen (ENN-107). */
-  const isFullscreenLab = activeScreen === 'laboratorio-arcani-maggiori';
-  /** Highlight Area personale when on gated Maggiori companion pages (ENN-106 / ENN-107). */
+  /** Highlight Area personale when on gated Maggiori approfondimenti (ENN-106). */
   const topBarScreen: ScreenId = isAuxScreen
     ? 'home'
-    : activeScreen === 'approfondimenti-terzo-settenario' ||
-        activeScreen === 'laboratorio-arcani-maggiori'
+    : activeScreen === 'approfondimenti-terzo-settenario'
       ? 'area-riservata'
       : activeScreen;
 
@@ -371,21 +367,16 @@ export function App() {
       <LeftToolsMenuProvider>
       <div className="min-h-screen min-h-[100dvh] w-full max-w-[100%] overflow-x-clip bg-[#12100E] text-[#F4F1EA] flex flex-col relative">
         <DocumentSeo activeScreen={activeScreen} />
-        {!isFullscreenLab && <AmbientSanctuaryBackground />}
+        <AmbientSanctuaryBackground />
 
-        {!isFullscreenLab && (
-          <TopBar
-            activeScreen={topBarScreen}
-            onNavigate={handleNavigate}
-            onOpenHandoff={() => setIsHandoffOpen(true)}
-            onOpenPrivacy={() => setIsPrivacyOpen(true)}
-            showCmsKeys={showCmsKeys}
-          />
-        )}
+        <TopBar
+          activeScreen={topBarScreen}
+          onNavigate={handleNavigate}
+          onOpenHandoff={() => setIsHandoffOpen(true)}
+          onOpenPrivacy={() => setIsPrivacyOpen(true)}
+          showCmsKeys={showCmsKeys}
+        />
 
-        {isFullscreenLab ? (
-          <LaboratorioArcaniMaggioriScreen onNavigate={handleNavigate} />
-        ) : (
         <main className="flex-1 w-full max-w-6xl mx-auto px-5 md:px-8 lg:px-12 pb-[max(6rem,env(safe-area-inset-bottom))] relative z-10">
           {activeScreen === 'home' && (
             <HomeScreen
@@ -479,9 +470,7 @@ export function App() {
             <NotFoundScreen onNavigate={handleNavigate} />
           )}
         </main>
-        )}
 
-        {!isFullscreenLab && (
         <footer className="border-t border-[#D4AF37]/15 py-10 pb-24 relative z-10 md:py-12">
           <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-8 text-xs text-[#A39B93] md:space-y-10">
             {/*
@@ -632,41 +621,36 @@ export function App() {
             </div>
           </div>
         </footer>
-        )}
 
-        {!isFullscreenLab && (
-          <>
-            <FloatingSideRail
-              onNavigate={handleNavigate}
-              onOpenHandoff={() => setIsHandoffOpen(true)}
-              onOpenPrivacy={() => setIsPrivacyOpen(true)}
-              showCmsKeys={showCmsKeys}
-            />
+        <FloatingSideRail
+          onNavigate={handleNavigate}
+          onOpenHandoff={() => setIsHandoffOpen(true)}
+          onOpenPrivacy={() => setIsPrivacyOpen(true)}
+          showCmsKeys={showCmsKeys}
+        />
 
-            <HandoffDrawer
-              isOpen={isHandoffOpen}
-              onClose={() => setIsHandoffOpen(false)}
-              showCmsKeys={showCmsKeys}
-              onToggleCmsKeys={() => setShowCmsKeys((prev) => !prev)}
-            />
+        <HandoffDrawer
+          isOpen={isHandoffOpen}
+          onClose={() => setIsHandoffOpen(false)}
+          showCmsKeys={showCmsKeys}
+          onToggleCmsKeys={() => setShowCmsKeys((prev) => !prev)}
+        />
 
-            <StickyContactBar />
+        <StickyContactBar />
 
-            {/* Mobile: single «Strumenti» FAB; desktop: full vertical stack */}
-            <ToolsFab />
-            <div id={LEFT_TOOLS_MENU_ID}>
-              <BackToTopFab />
-              <ChatFab />
-              <AccessibilityFab />
-              <PrivacyCookiesWidget
-                showCmsKeys={showCmsKeys}
-                isModalOpen={isPrivacyOpen}
-                onOpenModal={() => setIsPrivacyOpen(true)}
-                onCloseModal={() => setIsPrivacyOpen(false)}
-              />
-            </div>
-          </>
-        )}
+        {/* Mobile: single «Strumenti» FAB; desktop: full vertical stack */}
+        <ToolsFab />
+        <div id={LEFT_TOOLS_MENU_ID}>
+          <BackToTopFab />
+          <ChatFab />
+          <AccessibilityFab />
+          <PrivacyCookiesWidget
+            showCmsKeys={showCmsKeys}
+            isModalOpen={isPrivacyOpen}
+            onOpenModal={() => setIsPrivacyOpen(true)}
+            onCloseModal={() => setIsPrivacyOpen(false)}
+          />
+        </div>
 
         <LegalNotice kind={legalNotice} onClose={() => setLegalNotice(null)} />
       </div>
