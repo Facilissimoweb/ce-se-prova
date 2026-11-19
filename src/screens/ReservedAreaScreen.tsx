@@ -195,20 +195,20 @@ export function ReservedAreaScreen({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 shrink-0">
+        <div className="grid grid-cols-2 gap-3 w-full md:w-auto md:min-w-[20rem] shrink-0">
           <button
             type="button"
             onClick={() => onNavigate('corsi')}
-            className="px-4 py-2.5 min-h-[44px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs md:text-sm font-medium text-[#F4F1EA] whitespace-nowrap transition-colors"
+            className="w-full px-3 py-2.5 min-h-[44px] rounded-lg border border-[#D4AF37]/30 bg-[#12100E]/55 hover:border-[#D4AF37] hover:bg-[#D4AF37]/10 text-xs md:text-sm font-medium text-[#F4F1EA] inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
           >
             Esplora Corsi
           </button>
           <button
             type="button"
             onClick={logout}
-            className="px-4 py-2.5 min-h-[44px] rounded-lg bg-[#12100E]/80 border border-[#A39B93]/25 hover:border-[#D4AF37] text-xs md:text-sm font-medium text-[#A39B93] hover:text-[#F4F1EA] inline-flex items-center gap-2 whitespace-nowrap transition-colors"
+            className="w-full px-3 py-2.5 min-h-[44px] rounded-lg border border-[#D4AF37]/30 bg-[#12100E]/55 hover:border-[#D4AF37] hover:bg-[#D4AF37]/10 text-xs md:text-sm font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
           >
-            <LogOut className="w-4 h-4 text-[#D4AF37]" />
+            <LogOut className="w-4 h-4 text-[#D4AF37] shrink-0" />
             Esci
           </button>
         </div>
