@@ -5,6 +5,7 @@ import {
   Check,
   Clock,
   CreditCard,
+  Eye,
   Layers,
   Lock,
   MessageCircle,
@@ -17,6 +18,7 @@ import { CopyText } from '../components/CopyText';
 import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
 import { ResilientImage } from '../components/ResilientImage';
 import { COURSE_SECTION_IMAGES } from '../data/sectionImages';
+import { MaggioriMattoPreview } from '../components/corsi/MaggioriMattoPreview';
 import { MinorArcanaSuitsPlate, SpreadGeometryExplorer } from '../components/CourseVisuals';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -24,7 +26,11 @@ import {
   isValidFullName,
   isValidPhone,
 } from '../lib/formValidation';
-import { SCROLL_LANDMARKS, scrollToElement } from '../lib/scrollNavigation';
+import {
+  SCROLL_LANDMARKS,
+  scrollToElement,
+  scrollToId,
+} from '../lib/scrollNavigation';
 import { whatsappHref } from '../lib/siteContacts';
 
 interface CorsiScreenProps {
@@ -93,6 +99,12 @@ export function CorsiScreen({
   const handleEnrollCourse = (courseId: CourseId) => {
     onChangeCourseId(courseId);
     scrollToElement(checkoutSectionRef.current, { behavior: 'smooth' });
+  };
+
+  /** ENN-126 — open public Il Matto slice from the Maggiori card. */
+  const handleMaggioriMattoPreview = () => {
+    onChangeCourseId('arcani-maggiori');
+    scrollToId(SCROLL_LANDMARKS.corsiMaggioriPreview, { behavior: 'smooth' });
   };
 
   const handlePrepareCourseCheckout = async (e: React.FormEvent) => {
@@ -361,6 +373,17 @@ export function CorsiScreen({
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
+                {course.id === 'arcani-maggiori' && (
+                  <button
+                    type="button"
+                    onClick={handleMaggioriMattoPreview}
+                    className="w-full min-h-[42px] px-4 py-2 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-2 border border-[#D4AF37]/40 text-[#E6C65C] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/18 hover:border-[#D4AF37]/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                  >
+                    <Eye className="w-3.5 h-3.5" aria-hidden="true" />
+                    Anteprima gratuita · Il Matto
+                  </button>
+                )}
+
                 <button
                   type="button"
                   onClick={() => handleExploreCourse(course.id)}
@@ -382,6 +405,15 @@ export function CorsiScreen({
           );
         })}
       </section>
+
+      {/* ENN-126 — public Maggiori · Il Matto slice (real dispensa + scheda + 3 flashcards) */}
+      <MaggioriMattoPreview
+        priceEur={
+          educationalCourses.find((c) => c.id === 'arcani-maggiori')?.priceEur ??
+          190
+        }
+        onEnroll={() => handleEnrollCourse('arcani-maggiori')}
+      />
 
       {/* Interactive Syllabus + Visual Workbench */}
       <section
@@ -475,7 +507,7 @@ export function CorsiScreen({
               <span>Anteprima Didattica Interattiva</span>
               <span className="text-[#A39B93] font-normal normal-case">
                 {activeCourse.id === 'arcani-maggiori'
-                  ? 'Estratto dal Modulo 01–04'
+                  ? 'Assaggio Il Matto + mappa carte'
                   : activeCourse.id === 'arcani-minori'
                     ? 'Atlante dei 4 Semi'
                     : 'Schemi di Stesa'}
@@ -484,6 +516,24 @@ export function CorsiScreen({
 
             {activeCourse.id === 'arcani-maggiori' && (
               <div className="space-y-4">
+                <button
+                  type="button"
+                  onClick={handleMaggioriMattoPreview}
+                  className="w-full text-left rounded-xl border border-[#D4AF37]/35 bg-[#D4AF37]/10 p-4 md:p-5 space-y-2 hover:bg-[#D4AF37]/14 hover:border-[#D4AF37]/55 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37] inline-flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5" aria-hidden="true" />
+                    Contenuto reale · Dispensa 01
+                  </p>
+                  <p className="font-display text-base md:text-lg text-[#F4F1EA]">
+                    Anteprima gratuita · Il Matto
+                  </p>
+                  <p className="text-xs md:text-sm text-[#A39B93] leading-relaxed">
+                    Bullet della scheda, widget scheda visiva e 3 flashcard del
+                    Sigillo — scorri all&apos;assaggio sopra il programma.
+                  </p>
+                </button>
+
                 <div className="grid grid-cols-4 gap-2.5">
                   {SAMPLE_MAJOR_ARCANA.map((card, idx) => {
                     const current = idx === sampleArcanaIdx;
