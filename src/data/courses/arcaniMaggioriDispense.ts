@@ -74,6 +74,8 @@ La dinamica iniziale del manifestato divide il cammino tra azione visibile e ges
 - **Significato Profondo**: gestazione silenziosa, verità intuita prima di essere detta, sapienza del tempo, attesa fertile. Ogni vera creazione richiede raccoglimento e maturazione interiore.
 - **In Chiave Previsionale**: non è il momento di agire o esporre idee; custodire, studiare, riflettere, fare ricerca e lasciare maturare gli eventi in profondità.
 
+{{scheda-visiva:la-papessa}}
+
 ### Dal Fiorire alla Conquista (III – VII)
 
 La progressione conduce dalla fioritura creativa fino all'accelerazione e alla vittoria della volontà disciplinata.
