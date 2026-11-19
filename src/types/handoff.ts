@@ -6,6 +6,8 @@ export type ScreenId =
   | 'area-riservata'
   /** ENN-106 — Approfondimenti Maggiori; gated like Area Riservata (auth). */
   | 'approfondimenti-terzo-settenario'
+  /** ENN-107 — Laboratorio Maggiori (static HTML shell); gated like Area Riservata. */
+  | 'laboratorio-arcani-maggiori'
   | 'booking'
   | 'chat'
   | 'news'

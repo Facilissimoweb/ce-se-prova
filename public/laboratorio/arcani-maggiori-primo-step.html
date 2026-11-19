@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Tarot Italia — Laboratorio Arcani Maggiori (Primo Step)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cinzel & Plus Jakarta Sans (lab-only; site uses its own stack) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons (pinned for stable mobile Safari/Chrome) -->
+    <script src="https://unpkg.com/lucide@0.546.0"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Cinzel', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        mystic: {
+                            950: '#0a0910',
+                            900: '#12101c',
+                            800: '#1d192b',
+                            700: '#2d2742',
+                            gold: '#d4af37',
+                            goldLight: '#f3e5ab',
+                            amber: '#f59e0b',
+                            indigo: '#4f46e5',
+                            violet: '#7c3aed'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Stili base e scrollbar personalizzata — mobile-first (ENN-107) */
+        html {
+            max-width: 100%;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+        body {
+            background-color: #0a0910;
+            color: #f3f4f6;
+            overflow-x: hidden;
+            max-width: 100%;
+            min-height: 100dvh;
+        }
+        /* Filter chips / lab mode row: allow wrap on narrow phones */
+        .filter-scroll {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #12101c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2d2742;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4af37;
+        }
+
+        /* Effetto carta 3D Flip */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        /* Effetto bagliore oro */
+        .gold-glow {
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+        }
+        .gold-glow:hover {
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+        }
+        
+        /* Sfondo stellato sottile */
+        .bg-stars {
+            background-image: radial-gradient(rgba(212, 175, 55, 0.15) 1px, transparent 1px),
+                              radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+        }
+    </style>
+</head>
+<body class="bg-stars min-h-screen flex flex-col font-sans antialiased selection:bg-mystic-gold selection:text-mystic-950">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 bg-mystic-950/90 backdrop-blur-md border-b border-mystic-700/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                <!-- Logo -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('dispensa')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-mystic-gold to-amber-700 flex items-center justify-center text-mystic-950 shadow-lg">
+                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-serif font-bold text-lg sm:text-xl tracking-wider text-mystic-goldLight">TAROT ITALIA</h1>
+                        <p class="text-[11px] sm:text-xs text-gray-400 tracking-widest uppercase">Arcani Maggiori • Primo Step</p>
+                    </div>
+                </div>
+
+                <!-- Navigazione Desktop -->
+                <nav class="hidden md:flex items-center space-x-2">
+                    <button onclick="switchTab('dispensa')" id="nav-dispensa" class="nav-btn px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2 bg-mystic-800 text-mystic-gold border border-mystic-gold/40">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                        <span>Dispensa & Settenari</span>
+                    </button>
+                    <button onclick="switchTab('atlante')" id="nav-atlante" class="nav-btn px-4 py-2.5 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-mystic-800/60 transition-all flex items-center gap-2">
+                        <i data-lucide="layers" class="w-4 h-4"></i>
+                        <span>Le 22 Lame</span>
+                    </button>
+                    <button onclick="switchTab('nodi')" id="nav-nodi" class="nav-btn px-4 py-2.5 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-mystic-800/60 transition-all flex items-center gap-2">
+                        <i data-lucide="compass" class="w-4 h-4"></i>
+                        <span>I 3 Nodi Pratici</span>
+                    </button>
+                    <button onclick="switchTab('laboratorio')" id="nav-laboratorio" class="nav-btn px-4 py-2.5 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-mystic-800/60 transition-all flex items-center gap-2">
+                        <i data-lucide="wand-2" class="w-4 h-4"></i>
+                        <span>Laboratorio & Stese</span>
+                    </button>
+                </nav>
+
+                <!-- Bottone Menu Mobile -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="p-2.5 rounded-xl bg-mystic-800 text-mystic-gold border border-mystic-700">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Mobile a tendina -->
+        <div id="mobile-menu" class="hidden md:hidden bg-mystic-900 border-b border-mystic-700 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="switchTab('dispensa'); toggleMobileMenu()" id="mob-dispensa" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium bg-mystic-800 text-mystic-gold flex items-center gap-3">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                <span>Dispensa & Settenari</span>
+            </button>
+            <button onclick="switchTab('atlante'); toggleMobileMenu()" id="mob-atlante" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-mystic-800 flex items-center gap-3">
+                <i data-lucide="layers" class="w-5 h-5"></i>
+                <span>Atlante delle 22 Lame</span>
+            </button>
+            <button onclick="switchTab('nodi'); toggleMobileMenu()" id="mob-nodi" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-mystic-800 flex items-center gap-3">
+                <i data-lucide="compass" class="w-5 h-5"></i>
+                <span>I 3 Nodi Pratici</span>
+            </button>
+            <button onclick="switchTab('laboratorio'); toggleMobileMenu()" id="mob-laboratorio" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-mystic-800 flex items-center gap-3">
+                <i data-lucide="wand-2" class="w-5 h-5"></i>
+                <span>Laboratorio & Stese</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ========================================== -->
+        <!-- SEZIONE 1: DISPENSA & ARCHITETTURA         -->
+        <!-- ========================================== -->
+        <section id="tab-dispensa" class="tab-content space-y-8 animate-fadeIn">
+            <!-- Hero Intro -->
+            <div class="bg-gradient-to-br from-mystic-800 via-mystic-900 to-mystic-950 rounded-3xl p-6 sm:p-10 border border-mystic-700/70 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-mystic-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-mystic-gold/20 text-mystic-gold border border-mystic-gold/30 mb-4">
+                        Programma Ufficiale • Primo Step
+                    </span>
+                    <h2 class="font-serif text-2xl sm:text-4xl font-bold text-white leading-tight mb-4">
+                        La Mappa dell'Esperienza Umana: <span class="text-mystic-gold">I Tre Settenari</span>
+                    </h2>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
+                        Gli Arcani Maggiori non costituiscono strumenti di divinazione meccanica, bensì una mappa strutturata della psiche e dei cicli evolutivi. Il mazzo si articola in ventidue lame fondamentali (dalla carta 0 alla XXI), organizzate in tre grandi cicli di crescita interiore e manifestazione esteriore, scandendo il passaggio dalla materia allo spirito.
+                    </p>
+                </div>
+            </div>
+
+            <!-- I Tre Settenari Cards -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Primo Settenario -->
+                <div class="bg-mystic-900/90 rounded-3xl p-6 border border-amber-500/30 hover:border-amber-500/60 transition-all flex flex-col justify-between shadow-xl">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 rounded-xl bg-amber-500/20 text-amber-300 text-xs font-bold tracking-wider uppercase">Ciclo I • Lame 0 – VII</span>
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400">
+                                <i data-lucide="compass" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-white mb-2">La Formazione dell'Identità</h3>
+                        <p class="text-xs text-amber-200/80 mb-4 font-medium">Radicamento, azione concreta e conquista della direzione</p>
+                        <p class="text-sm text-gray-300 leading-relaxed mb-4">
+                            Rappresenta la fase di costruzione della personalità cosciente. Dal potenziale incontaminato del <strong>Matto (0)</strong> e la diade creativa <strong>Bagatto–Papessa</strong>, l'individuo impara a gestire risorse, autorità e scelte fino alla vittoria disciplinata del <strong>Carro (VII)</strong>.
+                        </p>
+                    </div>
+                    <div class="pt-4 border-t border-mystic-700/60 flex items-center justify-between">
+                        <span class="text-xs text-gray-400">8 Lame (0 - VII)</span>
+                        <button onclick="filterCardsAndGo(1)" class="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1">
+                            <span>Esplora le lame</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Secondo Settenario -->
+                <div class="bg-mystic-900/90 rounded-3xl p-6 border border-indigo-500/30 hover:border-indigo-500/60 transition-all flex flex-col justify-between shadow-xl">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 rounded-xl bg-indigo-500/20 text-indigo-300 text-xs font-bold tracking-wider uppercase">Ciclo II • Lame VIII – XIV</span>
+                            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                                <i data-lucide="scale" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-white mb-2">La Prova Etica e l'Interiorizzazione</h3>
+                        <p class="text-xs text-indigo-200/80 mb-4 font-medium">Maturazione morale, transizione ed equilibrio interiore</p>
+                        <p class="text-sm text-gray-300 leading-relaxed mb-4">
+                            Sposta l'asse verso l'interno. Dalla legge causa-effetto della <strong>Giustizia (VIII)</strong> e la ricerca dell'<strong>Eremita (IX)</strong>, si attraversa il cambio di prospettiva dell'<strong>Appeso (XII)</strong> e il taglio netto della <strong>Morte (XIII)</strong> fino all'alchimia della <strong>Temperanza (XIV)</strong>.
+                        </p>
+                    </div>
+                    <div class="pt-4 border-t border-mystic-700/60 flex items-center justify-between">
+                        <span class="text-xs text-gray-400">7 Lame (VIII - XIV)</span>
+                        <button onclick="filterCardsAndGo(2)" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+                            <span>Esplora le lame</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Terzo Settenario -->
+                <div class="bg-mystic-900/90 rounded-3xl p-6 border border-purple-500/30 hover:border-purple-500/60 transition-all flex flex-col justify-between shadow-xl">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 rounded-xl bg-purple-500/20 text-purple-300 text-xs font-bold tracking-wider uppercase">Ciclo III • Lame XV – XXI</span>
+                            <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400">
+                                <i data-lucide="sun" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-white mb-2">Padronanza Spirituale e Compiutezza</h3>
+                        <p class="text-xs text-purple-200/80 mb-4 font-medium">Confronto con l'Ombra, liberazione dai vincoli e realizzazione</p>
+                        <p class="text-sm text-gray-300 leading-relaxed mb-4">
+                            La fase più avanzata: confronto con l'Ombra del <strong>Diavolo (XV)</strong> e la folgore della <strong>Torre (XVI)</strong>; guarigione nelle <strong>Stelle (XVII)</strong> e traversata nella <strong>Luna (XVIII)</strong>; fino alla luce del <strong>Sole (XIX)</strong>, al risveglio del <strong>Giudizio (XX)</strong> e al trionfo del <strong>Mondo (XXI)</strong>.
+                        </p>
+                    </div>
+                    <div class="pt-4 border-t border-mystic-700/60 flex items-center justify-between">
+                        <span class="text-xs text-gray-400">7 Lame (XV - XXI)</span>
+                        <button onclick="filterCardsAndGo(3)" class="text-xs font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1">
+                            <span>Esplora le lame</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Approfondimento Terzo Settenario (Modulo Avanzato) -->
+            <div class="bg-mystic-900/95 rounded-3xl p-6 sm:p-8 border border-mystic-700 shadow-xl">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-mystic-700/70">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-widest text-mystic-gold">Focus Avanzato</span>
+                        <h3 class="font-serif text-2xl font-bold text-white mt-1">Anatomia del Terzo Settenario (XV – XXI)</h3>
+                    </div>
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-mystic-800 text-xs text-gray-300 border border-mystic-700">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-mystic-gold"></i>
+                        <span>Fase di Svolta e Realizzazione</span>
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <div class="bg-mystic-800/60 rounded-2xl p-5 border border-mystic-700/50">
+                        <div class="text-mystic-gold font-serif font-bold text-base mb-2">1. Rottura delle Catene (XV – XVI)</div>
+                        <p class="text-sm text-gray-300 leading-relaxed">
+                            <strong>Il Diavolo</strong> confronta l'allievo con l'Ombra e i falsi poteri consenzienti. <strong>La Torre</strong> interviene con una folgore liberatoria che abbatte le strutture rigide costruite sull'illusione per ripartire dall'autenticità.
+                        </p>
+                    </div>
+                    <div class="bg-mystic-800/60 rounded-2xl p-5 border border-mystic-700/50">
+                        <div class="text-mystic-gold font-serif font-bold text-base mb-2">2. Guarigione e Inconscio (XVII – XVIII)</div>
+                        <p class="text-sm text-gray-300 leading-relaxed">
+                            <strong>Le Stelle</strong> portano grazia, speranza e connessione col talento originario dopo la tempesta. <strong>La Luna</strong> insegna a navigare le nebbie emotive e le paure ancestrali ascoltando l'intuito profondo.
+                        </p>
+                    </div>
+                    <div class="bg-mystic-800/60 rounded-2xl p-5 border border-mystic-700/50">
+                        <div class="text-mystic-gold font-serif font-bold text-base mb-2">3. Luce e Integrazione (XIX – XXI)</div>
+                        <p class="text-sm text-gray-300 leading-relaxed">
+                            <strong>Il Sole</strong> svela la verità e la gioia radiosa; <strong>Il Giudizio</strong> suona la chiamata al risveglio e al perdono; <strong>Il Mondo</strong> corona la Grande Opera con l'integrazione armonica di tutti i settenari.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Rapido di Autovalutazione dei Cicli -->
+            <div class="bg-gradient-to-r from-mystic-800 to-mystic-900 rounded-3xl p-6 sm:p-8 border border-mystic-gold/30 shadow-xl">
+                <h3 class="font-serif text-xl sm:text-2xl font-bold text-white mb-2">Test di Autovalutazione: In quale Settenario ti trovi?</h3>
+                <p class="text-sm text-gray-300 mb-6">Seleziona la descrizione che risuona maggiormente con la tua situazione attuale o con quella del consultante:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="cycle-quiz">
+                    <button onclick="selectCycleDiagnosis(1)" class="text-left p-5 rounded-2xl bg-mystic-950/70 hover:bg-mystic-800 border border-mystic-700 hover:border-amber-400 transition-all group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Opzione A • Avvio</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 group-hover:text-amber-400"></i>
+                        </div>
+                        <p class="text-sm text-gray-200 font-medium">Sto vivendo un nuovo inizio, cercando la mia direzione o posando le basi di un progetto pratico.</p>
+                    </button>
+
+                    <button onclick="selectCycleDiagnosis(2)" class="text-left p-5 rounded-2xl bg-mystic-950/70 hover:bg-mystic-800 border border-mystic-700 hover:border-indigo-400 transition-all group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Opzione B • Elaborazione</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 group-hover:text-indigo-400"></i>
+                        </div>
+                        <p class="text-sm text-gray-200 font-medium">Sto affrontando blocchi, soste forzate, regole da rispettare o trasformazioni interiori radicali.</p>
+                    </button>
+
+                    <button onclick="selectCycleDiagnosis(3)" class="text-left p-5 rounded-2xl bg-mystic-950/70 hover:bg-mystic-800 border border-mystic-700 hover:border-purple-400 transition-all group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-purple-400">Opzione C • Svolta</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 group-hover:text-purple-400"></i>
+                        </div>
+                        <p class="text-sm text-gray-200 font-medium">Sto recidendo schemi limitanti, affrontando lati d'Ombra o raccogliendo i frutti di un ciclo completo.</p>
+                    </button>
+                </div>
+
+                <!-- Risultato Diagnosi -->
+                <div id="cycle-diagnosis-result" class="hidden mt-6 p-5 rounded-2xl bg-mystic-950 border border-mystic-gold/50 animate-fadeIn">
+                    <!-- Popolato da JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SEZIONE 2: ATLANTE DELLE 22 LAME           -->
+        <!-- ========================================== -->
+        <section id="tab-atlante" class="tab-content hidden space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-mystic-900/90 p-6 rounded-3xl border border-mystic-700">
+                <div>
+                    <h2 class="font-serif text-2xl sm:text-3xl font-bold text-white">Atlante degli Arcani Maggiori</h2>
+                    <p class="text-sm text-gray-400 mt-1">Clicca su una lama per esplorare Simbologia, Significato Profondo e Chiave Previsionale.</p>
+                </div>
+                
+                <!-- Barra di Ricerca e Filtri -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="relative">
+                        <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="card-search" oninput="renderCardsGrid()" placeholder="Cerca arcano o parola chiave..." class="w-full sm:w-64 pl-10 pr-4 py-2.5 rounded-xl bg-mystic-950 border border-mystic-700 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-mystic-gold">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtri Settenario -->
+            <div class="flex flex-wrap gap-2">
+                <button onclick="setSettenarioFilter(0)" id="filter-0" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-mystic-gold text-mystic-950 transition-all">
+                    Tutti (22)
+                </button>
+                <button onclick="setSettenarioFilter(1)" id="filter-1" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-mystic-800 text-gray-300 hover:bg-mystic-700 transition-all">
+                    I Settenario (0 – VII)
+                </button>
+                <button onclick="setSettenarioFilter(2)" id="filter-2" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-mystic-800 text-gray-300 hover:bg-mystic-700 transition-all">
+                    II Settenario (VIII – XIV)
+                </button>
+                <button onclick="setSettenarioFilter(3)" id="filter-3" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-mystic-800 text-gray-300 hover:bg-mystic-700 transition-all">
+                    III Settenario (XV – XXI)
+                </button>
+            </div>
+
+            <!-- Griglia Carte -->
+            <div id="cards-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+                <!-- Popolato dinamicamente via JS -->
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SEZIONE 3: I 3 NODI PRATICI QUOTIDIANI     -->
+        <!-- ========================================== -->
+        <section id="tab-nodi" class="tab-content hidden space-y-8">
+            <div class="bg-mystic-900/90 rounded-3xl p-6 sm:p-8 border border-mystic-700">
+                <span class="text-xs font-bold uppercase tracking-widest text-mystic-gold">Dall'Archetipo alla Vita Quotidiana</span>
+                <h2 class="font-serif text-2xl sm:text-3xl font-bold text-white mt-1 mb-3">I Tre Nodi Fondamentali del Percorso</h2>
+                <p class="text-sm sm:text-base text-gray-300 max-w-3xl">
+                    Come tradurre i grandi concetti archetipici dei Tarocchi in protocolli d'azione concreti di fronte ai blocchi lavorativi, relazionali ed esistenziali.
+                </p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- NODO 1 -->
+                <div class="bg-mystic-900/95 rounded-3xl p-6 sm:p-8 border border-amber-500/30 shadow-xl">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 font-serif font-bold flex items-center justify-center text-lg">1</span>
+                            <div>
+                                <h3 class="font-serif text-xl sm:text-2xl font-bold text-white">Il Nodo dell'Azione: "Sindrome da Foglio Bianco"</h3>
+                                <p class="text-xs text-amber-300 font-medium">Archetipi coinvolti: 0. Il Matto • I. Il Bagatto • II. La Papessa</p>
+                            </div>
+                        </div>
+                        <button onclick="openActionTool('nodo1')" class="px-4 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold flex items-center gap-2 transition-all">
+                            <i data-lucide="play" class="w-4 h-4"></i>
+                            <span>Avvia Test di Alternanza</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                        <div class="bg-mystic-950/60 p-5 rounded-2xl border border-mystic-800">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Il Concetto Alto</h4>
+                            <p class="text-sm text-gray-300 leading-relaxed">
+                                Tensione tra il salto nell'ignoto senza garanzie (<strong>Matto</strong>), l'iniziativa pratica immediata con le risorse disponibili (<strong>Bagatto</strong>) e la gestazione silenziosa che rischia di trasformarsi in accumulo infinito di informazioni (<strong>Papessa</strong>).
+                            </p>
+                        </div>
+                        <div class="bg-mystic-950/60 p-5 rounded-2xl border border-mystic-800">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">La Traduzione Pratica</h4>
+                            <p class="text-sm text-gray-300 leading-relaxed">
+                                Si manifesta quando rinvii un progetto perché "non ti senti pronto", continuando a studiare o cercare rassicurazioni (polarità Papessa) invece di mettere alla prova il tuo talento sul campo (polarità Bagatto).
+                            </p>
+                        </div>
+                        <div class="bg-amber-950/20 p-5 rounded-2xl border border-amber-500/30">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">Applicazione sul Campo</h4>
+                            <ul class="text-sm text-gray-200 space-y-2 list-disc list-inside">
+                                <li><strong>Minima azione di coraggio (Matto):</strong> individua un passo pratico da compiere oggi stesso senza pianificare nei dettagli.</li>
+                                <li><strong>Test di alternanza:</strong> azione pragmatica entro 24 ore (Bagatto) oppure 3 giorni di silenzio e ascolto interiore (Papessa).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NODO 2 -->
+                <div class="bg-mystic-900/95 rounded-3xl p-6 sm:p-8 border border-indigo-500/30 shadow-xl">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 font-serif font-bold flex items-center justify-center text-lg">2</span>
+                            <div>
+                                <h3 class="font-serif text-xl sm:text-2xl font-bold text-white">Il Nodo della Stagnazione: Sosta e Potatura</h3>
+                                <p class="text-xs text-indigo-300 font-medium">Archetipi coinvolti: XII. L'Appeso • XIII. La Morte</p>
+                            </div>
+                        </div>
+                        <button onclick="openActionTool('nodo2')" class="px-4 py-2.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 text-xs font-semibold flex items-center gap-2 transition-all">
+                            <i data-lucide="scissors" class="w-4 h-4"></i>
+                            <span>Strumento di Potatura</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                        <div class="bg-mystic-950/60 p-5 rounded-2xl border border-mystic-800">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Il Concetto Alto</h4>
+                            <p class="text-sm text-gray-300 leading-relaxed">
+                                Il passaggio dalla sosta volontaria o subìta — che richiede di capovolgere il punto di vista e rinunciare al controllo rigido (<strong>L'Appeso</strong>) — al taglio netto che elimina ciò che è obsoleto per consentire la rinascita (<strong>La Morte</strong>).
+                            </p>
+                        </div>
+                        <div class="bg-mystic-950/60 p-5 rounded-2xl border border-mystic-800">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">La Traduzione Pratica</h4>
+                            <p class="text-sm text-gray-300 leading-relaxed">
+                                È la situazione in cui un progetto si blocca, un lavoro ristagna o una relazione non progredisce. L'errore comune è accanirsi cercando di forzare gli eventi con la fretta.
+                            </p>
+                        </div>
+                        <div class="bg-indigo-950/20 p-5 rounded-2xl border border-indigo-500/30">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-2">Applicazione sul Campo</h4>
+                            <ul class="text-sm text-gray-200 space-y-2 list-disc list-inside">
+                                <li><strong>Cambio prospettiva (Appeso):</strong> rendi sacro il tempo chiedendoti: <em>"Guardando questo blocco al contrario, quale priorità ignoro?"</em>.</li>
+                                <li><strong>Potatura (Morte):</strong> recidi abitudini o impegni obsoleti che assorbono energia senza produrre valore.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NODO 3 -->
+                <div class="bg-mystic-900/95 rounded-3xl p-6 sm:p-8 border border-purple-500/30 shadow-xl">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 font-serif font-bold flex items-center justify-center text-lg">3</span>
+                            <div>
+                                <h3 class="font-serif text-xl sm:text-2xl font-bold text-white">Il Nodo delle "Catene Dorate": Falsa Sicurezza</h3>
+                                <p class="text-xs text-purple-300 font-medium">Archetipi coinvolti: XV. Il Diavolo • XVI. La Torre</p>
+                            </div>
+                        </div>
+                        <button onclick="openActionTool('nodo3')" class="px-4 py-2.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 text-xs font-semibold flex items-center gap-2 transition-all">
+                            <i data-lucide="zap" class="w-4 h-4"></i>
+                            <span>Diagnosi dell'Ombra</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                        <div class="bg-mystic-950/60 p-5 rounded-2xl border border-mystic-800">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Il Concetto Alto</h4>
+                            <p class="text-sm text-gray-300 leading-relaxed">
+                                Il confronto con le dipendenze, le dinamiche di potere e gli attaccamenti materiali consenzienti (<strong>Il Diavolo</strong>), seguito dalla scossa improvvisa che abbatte le strutture rigide non più autentiche (<strong>La Torre</strong>).
+                            </p>
+                        </div>
+                        <div class="bg-mystic-950/60 p-5 rounded-2xl border border-mystic-800">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">La Traduzione Pratica</h4>
+                            <p class="text-sm text-gray-300 leading-relaxed">
+                                Rimanere incastrati in una situazione comoda o redditizia (un lavoro soffocante, una routine dipendente) per paura di perdere il controllo o il vantaggio materiale.
+                            </p>
+                        </div>
+                        <div class="bg-purple-950/20 p-5 rounded-2xl border border-purple-500/30">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-purple-400 mb-2">Applicazione sul Campo</h4>
+                            <ul class="text-sm text-gray-200 space-y-2 list-disc list-inside">
+                                <li><strong>Diagnosi dell'Ombra (Diavolo):</strong> riconosci dove cedi autonomia in cambio di sicurezza immediata.</li>
+                                <li><strong>Gestione della crisi (Torre):</strong> se una struttura crolla, non ricostruire vecchie illusioni; accogli la rottura come liberazione catartica.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SEZIONE 4: LABORATORIO PRATICO & STESE     -->
+        <!-- ========================================== -->
+        <section id="tab-laboratorio" class="tab-content hidden space-y-8">
+            <!-- Header Laboratorio -->
+            <div class="bg-mystic-900/90 rounded-3xl p-6 sm:p-8 border border-mystic-700 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-mystic-gold">Esercizi Pratici del Corso</span>
+                    <h2 class="font-serif text-2xl sm:text-3xl font-bold text-white mt-1">Laboratorio Interattivo di Consultazione</h2>
+                    <p class="text-sm text-gray-300 mt-2 max-w-2xl">
+                        Metti in pratica gli esercizi ufficiali della dispensa: estrai una carta singola per allenare il riconoscimento dei settenari, esegui la stesa delle tre fasi, o risolvi il bivio Bagatto/Papessa.
+                    </p>
+                </div>
+
+                <!-- Selettore Modalità Esercizio -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="setLabMode('tre-fasi')" id="lab-btn-tre-fasi" class="lab-mode-btn px-4 py-3 rounded-xl text-xs sm:text-sm font-semibold bg-mystic-gold text-mystic-950 shadow-lg transition-all">
+                        Stesa delle Tre Fasi
+                    </button>
+                    <button onclick="setLabMode('tris-settenari')" id="lab-btn-tris-settenari" class="lab-mode-btn px-4 py-3 rounded-xl text-xs sm:text-sm font-semibold bg-mystic-800 text-gray-200 hover:bg-mystic-700 border border-mystic-700 transition-all">
+                        Esercizio A: Carta Singola
+                    </button>
+                    <button onclick="setLabMode('diade')" id="lab-btn-diade" class="lab-mode-btn px-4 py-3 rounded-xl text-xs sm:text-sm font-semibold bg-mystic-800 text-gray-200 hover:bg-mystic-700 border border-mystic-700 transition-all">
+                        Bagatto vs Papessa
+                    </button>
+                    <button onclick="setLabMode('carro')" id="lab-btn-carro" class="lab-mode-btn px-4 py-3 rounded-xl text-xs sm:text-sm font-semibold bg-mystic-800 text-gray-200 hover:bg-mystic-700 border border-mystic-700 transition-all">
+                        Sblocco del Carro
+                    </button>
+                </div>
+            </div>
+
+            <!-- Area Interattiva del Laboratorio -->
+            <div class="bg-mystic-950/90 rounded-3xl p-6 sm:p-10 border border-mystic-700/80 shadow-2xl min-h-[460px] flex flex-col justify-between">
+                
+                <!-- Descrizione Esercizio Attivo -->
+                <div id="lab-header-info" class="text-center max-w-2xl mx-auto mb-8">
+                    <!-- Popolato da JS -->
+                </div>
+
+                <!-- Tavolo da Gioco / Carte Estratte -->
+                <div id="lab-stage" class="flex-grow flex items-center justify-center my-4">
+                    <!-- Popolato da JS -->
+                </div>
+
+                <!-- Controlli e Azioni -->
+                <div class="mt-8 pt-6 border-t border-mystic-800 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <button onclick="executeLabDraw()" id="lab-draw-btn" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-mystic-gold to-amber-500 hover:from-amber-400 hover:to-mystic-gold text-mystic-950 font-bold text-sm tracking-wide shadow-lg transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="shuffle" class="w-5 h-5"></i>
+                        <span>Mescola ed Estrai</span>
+                    </button>
+                    <button onclick="copyReadingToClipboard()" id="lab-copy-btn" class="hidden w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-mystic-800 hover:bg-mystic-700 text-gray-200 border border-mystic-600 font-medium text-sm transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                        <span>Copia Sintesi Lettura</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quaderno degli Appunti dell'Allievo -->
+            <div class="bg-mystic-900/90 rounded-3xl p-6 sm:p-8 border border-mystic-700">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2.5">
+                        <i data-lucide="pen-tool" class="w-5 h-5 text-mystic-gold"></i>
+                        <h3 class="font-serif text-lg sm:text-xl font-bold text-white">Diario di Pratica dell'Allievo</h3>
+                    </div>
+                    <span id="notes-saved-badge" class="text-xs text-emerald-400 opacity-0 transition-opacity">Salvato localmente</span>
+                </div>
+                <p class="text-xs text-gray-400 mb-3">Annota qui la tua "minima azione di coraggio" del Matto, i tuoi "rami secchi" da potare o le tue riflessioni sulle stese effettuate.</p>
+                <textarea id="student-notes" oninput="saveStudentNotes()" rows="4" placeholder="Scrivi qui le tue intuizioni, la domanda della stesa o l'azione pratica da compiere oggi..." class="w-full p-4 rounded-2xl bg-mystic-950 border border-mystic-700 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-mystic-gold"></textarea>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-mystic-950 border-t border-mystic-800/80 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+            <div class="flex items-center gap-2">
+                <span class="text-mystic-gold font-serif font-bold">TAROT ITALIA</span>
+                <span>• Dispensa Formativa Interattiva — Corso Arcani Maggiori (Primo Step)</span>
+            </div>
+            <div>
+                <span>Mappa evolutiva dei Tre Settenari (Lame 0 – XXI)</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- MODALE DETTAGLIO CARTA                     -->
+    <!-- ========================================== -->
+    <div id="card-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-mystic-900 border border-mystic-gold/50 rounded-3xl max-w-2xl w-full p-6 sm:p-8 relative shadow-2xl my-auto">
+            <button onclick="closeCardModal()" class="absolute top-5 right-5 p-2 rounded-xl bg-mystic-800 hover:bg-mystic-700 text-gray-400 hover:text-white transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div id="modal-body">
+                <!-- Contenuto inserito dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODALE STRUMENTO PRATICO DEI 3 NODI        -->
+    <!-- ========================================== -->
+    <div id="tool-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-mystic-900 border border-mystic-gold/50 rounded-3xl max-w-xl w-full p-6 sm:p-8 relative shadow-2xl my-auto">
+            <button onclick="closeToolModal()" class="absolute top-5 right-5 p-2 rounded-xl bg-mystic-800 hover:bg-mystic-700 text-gray-400 hover:text-white transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div id="tool-modal-body">
+                <!-- Contenuto inserito dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification (Mai usare alert()) -->
+    <div id="toast" class="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] left-4 right-4 sm:left-auto sm:right-5 sm:max-w-sm z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-mystic-800 border border-mystic-gold text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-sm">
+        <i data-lucide="check-circle-2" class="w-5 h-5 text-mystic-gold"></i>
+        <span id="toast-message">Operazione completata</span>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- LOGICA JAVASCRIPT                          -->
+    <!-- ========================================== -->
+    <script>
+        // Database completo delle 22 Lame dei Tre Settenari
+        const ARCANI_DATA = [
+            // PRIMO SETTENARIO (0 - VII)
+            {
+                id: 0,
+                roman: "0",
+                name: "Il Matto",
+                subtitle: "L'Inizio Non Condizionato",
+                settenario: 1,
+                settenarioName: "Primo Settenario • Identità",
+                icon: "footprints",
+                color: "amber",
+                simbologia: "Rappresenta la soglia collocata al di fuori della numerazione sequenziale. È il passo sul precipizio, il principio di libertà assoluta e incontaminata che precede ogni schema, regola o sovrastruttura mentale.",
+                significato: "Incarna lo slancio genuino, l'apertura incondizionata al nuovo, il coraggio di slegarsi dai condizionamenti passati e la totale fiducia nel cammino interiore. Ricorda che ogni inizio autentico richiede il rischio dell'ignoto.",
+                previsionale: "Indica un cambiamento improvviso di rotta, una partenza imminente, un salto di fiducia o una novità inattesa. Invita a non cercare garanzie logiche ma ad affidarsi all'istinto pionieristico."
+            },
+            {
+                id: 1,
+                roman: "I",
+                name: "Il Bagatto",
+                subtitle: "L'Iniziativa e il Talento all'Opera",
+                settenario: 1,
+                settenarioName: "Primo Settenario • Identità",
+                icon: "wand",
+                color: "amber",
+                simbologia: "Situato alla guida della numerazione, dispone sul proprio banco di lavoro di tutti gli strumenti primari (bastoni, coppe, spade e denari). È il padrone delle risorse operative per cominciare subito.",
+                significato: "Rappresenta l'iniziativa immediata, il talento allo stato puro, la destrezza e la capacità di attivare i processi con le risorse già disponibili, senza attendere condizioni ideali.",
+                previsionale: "Sollecita l'azione pratica e immediata. È l'invito a mettere le mani in pasta, sfruttare le proprie abilità pratiche e concretizzare un progetto entro le prossime 24 ore."
+            },
+            {
+                id: 2,
+                roman: "II",
+                name: "La Papessa",
+                subtitle: "La Gestazione e la Saggezza del Silenzio",
+                settenario: 1,
+                settenarioName: "Primo Settenario • Identità",
+                icon: "book-closed",
+                color: "amber",
+                simbologia: "Seduta immobile e velata tra i pilastri del tempio, con il sacro libro chiuso o socchiuso sulle ginocchia, custodisce la conoscenza sottile senza agire all'esterno.",
+                significato: "Incarna la gestazione silenziosa, la verità intuita prima di essere verbalizzata, la sapienza del tempo e l'attesa fertile. Insegna che ogni vera creazione richiede raccoglimento.",
+                previsionale: "Indica che non è il momento di agire o esporre idee all'esterno. Invita a custodire il segreto, studiare, riflettere e concedersi tempo di ascolto interiore prima di decidere."
+            },
+            {
+                id: 3,
+                roman: "III",
+                name: "L'Imperatrice",
+                subtitle: "La Fioritura Creativa e l'Abbondanza",
+                settenario: 1,
+                settenarioName: "Primo Settenario • Identità",
+                icon: "sprout",
+                color: "amber",
+                simbologia: "Incarna la fioritura sensibile, l'abbondanza generativa e la capacità di dare forma e vita alle idee attraverso l'espressività, la comunicazione e la cura fertile dei progetti.",
+                significato: "Rappresenta la vitalità rigogliosa, l'espressione senza vincoli della creatività, il potere generativo della parola e l'armonia che trasforma l'impulso iniziale in manifestazione ricca.",
+                previsionale: "Indica espansione prospera, intese riuscite, fioritura di nuove idee, fecondità nei progetti e grande armonia relazionale."
+            },
+            {
+                id: 4,
+                roman: "IV",
+                name: "L'Imperatore",
+                subtitle: "La Stabilità Strutturale e il Metodo",
+                settenario: 1,
+                settenarioName: "Primo Settenario • Identità",
+                icon: "shield",
+                color: "amber",
+                simbologia: "Figura di autorità e concretezza assisa su un trono cubico, incarna la stabilità, il metodo rigoroso, la costruzione di confini solidi e la gestione organizzata del mondo materiale.",
+                significato: "Rappresenta l'autorità saggia, la protezione, la capacità di governare la realtà senza tentennamenti e la forza strutturale necessaria per dare durata e confini certi a quanto creato.",
+                previsionale: "Segnala consolidamento di progetti lavorativi o finanziari, affermazione di basi solide, presenza di un referente autorevole e gestione metodica della materia."
+            },
+            {
+                id: 5,
+                roman: "V",
+                name: "Il Papa",
+                subtitle: "Il Patto Etico e la Guida Spettabile",
+                settenario: 1,
+                settenarioName: "Primo Settenario • Identità",
+                icon: "key",
+                color: "amber",
+                simbologia: "Si propone come la guida spirituale o professionale, il maestro che trasmette valori condivisi e facilita l'adesione a regole affidabili e principi codificati.",
+                significato: "Incarna il patto etico, la trasmissione della sapienza, la mediazione illuminata e l'alleanza tra le aspirazioni individuali e la struttura sociale.",
+                previsionale: "Segnala contratti chiari e trasparenti, mediazioni riuscite, consulenze autorevoli, alleanze basate sulla fiducia reciproca e rispetto delle norme etiche."
+            },
+            {
+                id: 6,
+                roman: "VI",
+                name: "Gli Innamorati",
+                subtitle: "Il Bivio Fondamentale e la Scelta del Cuore",
+                settenario: 1,
+                settenarioName: "Primo Settenario • Identità",
+                icon: "heart",
+                color: "amber",
+                simbologia: "Mostrano la figura umana al bivio fondamentale, di fronte all'incontro, all'affetto e alla responsabilità della decisione sotto la benedizione dell'angelo.",
+                significato: "Rappresenta la scelta consapevole del cuore e l'assunzione di responsabilità verso la propria direzione emotiva ed esistenziale. Richiede di optare con convinzione per una strada.",
+                previsionale: "Indica decisioni sentimentali o professionali ineludibili, la necessità di compiere una scelta d'amore o di valore chiara e l'allineamento con i propri desideri profondi."
+            },
+            {
+                id: 7,
+                roman: "VII",
+                name: "Il Carro",
+                subtitle: "L'Azione Coordinata e la Vittoria Disciplinata",
+                settenario: 1,
+                settenarioName: "Primo Settenario • Identità",
+                icon: "compass",
+                color: "amber",
+                simbologia: "Il condottiero alla guida del Carro trionfale governa con maestria e disciplina le forze opposte (le due sfingi o cavalli) che muovono il veicolo.",
+                significato: "Rappresenta l'azione coordinata, il controllo sapiente e consapevole delle polarità energetiche e la vittoria conseguita grazie alla determinazione e al rigore.",
+                previsionale: "Annuncia lo sblocco rapido di trattative o situazioni stagnanti, viaggi, spostamenti materiali e un'accelerazione decisiva e trionfante verso i propri obiettivi."
+            },
+
+            // SECONDO SETTENARIO (VIII - XIV)
+            {
+                id: 8,
+                roman: "VIII",
+                name: "La Giustizia",
+                subtitle: "L'Ordine, la Misura e Causa-Effetto",
+                settenario: 2,
+                settenarioName: "Secondo Settenario • Prova Etica",
+                icon: "scale",
+                color: "indigo",
+                simbologia: "Figura regale assisa in trono, con la spada verticale nella mano destra e la bilancia in equilibrio nella sinistra. Rappresenta l'ordine cosmico e l'imparzialità.",
+                significato: "Responsabilità, onestà intellettuale, giusto equilibrio e rigore etico. Ricorda che ogni azione genera una conseguenza inevitabile e la chiarezza mentale deve guidare l'emotività.",
+                previsionale: "Indica la risoluzione di questioni legali o burocratiche, la firma di contratti equi, la necessità di fare ordine o l'arrivo di una risposta meritata e oggettiva."
+            },
+            {
+                id: 9,
+                roman: "IX",
+                name: "L'Eremita",
+                subtitle: "La Luce Interiore e il Tempo della Ricerca",
+                settenario: 2,
+                settenarioName: "Secondo Settenario • Prova Etica",
+                icon: "lamp",
+                color: "indigo",
+                simbologia: "Un vecchio saggio avvolto nel mantello cammina lentamente nella notte, sorreggendo una lanterna accesa per illuminare il cammino e proteggere la luce.",
+                significato: "Raccoglimento, solitudine rigenerante, ricerca della verità interiore e prudenza. Rappresenta il distacco temporaneo dal frastuono esterno per trovare risposte autentiche.",
+                previsionale: "Segnala un periodo di rallentamento, studio approfondito, introspezione o la necessità di procedere con estrema cautela e riserbo, senza affrettare i tempi."
+            },
+            {
+                id: 10,
+                roman: "X",
+                name: "La Ruota di Fortuna",
+                subtitle: "Il Ciclo, il Mutamento e l'Imprevisto",
+                settenario: 2,
+                settenarioName: "Secondo Settenario • Prova Etica",
+                icon: "refresh-cw",
+                color: "indigo",
+                simbologia: "Una ruota in movimento circondata da figure in evoluzione, simbolo dello scorrere dei cicli vitali e della mutevolezza delle circostanze terrene.",
+                significato: "Accettazione del cambiamento, ciclicità dell'esistenza e sblocco della stagnazione. Insegna ad adattarsi con flessibilità alle correnti del destino.",
+                previsionale: "Annuncia una svolta improvvisa, un colpo di scena fortunato, l'avvio di un nuovo ciclo o il rapido ribaltamento di una situazione bloccata."
+            },
+            {
+                id: 11,
+                roman: "XI",
+                name: "La Forza",
+                subtitle: "Il Dominio Istintivo e il Coraggio Gentile",
+                settenario: 2,
+                settenarioName: "Secondo Settenario • Prova Etica",
+                icon: "flame",
+                color: "indigo",
+                simbologia: "Una donna apre o chiude con dolcezza e fermezza le fauci di un leone, senza ricorrere alla violenza o alla coercizione.",
+                significato: "Dominio delle passioni tramite la consapevolezza, coraggio interiore, pazienza e gestione saggia dell'energia vitale. Integrare gli impulsi anziché reprimerli.",
+                previsionale: "Indica la capacità di superare una prova complessa grazie alla determinazione e all'autocontrollo, riportando armonia nelle tensioni."
+            },
+            {
+                id: 12,
+                roman: "XII",
+                name: "L'Appeso",
+                subtitle: "La Sosta Volontaria e il Cambio di Prospettiva",
+                settenario: 2,
+                settenarioName: "Secondo Settenario • Prova Etica",
+                icon: "rotate-ccw",
+                color: "indigo",
+                simbologia: "Figura sospesa a testa in giù per una caviglia, con espressione serena mentre l'energia fluisce verso l'alto e il mondo appare capovolto.",
+                significato: "Sosta necessaria, sacrificio inteso come 'rendere sacro', rinuncia al controllo rigido e capovolgimento del punto di vista per cogliere sfumature inedite.",
+                previsionale: "Segnala un momentaneo blocco o un'attesa inevitabile utile a riconsiderare le priorità, lasciando andare la fretta e accettando la pausa."
+            },
+            {
+                id: 13,
+                roman: "XIII",
+                name: "La Morte",
+                subtitle: "L'Arcano Senza Nome • Trasmutazione",
+                settenario: 2,
+                settenarioName: "Secondo Settenario • Prova Etica",
+                icon: "scissors",
+                color: "indigo",
+                simbologia: "Uno scheletro falcia il terreno nero da cui emergono germogli e forme umane. Rappresenta la potatura indispensabile alla vita.",
+                significato: "Fine radicale di un ciclo, distacco da ciò che è obsoleto, trasformazione profonda e rinascita interiore per fare spazio al nuovo.",
+                previsionale: "Preannuncia una chiusura netta e un cambiamento drastico ineludibile che, se accolto senza resistenza, apre a un rinnovamento totale."
+            },
+            {
+                id: 14,
+                roman: "XIV",
+                name: "La Temperanza",
+                subtitle: "L'Alchimia Quotidiana e la Moderazione",
+                settenario: 2,
+                settenarioName: "Secondo Settenario • Prova Etica",
+                icon: "droplets",
+                color: "indigo",
+                simbologia: "Figura alata che travasa dolcemente liquido tra due vasi, generando un flusso continuo di armonia tra elementi opposti.",
+                significato: "Misura, guarigione, pazienza alchemica, riconciliazione e capacità di trovare il compromesso e la pace interiore.",
+                previsionale: "Indica la risoluzione pacifica dei conflitti, cure efficaci, tempi di recupero fluidi e una fase di stabilizzazione in cui regna la cooperazione."
+            },
+
+            // TERZO SETTENARIO (XV - XXI)
+            {
+                id: 15,
+                roman: "XV",
+                name: "Il Diavolo",
+                subtitle: "L'Ombra, la Materia e il Fascino del Potere",
+                settenario: 3,
+                settenarioName: "Terzo Settenario • Padronanza",
+                icon: "link",
+                color: "purple",
+                simbologia: "Creatura alata con tratti bestiali che domina su due figure incatenate a un basamento, legate in modo blando ma consenziente.",
+                significato: "Confronto con l'Ombra, attaccamento smodato alla materia, passioni viscerali, denaro, dipendenze e falsi poteri. Invita a riconoscere i desideri inconsci.",
+                previsionale: "Segnala forti passioni, dinamiche di potere o manipolazione, profitto materiale, ma anche la necessità imperativa di liberarsi da legami tossici."
+            },
+            {
+                id: 16,
+                roman: "XVI",
+                name: "La Torre",
+                subtitle: "La Folgore, il Crollo e la Liberazione",
+                settenario: 3,
+                settenarioName: "Terzo Settenario • Padronanza",
+                icon: "zap",
+                color: "purple",
+                simbologia: "Una torre merlata colpita da un fulmine infuocato che fa saltare la corona, mentre due figure precipitano circondate da scintille.",
+                significato: "Rottura improvvisa delle false certezze, crollo delle strutture rigide non più aderenti alla verità interiore e liberazione catartica attraverso la crisi.",
+                previsionale: "Annuncia un cambiamento drastico e inatteso che rompe la stagnazione e libera nuove energie per ricostruire su basi autentiche."
+            },
+            {
+                id: 17,
+                roman: "XVII",
+                name: "Le Stelle",
+                subtitle: "La Speranza, l'Ispirazione e la Guarigione",
+                settenario: 3,
+                settenarioName: "Terzo Settenario • Padronanza",
+                icon: "sparkles",
+                color: "purple",
+                simbologia: "Figura nuda inginocchiata che versa linfa vitale su terra e acqua, sotto un cielo notturno illuminato da grandi stelle radiose.",
+                significato: "Guida celeste, fiducia nel futuro, chiarezza d'intenti, ispirazione artistica e intuitiva, guarigione dopo la tempesta della Torre.",
+                previsionale: "Indica serenità ritrovata, prospettive favorevoli, successo creativo, protezione e conferma della bontà del cammino intrapreso."
+            },
+            {
+                id: 18,
+                roman: "XVIII",
+                name: "La Luna",
+                subtitle: "L'Inconscio, le Illusioni e la Notte",
+                settenario: 3,
+                settenarioName: "Terzo Settenario • Padronanza",
+                icon: "moon",
+                color: "purple",
+                simbologia: "La Luna piena splende nel cielo umido mentre un gambero emerge dalle acque profonde e due lupi ululano davanti a torri lontane.",
+                significato: "Regno dell'inconscio, sogni, paure ancestrali, intuito viscerale ma anche illusioni e nebbie emotive da attraversare con la luce interiore.",
+                previsionale: "Incertezza, segreti nascosti, malintesi o necessità di procedere ascoltando l'istinto profondo senza farsi paralizzare dalle ansie."
+            },
+            {
+                id: 19,
+                roman: "XIX",
+                name: "Il Sole",
+                subtitle: "La Chiarezza, la Gioia e la Realizzazione",
+                settenario: 3,
+                settenarioName: "Terzo Settenario • Padronanza",
+                icon: "sun",
+                color: "purple",
+                simbologia: "Grande Sole radioso che illumina due bambini festosi che giocano in un prato fiorito davanti a un muretto.",
+                significato: "Verità svelata, gioia di vivere, trasparenza, calore umano, successo pubblico e piena espressione della vitalità cosciente.",
+                previsionale: "Garantisce successo, chiarezza nei rapporti, accordi fortunati, vitalità e trionfo di un progetto portato alla luce."
+            },
+            {
+                id: 20,
+                roman: "XX",
+                name: "Il Giudizio",
+                subtitle: "La Chiamata, il Risveglio e il Rinnovamento",
+                settenario: 3,
+                settenarioName: "Terzo Settenario • Padronanza",
+                icon: "bell-ring",
+                color: "purple",
+                simbologia: "Un angelo suona la tromba celeste e figure umane emergono dai sepolcri con le braccia aperte verso l'alto.",
+                significato: "Chiamata alla consapevolezza, risveglio spirituale, perdono verso se stessi e gli altri, e liberazione dai vecchi giudizi limitanti.",
+                previsionale: "Svolta decisiva legata a una presa di coscienza, arrivo di notizie importanti o riconciliazione che rinnova l'esistenza."
+            },
+            {
+                id: 21,
+                roman: "XXI",
+                name: "Il Mondo",
+                subtitle: "La Compiutezza e il Cerchio Perfetto",
+                settenario: 3,
+                settenarioName: "Terzo Settenario • Padronanza",
+                icon: "globe",
+                color: "purple",
+                simbologia: "Figura femminile danzante all'interno di una mandorla di foglie, circondata dai quattro viventi simbolici (Toro, Leone, Aquila, Angelo).",
+                significato: "Compimento della Grande Opera, integrazione totale delle esperienze dei tre settenari, realizzazione degli obiettivi e perfetta armonia universale.",
+                previsionale: "Segnala successo totale, chiusura trionfante di un ciclo professionale o di studio, viaggi internazionali e massima espansione."
+            }
+        ];
+
+        // Stato globale dell'applicazione
+        let currentTab = 'dispensa';
+        let currentSettenarioFilter = 0;
+        let currentLabMode = 'tre-fasi';
+        let lastReadingText = '';
+
+        // Inizializzazione al caricamento
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderCardsGrid();
+            setLabMode('tre-fasi');
+            loadStudentNotes();
+        });
+
+        // Gestione Tab di Navigazione
+        function switchTab(tabId) {
+            currentTab = tabId;
+            
+            // Nascondi tutte le sezioni
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+            
+            // Mostra la sezione selezionata
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            // Aggiorna stili bottoni Desktop
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-4 py-2.5 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-mystic-800/60 transition-all flex items-center gap-2";
+            });
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.className = "nav-btn px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2 bg-mystic-800 text-mystic-gold border border-mystic-gold/40";
+            }
+
+            // Aggiorna stili bottoni Mobile
+            ['dispensa', 'atlante', 'nodi', 'laboratorio'].forEach(id => {
+                const mobBtn = document.getElementById(`mob-${id}`);
+                if (mobBtn) {
+                    mobBtn.className = id === tabId 
+                        ? "w-full text-left px-4 py-3 rounded-xl text-sm font-medium bg-mystic-800 text-mystic-gold flex items-center gap-3"
+                        : "w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:bg-mystic-800 flex items-center gap-3";
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            lucide.createIcons();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Funzione ponte dalla dispensa all'atlante filtrato
+        function filterCardsAndGo(settenarioNum) {
+            switchTab('atlante');
+            setSettenarioFilter(settenarioNum);
+        }
+
+        // ==========================================
+        // TEST AUTOVALUTAZIONE DEI CICLI (DISPENSA)
+        // ==========================================
+        function selectCycleDiagnosis(cycle) {
+            const box = document.getElementById('cycle-diagnosis-result');
+            let content = '';
+
+            if (cycle === 1) {
+                content = `
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-1">
+                            <i data-lucide="compass" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-serif font-bold text-amber-400 text-lg">Risuona il Primo Settenario (Lame 0 – VII)</h4>
+                            <p class="text-sm text-gray-300 mt-1 leading-relaxed">
+                                Ti trovi nella <strong>Fase di Avvio e Costruzione dell'Identità</strong>. Analizza l'energia del <strong>Matto (0)</strong> per superare la paura dell'ignoto, bilancia <strong>Bagatto (I)</strong> e <strong>Papessa (II)</strong> per evitare la paralisi da studio infinito, e punta alla direzione disciplinata del <strong>Carro (VII)</strong>.
+                            </p>
+                            <button onclick="filterCardsAndGo(1)" class="mt-3 text-xs font-semibold text-amber-300 underline hover:text-amber-200">Vai alle carte del Primo Settenario →</button>
+                        </div>
+                    </div>
+                `;
+            } else if (cycle === 2) {
+                content = `
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 mt-1">
+                            <i data-lucide="scale" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-serif font-bold text-indigo-400 text-lg">Risuona il Secondo Settenario (Lame VIII – XIV)</h4>
+                            <p class="text-sm text-gray-300 mt-1 leading-relaxed">
+                                Ti trovi nella <strong>Fase di Scelta ed Elaborazione Interiore</strong>. Approfondisci la lezione dell'<strong>Eremita (IX)</strong> per ascoltare la tua luce interna, accetta la sosta dell'<strong>Appeso (XII)</strong> capovolgendo la prospettiva e pratica la potatura della <strong>Morte (XIII)</strong> per giungere all'equilibrio della <strong>Temperanza (XIV)</strong>.
+                            </p>
+                            <button onclick="filterCardsAndGo(2)" class="mt-3 text-xs font-semibold text-indigo-300 underline hover:text-indigo-200">Vai alle carte del Secondo Settenario →</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content = `
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 mt-1">
+                            <i data-lucide="sun" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-serif font-bold text-purple-400 text-lg">Risuona il Terzo Settenario (Lame XV – XXI)</h4>
+                            <p class="text-sm text-gray-300 mt-1 leading-relaxed">
+                                Ti trovi nella <strong>Fase di Svolta e Realizzazione</strong>. Osserva dove il <strong>Diavolo (XV)</strong> crea attaccamenti o falsi poteri, accogli la scossa autentica della <strong>Torre (XVI)</strong> e orientati verso la chiarezza del <strong>Sole (XIX)</strong> e il compimento del <strong>Mondo (XXI)</strong>.
+                            </p>
+                            <button onclick="filterCardsAndGo(3)" class="mt-3 text-xs font-semibold text-purple-300 underline hover:text-purple-200">Vai alle carte del Terzo Settenario →</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            box.innerHTML = content;
+            box.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // RENDERING GRIGLIA ATLANTE 22 LAME
+        // ==========================================
+        function setSettenarioFilter(num) {
+            currentSettenarioFilter = num;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = "filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-mystic-800 text-gray-300 hover:bg-mystic-700 transition-all";
+            });
+            document.getElementById(`filter-${num}`).className = "filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-mystic-gold text-mystic-950 transition-all";
+            renderCardsGrid();
+        }
+
+        function renderCardsGrid() {
+            const grid = document.getElementById('cards-grid');
+            const query = document.getElementById('card-search').value.toLowerCase().trim();
+
+            const filtered = ARCANI_DATA.filter(card => {
+                const matchSettenario = currentSettenarioFilter === 0 || card.settenario === currentSettenarioFilter;
+                const matchQuery = !query || 
+                    card.name.toLowerCase().includes(query) || 
+                    card.subtitle.toLowerCase().includes(query) ||
+                    card.significato.toLowerCase().includes(query) ||
+                    card.roman.toLowerCase() === query;
+                return matchSettenario && matchQuery;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-mystic-900/60 rounded-3xl border border-mystic-800">
+                        <p class="text-gray-400 text-sm">Nessun arcano trovato per la ricerca "${query}".</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(card => {
+                const badgeColors = {
+                    amber: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                    indigo: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+                    purple: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                };
+                const borderHover = {
+                    amber: 'hover:border-amber-400/70',
+                    indigo: 'hover:border-indigo-400/70',
+                    purple: 'hover:border-purple-400/70'
+                };
+
+                return `
+                    <div onclick="openCardModal(${card.id})" class="group cursor-pointer bg-gradient-to-b from-mystic-800 to-mystic-950 rounded-2xl p-4 border border-mystic-700/80 ${borderHover[card.color]} transition-all duration-300 flex flex-col justify-between aspect-[3/4] relative overflow-hidden gold-glow">
+                        <!-- Cornice interna decorativa -->
+                        <div class="absolute inset-2 border border-mystic-gold/20 rounded-xl pointer-events-none group-hover:border-mystic-gold/50 transition-colors"></div>
+                        
+                        <!-- Numero Romano Top -->
+                        <div class="text-center z-10 pt-1">
+                            <span class="font-serif font-bold text-base sm:text-lg text-mystic-gold tracking-widest">${card.roman}</span>
+                        </div>
+
+                        <!-- Icona Centrale -->
+                        <div class="my-auto flex flex-col items-center justify-center z-10">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-mystic-950/80 border border-mystic-700 flex items-center justify-center text-mystic-goldLight group-hover:scale-110 transition-transform">
+                                <i data-lucide="${card.icon}" class="w-6 h-6 sm:w-7 sm:h-7"></i>
+                            </div>
+                        </div>
+
+                        <!-- Titolo & Settenario Bottom -->
+                        <div class="text-center z-10 pb-1">
+                            <h3 class="font-serif font-bold text-xs sm:text-sm text-white group-hover:text-mystic-gold transition-colors line-clamp-1">${card.name}</h3>
+                            <span class="inline-block mt-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium border ${badgeColors[card.color]}">
+                                ${card.settenario}° Settenario
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        // Modale Dettaglio Singola Carta
+        function openCardModal(id) {
+            const card = ARCANI_DATA.find(c => c.id === id);
+            if (!card) return;
+
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = `
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-2xl bg-mystic-800 border border-mystic-gold/50 flex items-center justify-center text-mystic-gold shrink-0">
+                        <i data-lucide="${card.icon}" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-serif font-bold text-mystic-gold text-lg">${card.roman}.</span>
+                            <h3 class="font-serif font-bold text-2xl text-white">${card.name}</h3>
+                        </div>
+                        <p class="text-xs text-mystic-goldLight font-medium">${card.subtitle} • ${card.settenarioName}</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="bg-mystic-950/80 p-4 rounded-2xl border border-mystic-800">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-mystic-gold mb-1.5 flex items-center gap-1.5">
+                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                            <span>Simbologia ed Essenza</span>
+                        </h4>
+                        <p class="text-sm text-gray-300 leading-relaxed">${card.simbologia}</p>
+                    </div>
+
+                    <div class="bg-mystic-950/80 p-4 rounded-2xl border border-mystic-800">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-mystic-gold mb-1.5 flex items-center gap-1.5">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                            <span>Significato Profondo</span>
+                        </h4>
+                        <p class="text-sm text-gray-300 leading-relaxed">${card.significato}</p>
+                    </div>
+
+                    <div class="bg-mystic-800/60 p-4 rounded-2xl border border-mystic-gold/30">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-amber-300 mb-1.5 flex items-center gap-1.5">
+                            <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+                            <span>In Chiave Previsionale</span>
+                        </h4>
+                        <p class="text-sm text-white leading-relaxed">${card.previsionale}</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('card-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeCardModal() {
+            document.getElementById('card-modal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // STRUMENTI INTERATTIVI DEI 3 NODI
+        // ==========================================
+        function openActionTool(nodoId) {
+            const body = document.getElementById('tool-modal-body');
+            if (nodoId === 'nodo1') {
+                body.innerHTML = `
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Protocollo Nodo 1</span>
+                    <h3 class="font-serif text-2xl font-bold text-white mt-1 mb-3">Test di Alternanza: Bagatto vs Papessa</h3>
+                    <p class="text-sm text-gray-300 mb-5">Pensa al progetto che stai rimandando per "sindrome da foglio bianco". Estrai la polarità dominante per sbloccarti oggi stesso.</p>
+                    <div id="nodo1-result" class="p-5 rounded-2xl bg-mystic-950 border border-mystic-800 text-center mb-5">
+                        <p class="text-sm text-gray-400">Premi il pulsante qui sotto per consultare la diade creativa.</p>
+                    </div>
+                    <button onclick="runNodo1Test()" class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-mystic-950 font-bold text-sm transition-all">
+                        Estrai tra Bagatto (I) e Papessa (II)
+                    </button>
+                `;
+            } else if (nodoId === 'nodo2') {
+                body.innerHTML = `
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Protocollo Nodo 2</span>
+                    <h3 class="font-serif text-2xl font-bold text-white mt-1 mb-3">Cambio Prospettiva & Potatura</h3>
+                    <p class="text-sm text-gray-300 mb-4">Applica l'esercizio dell'Appeso (XII) e della Morte (XIII) a una situazione stagnante:</p>
+                    <div class="space-y-4">
+                        <div class="p-4 rounded-2xl bg-mystic-950 border border-indigo-500/30">
+                            <div class="text-xs font-bold text-indigo-300 uppercase mb-1">1. Domanda dell'Appeso (XII)</div>
+                            <p class="text-sm text-white italic">"Se guardassi questo blocco al contrario, quale priorità fondamentale sto ignorando?"</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-mystic-950 border border-indigo-500/30">
+                            <div class="text-xs font-bold text-indigo-300 uppercase mb-1">2. Ramo secco da potare (XIII)</div>
+                            <input type="text" id="ramo-secco-input" placeholder="Scrivi un'abitudine o impegno obsoleto da tagliare..." class="w-full mt-2 p-3 rounded-xl bg-mystic-900 border border-mystic-700 text-sm text-white">
+                        </div>
+                        <button onclick="saveRamoSecco()" class="w-full py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-sm transition-all">
+                            Registra nel Diario di Pratica
+                        </button>
+                    </div>
+                `;
+            } else {
+                body.innerHTML = `
+                    <span class="text-xs font-bold uppercase tracking-wider text-purple-400">Protocollo Nodo 3</span>
+                    <h3 class="font-serif text-2xl font-bold text-white mt-1 mb-3">Diagnosi delle Catene Dorate</h3>
+                    <p class="text-sm text-gray-300 mb-4">Confrontati con l'archetipo del Diavolo (XV) e della Torre (XVI) per verificare la tua autenticità:</p>
+                    <div class="space-y-3 text-sm text-gray-200">
+                        <div class="p-4 rounded-2xl bg-mystic-950 border border-purple-500/30">
+                            <strong class="text-purple-300 block mb-1">Verifica del Diavolo (XV):</strong>
+                            In quale ambito sto barattando la mia libertà espressiva in cambio di sicurezza economica o approvazione?
+                        </div>
+                        <div class="p-4 rounded-2xl bg-mystic-950 border border-purple-500/30">
+                            <strong class="text-purple-300 block mb-1">Accoglienza della Torre (XVI):</strong>
+                            Se una struttura rigida della mia vita sta crollando, sto cercando di riparare vecchie illusioni o sto accogliendo lo spazio libero per ricostruire sul vero?
+                        </div>
+                    </div>
+                `;
+            }
+            document.getElementById('tool-modal').classList.remove('hidden');
+        }
+
+        function runNodo1Test() {
+            const isBagatto = Math.random() < 0.5;
+            const resBox = document.getElementById('nodo1-result');
+            if (isBagatto) {
+                resBox.innerHTML = `
+                    <div class="text-amber-400 font-serif font-bold text-xl mb-1">I. IL BAGATTO</div>
+                    <p class="text-sm text-white font-medium mb-2">Polarità dell'Azione Immediata</p>
+                    <p class="text-xs text-gray-300 leading-relaxed">Basta studiare e rimandare. Hai già tutti gli strumenti sul banco. Definisci un'azione pratica e chiudila <strong>entro le prossime 24 ore</strong>.</p>
+                `;
+            } else {
+                resBox.innerHTML = `
+                    <div class="text-amber-400 font-serif font-bold text-xl mb-1">II. LA PAPESSA</div>
+                    <p class="text-sm text-white font-medium mb-2">Polarità della Gestazione Silenziosa</p>
+                    <p class="text-xs text-gray-300 leading-relaxed">Non forzare l'uscita all'esterno. Concediti <strong>3 giorni di silenzio, studio mirato e ascolto interiore</strong> senza parlarne con nessuno prima di decidere.</p>
+                `;
+            }
+        }
+
+        function saveRamoSecco() {
+            const val = document.getElementById('ramo-secco-input').value.trim();
+            if (!val) {
+                showToast("Inserisci prima un ramo secco da potare.");
+                return;
+            }
+            const notes = document.getElementById('student-notes');
+            notes.value = (notes.value ? notes.value + "\n" : "") + `[Potatura XIII. La Morte]: Taglio netto di -> ${val}`;
+            saveStudentNotes();
+            closeToolModal();
+            showToast("Potatura registrata nel Diario di Pratica!");
+        }
+
+        function closeToolModal() {
+            document.getElementById('tool-modal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // LABORATORIO INTERATTIVO & STESE
+        // ==========================================
+        function setLabMode(mode) {
+            currentLabMode = mode;
+            
+            document.querySelectorAll('.lab-mode-btn').forEach(btn => {
+                btn.className = "lab-mode-btn px-4 py-3 rounded-xl text-xs sm:text-sm font-semibold bg-mystic-800 text-gray-200 hover:bg-mystic-700 border border-mystic-700 transition-all";
+            });
+            document.getElementById(`lab-btn-${mode}`).className = "lab-mode-btn px-4 py-3 rounded-xl text-xs sm:text-sm font-semibold bg-mystic-gold text-mystic-950 shadow-lg transition-all";
+
+            const headerInfo = document.getElementById('lab-header-info');
+            const stage = document.getElementById('lab-stage');
+            const copyBtn = document.getElementById('lab-copy-btn');
+            copyBtn.classList.add('hidden');
+
+            if (mode === 'tre-fasi') {
+                headerInfo.innerHTML = `
+                    <h3 class="font-serif text-xl font-bold text-mystic-gold">Esercizio B: La Stesa delle Tre Fasi</h3>
+                    <p class="text-xs sm:text-sm text-gray-300 mt-1">Viene estratta una carta per ciascuno dei Tre Settenari: <strong>1) Punto di partenza</strong> (0–VII), <strong>2) Prova etica o nodo interiore</strong> (VIII–XIV), <strong>3) Prospettiva di sblocco finale</strong> (XV–XXI).</p>
+                `;
+                stage.innerHTML = renderPlaceholderSlots([
+                    { title: "1° Settenario (0–VII)", sub: "Azione Pratica Immediata" },
+                    { title: "2° Settenario (VIII–XIV)", sub: "Nodo Interiore / Prova Etica" },
+                    { title: "3° Settenario (XV–XXI)", sub: "Sblocco e Direzione Finale" }
+                ]);
+            } else if (mode === 'tris-settenari') {
+                headerInfo.innerHTML = `
+                    <h3 class="font-serif text-xl font-bold text-mystic-gold">Esercizio A: Il Tris dei Settenari</h3>
+                    <p class="text-xs sm:text-sm text-gray-300 mt-1">Estrai una lama casuale tra le 22, riconosci a quale dei tre settenari appartiene e articola la lezione evolutiva per la tua situazione attuale.</p>
+                `;
+                stage.innerHTML = renderPlaceholderSlots([
+                    { title: "Arcano Estratto", sub: "Clicca 'Mescola ed Estrai'" }
+                ]);
+            } else if (mode === 'diade') {
+                headerInfo.innerHTML = `
+                    <h3 class="font-serif text-xl font-bold text-mystic-gold">Esercizio 2: Bagatto (I) vs Papessa (II)</h3>
+                    <p class="text-xs sm:text-sm text-gray-300 mt-1">Di fronte a un dubbio attuale, estrai tra le due polarità creative: azione immediata entro 24 ore oppure 3 giorni di gestazione silenziosa.</p>
+                `;
+                stage.innerHTML = renderPlaceholderSlots([
+                    { title: "Diade Creativa", sub: "Azione vs Silenzio" }
+                ]);
+            } else if (mode === 'carro') {
+                headerInfo.innerHTML = `
+                    <h3 class="font-serif text-xl font-bold text-mystic-gold">Esercizio 3: Lettura Rapida con Il Carro (VII)</h3>
+                    <p class="text-xs sm:text-sm text-gray-300 mt-1">Combina <strong>Il Carro (VII)</strong> con una delle lame precedenti (0–VI) per interpretare uno sblocco inatteso in ambito lavorativo o personale.</p>
+                `;
+                stage.innerHTML = renderPlaceholderSlots([
+                    { title: "Risorsa Precedente (0–VI)", sub: "La leva dello sblocco" },
+                    { title: "VII. Il Carro", sub: "Azione Coordinata & Vittoria" }
+                ]);
+            }
+            lucide.createIcons();
+        }
+
+        function renderPlaceholderSlots(slots) {
+            return `
+                <div class="grid grid-cols-1 ${slots.length > 1 ? 'md:grid-cols-' + slots.length : 'max-w-xs mx-auto'} gap-6 w-full">
+                    ${slots.map(s => `
+                        <div class="bg-mystic-900/70 border-2 border-dashed border-mystic-700 rounded-3xl p-6 flex flex-col items-center justify-center text-center min-h-[260px]">
+                            <div class="w-12 h-12 rounded-2xl bg-mystic-800 flex items-center justify-center text-gray-500 mb-3">
+                                <i data-lucide="sparkles" class="w-6 h-6"></i>
+                            </div>
+                            <div class="font-serif font-bold text-sm text-gray-300">${s.title}</div>
+                            <div class="text-xs text-gray-500 mt-1">${s.sub}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function executeLabDraw() {
+            const stage = document.getElementById('lab-stage');
+            const copyBtn = document.getElementById('lab-copy-btn');
+            copyBtn.classList.remove('hidden');
+
+            if (currentLabMode === 'tre-fasi') {
+                const set1 = ARCANI_DATA.filter(c => c.settenario === 1);
+                const set2 = ARCANI_DATA.filter(c => c.settenario === 2);
+                const set3 = ARCANI_DATA.filter(c => c.settenario === 3);
+
+                const c1 = set1[Math.floor(Math.random() * set1.length)];
+                const c2 = set2[Math.floor(Math.random() * set2.length)];
+                const c3 = set3[Math.floor(Math.random() * set3.length)];
+
+                lastReadingText = `STESA DELLE TRE FASI (Tarot Italia)\n1. Punto di Partenza (1° Settenario): ${c1.roman}. ${c1.name} — ${c1.previsionale}\n2. Nodo Interiore (2° Settenario): ${c2.roman}. ${c2.name} — ${c2.previsionale}\n3. Sblocco Finale (3° Settenario): ${c3.roman}. ${c3.name} — ${c3.previsionale}`;
+
+                stage.innerHTML = `
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full animate-fadeIn">
+                        ${renderDrawnCardHTML(c1, "1. Punto di Partenza (1° Settenario)", "Azione pratica immediata")}
+                        ${renderDrawnCardHTML(c2, "2. Nodo Interiore (2° Settenario)", "Prova etica da superare")}
+                        ${renderDrawnCardHTML(c3, "3. Prospettiva Finale (3° Settenario)", "Direzione evolutiva e sblocco")}
+                    </div>
+                `;
+            } else if (currentLabMode === 'tris-settenari') {
+                const card = ARCANI_DATA[Math.floor(Math.random() * ARCANI_DATA.length)];
+                lastReadingText = `ESTRAZIONE SINGOLA: ${card.roman}. ${card.name} (${card.settenarioName})\nSignificato: ${card.significato}\nChiave Previsionale: ${card.previsionale}`;
+
+                stage.innerHTML = `
+                    <div class="max-w-md w-full mx-auto animate-fadeIn">
+                        ${renderDrawnCardHTML(card, card.settenarioName, card.subtitle)}
+                    </div>
+                `;
+            } else if (currentLabMode === 'diade') {
+                const choice = Math.random() < 0.5 ? ARCANI_DATA[1] : ARCANI_DATA[2];
+                const advice = choice.id === 1 
+                    ? "Pianifica un'azione pratica e chiudila entro 24 ore."
+                    : "Concediti tre giorni di silenzio e ascolto interiore prima di decidere.";
+                
+                lastReadingText = `TEST BAGATTO VS PAPESSA: Estratto ${choice.roman}. ${choice.name}\nIndicazione: ${advice}`;
+
+                stage.innerHTML = `
+                    <div class="max-w-md w-full mx-auto animate-fadeIn">
+                        ${renderDrawnCardHTML(choice, "Responso della Diade Creativa", advice)}
+                    </div>
+                `;
+            } else if (currentLabMode === 'carro') {
+                const prevCards = ARCANI_DATA.filter(c => c.id >= 0 && c.id <= 6);
+                const cPrev = prevCards[Math.floor(Math.random() * prevCards.length)];
+                const cCarro = ARCANI_DATA[7];
+
+                lastReadingText = `LETTURA DI SBLOCCO CON IL CARRO:\nLeva Iniziale: ${cPrev.roman}. ${cPrev.name} (${cPrev.subtitle})\nAccelerazione: VII. Il Carro (${cCarro.previsionale})`;
+
+                stage.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl mx-auto animate-fadeIn">
+                        ${renderDrawnCardHTML(cPrev, "1. La Risorsa Attivata (0–VI)", "Ciò che sblocca la situazione")}
+                        ${renderDrawnCardHTML(cCarro, "2. La Spinta del Carro (VII)", "Vittoria disciplinata e accelerazione")}
+                    </div>
+                `;
+            }
+
+            lucide.createIcons();
+        }
+
+        function renderDrawnCardHTML(card, roleTitle, roleSub) {
+            return `
+                <div class="bg-gradient-to-b from-mystic-800 to-mystic-900 rounded-3xl p-6 border border-mystic-gold/50 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between border-b border-mystic-700 pb-3 mb-4">
+                            <div>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-mystic-gold block">${roleTitle}</span>
+                                <span class="text-xs text-gray-400">${roleSub}</span>
+                            </div>
+                            <span class="font-serif font-bold text-xl text-mystic-gold">${card.roman}</span>
+                        </div>
+
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-mystic-950 border border-mystic-700 flex items-center justify-center text-mystic-goldLight shrink-0">
+                                <i data-lucide="${card.icon}" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-serif font-bold text-lg text-white">${card.name}</h4>
+                                <p class="text-xs text-gray-400">${card.subtitle}</p>
+                            </div>
+                        </div>
+
+                        <p class="text-xs sm:text-sm text-gray-300 leading-relaxed mb-4">
+                            ${card.significato}
+                        </p>
+                    </div>
+
+                    <div class="bg-mystic-950/80 p-3.5 rounded-2xl border border-mystic-800">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 block mb-1">Chiave Previsionale</span>
+                        <p class="text-xs text-gray-200 leading-relaxed">${card.previsionale}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Copia negli appunti (usando execCommand per compatibilità iFrame)
+        function copyReadingToClipboard() {
+            if (!lastReadingText) return;
+            const textarea = document.createElement('textarea');
+            textarea.value = lastReadingText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast("Sintesi della lettura copiata negli appunti!");
+            } catch (err) {
+                showToast("Impossibile copiare automaticamente.");
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // Salvataggio Diario dell'Allievo
+        function saveStudentNotes() {
+            const val = document.getElementById('student-notes').value;
+            try {
+                localStorage.setItem('tarot_italia_notes', val);
+                const badge = document.getElementById('notes-saved-badge');
+                badge.classList.remove('opacity-0');
+                clearTimeout(window.noteTimeout);
+                window.noteTimeout = setTimeout(() => badge.classList.add('opacity-0'), 2000);
+            } catch (e) {
+                // Ignora errori storage in ambienti ristretti
+            }
+        }
+
+        function loadStudentNotes() {
+            try {
+                const saved = localStorage.getItem('tarot_italia_notes');
+                if (saved) {
+                    document.getElementById('student-notes').value = saved;
+                }
+            } catch (e) {}
+        }
+
+        // Toast Notification
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
