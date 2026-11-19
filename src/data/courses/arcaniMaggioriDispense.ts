@@ -76,6 +76,8 @@ La dinamica iniziale del manifestato divide il cammino tra azione visibile e ges
 
 {{scheda-visiva:la-papessa}}
 
+{{sigillo:la-papessa}}
+
 ### Dal Fiorire alla Conquista (III – VII)
 
 La progressione conduce dalla fioritura creativa fino all'accelerazione e alla vittoria della volontà disciplinata.
