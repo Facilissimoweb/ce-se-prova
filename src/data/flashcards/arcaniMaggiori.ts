@@ -10,6 +10,9 @@
  *
  * ENN-116 — Sigillo sezione Il Bagatto (21 carte CSV Maria), inline dopo
  * `{{scheda-visiva:il-bagatto}}` in Dispensa 01 (marker `{{sigillo:il-bagatto}}`).
+ *
+ * ENN-118 — Sigillo sezione La Papessa (40 carte CSV Maria), inline dopo
+ * `{{scheda-visiva:la-papessa}}` in Dispensa 01 (marker `{{sigillo:la-papessa}}`).
  */
 
 import type { CourseId } from '../../types/handoff';
@@ -29,7 +32,7 @@ export interface CourseModuleFlashcardDeck {
 }
 
 /** Inline section seals (not module-end decks). Key = `{{sigillo:<id>}}`. */
-export type InlineFlashcardSectionId = 'il-matto' | 'il-bagatto';
+export type InlineFlashcardSectionId = 'il-matto' | 'il-bagatto' | 'la-papessa';
 
 export const ARCANI_MAGGIORI_MODULE_01_FLASHCARDS: StudyFlashcard[] = [
   {
@@ -600,12 +603,293 @@ export const IL_BAGATTO_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
   cards: IL_BAGATTO_SECTION_FLASHCARDS,
 };
 
+/** ENN-118 — flashcard La Papessa (CSV Maria), dopo scheda-visiva in Dispensa 01. */
+export const LA_PAPESSA_SECTION_FLASHCARDS: StudyFlashcard[] = [
+  {
+    id: 1,
+    question:
+      "Quale numero d'ordine e quale polarità incarna La Papessa nella struttura dei Tarocchi?",
+    answer:
+      'La Papessa incarna il numero II e la polarità femminile ricettiva della Diade Creativa.',
+  },
+  {
+    id: 2,
+    question:
+      'Come viene figurativamente rappresentata La Papessa nel tempio archetipico?',
+    answer:
+      'Seduta immobile e velata tra i pilastri del tempio, con un sacro libro chiuso o socchiuso sulle ginocchia.',
+  },
+  {
+    id: 3,
+    question:
+      'Quale dimensione custodisce La Papessa prima di ogni manifestazione esteriore?',
+    answer:
+      "La custodia della conoscenza sottile, la memoria, la gestazione e la dimensione dell'invisibile.",
+  },
+  {
+    id: 4,
+    question: 'Cosa insegna La Papessa riguardo al processo di creazione?',
+    answer:
+      'Insegna che ogni vera creazione richiede tempo di raccoglimento, studio e maturazione interiore lontano dal frastuono esterno.',
+  },
+  {
+    id: 5,
+    question:
+      "In chiave previsionale, l'uscita della Papessa indica che è giunto il momento di agire subito?",
+    answer:
+      "No; indica che non è ancora il momento di agire o di esporre un'idea all'esterno.",
+  },
+  {
+    id: 6,
+    question:
+      'Quale atteggiamento suggerisce di adottare La Papessa in una lettura previsionale?',
+    answer:
+      'Suggerisce di custodire un segreto, studiare, riflettere e far maturare gli eventi in profondità con riservatezza e ascolto intuitivo.',
+  },
+  {
+    id: 7,
+    question:
+      'Nella figura della Papessa del mazzo Waite-Smith, cosa reca in capo la figura femminile?',
+    answer: 'Una tiara papale a tre livelli.',
+  },
+  {
+    id: 8,
+    question:
+      'Nel mazzo Waite-Smith, quali lettere contrassegnano le due colonne tra cui siede La Papessa?',
+    answer:
+      'La lettera "B" sulla colonna nera e la lettera "J" sulla colonna bianca.',
+  },
+  {
+    id: 9,
+    question:
+      'Quali nomi estesi corrispondono alle lettere B e J sulle colonne della Papessa?',
+    answer: 'B sta per Boaz e J sta per Jachin.',
+  },
+  {
+    id: 10,
+    question: 'Quale simbolo reca La Papessa sul petto nel mazzo Waite-Smith?',
+    answer: 'Una croce solare equilatera.',
+  },
+  {
+    id: 11,
+    question:
+      'Quale elemento astrologico/simbolico si trova ai piedi della Papessa nel mazzo Waite-Smith?',
+    answer: 'Una luna crescente.',
+  },
+  {
+    id: 12,
+    question:
+      "Cosa tiene La Papessa sul proprio grembo nell'iconografia Waite-Smith?",
+    answer: 'Una pergamena parzialmente celata recante la scritta "TORA".',
+  },
+  {
+    id: 13,
+    question: 'Cosa cela il velo posto alle spalle della Papessa?',
+    answer:
+      "Un uno specchio d'acqua, simbolo dell'inconscio e della saggezza primordiale.",
+  },
+  {
+    id: 14,
+    question:
+      'Con quali motivi vegetali è decorato il velo dietro il trono della Papessa?',
+    answer: 'Con melograni e palme.',
+  },
+  {
+    id: 15,
+    question:
+      'Cosa rappresentano simbolicamente le colonne Boaz (B) e Jachin (J) nella lama della Papessa?',
+    answer:
+      'Rappresentano la dualità cosmica: forza e materia, oscurità e luce, attivo e passivo.',
+  },
+  {
+    id: 16,
+    question:
+      'Qual è il ruolo della Papessa rispetto alla dualità rappresentata dalle colonne B e J?',
+    answer:
+      'Siede al centro come punto di equilibrio e sintesi tra gli opposti.',
+  },
+  {
+    id: 17,
+    question:
+      'Cosa simboleggia la pergamena recante la scritta "TORA" nel grembo della Papessa?',
+    answer: 'Simboleggia la legge sacra e la conoscenza esoterica.',
+  },
+  {
+    id: 18,
+    question:
+      'Perché la pergamena TORA è parzialmente coperta dal mantello della Papessa?',
+    answer:
+      'Per indicare che la sapienza si svela soltanto a chi sa guardare oltre le apparenze di superficie.',
+  },
+  {
+    id: 19,
+    question:
+      'Cosa simboleggia la tiara papale a tre livelli indossata dalla Papessa?',
+    answer:
+      'Indica il dominio e il governo sui tre mondi: spirituale, mentale e fisico.',
+  },
+  {
+    id: 20,
+    question:
+      'Quali dimensioni interiori richiamano la croce solare e la luna crescente nella Papessa?',
+    answer:
+      "L'unione degli opposti e la connessione con i cicli dell'intuizione, dell'inconscio e della memoria profonda.",
+  },
+  {
+    id: 21,
+    question:
+      'Nella decorazione del velo della Papessa, cosa simboleggiano rispettivamente i melograni e le palme?',
+    answer:
+      'I melograni simboleggiano il principio femminile e la gestazione; le palme simboleggiano il principio maschile e la fecondità.',
+  },
+  {
+    id: 22,
+    question:
+      'A quali decisioni sconsiglia di procedere la comparsa della Papessa in una stesa?',
+    answer:
+      'Sconsiglia azioni affrettate, invitando invece allo studio rigoroso, alla protezione delle idee e al rispetto dei tempi naturali.',
+  },
+  {
+    id: 23,
+    question:
+      "Nell'ambito della Crescita Personale, qual è lo spunto di riflessione legato alla Papessa?",
+    answer:
+      "Osservare se si avverte il bisogno di spiegare o giustificare all'esterno le proprie intuizioni prima che siano davvero maturate.",
+  },
+  {
+    id: 24,
+    question:
+      'In che cosa consiste il micro-esercizio pratico di Crescita Personale per La Papessa?',
+    answer:
+      "Sperimentare un breve periodo di riservatezza su un'idea o desiderio, custodendone l'energia senza condividerla prematuramente.",
+  },
+  {
+    id: 25,
+    question:
+      "Nell'ambito di Lavoro e Carriera, qual è lo spunto di riflessione associato alla Papessa?",
+    answer:
+      'Notare se in un progetto professionale sia richiesta una fase preliminare di studio, documentazione o analisi prima di uscire allo scoperto.',
+  },
+  {
+    id: 26,
+    question:
+      'Qual è il micro-esercizio pratico suggerito dalla Papessa per il settore Lavoro e Carriera?',
+    answer:
+      "Dedicare una pausa mirata all'approfondimento teorico, alla verifica dei dati o alla revisione silenziosa della strategia.",
+  },
+  {
+    id: 27,
+    question:
+      'In Amore e Rapporti Sociali, quale valore invita a valutare lo spunto di riflessione della Papessa?',
+    answer:
+      "Il valore del silenzio empatico, dell'ascolto discreto e del rispetto dei tempi altrui nelle dinamiche affettive.",
+  },
+  {
+    id: 28,
+    question:
+      'In che modo si applica il micro-esercizio pratico della Papessa nelle relazioni sociali?',
+    answer:
+      "Praticare un ascolto attento e privo di giudizio, lasciando che l'altro si esprima pienamente prima di formulare risposte o consigli.",
+  },
+  {
+    id: 29,
+    question:
+      "Come si colloca La Papessa (II) rispetto all'iniziativa del Bagatto (I) nella Diade Creativa?",
+    answer:
+      "Si pone come contrappeso e ricettacolo indispensabile all'impulso estroverso e immediato del Bagatto, fornendo gestazione e profondità.",
+  },
+  {
+    id: 30,
+    question:
+      "Qual è la differenza fondamentale tra l'azione del Bagatto (I) e il ruolo della Papessa (II)?",
+    answer:
+      "Il Bagatto rappresenta la scintilla attiva e la proiezione esterna; La Papessa rappresenta l'assorbimento ricettivo, lo studio e la matura gestazione interiore.",
+  },
+  {
+    id: 31,
+    question:
+      'Quando la presenza della Papessa in una stesa segna una pausa fertile per la lettura?',
+    answer:
+      'Quando evidenzia la necessità di studiare, approfondire, accumulare energia e far maturare un progetto al riparo da sguardi esterni.',
+  },
+  {
+    id: 32,
+    question:
+      "Quando la presenza della Papessa in una stesa può indicare un'ombra o un limite psicologico?",
+    answer:
+      "Quando segnala un eccesso di passività, il blocco nell'inazione, il timore di esporsi o la tendenza a nascondersi nel segreto.",
+  },
+  {
+    id: 33,
+    question:
+      "Quale passaggio evolutivo segna l'avvento dell'Imperatrice (III) dopo La Papessa (II)?",
+    answer:
+      "Il passaggio dalla gestazione silenziosa e contenuta della Papessa alla fioritura, creatività e manifestazione espressiva dell'Imperatrice.",
+  },
+  {
+    id: 34,
+    question:
+      "Il principio che unisce la fecondità maschile e la gestazione femminile sul velo della Papessa è rappresentato dall'unione di _____ e _____.",
+    answer: 'palme (principio maschile) e melograni (principio femminile)',
+  },
+  {
+    id: 35,
+    question:
+      'La verità intuita prima ancora di essere tradotta in parole è il significato profondo legato alla figura della _____.',
+    answer: 'Papessa (II)',
+  },
+  {
+    id: 36,
+    question:
+      "Che relazione intercorre tra il velo della Papessa e lo specchio d'acqua sottostante?",
+    answer:
+      "Il velo custodisce e protegge l'accesso diretto alle acque profonde dell'inconscio e della conoscenza primordiale.",
+  },
+  {
+    id: 37,
+    question:
+      'Perché La Papessa invita al silenzio riguardo ai propri progetti in fase iniziale?',
+    answer:
+      "Per evitare che la dispersione energetica o la condivisione prematura compromettano la maturazione profonda dell'idea.",
+  },
+  {
+    id: 38,
+    question: 'Quale polarità della Diade Creativa rappresenta La Papessa?',
+    answer: 'La polarità femminile ricettiva.',
+  },
+  {
+    id: 39,
+    question:
+      "In che luogo si trova posizionato il trono della Papessa nell'iconografia classica del mazzo Waite-Smith?",
+    answer: "Tra le due colonne Boaz e Jachin all'interno del tempio.",
+  },
+  {
+    id: 40,
+    question:
+      'Per quale motivo la conoscenza rappresentata dalla Papessa è definita "sapienza del silenzio"?',
+    answer:
+      "Perché non si esprime attraverso la proclamazione o l'azione esteriore, ma mediante l'ascolto, l'intuizione e la maturazione interiore.",
+  },
+];
+
+
+export const LA_PAPESSA_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
+  courseSlug: 'arcani-maggiori',
+  /** Distinct from module-end seals (`01` / `04`) — section-scoped deck. */
+  moduleNumber: '01-la-papessa',
+  title: 'Sigillo di apprendimento · La Papessa',
+  subtitle:
+    'Ripassa La Papessa (II) subito dopo la scheda visiva: gestazione, simboli e chiave previsionale.',
+  cards: LA_PAPESSA_SECTION_FLASHCARDS,
+};
+
 const INLINE_FLASHCARD_DECKS: Record<
   InlineFlashcardSectionId,
   CourseModuleFlashcardDeck
 > = {
   'il-matto': IL_MATTO_FLASHCARD_DECK,
   'il-bagatto': IL_BAGATTO_FLASHCARD_DECK,
+  'la-papessa': LA_PAPESSA_FLASHCARD_DECK,
 };
 
 export function getFlashcardDeck(
