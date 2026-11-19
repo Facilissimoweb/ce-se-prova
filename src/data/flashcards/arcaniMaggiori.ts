@@ -16,6 +16,9 @@
  *
  * ENN-119 — Sigillo sezione L'Imperatrice (25 carte CSV Maria), inline dopo
  * `{{scheda-visiva:l-imperatrice}}` in Dispensa 01 (marker `{{sigillo:l-imperatrice}}`).
+ *
+ * ENN-120 — Sigillo sezione L'Imperatore (19 carte CSV Maria), inline dopo
+ * `{{scheda-visiva:l-imperatore}}` in Dispensa 01 (marker `{{sigillo:l-imperatore}}`).
  */
 
 import type { CourseId } from '../../types/handoff';
@@ -39,7 +42,8 @@ export type InlineFlashcardSectionId =
   | 'il-matto'
   | 'il-bagatto'
   | 'la-papessa'
-  | 'l-imperatrice';
+  | 'l-imperatrice'
+  | 'l-imperatore';
 
 export const ARCANI_MAGGIORI_MODULE_01_FLASHCARDS: StudyFlashcard[] = [
   {
@@ -1074,6 +1078,145 @@ export const L_IMPERATRICE_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
   cards: L_IMPERATRICE_SECTION_FLASHCARDS,
 };
 
+/** ENN-120 — flashcard L'Imperatore (CSV Maria), dopo scheda-visiva in Dispensa 01. */
+export const L_IMPERATORE_SECTION_FLASHCARDS: StudyFlashcard[] = [
+  {
+    id: 1,
+    question:
+      "Quale posizione occupa L'Imperatore all'interno del Primo Settenario dei Tarocchi?",
+    answer: 'La quarta lama (IV).',
+  },
+  {
+    id: 2,
+    question:
+      "Quale figura femminile affianca L'Imperatore per completare la coppia regale del Primo Settenario?",
+    answer: "L'Imperatrice (III).",
+  },
+  {
+    id: 3,
+    question:
+      "Quali sono i tre concetti chiave che definiscono l'essenza archetipica de L'Imperatore (IV)?",
+    answer: 'La stabilità, il metodo e la costruzione di confini solidi.',
+  },
+  {
+    id: 4,
+    question:
+      'In che modo L\'Imperatore sviluppa le idee germinate precedentemente con Il Bagatto e L\'Imperatrice?',
+    answer:
+      'Fornendo ad esse ordine, metodo, persistenza e concretezza strutturale.',
+  },
+  {
+    id: 5,
+    question:
+      "Cosa indica la comparsa de L'Imperatore (IV) in una lettura di tipo previsionale?",
+    answer:
+      'Segnala consolidamento, stabilità lavorativa o personale, protezione autorevole e gestione concreta.',
+  },
+  {
+    id: 6,
+    question:
+      'Nel mazzo Waite-Smith, su quale tipo di struttura siede L\'Imperatore?',
+    answer:
+      'Su un imponente trono di pietra decorato con quattro teste di ariete scolpite.',
+  },
+  {
+    id: 7,
+    question:
+      'Nel mazzo Waite-Smith, cosa simboleggiano le teste d\'ariete presenti sul trono de L\'Imperatore?',
+    answer:
+      'La solidità inamovibile, la tenacia, l\'autorità e il legame con il segno zodiacale dell\'Ariete.',
+  },
+  {
+    id: 8,
+    question:
+      'Qual è il significato simbolico dell\'armatura metallica indossata da L\'Imperatore sotto la veste?',
+    answer:
+      'Rappresenta la protezione dei propri confini, la prontezza difensiva e la tutela del proprio regno.',
+  },
+  {
+    id: 9,
+    question:
+      'Nel mazzo Waite-Smith, quale oggetto tiene L\'Imperatore nella mano destra?',
+    answer: 'Uno scettro ad ankh (la croce ansata della vita).',
+  },
+  {
+    id: 10,
+    question:
+      'Cosa simboleggia lo scettro ad ankh impugnato da L\'Imperatore?',
+    answer: 'Il potere di preservare la vita e la saggezza.',
+  },
+  {
+    id: 11,
+    question:
+      'Qual è il significato simbolico del globo dorato tenuto nella mano sinistra de L\'Imperatore?',
+    answer: 'Rappresenta la sovranità e il controllo pratico sul piano fisico.',
+  },
+  {
+    id: 12,
+    question:
+      'Nel mazzo Waite-Smith, cosa simboleggia il paesaggio montuoso e roccioso alle spalle de L\'Imperatore?',
+    answer:
+      'La fermezza dei principi, la chiarezza razionale e la capacità di resistere alle sfide mediante la disciplina.',
+  },
+  {
+    id: 13,
+    question:
+      'Nel contesto della crescita personale, quale lavoro interiore richiede la carta de L\'Imperatore?',
+    answer:
+      'Sviluppare l\'autodisciplina e definire confini più chiari verso l\'esterno.',
+  },
+  {
+    id: 14,
+    question:
+      'In ambito lavorativo, quale comportamento promuove l\'archetipo de L\'Imperatore (IV)?',
+    answer:
+      'L\'organizzazione metodica, la pianificazione delle risorse e l\'eliminazione dell\'improvvisazione.',
+  },
+  {
+    id: 15,
+    question:
+      'Nelle relazioni interpersonali, come si manifesta la gestione sana dei confini secondo L\'Imperatore?',
+    answer:
+      'Comunicando i propri limiti in modo fermo ma calmo per garantire rispetto e stabilità.',
+  },
+  {
+    id: 16,
+    question:
+      'Affinché l\'abbondanza espansiva dell\'Imperatrice (III) diventi duratura, L\'Imperatore (IV) apporta _____ e _____.',
+    answer: 'metodo; confini',
+  },
+  {
+    id: 17,
+    question:
+      'Qual è il rischio evolutivo o la deriva negativa associata all\'energia de L\'Imperatore in una stesa?',
+    answer:
+      'La rigidità, il controllo eccessivo, l\'inflessibilità e l\'autoritarismo.',
+  },
+  {
+    id: 18,
+    question:
+      'Quale lama segue L\'Imperatore (IV) nel percorso didattico dei Tarocchi?',
+    answer: 'Il Papa (V).',
+  },
+  {
+    id: 19,
+    question:
+      'Quale nuova dimensione introduce la carta successiva, Il Papa (V), rispetto alla stabilità materiale de L\'Imperatore?',
+    answer:
+      'La dimensione del patto etico, della guida e della trasmissione dei valori spirituali.',
+  },
+];
+
+export const L_IMPERATORE_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
+  courseSlug: 'arcani-maggiori',
+  /** Distinct from module-end seals (`01` / `04`) — section-scoped deck. */
+  moduleNumber: '01-l-imperatore',
+  title: "Sigillo di apprendimento · L'Imperatore",
+  subtitle:
+    "Ripassa L'Imperatore (IV) subito dopo la scheda visiva: struttura, simboli e chiave previsionale.",
+  cards: L_IMPERATORE_SECTION_FLASHCARDS,
+};
+
 const INLINE_FLASHCARD_DECKS: Record<
   InlineFlashcardSectionId,
   CourseModuleFlashcardDeck
@@ -1082,6 +1225,7 @@ const INLINE_FLASHCARD_DECKS: Record<
   'il-bagatto': IL_BAGATTO_FLASHCARD_DECK,
   'la-papessa': LA_PAPESSA_FLASHCARD_DECK,
   'l-imperatrice': L_IMPERATRICE_FLASHCARD_DECK,
+  'l-imperatore': L_IMPERATORE_FLASHCARD_DECK,
 };
 
 export function getFlashcardDeck(
