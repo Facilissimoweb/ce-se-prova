@@ -65,6 +65,12 @@ const PAGE_SEO: Record<ScreenId, PageSeo> = {
       'Accesso riservato ai corsisti Tarot Italia: dispense, appunti e percorsi formativi.',
     noindex: true,
   },
+  'approfondimenti-terzo-settenario': {
+    title: 'Approfondimenti Terzo Settenario — Tarot Italia',
+    description:
+      'Approfondimenti riservati sul Terzo Settenario (XV–XXI): nodi pratici, archi e sintesi per i corsisti Tarot Italia.',
+    noindex: true,
+  },
   privacy: {
     title: 'Privacy — Tarot Italia',
     description:

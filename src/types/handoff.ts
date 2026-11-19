@@ -4,6 +4,8 @@ export type ScreenId =
   | 'consulti'
   | 'corsi'
   | 'area-riservata'
+  /** ENN-106 — Approfondimenti Maggiori; gated like Area Riservata (auth). */
+  | 'approfondimenti-terzo-settenario'
   | 'booking'
   | 'chat'
   | 'news'

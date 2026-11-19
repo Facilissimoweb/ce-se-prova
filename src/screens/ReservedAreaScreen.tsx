@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import {
   ArrowRight,
+  BookOpen,
   Check,
   CheckCircle2,
   Clock,
@@ -409,6 +410,30 @@ export function ReservedAreaScreen({
                     );
                   })}
                 </div>
+
+                {/* ENN-106 — Maggiori only; not in public nav */}
+                {activeCourse.slug === 'arcani-maggiori' && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onNavigate('approfondimenti-terzo-settenario')
+                    }
+                    className="w-full text-left rounded-xl p-4 border border-[#D4AF37]/30 bg-[#D4AF37]/08 hover:border-[#D4AF37] hover:bg-[#D4AF37]/14 transition-all space-y-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                  >
+                    <div className="flex items-center gap-2 text-xs text-[#D4AF37]">
+                      <BookOpen className="w-3.5 h-3.5 shrink-0" />
+                      <span className="font-semibold uppercase tracking-[0.08em]">
+                        Approfondimenti
+                      </span>
+                    </div>
+                    <p className="text-sm font-semibold text-[#F4F1EA]">
+                      Approfondimenti Terzo Settenario
+                    </p>
+                    <p className="text-xs text-[#A39B93]">
+                      Nodi pratici · XV–XXI · Sintesi per il consultante
+                    </p>
+                  </button>
+                )}
               </aside>
 
               {/* Right Column: Dispensa Content + Study Notes */}
