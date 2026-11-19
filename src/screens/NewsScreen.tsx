@@ -1,10 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, ArrowRight, Newspaper } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Lock, Newspaper } from 'lucide-react';
 import type { ScreenId } from '../types/handoff';
+import { BlogCourseGate } from '../components/BlogCourseGate';
 import { BlogMarkdownBody } from '../components/BlogMarkdownBody';
 import { SocialShareButtons } from '../components/SocialShareButtons';
+import { useCourseEntitlement } from '../hooks/useCourseEntitlement';
 import {
   BLOG_CATEGORIES,
+  blogPostGatedMarkdown,
+  blogPostRequiresCourse,
+  blogPostTeaserMarkdown,
   filterBlogPosts,
   getBlogPostBySlug,
   type BlogPost,
@@ -20,7 +25,10 @@ import {
 import { absoluteUrl, getSiteOrigin } from '../lib/seo';
 
 type Props = {
-  onNavigate: (screen: ScreenId) => void;
+  onNavigate: (
+    screen: ScreenId,
+    options?: { focusId?: string }
+  ) => void;
 };
 
 type CategoryFilter = (typeof BLOG_CATEGORIES)[number] | 'Tutti';
@@ -244,6 +252,12 @@ export function NewsScreen({ onNavigate }: Props) {
                         {post.category}
                       </span>
                     )}
+                    {post.gated && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]/90">
+                        <Lock className="h-3 w-3" aria-hidden="true" />
+                        Maggiori
+                      </span>
+                    )}
                     {post.publishedAt && (
                       <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#A39B93]">
                         {formatArticleDate(post.publishedAt)}
@@ -286,10 +300,21 @@ function ArticleDetail({
 }: {
   post: BlogPost;
   onBack: () => void;
-  onNavigate: (screen: ScreenId) => void;
+  onNavigate: (
+    screen: ScreenId,
+    options?: { focusId?: string }
+  ) => void;
   onTagClick: (tag: string) => void;
 }) {
   const shareUrl = absoluteUrl(pathForBlogPost(post.slug), getSiteOrigin());
+  const requiredCourse = blogPostRequiresCourse(post);
+  const entitlement = useCourseEntitlement(requiredCourse);
+  const teaserMarkdown = blogPostTeaserMarkdown(post);
+  const gatedMarkdown = blogPostGatedMarkdown(post);
+  const showGatedBody =
+    Boolean(requiredCourse) && entitlement.owns && Boolean(gatedMarkdown);
+  const showGate =
+    Boolean(requiredCourse) && !entitlement.owns && Boolean(gatedMarkdown);
 
   return (
     <article className="space-y-8 pb-12 pt-6 md:pt-10">
@@ -307,6 +332,12 @@ function ArticleDetail({
           {post.category && (
             <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[#D4AF37]">
               {post.category}
+            </span>
+          )}
+          {post.gated && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#D4AF37]/90">
+              <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+              Intro libera · corpo Maggiori
             </span>
           )}
           {post.publishedAt && (
@@ -351,7 +382,30 @@ function ArticleDetail({
       )}
 
       <div className="max-w-3xl">
-        <BlogMarkdownBody markdown={post.body} />
+        <BlogMarkdownBody
+          markdown={
+            post.gated ? teaserMarkdown : post.body
+          }
+        />
+        {showGatedBody && gatedMarkdown && (
+          <div className="mt-8 space-y-4 border-t border-[#D4AF37]/15 pt-8">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]">
+              Approfondimento sbloccato · corso Maggiori
+            </p>
+            <BlogMarkdownBody markdown={gatedMarkdown} />
+          </div>
+        )}
+        {showGate && requiredCourse && (
+          <BlogCourseGate
+            courseSlug={requiredCourse}
+            moduleLink={post.moduleLink}
+            signedIn={entitlement.signedIn}
+            loading={entitlement.loading}
+            error={entitlement.error}
+            onNavigate={onNavigate}
+            onSignIn={entitlement.signInWithGoogle}
+          />
+        )}
       </div>
 
       <div className="max-w-3xl border-t border-[#D4AF37]/15 pt-6">
@@ -366,7 +420,14 @@ function ArticleDetail({
   );
 }
 
-function BlogCta({ onNavigate }: { onNavigate: (screen: ScreenId) => void }) {
+function BlogCta({
+  onNavigate,
+}: {
+  onNavigate: (
+    screen: ScreenId,
+    options?: { focusId?: string }
+  ) => void;
+}) {
   return (
     <section className="glass-tier-2 flex max-w-3xl flex-col justify-between gap-6 rounded-2xl border border-[#D4AF37]/20 p-6 md:flex-row md:items-center md:p-8">
       <div className="max-w-xl space-y-2">

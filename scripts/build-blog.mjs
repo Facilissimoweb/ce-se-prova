@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 /**
- * ENN-82 / ENN-84 — Compile content/blog/*.{md,mdx} → src/data/blogPosts.generated.ts
+ * ENN-82 / ENN-84 / ENN-131 — Compile content/blog/*.{md,mdx} → src/data/blogPosts.generated.ts
  * Shared by the Vite SPA and the bundled GET /api/news handler.
  *
- * Frontmatter: title, date, description, draft, cover?, category?, tags[]?
+ * Frontmatter: title, date, description, draft, cover?, category?, tags[]?,
+ *              gated?, requiresCourse?, moduleLink?
+ * Body split: optional `<!-- gated -->` marker → teaserBody (public) + gatedBody (locked).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -102,6 +104,57 @@ function slugFromFilename(filename) {
   return filename.replace(/\.(md|mdx)$/i, '');
 }
 
+/** Course slugs that may unlock gated blog bodies (ENN-131). */
+const COURSE_SLUGS = new Set([
+  'arcani-maggiori',
+  'arcani-minori',
+  'metodi-stesura',
+]);
+
+const GATED_MARKER = /<!--\s*gated\s*-->/i;
+
+/**
+ * Split markdown on `<!-- gated -->` into public teaser + locked body.
+ * @param {string} body
+ * @returns {{ teaserBody: string; gatedBody: string | null }}
+ */
+function splitGatedBody(body) {
+  const match = GATED_MARKER.exec(body);
+  if (!match) {
+    return { teaserBody: body.trim(), gatedBody: null };
+  }
+  const teaserBody = body.slice(0, match.index).trim();
+  const gatedBody = body.slice(match.index + match[0].length).trim();
+  return {
+    teaserBody,
+    gatedBody: gatedBody || null,
+  };
+}
+
+/**
+ * @param {unknown} value
+ * @returns {string | null}
+ */
+function normalizeRequiresCourse(value) {
+  if (typeof value !== 'string' || !value.trim()) return null;
+  const slug = value.trim().toLowerCase();
+  return COURSE_SLUGS.has(slug) ? slug : null;
+}
+
+/**
+ * @param {unknown} value
+ * @returns {string | null}
+ */
+function normalizeModuleLink(value) {
+  if (typeof value !== 'string' || !value.trim()) return null;
+  const trimmed = value.trim();
+  // Keep zero-padded module numbers like "01"
+  if (/^\d{1,2}$/.test(trimmed)) {
+    return trimmed.padStart(2, '0');
+  }
+  return trimmed;
+}
+
 function toIsoDate(value) {
   if (typeof value !== 'string' || !value.trim()) return null;
   const raw = value.trim();
@@ -152,6 +205,9 @@ function loadPosts() {
     const raw = fs.readFileSync(path.join(contentDir, file), 'utf8');
     const { data, body } = parseFrontmatter(raw);
     const draft = data.draft === true;
+    const gated = data.gated === true;
+    const requiresCourse = normalizeRequiresCourse(data.requiresCourse);
+    const moduleLink = normalizeModuleLink(data.moduleLink);
     const title =
       typeof data.title === 'string' && data.title.trim()
         ? data.title.trim()
@@ -170,6 +226,7 @@ function loadPosts() {
     const publishedAt = toIsoDate(
       typeof data.date === 'string' ? data.date : ''
     );
+    const { teaserBody, gatedBody } = splitGatedBody(body);
     posts.push({
       id: slug,
       slug,
@@ -180,6 +237,11 @@ function loadPosts() {
       publishedAt,
       category,
       tags,
+      gated,
+      requiresCourse: gated ? requiresCourse || 'arcani-maggiori' : null,
+      moduleLink: gated ? moduleLink : null,
+      teaserBody: gated ? teaserBody : body.trim(),
+      gatedBody: gated ? gatedBody : null,
       body,
       sourceFile: `content/blog/${file}`,
     });
@@ -212,6 +274,12 @@ export function buildBlogPosts() {
   publishedAt: string | null;
   category: string | null;
   tags: string[];
+  /** ENN-131 — deeper body locked behind course ownership */
+  gated: boolean;
+  requiresCourse: string | null;
+  moduleLink: string | null;
+  teaserBody: string;
+  gatedBody: string | null;
   body: string;
   sourceFile: string;
 };

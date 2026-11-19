@@ -38,6 +38,8 @@ interface CorsiScreenProps {
   onChangeCourseId: (id: CourseId) => void;
   onOpenChat: () => void;
   onOpenReservedArea: () => void;
+  /** ENN-131 — Modulo 01 gated blog companion */
+  onOpenMaggioriModuloBlog?: () => void;
 }
 
 export function CorsiScreen({
@@ -46,6 +48,7 @@ export function CorsiScreen({
   onChangeCourseId,
   onOpenChat,
   onOpenReservedArea,
+  onOpenMaggioriModuloBlog,
 }: CorsiScreenProps) {
   const { user, signInWithGoogle, getIdToken } = useAuth();
   const activeCourse =
@@ -462,6 +465,7 @@ export function CorsiScreen({
                 ?.priceEur ?? 190
             }
             onEnroll={() => handleEnrollCourse('arcani-maggiori')}
+            onOpenModuloBlog={onOpenMaggioriModuloBlog}
           />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

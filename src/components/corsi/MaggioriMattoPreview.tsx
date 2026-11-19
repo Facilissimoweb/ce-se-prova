@@ -22,6 +22,8 @@ import { SCROLL_LANDMARKS } from '../../lib/scrollNavigation';
 interface MaggioriMattoPreviewProps {
   priceEur: number;
   onEnroll: () => void;
+  /** ENN-131 — open Modulo 01 gated blog companion */
+  onOpenModuloBlog?: () => void;
 }
 
 /**
@@ -32,6 +34,7 @@ interface MaggioriMattoPreviewProps {
 export function MaggioriMattoPreview({
   priceEur,
   onEnroll,
+  onOpenModuloBlog,
 }: MaggioriMattoPreviewProps) {
   const dispensa01 = useMemo(() => getMaggioriDispensa01(), []);
   const sidebarDispense = useMemo(() => getMaggioriPreviewSidebarDispense(), []);
@@ -211,6 +214,26 @@ export function MaggioriMattoPreview({
 
           {/* Cut after Il Matto — guest enroll CTA (no Bagatto+, notes, or next module) */}
           <div className="gold-divider" aria-hidden="true" />
+
+          {onOpenModuloBlog && (
+            <div className="rounded-xl border border-[#D4AF37]/18 bg-[#12100E]/50 p-4 md:p-5 space-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                Dal Blog · Modulo 01
+              </p>
+              <p className="text-sm text-[#E8e1dd] leading-relaxed">
+                Intro pubblica sulla mappa del Primo Settenario; l&apos;approfondimento
+                si sblocca con l&apos;acquisto Maggiori.
+              </p>
+              <button
+                type="button"
+                onClick={onOpenModuloBlog}
+                className="inline-flex min-h-[44px] items-center gap-2 text-sm font-medium text-[#D4AF37] transition-colors hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-sm"
+              >
+                Leggi l&apos;articolo
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </button>
+            </div>
+          )}
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 rounded-xl border border-[#D4AF37]/22 bg-[#D4AF37]/8 p-4 md:p-5">
             <div className="flex-1 space-y-1.5 min-w-0">

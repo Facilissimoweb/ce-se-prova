@@ -37,10 +37,12 @@ import { NewsScreen } from './screens/NewsScreen';
 import { ContattiScreen } from './screens/ContattiScreen';
 import { SocialShareButtons } from './components/SocialShareButtons';
 import { DocumentSeo } from './components/DocumentSeo';
+import { MAGGIORI_MODULO_01_BLOG_SLUG } from './data/maggioriGatedBlog';
 import { legalContent } from './data/legalContent';
 import {
   PATH_CHANGE_EVENT,
   bootstrapScreenFromLocation,
+  navigateBlogPost,
   navigatePath,
   pathForScreen,
   screenFromPath,
@@ -197,6 +199,19 @@ export function App() {
     },
     []
   );
+
+  /** Open `/news/<slug>` without collapsing to list via navigatePath('news'). */
+  const handleOpenBlogPost = useCallback((slug: string) => {
+    scrollPositionsRef.current[activeScreenRef.current] = captureScrollY();
+    navigationKindRef.current = 'push';
+    pendingFocusIdRef.current = null;
+    navigateBlogPost(slug);
+    if (activeScreenRef.current !== 'news') {
+      setActiveScreen('news');
+    } else {
+      scrollToTopAfterPaint('auto');
+    }
+  }, []);
 
   // Land on the right spot after SPA paint (avoids sticky-header + menu-unlock races).
   useEffect(() => {
@@ -415,6 +430,9 @@ export function App() {
               onChangeCourseId={setSelectedCourseId}
               onOpenChat={() => handleNavigate('chat')}
               onOpenReservedArea={() => handleNavigate('area-riservata')}
+              onOpenMaggioriModuloBlog={() =>
+                handleOpenBlogPost(MAGGIORI_MODULO_01_BLOG_SLUG)
+              }
             />
           )}
 
@@ -422,6 +440,7 @@ export function App() {
             <ReservedAreaScreen
               onNavigate={handleNavigate}
               onSelectCourse={handleSelectCourseAndNavigate}
+              onOpenBlogPost={handleOpenBlogPost}
             />
           )}
 

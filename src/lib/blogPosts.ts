@@ -1,5 +1,5 @@
 /**
- * In-repo Blog posts (ENN-82 / ENN-84). Compiled from content/blog/*.{md,mdx}.
+ * In-repo Blog posts (ENN-82 / ENN-84 / ENN-131). Compiled from content/blog/*.{md,mdx}.
  */
 import {
   BLOG_CATEGORIES,
@@ -7,6 +7,7 @@ import {
   type BlogCategory,
   type BlogPostRecord,
 } from '../data/blogPosts.generated.ts';
+import type { CourseId } from '../types/handoff.ts';
 import { pathForBlogPost } from './appPaths.ts';
 import type { NewsArticle } from './newsFeed.ts';
 
@@ -23,6 +24,23 @@ export function getBlogPostBySlug(slug: string): BlogPost | undefined {
   return listPublishedBlogPosts().find(
     (post) => post.slug.toLowerCase() === normalized
   );
+}
+
+/** Course required to unlock gated body (ENN-131). */
+export function blogPostRequiresCourse(post: BlogPost): CourseId | null {
+  if (!post.gated || !post.requiresCourse) return null;
+  return post.requiresCourse as CourseId;
+}
+
+/** Public markdown always visible (SEO teaser). */
+export function blogPostTeaserMarkdown(post: BlogPost): string {
+  return post.teaserBody || post.body;
+}
+
+/** Locked markdown for Maggiori (or other course) owners. */
+export function blogPostGatedMarkdown(post: BlogPost): string | null {
+  if (!post.gated) return null;
+  return post.gatedBody;
 }
 
 export function filterBlogPosts(options: {

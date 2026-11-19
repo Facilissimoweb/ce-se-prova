@@ -24,6 +24,7 @@ import {
 } from '../data/flashcards/arcaniMaggiori';
 import { getSchedaVisiva } from '../data/schedeVisive';
 import { useReservedArea } from '../hooks/useReservedArea';
+import { MAGGIORI_MODULO_01_BLOG_SLUG } from '../data/maggioriGatedBlog';
 import {
   SCROLL_LANDMARKS,
   scrollToIdAfterPaint,
@@ -38,11 +39,14 @@ type ReservedScrollTarget =
 interface ReservedAreaScreenProps {
   onNavigate: (screen: ScreenId) => void;
   onSelectCourse: (courseId: CourseId) => void;
+  /** ENN-131 — open Modulo 01 blog companion without losing slug */
+  onOpenBlogPost?: (slug: string) => void;
 }
 
 export function ReservedAreaScreen({
   onNavigate,
   onSelectCourse,
+  onOpenBlogPost,
 }: ReservedAreaScreenProps) {
   const { user, loading: authLoading, authError, signInWithGoogle, logout, getIdToken } =
     useAuth();
@@ -518,6 +522,20 @@ export function ReservedAreaScreen({
                       <p className="text-sm text-[#A39B93]">
                         {activeDispensa.subtitle}
                       </p>
+                      {activeCourse.slug === 'arcani-maggiori' &&
+                        activeDispensa.moduleNumber === '01' &&
+                        onOpenBlogPost && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onOpenBlogPost(MAGGIORI_MODULO_01_BLOG_SLUG)
+                            }
+                            className="inline-flex min-h-[40px] items-center gap-1.5 pt-1 text-xs font-medium text-[#D4AF37] transition-colors hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-sm"
+                          >
+                            <BookOpen className="w-3.5 h-3.5" aria-hidden="true" />
+                            Articolo Blog · Modulo 01
+                          </button>
+                        )}
                     </div>
 
                     <div className="flex flex-wrap gap-2 shrink-0">
