@@ -15,12 +15,14 @@ import { useAuth } from '../context/AuthContext';
 import { CheckoutReturnBanner } from '../components/CheckoutReturnBanner';
 import { FormattedDispensaBody } from '../components/reserved/FormattedDispensaBody';
 import { DispensaFlashcards } from '../components/reserved/DispensaFlashcards';
+import { DispensaSchedaVisiva } from '../components/reserved/DispensaSchedaVisiva';
 import { ReservedLoginGate } from '../components/reserved/ReservedLoginGate';
 import { ReservedNotesPanel } from '../components/reserved/ReservedNotesPanel';
 import {
   getFlashcardDeck,
   getInlineFlashcardDeck,
 } from '../data/flashcards/arcaniMaggiori';
+import { SCHEDA_VISIVA_IL_MATTO } from '../data/schedeVisive/ilMatto';
 import { useReservedArea } from '../hooks/useReservedArea';
 import {
   SCROLL_LANDMARKS,
@@ -99,7 +101,11 @@ export function ReservedAreaScreen({
     return getFlashcardDeck(activeCourse.slug, activeDispensa.moduleNumber);
   }, [activeCourse, activeDispensa]);
 
-  /** ENN-113 — section seals mid-dispensa (e.g. Il Matto after its scheda). */
+  /**
+   * ENN-113 / ENN-114 — mid-dispensa embeds for Maggiori Dispensa 01.
+   * Order in markdown: scheda-visiva → sigillo (visual widget before flashcards).
+   * Embed keys are `<type>:<id>` (see FormattedDispensaBody).
+   */
   const dispensaFlashcardEmbeds = useMemo(() => {
     if (
       !activeCourse ||
@@ -110,10 +116,15 @@ export function ReservedAreaScreen({
       return undefined;
     }
     const mattoDeck = getInlineFlashcardDeck('il-matto');
-    if (!mattoDeck) return undefined;
-    return {
-      'il-matto': <DispensaFlashcards deck={mattoDeck} />,
+    const embeds: Record<string, React.ReactNode> = {
+      'scheda-visiva:il-matto': (
+        <DispensaSchedaVisiva content={SCHEDA_VISIVA_IL_MATTO} />
+      ),
     };
+    if (mattoDeck) {
+      embeds['sigillo:il-matto'] = <DispensaFlashcards deck={mattoDeck} />;
+    }
+    return embeds;
   }, [activeCourse, activeDispensa]);
 
   const pendingScrollRef = useRef<ReservedScrollTarget>(null);
