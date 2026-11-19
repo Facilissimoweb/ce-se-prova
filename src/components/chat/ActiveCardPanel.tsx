@@ -127,6 +127,25 @@ export function ActiveCardPanel({
             </div>
           </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div className="rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/15 p-3 space-y-1.5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37]">
+                Amore
+              </p>
+              <p className="text-xs leading-relaxed text-[#E8e1dd]">
+                {activeCard.loveReading}
+              </p>
+            </div>
+            <div className="rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/15 p-3 space-y-1.5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37]">
+                Lavoro
+              </p>
+              <p className="text-xs leading-relaxed text-[#E8e1dd]">
+                {activeCard.workReading}
+              </p>
+            </div>
+          </div>
+
           <div className="rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/15 p-3.5 space-y-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37]">
               Linea Previsionale · Futuro

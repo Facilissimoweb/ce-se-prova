@@ -1,8 +1,15 @@
 import React from 'react';
 import { Check, Lock, Send, Sparkles, X } from 'lucide-react';
 import type { ArcanaCard, ChatMessage, DialoguePack } from '../../types/handoff';
+import type { DialogueDomain } from '../../data/majorArcana';
 import { dialogueTimePacks, siteContent } from '../../data/siteContent';
 import { CopyText } from '../CopyText';
+
+interface QuickPromptChip {
+  label: string;
+  prompt: string;
+  domain: DialogueDomain;
+}
 
 interface ChatThreadPanelProps {
   messages: ChatMessage[];
@@ -28,7 +35,8 @@ interface ChatThreadPanelProps {
   onBookConsult: () => void;
   onInputChange: (value: string) => void;
   onSubmitMessage: (e: React.FormEvent) => void;
-  onQuickPrompt: (prompt: string) => void;
+  /** Chip passano un `domain` esplicito (non solo regex sul testo). */
+  onQuickPrompt: (prompt: string, domain: DialogueDomain) => void;
 }
 
 export function ChatThreadPanel({
@@ -220,18 +228,32 @@ export function ChatThreadPanel({
         <div className="border-t border-[#D4AF37]/15 p-4 md:p-5 bg-[#151311]/70 space-y-3">
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
             <Sparkles className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" aria-hidden="true" />
-            {[
-              `Cosa prevede ${activeCard.name} per il mio futuro?`,
-              `Lettura amore con ${activeCard.name}`,
-              `Lettura lavoro e progetti`,
-            ].map((prompt) => (
+            {(
+              [
+                {
+                  label: `Cosa prevede ${activeCard.name} per il mio futuro?`,
+                  prompt: `Cosa prevede ${activeCard.name} per il mio futuro?`,
+                  domain: 'future',
+                },
+                {
+                  label: `Lettura amore con ${activeCard.name}`,
+                  prompt: `Lettura amore con ${activeCard.name}`,
+                  domain: 'love',
+                },
+                {
+                  label: 'Lettura lavoro e progetti',
+                  prompt: 'Lettura lavoro e progetti',
+                  domain: 'work',
+                },
+              ] satisfies QuickPromptChip[]
+            ).map((chip) => (
               <button
-                key={prompt}
+                key={chip.label}
                 type="button"
-                onClick={() => onQuickPrompt(prompt)}
+                onClick={() => onQuickPrompt(chip.prompt, chip.domain)}
                 className="px-3 py-1.5 rounded-lg bg-[#12100E]/90 border border-[#D4AF37]/20 hover:border-[#D4AF37] text-xs text-[#A39B93] hover:text-[#F4F1EA] whitespace-nowrap shrink-0 transition-colors"
               >
-                {prompt}
+                {chip.label}
               </button>
             ))}
           </div>

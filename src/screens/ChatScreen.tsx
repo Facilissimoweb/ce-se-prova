@@ -11,6 +11,8 @@ import {
   MAJOR_ARCANA,
   buildArcanaDialogueReply,
   buildSpreadSynthesisReply,
+  detectDialogueDomain,
+  type DialogueDomain,
   type SpreadDrawItem,
   type SpreadPosition,
 } from '../data/majorArcana';
@@ -48,6 +50,8 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialChatMessages);
   const [inputText, setInputText] = useState('');
   const [cardTab, setCardTab] = useState<'lettura' | 'domande'>('lettura');
+  /** Ultimo ambito scelto in sessione (chip o keyword) — riusato dalle maieutiche senza keyword. */
+  const [sessionDomain, setSessionDomain] = useState<DialogueDomain | null>(null);
   const threadEndRef = useRef<HTMLDivElement | null>(null);
 
   const onPassActivated = useCallback((message: ChatMessage) => {
@@ -102,9 +106,8 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
       arcanaRef: `${card.name} · ${card.numeral}`,
       text: [
         `Hai ${sourceLabel} ${card.name} (${card.numeral} · ${card.archetype}).`,
-        `Presente: ${card.synthesis}`,
-        `Previsione futura: ${card.futureTendency}`,
-        `Chiedimi pure cosa indica su amore, lavoro o decisioni future, oppure scegli una delle sue domande.`,
+        `Sintesi del presente: ${card.synthesis}`,
+        `Scegli un ambito per approfondire — Amore, Lavoro o percorso generale — con i suggerimenti sotto, oppure scrivi la tua domanda. Le domande dell’Arcano nel pannello usano l’ultimo ambito scelto in questa sessione.`,
       ].join('\n\n'),
     };
 
@@ -148,7 +151,10 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
     scrollToBottom();
   };
 
-  const appendDialogue = async (userText: string) => {
+  const appendDialogue = async (
+    userText: string,
+    forcedDomain?: DialogueDomain | null
+  ) => {
     const trimmed = userText.trim();
     if (!trimmed) return;
 
@@ -156,6 +162,9 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
     if (!allowed) return;
 
     const timeLabel = nowTimeLabel();
+    const inferred = detectDialogueDomain(trimmed);
+    const resolvedDomain: DialogueDomain | null =
+      forcedDomain ?? inferred ?? sessionDomain;
 
     const userMsg: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -165,7 +174,40 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
       text: trimmed,
     };
 
-    const replyText = buildArcanaDialogueReply(trimmed, activeCard, activeSpread);
+    // Maieutiche / testo senza keyword e senza ambito di sessione: chiedi l’ambito.
+    if (!resolvedDomain) {
+      const clarifyMsg: ChatMessage = {
+        id: `prac-${Date.now() + 1}`,
+        sender: 'practitioner',
+        authorName: 'Tarot Italia IA · Lettura Guidata',
+        timestamp: timeLabel,
+        text: [
+          `Prima di rispondere con ${activeCard.name} (${activeCard.numeral}), dimmi l’ambito: amore, lavoro o percorso generale?`,
+          `Puoi usare i suggerimenti «Lettura amore…» / «Lettura lavoro…», oppure scrivere ad esempio «in amore» o «nel lavoro».`,
+        ].join('\n\n'),
+        arcanaRef: `${activeCard.name} · ${activeCard.numeral}`,
+      };
+      setMessages((prev) => [...prev, userMsg, clarifyMsg]);
+      setInputText('');
+      scrollToBottom();
+      return;
+    }
+
+    // Persisti amore/lavoro/generale in sessione; le domande «futuro» non sovrascrivono.
+    if (
+      resolvedDomain === 'love' ||
+      resolvedDomain === 'work' ||
+      resolvedDomain === 'general'
+    ) {
+      setSessionDomain(resolvedDomain);
+    }
+
+    const replyText = buildArcanaDialogueReply(
+      trimmed,
+      activeCard,
+      activeSpread,
+      { domain: resolvedDomain }
+    );
 
     const practitionerMsg: ChatMessage = {
       id: `prac-${Date.now() + 1}`,
@@ -318,7 +360,7 @@ export function ChatScreen({ showCmsKeys, onBookConsult }: ChatScreenProps) {
             onBookConsult={onBookConsult}
             onInputChange={setInputText}
             onSubmitMessage={handleSubmit}
-            onQuickPrompt={(prompt) => void appendDialogue(prompt)}
+            onQuickPrompt={(prompt, domain) => void appendDialogue(prompt, domain)}
           />
         </div>
       </div>
