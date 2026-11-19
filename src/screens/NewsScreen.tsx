@@ -12,6 +12,7 @@ import {
   blogPostTeaserMarkdown,
   filterBlogPosts,
   getBlogPostBySlug,
+  resolveBlogSlug,
   type BlogPost,
 } from '../lib/blogPosts';
 import { formatArticleDate } from '../lib/newsFeed';
@@ -42,7 +43,17 @@ export function NewsScreen({ onNavigate }: Props) {
 
   useEffect(() => {
     const syncSlug = () => {
-      setSlug(blogSlugFromPath(window.location.pathname));
+      const fromPath = blogSlugFromPath(window.location.pathname);
+      if (!fromPath) {
+        setSlug(null);
+        return;
+      }
+      const resolved = resolveBlogSlug(fromPath);
+      // ENN-132 — soft-redirect legacy Settenario promo slug → Il Matto.
+      if (resolved !== fromPath) {
+        window.history.replaceState({}, '', pathForBlogPost(resolved));
+      }
+      setSlug(resolved);
     };
     syncSlug();
     window.addEventListener('popstate', syncSlug);

@@ -1,5 +1,5 @@
 /**
- * In-repo Blog posts (ENN-82 / ENN-84 / ENN-131). Compiled from content/blog/*.{md,mdx}.
+ * In-repo Blog posts (ENN-82 / ENN-84 / ENN-131 / ENN-132). Compiled from content/blog/*.{md,mdx}.
  */
 import {
   BLOG_CATEGORIES,
@@ -7,6 +7,7 @@ import {
   type BlogCategory,
   type BlogPostRecord,
 } from '../data/blogPosts.generated.ts';
+import { resolveMaggioriModulo01BlogSlug } from '../data/maggioriGatedBlog.ts';
 import type { CourseId } from '../types/handoff.ts';
 import { pathForBlogPost } from './appPaths.ts';
 import type { NewsArticle } from './newsFeed.ts';
@@ -19,8 +20,13 @@ export function listPublishedBlogPosts(): BlogPost[] {
   return BLOG_POSTS.filter((post) => !post.draft);
 }
 
+/** Resolve legacy Modulo 01 promo slug → current Matto article (ENN-132). */
+export function resolveBlogSlug(slug: string): string {
+  return resolveMaggioriModulo01BlogSlug(slug);
+}
+
 export function getBlogPostBySlug(slug: string): BlogPost | undefined {
-  const normalized = slug.trim().toLowerCase();
+  const normalized = resolveBlogSlug(slug);
   return listPublishedBlogPosts().find(
     (post) => post.slug.toLowerCase() === normalized
   );
