@@ -9,8 +9,6 @@ export const SCREEN_PATHS: Record<ScreenId, string> = {
   'area-riservata': '/area-riservata',
   'approfondimenti-terzo-settenario':
     '/area-riservata/approfondimenti-terzo-settenario',
-  'laboratorio-arcani-maggiori':
-    '/area-riservata/laboratorio-arcani-maggiori',
   booking: '/prenota',
   chat: '/dialogo',
   news: '/news',
@@ -34,9 +32,6 @@ const PATH_ALIASES: Record<string, ScreenId> = {
     'approfondimenti-terzo-settenario',
   '/riservata/approfondimenti-terzo-settenario':
     'approfondimenti-terzo-settenario',
-  '/area-riservata/laboratorio-arcani-maggiori':
-    'laboratorio-arcani-maggiori',
-  '/riservata/laboratorio-arcani-maggiori': 'laboratorio-arcani-maggiori',
   '/prenota': 'booking',
   '/prenotazione': 'booking',
   '/dialogo': 'chat',
