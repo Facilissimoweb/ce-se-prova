@@ -24,7 +24,10 @@ import {
 } from '../data/flashcards/arcaniMaggiori';
 import { getSchedaVisiva } from '../data/schedeVisive';
 import { useReservedArea } from '../hooks/useReservedArea';
-import { MAGGIORI_MODULO_01_BLOG_SLUG } from '../data/maggioriGatedBlog';
+import {
+  MAGGIORI_BAGATTO_BLOG_SLUG,
+  MAGGIORI_MODULO_01_BLOG_SLUG,
+} from '../data/maggioriGatedBlog';
 import {
   SCROLL_LANDMARKS,
   scrollToIdAfterPaint,
@@ -525,16 +528,34 @@ export function ReservedAreaScreen({
                       {activeCourse.slug === 'arcani-maggiori' &&
                         activeDispensa.moduleNumber === '01' &&
                         onOpenBlogPost && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              onOpenBlogPost(MAGGIORI_MODULO_01_BLOG_SLUG)
-                            }
-                            className="inline-flex min-h-[40px] items-center gap-1.5 pt-1 text-xs font-medium text-[#D4AF37] transition-colors hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-sm"
-                          >
-                            <BookOpen className="w-3.5 h-3.5" aria-hidden="true" />
-                            Articolo Blog · Modulo 01
-                          </button>
+                          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-1 sm:gap-3 pt-1">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                onOpenBlogPost(MAGGIORI_MODULO_01_BLOG_SLUG)
+                              }
+                              className="inline-flex min-h-[40px] items-center gap-1.5 text-xs font-medium text-[#D4AF37] transition-colors hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-sm"
+                            >
+                              <BookOpen
+                                className="w-3.5 h-3.5"
+                                aria-hidden="true"
+                              />
+                              Blog · Il Matto
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                onOpenBlogPost(MAGGIORI_BAGATTO_BLOG_SLUG)
+                              }
+                              className="inline-flex min-h-[40px] items-center gap-1.5 text-xs font-medium text-[#D4AF37] transition-colors hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-sm"
+                            >
+                              <BookOpen
+                                className="w-3.5 h-3.5"
+                                aria-hidden="true"
+                              />
+                              Blog · Il Bagatto
+                            </button>
+                          </div>
                         )}
                     </div>
 
