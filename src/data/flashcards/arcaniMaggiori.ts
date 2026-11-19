@@ -13,6 +13,9 @@
  *
  * ENN-118 — Sigillo sezione La Papessa (40 carte CSV Maria), inline dopo
  * `{{scheda-visiva:la-papessa}}` in Dispensa 01 (marker `{{sigillo:la-papessa}}`).
+ *
+ * ENN-119 — Sigillo sezione L'Imperatrice (25 carte CSV Maria), inline dopo
+ * `{{scheda-visiva:l-imperatrice}}` in Dispensa 01 (marker `{{sigillo:l-imperatrice}}`).
  */
 
 import type { CourseId } from '../../types/handoff';
@@ -32,7 +35,11 @@ export interface CourseModuleFlashcardDeck {
 }
 
 /** Inline section seals (not module-end decks). Key = `{{sigillo:<id>}}`. */
-export type InlineFlashcardSectionId = 'il-matto' | 'il-bagatto' | 'la-papessa';
+export type InlineFlashcardSectionId =
+  | 'il-matto'
+  | 'il-bagatto'
+  | 'la-papessa'
+  | 'l-imperatrice';
 
 export const ARCANI_MAGGIORI_MODULE_01_FLASHCARDS: StudyFlashcard[] = [
   {
@@ -883,6 +890,190 @@ export const LA_PAPESSA_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
   cards: LA_PAPESSA_SECTION_FLASHCARDS,
 };
 
+/** ENN-119 — flashcard L'Imperatrice (CSV Maria), dopo scheda-visiva in Dispensa 01. */
+export const L_IMPERATRICE_SECTION_FLASHCARDS: StudyFlashcard[] = [
+  {
+    id: 1,
+    question:
+      "Quale tappa del Primo Settenario dei Tarocchi è rappresentata dall'Imperatrice (III)?",
+    answer: 'La terza tappa.',
+  },
+  {
+    id: 2,
+    question:
+      "In che modo L'Imperatrice (III) si sviluppa a partire dal percorso della Papessa (II)?",
+    answer:
+      'Sblocca la carica vitale accumulata nella gestazione silenziosa della Papessa e la fa sbocciare nella manifestazione visibile.',
+  },
+  {
+    id: 3,
+    question:
+      "Quali sono i quattro temi centrali incarnati dall'archetipo dell'Imperatrice (III)?",
+    answer:
+      "1. L'abbondanza\n2. La fioritura creativa\n3. L'espressività\n4. La comunicazione fertile",
+  },
+  {
+    id: 4,
+    question:
+      "Qual è il significato profondo legato alla virtù generativa dell'Imperatrice (III)?",
+    answer:
+      'La virtù di nutrire i propri progetti e le proprie relazioni attraverso la vitalità, la bellezza sensibile e il piacere della creazione.',
+  },
+  {
+    id: 5,
+    question:
+      "Secondo l'insegnamento dell'Imperatrice (III), quali condizioni richiede ogni vera crescita?",
+    answer:
+      'Richiede apertura, fluidità comunicativa e la capacità di accogliere la vita nei suoi aspetti più ricchi ed espansivi.',
+  },
+  {
+    id: 6,
+    question:
+      "Che cosa segnala la comparsa dell'Imperatrice (III) in una lettura in chiave previsionale?",
+    answer:
+      'Segnala espansione, intese riuscite, sviluppo rigoglioso di progetti e armonia nei rapporti.',
+  },
+  {
+    id: 7,
+    question:
+      "In ambito previsionale, quale maturità di situazione indica L'Imperatrice (III)?",
+    answer:
+      'Indica che le condizioni sono mature affinché una situazione cresca e porti frutti tangibili tramite un dialogo aperto e caloroso.',
+  },
+  {
+    id: 8,
+    question:
+      "Come viene raffigurato il trono dell'Imperatrice nel mazzo Waite-Smith?",
+    answer:
+      "Un comodo trono ricoperto di cuscini e drappeggi, situato all'interno di un paesaggio lussureggiante.",
+  },
+  {
+    id: 9,
+    question:
+      "Da quale motivo decorativo è ornato l'abito dell'Imperatrice nell'iconografia di Pamela Colman Smith?",
+    answer: 'Da melograni.',
+  },
+  {
+    id: 10,
+    question:
+      "Quali sono le caratteristiche della corona indossata dall'Imperatrice nel mazzo Waite-Smith?",
+    answer: 'È composta da dodici stelle a sei punte.',
+  },
+  {
+    id: 11,
+    question:
+      "Cosa impugna L'Imperatrice nella mano destra nella raffigurazione Waite-Smith?",
+    answer: 'Uno scettro sormontato da un globo.',
+  },
+  {
+    id: 12,
+    question:
+      "Quale oggetto recante il simbolo di Venere poggia ai piedi del trono dell'Imperatrice?",
+    answer: 'Uno scudo a forma di cuore.',
+  },
+  {
+    id: 13,
+    question:
+      "Quali elementi paesaggistici figurano rispettivamente in primo piano e sullo sfondo dell'Imperatrice (Waite-Smith)?",
+    answer:
+      'In primo piano matura un campo di grano dorato, mentre sullo sfondo scorre una cascata che alimenta un bosco alberato.',
+  },
+  {
+    id: 14,
+    question:
+      "Cosa simboleggiano congiuntamente la corona a 12 stelle e lo scettro dell'Imperatrice?",
+    answer:
+      "Il dominio armonico sui dodici mesi dell'anno e sui cicli naturali, congiungendo l'ispirazione celeste alla capacità di nutrire la terra.",
+  },
+  {
+    id: 15,
+    question:
+      "Qual è il significato simbolico dello scudo di Venere e dell'abito con melograni nell'Imperatrice?",
+    answer:
+      "Rappresentano l'amore, la sensualità, la bellezza e la fecondità vitale in ogni sua manifestazione.",
+  },
+  {
+    id: 16,
+    question:
+      "Cosa indicano la cascata e il campo di grano dorato nell'analisi simbolica dell'Imperatrice?",
+    answer:
+      'La ricchezza del raccolto, la fertilità della natura e il flusso generoso e ininterrotto delle energie emotive e creative.',
+  },
+  {
+    id: 17,
+    question:
+      "Qual è l'invito operativo sintetico trasmesso dall'Imperatrice quando compare in una stesa?",
+    answer:
+      "Abbracciare l'abbondanza, comunicare i propri intenti con calore e alimentare con dedizione ed entusiasmo le iniziative intraprese.",
+  },
+  {
+    id: 18,
+    question:
+      "In ambito di crescita personale, su quale aspetto invita a riflettere l'Imperatrice?",
+    answer:
+      'Sul verificare se si stia trattenendo la propria espressività o se ci si conceda il permesso di godere della bellezza e dei frutti dei propri sforzi.',
+  },
+  {
+    id: 19,
+    question:
+      "Qual è il micro-esercizio pratico di crescita personale legato all'Imperatrice?",
+    answer:
+      "Dedicare un breve momento della giornata a un'attività apertamente espressiva senza scopi utilitaristici, al solo fine di nutrire il benessere interiore.",
+  },
+  {
+    id: 20,
+    question:
+      "Nel settore lavoro e carriera, qual è lo spunto di riflessione associato all'Imperatrice?",
+    answer:
+      'Valutare in quale ambito una comunicazione più fluida, aperta ed empatica possa favorire la crescita delle intese.',
+  },
+  {
+    id: 21,
+    question:
+      "Qual è il micro-esercizio pratico consigliato per l'ambito professionale?",
+    answer:
+      "Condividere un'idea o un aggiornamento con colleghi o partner puntando sulla valorizzazione degli aspetti positivi e delle potenzialità di sviluppo comune.",
+  },
+  {
+    id: 22,
+    question:
+      "Nei rapporti affettivi e sociali, su cosa focalizza l'attenzione lo spunto di riflessione dell'Imperatrice?",
+    answer:
+      "Sulla propria disponibilità a manifestare apertamente l'affetto e a creare ambienti di condivisione caldi e accoglienti.",
+  },
+  {
+    id: 23,
+    question:
+      "Qual è il micro-esercizio pratico per il settore dell'amore e dei rapporti sociali?",
+    answer:
+      'Rivolgere un gesto premuroso o una parola di apprezzamento sincero a una persona cara, osservando la naturale armonia generata.',
+  },
+  {
+    id: 24,
+    question:
+      "Come si contrappone l'espressione dell'Imperatrice (III) alla natura della Papessa (II)?",
+    answer:
+      "Mentre La Papessa custodisce un sapere introverso e silenzioso, L'Imperatrice lo converte in un'energia espressiva, comunicativa ed estroversa.",
+  },
+  {
+    id: 25,
+    question:
+      "Nell'interpretare L'Imperatrice in stesa, quale rischio o ombra occorre distinguere da un reale processo di crescita?",
+    answer:
+      "Il rischio di una dispersione emotiva o di un'ostentazione superficiale.",
+  },
+];
+
+export const L_IMPERATRICE_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
+  courseSlug: 'arcani-maggiori',
+  /** Distinct from module-end seals (`01` / `04`) — section-scoped deck. */
+  moduleNumber: '01-l-imperatrice',
+  title: "Sigillo di apprendimento · L'Imperatrice",
+  subtitle:
+    "Ripassa L'Imperatrice (III) subito dopo la scheda visiva: abbondanza, simboli e chiave previsionale.",
+  cards: L_IMPERATRICE_SECTION_FLASHCARDS,
+};
+
 const INLINE_FLASHCARD_DECKS: Record<
   InlineFlashcardSectionId,
   CourseModuleFlashcardDeck
@@ -890,6 +1081,7 @@ const INLINE_FLASHCARD_DECKS: Record<
   'il-matto': IL_MATTO_FLASHCARD_DECK,
   'il-bagatto': IL_BAGATTO_FLASHCARD_DECK,
   'la-papessa': LA_PAPESSA_FLASHCARD_DECK,
+  'l-imperatrice': L_IMPERATRICE_FLASHCARD_DECK,
 };
 
 export function getFlashcardDeck(

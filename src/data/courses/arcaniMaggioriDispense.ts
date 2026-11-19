@@ -88,6 +88,10 @@ La progressione conduce dalla fioritura creativa fino all'accelerazione e alla v
 - **Significato Profondo**: vitalità rigogliosa, espressione creativa senza vincoli, potere generativo della parola; armonia che trasforma l'impulso in manifestazione ricca.
 - **In Chiave Previsionale**: espansione prospera, intese riuscite, fioritura di nuove idee, fecondità nei progetti, grande armonia relazionale.
 
+{{scheda-visiva:l-imperatrice}}
+
+{{sigillo:l-imperatrice}}
+
 ### 4. L'Imperatore (IV) – La Stabilità Strutturale e il Metodo
 
 - **Simbologia ed Essenza**: autorità e concretezza; stabilità, metodo rigoroso, confini solidi, gestione organizzata del mondo materiale.
