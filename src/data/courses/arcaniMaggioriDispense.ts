@@ -64,6 +64,8 @@ La dinamica iniziale del manifestato divide il cammino tra azione visibile e ges
 - **Significato Profondo**: iniziativa immediata, talento puro, destrezza, attivazione dei processi con ciò che è già disponibile, senza attendere condizioni ideali.
 - **In Chiave Previsionale**: azione pratica immediata; «mettere le mani in pasta», sfruttare le abilità pratiche e concretizzare un progetto o un'azione nei primissimi giorni.
 
+{{scheda-visiva:il-bagatto}}
+
 ### 2. La Papessa (II) – La Gestazione e la Saggezza del Silenzio
 
 - **Simbologia ed Essenza**: Seduta immobile e velata tra i pilastri del tempio, con il sacro libro chiuso o socchiuso; custodisce la conoscenza sottile senza agire all'esterno.

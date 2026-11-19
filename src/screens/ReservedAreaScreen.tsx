@@ -105,7 +105,6 @@ export function ReservedAreaScreen({
    * ENN-113 / ENN-114 / ENN-115 — mid-dispensa embeds for Maggiori Dispensa 01.
    * Order in markdown: scheda-visiva → sigillo when both exist (visual before flashcards).
    * Embed keys are `<type>:<id>` (see FormattedDispensaBody).
-   * Bagatto scheda-visiva: hold until Maria’s MD (not Matto paste) lands.
    */
   const dispensaFlashcardEmbeds = useMemo(() => {
     if (
@@ -117,11 +116,13 @@ export function ReservedAreaScreen({
       return undefined;
     }
     const embeds: Record<string, React.ReactNode> = {};
-    const mattoScheda = getSchedaVisiva('il-matto');
-    if (mattoScheda) {
-      embeds['scheda-visiva:il-matto'] = (
-        <DispensaSchedaVisiva content={mattoScheda} />
-      );
+    for (const schedaId of ['il-matto', 'il-bagatto'] as const) {
+      const scheda = getSchedaVisiva(schedaId);
+      if (scheda) {
+        embeds[`scheda-visiva:${schedaId}`] = (
+          <DispensaSchedaVisiva content={scheda} />
+        );
+      }
     }
     const mattoDeck = getInlineFlashcardDeck('il-matto');
     if (mattoDeck) {
