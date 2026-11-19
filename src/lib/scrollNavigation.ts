@@ -14,7 +14,7 @@ export const SCROLL_LANDMARKS = {
   homeDidattica: 'home-didattica',
   corsiWorkbench: 'corsi-workbench',
   corsiCheckout: 'corsi-checkout',
-  /** Public Maggiori teaser — Dispensa 01 · Il Matto (ENN-126) */
+  /** Public Maggiori teaser — nested under Modulo 01 (ENN-128) */
   corsiMaggioriPreview: 'corsi-maggiori-preview',
   /** Area Riservata — course strip / dispense list / active dispensa reader */
   reservedPercorsi: 'reserved-percorsi',
@@ -34,7 +34,7 @@ const HASH_SCREEN_ALIASES: Record<string, 'corsi' | 'chat' | 'home'> = {
   didattica: 'home',
   'home-consulti': 'home',
   'home-didattica': 'home',
-  /** ENN-126 — public Maggiori · Il Matto teaser */
+  /** ENN-126/128 — public Maggiori · Modulo 01 anteprima */
   'maggiori-preview': 'corsi',
   'matto-preview': 'corsi',
 };

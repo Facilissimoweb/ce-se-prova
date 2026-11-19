@@ -17,7 +17,6 @@ import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
 import { COURSE_SECTION_IMAGES } from '../data/sectionImages';
 import { MaggioriMattoPreview } from '../components/corsi/MaggioriMattoPreview';
-import { MaggioriMattoPreviewBody } from '../components/corsi/MaggioriMattoPreviewBody';
 import { MinorArcanaSuitsPlate, SpreadGeometryExplorer } from '../components/CourseVisuals';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -27,11 +26,11 @@ import {
 } from '../lib/formValidation';
 import {
   SCROLL_LANDMARKS,
+  afterNextPaint,
   scrollToElement,
   scrollToId,
 } from '../lib/scrollNavigation';
 import { whatsappHref } from '../lib/siteContacts';
-import { MAGGIORI_MATTO_PREVIEW_FLASHCARD_COUNT } from '../data/courses/maggioriMattoPreview';
 
 interface CorsiScreenProps {
   showCmsKeys: boolean;
@@ -93,10 +92,13 @@ export function CorsiScreen({
     scrollToElement(checkoutSectionRef.current, { behavior: 'smooth' });
   };
 
-  /** ENN-126 — open public Il Matto slice from the Maggiori card. */
+  /** ENN-128 — open Modulo 01 anteprima (nested under the 4-moduli program). */
   const handleMaggioriMattoPreview = () => {
     onChangeCourseId('arcani-maggiori');
-    scrollToId(SCROLL_LANDMARKS.corsiMaggioriPreview, { behavior: 'smooth' });
+    // Preview mounts only when Maggiori is the active workbench course.
+    afterNextPaint(() => {
+      scrollToId(SCROLL_LANDMARKS.corsiMaggioriPreview, { behavior: 'smooth' });
+    });
   };
 
   const handlePrepareCourseCheckout = async (e: React.FormEvent) => {
@@ -371,7 +373,7 @@ export function CorsiScreen({
                     className="w-full min-h-[42px] px-4 py-2 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-2 border border-[#D4AF37]/40 text-[#E6C65C] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/18 hover:border-[#D4AF37]/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
                   >
                     <Eye className="w-3.5 h-3.5" aria-hidden="true" />
-                    Anteprima gratuita · Il Matto
+                    Anteprima gratuita · Modulo 01
                   </button>
                 )}
 
@@ -397,16 +399,7 @@ export function CorsiScreen({
         })}
       </section>
 
-      {/* ENN-126 — public Maggiori · Il Matto slice (real dispensa + scheda + 3 flashcards) */}
-      <MaggioriMattoPreview
-        priceEur={
-          educationalCourses.find((c) => c.id === 'arcani-maggiori')?.priceEur ??
-          190
-        }
-        onEnroll={() => handleEnrollCourse('arcani-maggiori')}
-      />
-
-      {/* Interactive Syllabus + Visual Workbench */}
+      {/* Interactive Syllabus + Visual Workbench — Maggiori anteprima lives under Modulo 01 (ENN-128) */}
       <section
         id={SCROLL_LANDMARKS.corsiWorkbench}
         ref={workbenchSectionRef}
@@ -457,88 +450,83 @@ export function CorsiScreen({
           </div>
         </div>
 
-        {/* 12-col Split: 4 Modules Syllabus + Domain Visual Sandbox */}
+        {/* 12-col Split: 4 Modules Syllabus + Domain Visual Sandbox.
+            Maggiori: anteprima bound under Modulo 01 only (full-width modules). */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left: Structured 4-module curriculum */}
-          <div className="lg:col-span-6 space-y-4">
+          <div
+            className={
+              activeCourse.id === 'arcani-maggiori'
+                ? 'lg:col-span-12 space-y-4'
+                : 'lg:col-span-6 space-y-4'
+            }
+          >
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
               <Layers className="w-4 h-4" aria-hidden="true" />
               <span>Struttura in 4 Moduli</span>
             </div>
 
             <div className="space-y-3">
-              {activeCourse.modules.map((mod) => (
-                <div
-                  key={mod.number}
-                  className="rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/18 p-4 md:p-5 space-y-2"
-                >
-                  <div className="flex items-center justify-between gap-2 text-xs">
-                    <span className="font-display text-[#D4AF37] tabular-nums">
-                      Modulo {mod.number}
-                    </span>
-                    <span className="text-[#A39B93] inline-flex items-center gap-1 tabular-nums">
-                      <Clock className="w-3.5 h-3.5 text-[#D4AF37]/80" />
-                      {mod.duration}
-                    </span>
+              {activeCourse.modules.map((mod) => {
+                const showMaggioriModuloPreview =
+                  activeCourse.id === 'arcani-maggiori' && mod.number === '01';
+                return (
+                  <div
+                    key={mod.number}
+                    className="rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/18 p-4 md:p-5 space-y-2"
+                  >
+                    <div className="flex items-center justify-between gap-2 text-xs">
+                      <span className="font-display text-[#D4AF37] tabular-nums">
+                        Modulo {mod.number}
+                      </span>
+                      <span className="text-[#A39B93] inline-flex items-center gap-1 tabular-nums">
+                        <Clock className="w-3.5 h-3.5 text-[#D4AF37]/80" />
+                        {mod.duration}
+                      </span>
+                    </div>
+                    <h3 className="font-display text-base md:text-lg text-[#F4F1EA]">
+                      {mod.title}
+                    </h3>
+                    <p className="text-xs md:text-sm leading-relaxed text-[#A39B93]">
+                      {mod.summary}
+                    </p>
+
+                    {showMaggioriModuloPreview && (
+                      <div className="pt-3">
+                        <MaggioriMattoPreview
+                          nested
+                          priceEur={
+                            educationalCourses.find(
+                              (c) => c.id === 'arcani-maggiori'
+                            )?.priceEur ?? 190
+                          }
+                          onEnroll={() => handleEnrollCourse('arcani-maggiori')}
+                        />
+                      </div>
+                    )}
                   </div>
-                  <h3 className="font-display text-base md:text-lg text-[#F4F1EA]">
-                    {mod.title}
-                  </h3>
-                  <p className="text-xs md:text-sm leading-relaxed text-[#A39B93]">
-                    {mod.summary}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
-          {/* Right: Interactive Domain Preview */}
-          <div className="lg:col-span-6 space-y-4">
-            <div className="flex items-center justify-between gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-              <span>Anteprima Didattica Interattiva</span>
-              <span className="text-[#A39B93] font-normal normal-case">
-                {activeCourse.id === 'arcani-maggiori'
-                  ? 'Scheda reale · Il Matto'
-                  : activeCourse.id === 'arcani-minori'
+          {activeCourse.id !== 'arcani-maggiori' && (
+            <div className="lg:col-span-6 space-y-4">
+              <div className="flex items-center justify-between gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                <span>Anteprima Didattica Interattiva</span>
+                <span className="text-[#A39B93] font-normal normal-case">
+                  {activeCourse.id === 'arcani-minori'
                     ? 'Atlante dei 4 Semi'
                     : 'Schemi di Stesa'}
-              </span>
-            </div>
-
-            {activeCourse.id === 'arcani-maggiori' && (
-              <div className="space-y-4">
-                <div className="rounded-xl border border-[#D4AF37]/35 bg-[#D4AF37]/10 p-4 md:p-5 space-y-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37] inline-flex items-center gap-1.5">
-                    <Eye className="w-3.5 h-3.5" aria-hidden="true" />
-                    Contenuto reale · Dispensa 01
-                  </p>
-                  <p className="font-display text-base md:text-lg text-[#F4F1EA]">
-                    Anteprima gratuita · Il Matto
-                  </p>
-                  <p className="text-xs md:text-sm text-[#A39B93] leading-relaxed">
-                    Bullet della scheda, widget scheda visiva e{' '}
-                    {MAGGIORI_MATTO_PREVIEW_FLASHCARD_COUNT} flashcard del
-                    Sigillo — stesso assaggio dell&apos;Area Riservata, senza
-                    login.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleMaggioriMattoPreview}
-                    className="text-xs font-medium text-[#E6C65C] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded"
-                  >
-                    Apri anche la sezione anteprima sopra il programma
-                  </button>
-                </div>
-
-                {/* ENN-127 — real Matto scheda (no mock presente/previsione map) */}
-                <MaggioriMattoPreviewBody compact />
+                </span>
               </div>
-            )}
 
-            {activeCourse.id === 'arcani-minori' && <MinorArcanaSuitsPlate />}
+              {activeCourse.id === 'arcani-minori' && <MinorArcanaSuitsPlate />}
 
-            {activeCourse.id === 'metodi-stesura' && <SpreadGeometryExplorer />}
-          </div>
+              {activeCourse.id === 'metodi-stesura' && (
+                <SpreadGeometryExplorer />
+              )}
+            </div>
+          )}
         </div>
       </section>
 
