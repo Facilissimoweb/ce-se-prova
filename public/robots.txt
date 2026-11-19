@@ -8,40 +8,47 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /area-riservata
+Disallow: /laboratorio/
 
 # OpenAI
 User-agent: GPTBot
 Allow: /
 Disallow: /api/
 Disallow: /area-riservata
+Disallow: /laboratorio/
 
 # Anthropic
 User-agent: ClaudeBot
 Allow: /
 Disallow: /api/
 Disallow: /area-riservata
+Disallow: /laboratorio/
 
 User-agent: anthropic-ai
 Allow: /
 Disallow: /api/
 Disallow: /area-riservata
+Disallow: /laboratorio/
 
 # Google Gemini / AI Overviews training signal
 User-agent: Google-Extended
 Allow: /
 Disallow: /api/
 Disallow: /area-riservata
+Disallow: /laboratorio/
 
 # Perplexity
 User-agent: PerplexityBot
 Allow: /
 Disallow: /api/
 Disallow: /area-riservata
+Disallow: /laboratorio/
 
 # Apple Intelligence / Applebot extended
 User-agent: Applebot-Extended
 Allow: /
 Disallow: /api/
 Disallow: /area-riservata
+Disallow: /laboratorio/
 
 Sitemap: /sitemap.xml

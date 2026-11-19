@@ -71,6 +71,12 @@ const PAGE_SEO: Record<ScreenId, PageSeo> = {
       'Approfondimenti riservati sul Terzo Settenario (XV–XXI): nodi pratici, archi e sintesi per i corsisti Tarot Italia.',
     noindex: true,
   },
+  'laboratorio-arcani-maggiori': {
+    title: 'Laboratorio Arcani Maggiori — Tarot Italia',
+    description:
+      'Laboratorio interattivo riservato Arcani Maggiori (Primo Step): settenari, atlante delle 22 lame e stese pratiche.',
+    noindex: true,
+  },
   privacy: {
     title: 'Privacy — Tarot Italia',
     description:
