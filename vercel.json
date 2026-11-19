@@ -3,6 +3,23 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/news/primo-settenario-mappa-identita",
+      "destination": "/news/il-coraggio-di-iniziare-il-matto",
+      "permanent": true
+    },
+    {
+      "source": "/blog/primo-settenario-mappa-identita",
+      "destination": "/news/il-coraggio-di-iniziare-il-matto",
+      "permanent": true
+    },
+    {
+      "source": "/articoli/primo-settenario-mappa-identita",
+      "destination": "/news/il-coraggio-di-iniziare-il-matto",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/health",

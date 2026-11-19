@@ -35,7 +35,7 @@ tags:
 
 Opzionale: `cover: /brand/mia-immagine.png` (path sotto `public/`).
 
-### Articolo gated Maggiori (ENN-131)
+### Articolo gated Maggiori (ENN-131 / ENN-132)
 
 Per legare un pezzo al corso (Phase 1: unlock = acquisto Arcani Maggiori, non Stripe per articolo):
 
@@ -54,6 +54,9 @@ Testo intro SEO (sempre visibile)…
 
 Approfondimento (solo corsisti Maggiori)…
 ```
+
+Articolo Modulo 01 attuale: `/news/il-coraggio-di-iniziare-il-matto` (Il Matto).  
+Lo slug promo ENN-131 `primo-settenario-mappa-identita` reindirizza al pezzo Matto.
 
 3. Corpo in Markdown semplice (`##`, `###`, elenchi, `**grassetto**`, link `[testo](url)`).
 4. Con `draft: true` l’articolo **non** compare sul sito né in `GET /api/news`.

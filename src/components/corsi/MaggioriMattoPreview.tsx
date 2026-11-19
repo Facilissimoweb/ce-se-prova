@@ -221,8 +221,9 @@ export function MaggioriMattoPreview({
                 Dal Blog · Modulo 01
               </p>
               <p className="text-sm text-[#E8e1dd] leading-relaxed">
-                Intro pubblica sulla mappa del Primo Settenario; l&apos;approfondimento
-                si sblocca con l&apos;acquisto Maggiori.
+                Articolo su Il Matto (0): intro pubblica e approfondimento
+                (iconografia, Tre Settenari, laboratorio) sbloccato con
+                l&apos;acquisto Maggiori.
               </p>
               <button
                 type="button"
