@@ -3,7 +3,8 @@ import type { ArcanaCard } from '../types/handoff';
 /**
  * I 22 Arcani Maggiori completi per il dialogo interattivo di Tarot Italia.
  * Ogni Arcano include lettura del presente, tendenza previsionale del futuro,
- * declinazioni su relazioni e lavoro, e tre domande di consapevolezza.
+ * declinazioni su relazioni e lavoro (lettura + futuro + consiglio dedicati),
+ * e tre domande di consapevolezza.
  */
 export const MAJOR_ARCANA: ArcanaCard[] = [
   {
@@ -24,6 +25,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'In amore annuncia incontri inattesi, leggerezza ritrovata o la necessità di rinnovare un legame uscendo dalla routine.',
     workReading:
       'Sul piano professionale indica l’avvio di un progetto inedito, un cambio di settore o un’idea originale ancora tutta da plasmare.',
+    loveFuture:
+      'In amore si profilano incontri improvvisi, una dichiarazione fuori schema o la voglia di ripartire da zero lasciando dietro dinamiche stantie.',
+    workFuture:
+      'Sul lavoro arrivano proposte fuori programma, un trasferimento o l’avvio di un’iniziativa autonoma che premia chi osa cambiare mestiere o metodo.',
+    loveAdvice:
+      'Prima di impegnarti, chiediti se stai fuggendo dalla solitudine o se stai davvero aprendo il cuore a qualcosa di nuovo.',
+    workAdvice:
+      'Prepara un piano minimo concreto (budget, tempi, contatti) e poi fai il primo passo professionale senza aspettare garanzie totali.',
     maieuticQuestions: [
       'Quale passo nuovo sto rimandando solo per paura di non avere tutte le garanzie?',
       'Cosa posso lasciare andare oggi per sentirmi più leggero nel prossimo ciclo?',
@@ -48,6 +57,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Segnala dialoghi chiarificatori, attrazione intellettuale e la possibilità di dare un nuovo impulso a una conoscenza o coppia.',
     workReading:
       'Favorisce trattative, colloqui, lanci di progetti autonomi e acquisizione di nuove competenze pratiche.',
+    loveFuture:
+      'Nelle relazioni si aprono conversazioni decisive, un messaggio che sblocca l’attesa o il primo gesto concreto che fa passare dalla simpatia all’intesa.',
+    workFuture:
+      'In ambito professionale arrivano colloqui, trattative o il lancio di un’iniziativa in cui conta la tua capacità di usare subito gli strumenti che hai.',
+    loveAdvice:
+      'Smetti di aspettare che l’altro legga nel pensiero: proponi un incontro o un chiarimento chiaro e misurabile.',
+    workAdvice:
+      'Scegli un obiettivo professionale preciso e compi entro quarantotto ore la prima azione reale (mail, bozza, chiamata).',
     maieuticQuestions: [
       'Quale talento o risorsa ho già sul tavolo ma non sto ancora usando?',
       'Qual è il primo gesto concreto che posso compiere entro quarantotto ore?',
@@ -72,6 +89,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Indica sentimenti profondi ma riservati, bisogno di autenticità interiore o dinamiche non ancora dichiarate apertamente.',
     workReading:
       'Consiglia studio, ricerca, preparazione accurata dietro le quinte prima di firmare accordi o presentare un piano.',
+    loveFuture:
+      'In amore emergeranno sentimenti finora taciuti, un segnale discreto o la conferma che ciò che intuisci sul legame ha fondamento.',
+    workFuture:
+      'Sul lavoro arriveranno informazioni riservate, esiti di ricerche o tempi di preparazione utili prima di firmare o presentare in pubblico.',
+    loveAdvice:
+      'Non forzare dichiarazioni premature: ascolta cosa si muove sotto le parole e custodisci ciò che ancora non è maturo da condividere.',
+    workAdvice:
+      'Studia e prepara dietro le quinte; evita annunci o firme finché i dettagli chiave non sono chiari.',
     maieuticQuestions: [
       'Cosa intuisco già con chiarezza ma esito ancora ad ammettere a me stesso?',
       'Quale scelta merita ancora qualche giorno di riserbo e ascolto?',
@@ -96,6 +121,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Annuncia complicità, affetto espresso con calore, consolidamento sentimentale o un periodo favorevole alla vita familiare.',
     workReading:
       'Ottimo presagio per attività creative, comunicazione, collaborazioni armoniose e crescita di progetti già avviati.',
+    loveFuture:
+      'In amore si consolida calore quotidiano, gesti di cura, progetti di famiglia o una stagione in cui l’affetto diventa tangibile e generoso.',
+    workFuture:
+      'Sul lavoro fioriscono collaborazioni creative, feedback positivi e crescita concreta di progetti già coltivati con costanza.',
+    loveAdvice:
+      'Nutri il legame con gesti quotidiani di bellezza e presenza: non dare per scontato ciò che cresce solo se curato.',
+    workAdvice:
+      'Dai spazio e risorse a ciò che è già creativo e produttivo, senza sacrificare benessere e ritmo sostenibile.',
     maieuticQuestions: [
       'Quale progetto o relazione sta chiedendo cura e nutrimento quotidiano?',
       'Come posso esprimere in modo più autentico la mia creatività?',
@@ -120,6 +153,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Indica bisogno di sicurezza, presenza affidabile o la necessità di allentare il controllo per lasciare spazio all’ascolto.',
     workReading:
       'Sostiene leadership, organizzazione finanziaria, contratti solidi e il riconoscimento della tua autorevolezza.',
+    loveFuture:
+      'In amore emerge il bisogno di regole chiare nella coppia, di affidabilità reciproca o di rinegoziare chi decide e chi ascolta.',
+    workFuture:
+      'Sul lavoro si consolidano ruoli di responsabilità, budget, contratti stabili e riconoscimenti di leadership basati sulla disciplina.',
+    loveAdvice:
+      'Offri stabilità senza soffocare: definisci confini amorevoli e lascia spazio all’altro di esprimersi senza controllo eccessivo.',
+    workAdvice:
+      'Trasforma le intenzioni in un piano con scadenze e risorse; guida con fermezza, non con rigidità punitiva.',
     maieuticQuestions: [
       'Dove devo tracciare un confine più chiaro per proteggere la mia energia?',
       'Quale struttura pratica manca oggi al mio progetto per diventare stabile?',
@@ -144,6 +185,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Parla di legami fondati su rispetto, condivisione di valori, promesse durature o ricerca di armonia spirituale.',
     workReading:
       'Favorisce docenze, consulenze, percorsi di certificazione e collaborazioni basate su fiducia e serietà.',
+    loveFuture:
+      'In amore si avvicina un passo di impegno condiviso — promesse, dialogo sui valori di coppia o la benedizione di un legame che chiede chiarezza etica e rispetto reciproco.',
+    workFuture:
+      'Sul lavoro arrivano mentorship, corsi o certificazioni, e ufficializzazioni di ruolo basate su fiducia, serietà e trasmissione di competenza.',
+    loveAdvice:
+      'Scegli e custodisci un legame allineato ai tuoi principi: se serve, chiedi un confronto con qualcuno di fiducia sulla relazione, non solo sul “cosa fare”.',
+    workAdvice:
+      'Investi in formazione qualificata e in collaborazioni etiche; non accettare scorciatoie che tradiscono ciò in cui credi professionalmente.',
     maieuticQuestions: [
       'Quale principio non negoziabile deve guidare la scelta che ho davanti?',
       'Da chi potrei accogliere un consiglio lucido e disinteressato in questo momento?',
@@ -168,6 +217,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Arcano d’elezione per intesa sentimentale, attrazione reciproca, scelte di coppia o chiarimenti decisivi del cuore.',
     workReading:
       'Indica collaborazioni basate sull’affinità oppure un bivio professionale tra due strade ugualmente allettanti.',
+    loveFuture:
+      'In amore arriva una scelta di cuore da prendere con sincerità: un’intesa reciproca, un sì consapevole o il chiarimento di chi vuoi davvero accanto.',
+    workFuture:
+      'Sul lavoro si apre un bivio tra due strade allettanti, oppure una collaborazione basata su affinità reale più che su convenienza.',
+    loveAdvice:
+      'Non restare a metà per paura di ferire: dichiara cosa desideri davvero nella relazione e scegli con interezza.',
+    workAdvice:
+      'Valuta le due opzioni professionali in base a valori e energia quotidiana, non solo a stipendio o prestigio.',
     maieuticQuestions: [
       'Tra le opzioni davanti a me, quale nasce dal desiderio autentico e quale dalla paura?',
       'Cosa significa oggi scegliere con tutto il cuore senza rimanere a metà?',
@@ -192,6 +249,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Dinamismo, desiderio di superare ostacoli esterni insieme o uno spostamento che ravviva la relazione.',
     workReading:
       'Forte avanzamento di carriera, vittoria in una trattativa, mobilità lavorativa e risultati rapidi.',
+    loveFuture:
+      'Nella coppia si supera un ostacolo esterno, si decide un trasferimento insieme o si ritrova slancio dopo una fase di stallo sentimentale.',
+    workFuture:
+      'In carriera arrivano avanzamenti concreti, vittorie in trattative, mobilità o traguardi raggiunti grazie a determinazione e rotta chiara.',
+    loveAdvice:
+      'Tieni la stessa direzione emotiva: non lasciare che rabbia e tenerezza tirino la relazione in sensi opposti.',
+    workAdvice:
+      'Definisci la meta professionale del mese e accelera senza perdere lucidità su priorità e risorse.',
     maieuticQuestions: [
       'Verso quale meta precisa sto orientando le mie energie in questo mese?',
       'Quali due spinte interiori opposte ho bisogno di armonizzare per avanzare?',
@@ -216,6 +281,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Richiede sincerità reciproca, parità nei ruoli e chiarimenti netti su impegni o decisioni condivise.',
     workReading:
       'Favorisce contratti, pratiche burocratiche o legali, valutazioni meritocratiche e bilanci economici trasparenti.',
+    loveFuture:
+      'In amore arrivano chiarimenti netti su impegni, equità nei ruoli o decisioni condivise che chiudono zone grigie nella coppia.',
+    workFuture:
+      'Sul lavoro si chiudono contratti, pratiche legali o bilanci trasparenti: verdetti e firme che premiano chiarezza e merito.',
+    loveAdvice:
+      'Chiedi e offri parità: spezza ambiguità su cosa siete l’uno per l’altro e ristabilisci il dare-ricevere affettivo.',
+    workAdvice:
+      'Metti per iscritto accordi e numeri; taglia ambiguità contrattuali prima che diventino contenzioso.',
     maieuticQuestions: [
       'Sto guardando i fatti così come sono o li sto filtrando attraverso un desiderio?',
       'Dove si è creato uno squilibrio tra ciò che do e ciò che ricevo?',
@@ -240,6 +313,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Indica bisogno di spazio interiore per comprendere i propri sentimenti reali o un legame profondo, maturo e poco incline alla superficialità.',
     workReading:
       'Favorisce lavoro autonomo, ricerca, revisione strategica e scelte ponderate prima di esporsi pubblicamente.',
+    loveFuture:
+      'In amore matura una comprensione silenziosa dei tuoi sentimenti reali, o si approfondisce un legame adulto che non ha bisogno di rumorose prove.',
+    workFuture:
+      'Sul lavoro prevalgono ricerca, revisione strategica e scelte ponderate prima di esporsi: risposte che nascono dalla riflessione, non dalla fretta.',
+    loveAdvice:
+      'Concediti (e concedi) spazio senza chiudere la porta: ascolta cosa senti davvero prima di promettere o chiedere.',
+    workAdvice:
+      'Sospendi annunci pubblici e lavora in autonomia finché la prossima mossa professionale non è chiara alla tua lanterna.',
     maieuticQuestions: [
       'Dove sto cercando risposte all’esterno quando conosco già il mio passo?',
       'Quale rumore superfluo posso sospendere oggi per ascoltare con lucidità?',
@@ -264,6 +345,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Segnala incontri karmici o inattesi, cambi di fase nella coppia o la fine di una ripetizione emotiva.',
     workReading:
       'Novità improvvise, cambi di contesto, opportunità favorevoli e necessità di adattarsi rapidamente.',
+    loveFuture:
+      'In amore gira una fase nuova: incontro inatteso, fine di una ripetizione emotiva o sblocco di una storia ferma da troppo tempo.',
+    workFuture:
+      'Sul lavoro arriva una svolta di contesto — opportunità improvvisa, cambio di scenario o sblocco di una situazione professionale stagnante.',
+    loveAdvice:
+      'Accogli il cambio di fase sentimentale senza aggrapparti allo schema vecchio: resta aperto a ciò che la coincidenza porta.',
+    workAdvice:
+      'Tieni flessibilità operativa: quando arriva l’occasione professionale, coglila senza restare bloccato nei piani di ieri.',
     maieuticQuestions: [
       'Quale schema ripetitivo è pronto a chiudersi definitivamente in questo ciclo?',
       'Sono pronto a riconoscere e cogliere l’occasione quando la ruota gira?',
@@ -288,6 +377,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Passione profonda unita a tenerezza, capacità di ricucire tensioni con pazienza e magnetismo autentico.',
     workReading:
       'Resistenza nelle sfide impegnative, coraggio di sostenere le proprie idee e risoluzione diplomatica di conflitti.',
+    loveFuture:
+      'In amore la pazienza ricuce tensioni: passione e tenerezza si alleano e il legame guadagna fiducia dopo una prova emotiva.',
+    workFuture:
+      'Sul lavoro superi una resistenza con costanza serena: le tue idee tengono e i conflitti si risolvono con presenza diplomatica.',
+    loveAdvice:
+      'Non forzare l’altro né te stesso: canalizza gelosia o paura in dialogo caldo e fermo, senza aggressività.',
+    workAdvice:
+      'Sostieni le tue posizioni professionali con calma irremovibile; evita scontri frontali quando basta tenacia paziente.',
     maieuticQuestions: [
       'Quale paura o impulso sto cercando di forzare invece di ascoltare con calma?',
       'Dove posso mostrare più coraggio gentile verso me stesso?',
@@ -312,6 +409,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Fase di riflessione o attesa che invita a capire cosa sei disposto a trasformare senza sacrificare te stesso.',
     workReading:
       'Rallentamento temporaneo utile a rivedere strategie, priorità o accordi prima di ripartire su basi nuove.',
+    loveFuture:
+      'In amore una pausa o un’attesa prepara un cambio di sguardo sul legame: ciò che sembra fermo rivela cosa sei disposto a trasformare.',
+    workFuture:
+      'Sul lavoro un rallentamento temporaneo serve a rivedere strategia e priorità prima di ripartire su basi nuove e più lucide.',
+    loveAdvice:
+      'Smetti di spingere l’altro a rispondere subito: sospendi e osserva la relazione da un’angolazione inedita.',
+    workAdvice:
+      'Non forzare scadenze su una porta chiusa: rivedi priorità e accordi, poi riparti quando la visione è chiara.',
     maieuticQuestions: [
       'Come apparirebbe questo problema se lo guardassi capovolgendo le mie aspettative?',
       'Cosa sto trattenendo per abitudine che invece chiede di essere lasciato andare?',
@@ -336,6 +441,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Trasformazione profonda di un legame su basi totalmente rinnovate oppure chiusura definitiva di una storia esaurita.',
     workReading:
       'Fine di un ruolo, contratto o metodo superato per lasciare posto a un percorso molto più aderente a chi sei oggi.',
+    loveFuture:
+      'In amore si chiude una storia esaurita o nasce un legame su basi totalmente rinnovate: il taglio apre spazio a un’alba affettiva autentica.',
+    workFuture:
+      'Sul lavoro termina un ruolo, un contratto o un metodo superato: subito dopo si apre un percorso più aderente a chi sei oggi.',
+    loveAdvice:
+      'Onora la fine senza trattenere forme vuote: non restare per abitudine in un legame che ha già esaurito la sua vita.',
+    workAdvice:
+      'Chiudi con chiarezza ciò che è finito professionalmente e investi energia solo in ciò che può rinascere con te.',
     maieuticQuestions: [
       'Cosa nella mia vita è già finito interiormente ma fatico ancora a salutare?',
       'Quale zavorra posso deporre per permettere alla nuova alba di sorgere?',
@@ -360,6 +473,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Dialogo disteso, tenerezza, guarigione di ferite passate e ritrovata armonia quotidiana nella coppia.',
     workReading:
       'Collaborazioni fluide, mediazioni riuscite, gestione equilibrata del tempo e stabilità progressiva.',
+    loveFuture:
+      'In amore tornano dialogo disteso, tenerezza e guarigione di ferite passate: la coppia ritrova un ritmo quotidiano armonico.',
+    workFuture:
+      'Sul lavoro maturano mediazioni riuscite, collaborazioni fluide e una gestione del tempo più sana e sostenibile.',
+    loveAdvice:
+      'Non forzare riconciliazioni a tappe forzate: mescola ascolto e pazienza finché la tenerezza torna naturale.',
+    workAdvice:
+      'Cerca sintesi tra esigenze opposte in team o clienti; evita estremi di carico e procedi con gradualità.',
     maieuticQuestions: [
       'Quali due aspetti della mia vita hanno bisogno oggi di essere integrati con dolcezza?',
       'Dove posso sostituire la fretta con un ritmo più armonico e rispettoso?',
@@ -384,6 +505,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Forte magnetismo e attrazione fisica, ma anche invito a vigilare su gelosie, possessività o giochi di potere.',
     workReading:
       'Ambizione materiale ed energia produttiva elevate; leggi con attenzione clausole, compensi e dipendenze economiche.',
+    loveFuture:
+      'In amore intensità e magnetismo salgono: emergeranno anche prove su gelosia, possessività o dipendenza emotiva da affrontare con lucidità.',
+    workFuture:
+      'Sul lavoro crescono ambizione e pressione su compensi o clausole: attenzioni a contratti vincolanti e dipendenze economiche da sciogliere.',
+    loveAdvice:
+      'Riconosci dove cedi potere per paura di perdere l’altro: riprendi scelta e dignità senza spegnere il desiderio autentico.',
+    workAdvice:
+      'Leggi ogni clausola e ogni dipendenza da un cliente o datore: non scambiare sicurezza materiale con libertà professionale.',
     maieuticQuestions: [
       'A quale attaccamento o paura sto consegnando silenziosamente la mia libertà?',
       'Quale desiderio intenso chiede di essere riconosciuto senza vergogna né eccesso?',
@@ -408,6 +537,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Verità che vengono a galla di colpo, crisi chiarificatrici o rottura di schemi finti per tornare all’autenticità.',
     workReading:
       'Cambiamenti repentini di assetto, ristrutturazioni o intuizioni folgoranti che impongono un cambio di rotta immediato.',
+    loveFuture:
+      'In amore una verità esplode: crisi chiarificatrice o fine di uno schema finto, con spazio per ricostruire solo sull’autenticità.',
+    workFuture:
+      'Sul lavoro arrivano ristrutturazioni, cambi di assetto o intuizioni che impongono una rotta nuova senza indugi.',
+    loveAdvice:
+      'Non ricostruire la stessa illusione: salva ciò che è vivo nel legame e lascia cadere le maschere.',
+    workAdvice:
+      'Accetta lo scossone organizzativo; metti in salvo competenze e relazioni utili e riparti su basi verificabili.',
     maieuticQuestions: [
       'Quale falsa sicurezza nella mia vita si regge solo sull’abitudine?',
       'Quale verità ho già intuito ma temo ancora che venga alla luce?',
@@ -432,6 +569,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Tenerezza sincera, rinnovata speranza affettiva, incontri limpidi e affinità spirituale.',
     workReading:
       'Ispirazione artistica o progettuale, visibilità positiva, vocazione autentica e prospettive serene a medio termine.',
+    loveFuture:
+      'In amore tornano tenerezza sincera, speranza rinnovata e incontri limpidi: un orizzonte affettivo più chiaro dopo la tempesta.',
+    workFuture:
+      'Sul lavoro si apre visibilità positiva, ispirazione progettuale e prospettive serene allineate alla tua vocazione autentica.',
+    loveAdvice:
+      'Mostrati senza maschere nella relazione: la fiducia nasce dalla trasparenza, non dalla perfezione.',
+    workAdvice:
+      'Condividi la tua visione professionale con chiarezza; investi in ciò che ispira davvero, non solo in ciò che “fa curriculum”.',
     maieuticQuestions: [
       'Qual è l’orizzonte luminoso verso cui sento di poter guardare di nuovo con fiducia?',
       'In cosa posso essere oggi più trasparente e autentico?',
@@ -456,6 +601,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Emozioni profonde e nostalgiche, ma anche possibili malintesi o paure non dette da chiarire con dolcezza.',
     workReading:
       'Ottimo per l’immaginazione creativa e artistica; su accordi e denaro attendi invece chiarezza completa prima di decidere.',
+    loveFuture:
+      'In amore riaffiorano emozioni profonde e possibili malintesi: servirà chiarire paure non dette prima che la nebbia si addensi.',
+    workFuture:
+      'Sul lavoro l’immaginazione creativa è fertile, ma su contratti e denaro i contorni restano confusi finché non verifichi i fatti.',
+    loveAdvice:
+      'Distingui intuito e proiezione: parla con dolcezza di ciò che temi, invece di immaginare tradimenti o rifiuti.',
+    workAdvice:
+      'Usa la creatività, ma non firmare né investire finché numeri e clausole non sono limpidi.',
     maieuticQuestions: [
       'Quale timore attuale appartiene davvero al presente e quale invece al passato?',
       'Cosa mi stanno suggerendo i miei sogni o la mia sensibilità in questi giorni?',
@@ -480,6 +633,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Amore luminoso, gioia condivisa, chiarimento totale, progetti di coppia felici e vitalità affettiva.',
     workReading:
       'Riconoscimento pubblico, ottimo andamento economico, collaborazione trasparente e realizzazione dei tuoi sforzi.',
+    loveFuture:
+      'In amore si apre una stagione di gioia condivisa, chiarimenti felici e progetti di coppia vissuti con vitalità e luce.',
+    workFuture:
+      'Sul lavoro arrivano riconoscimenti pubblici, risultati evidenti e collaborazioni trasparenti che premiano sincerità e impegno.',
+    loveAdvice:
+      'Celebra e condividi la gioia di coppia senza sminuirla: lascia che il calore arrivi anche agli altri intorno a voi.',
+    workAdvice:
+      'Accogli il successo professionale senza falsa modestia; condividi credito e generosità con il team.',
     maieuticQuestions: [
       'Cosa merita oggi di essere celebrato nella mia vita con gratitudine?',
       'Dove posso portare più chiarezza solare e sincerità immediata?',
@@ -504,6 +665,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Ritorni significativi, rinascita profonda di un rapporto o una comprensione che libera entrambi dal passato.',
     workReading:
       'Scoperta o conferma della propria vocazione, chiamata professionale importante e svolta decisiva.',
+    loveFuture:
+      'In amore possono arrivare un ritorno significativo, una rinascita del rapporto o una comprensione che libera entrambi dal passato.',
+    workFuture:
+      'Sul lavoro arriva una chiamata o conferma di vocazione: notizie decisive e una svolta professionale che non puoi più ignorare.',
+    loveAdvice:
+      'Rispondi al richiamo del cuore senza restare prigioniero di colpe passate: il perdono apre lo spazio al nuovo.',
+    workAdvice:
+      'Accogli la chiamata professionale con presenza: non lasciarti bloccare dal giudizio su errori di carriera passati.',
     maieuticQuestions: [
       'Quale chiamata autentica sta suonando nella mia vita che non posso più ignorare?',
       'Cosa posso perdonare a me stesso per rinascere leggero in questa nuova fase?',
@@ -528,6 +697,14 @@ export const MAJOR_ARCANA: ArcanaCard[] = [
       'Pienezza affettiva, armonia matura, realizzazione di un progetto di vita o incontro che fa sentire a casa.',
     workReading:
       'Completamento brillante di un grande progetto, aperture verso l’estero o piena affermazione professionale.',
+    loveFuture:
+      'In amore si corona un ciclo con pienezza e armonia matura: progetto di vita condiviso o senso di casa ritrovato nel legame.',
+    workFuture:
+      'Sul lavoro si completa un grande progetto, con aperture verso l’estero o piena affermazione del percorso costruito finora.',
+    loveAdvice:
+      'Riconosci la strada percorsa insieme e apriti a un orizzonte di coppia più ampio, con il cuore integro.',
+    workAdvice:
+      'Celebra il traguardo professionale e preparati al prossimo cerchio: viaggio, studio o mercato più ampio.',
     maieuticQuestions: [
       'Quale grande ciclo della mia vita sta giungendo oggi al suo pieno compimento?',
       'Quali parti di me si sono finalmente riconciliate in questo percorso?',
@@ -578,33 +755,10 @@ export function detectDialogueDomain(userQuery: string): DialogueDomain | null {
   return null;
 }
 
-function softenLead(text: string): string {
-  const trimmed = text.trim();
-  if (!trimmed) return trimmed;
-  return trimmed.charAt(0).toLowerCase() + trimmed.slice(1);
-}
-
-/** Parafrasi soft di futuro/consiglio per ambito finché non arrivano campi dedicati (Fase B). */
-function domainFutureBlock(domain: 'love' | 'work', card: ArcanaCard): string {
-  const core = softenLead(card.futureTendency);
-  if (domain === 'love') {
-    return `Tendenza in amore: In chiave affettiva, ${core}`;
-  }
-  return `Tendenza nel lavoro: Sul piano professionale e dei progetti, ${core}`;
-}
-
-function domainAdviceBlock(domain: 'love' | 'work', card: ArcanaCard): string {
-  const core = softenLead(card.advice);
-  if (domain === 'love') {
-    return `Orientamento affettivo: Nelle relazioni, ${core}`;
-  }
-  return `Orientamento professionale: Nei progetti e nel lavoro, ${core}`;
-}
-
 /**
  * Genera una risposta contestuale autentica per il dialogo con qualsiasi dei 22 Arcani Maggiori,
  * integrando lettura del presente, tendenza previsionale del futuro, ambito (amore/lavoro) e consiglio.
- * In amore/lavoro non riusa i blocchi grezzi di futuro/consiglio del percorso generale.
+ * In amore/lavoro usa solo campi di dominio (loveFuture/workFuture, loveAdvice/workAdvice): mai futureTendency/advice condivisi.
  */
 export function buildArcanaDialogueReply(
   userQuery: string,
@@ -633,11 +787,18 @@ export function buildArcanaDialogueReply(
             ? 'Futuro'
             : 'Generale';
 
+    const futureLine =
+      domain === 'love' && activeCard.loveFuture
+        ? activeCard.loveFuture
+        : domain === 'work' && activeCard.workFuture
+          ? activeCard.workFuture
+          : future.card.futureTendency;
+
     return [
       `Nella tua stesa a tre Arcani (ambito: ${domainLabel}) sul tema "${userQuery.trim()}":`,
       `• ${past.position} (${past.card.name} · ${past.card.numeral}): mostra da dove nasce la situazione (${past.card.keywords.slice(0, 2).join(', ').toLowerCase()}).`,
       `• ${present.position} (${present.card.name} · ${present.card.numeral}): ${present.card.synthesis}`,
-      `• ${future.position} (${future.card.name} · ${future.card.numeral}): ${future.card.futureTendency}`,
+      `• ${future.position} (${future.card.name} · ${future.card.numeral}): ${futureLine}`,
       domain === 'love' || domain === 'work'
         ? `Indicazione per ${domainLabel.toLowerCase()}: ${domainNote}`
         : `Indicazione sintetica: ${domainNote}`,
@@ -660,12 +821,20 @@ export function buildArcanaDialogueReply(
 
   if (domain === 'love') {
     parts.push(`Lettura affettiva: ${activeCard.loveReading}`);
-    parts.push(domainFutureBlock('love', activeCard));
-    parts.push(domainAdviceBlock('love', activeCard));
+    if (activeCard.loveFuture) {
+      parts.push(`Tendenza in amore: ${activeCard.loveFuture}`);
+    }
+    if (activeCard.loveAdvice) {
+      parts.push(`Orientamento affettivo: ${activeCard.loveAdvice}`);
+    }
   } else if (domain === 'work') {
     parts.push(`Lettura professionale: ${activeCard.workReading}`);
-    parts.push(domainFutureBlock('work', activeCard));
-    parts.push(domainAdviceBlock('work', activeCard));
+    if (activeCard.workFuture) {
+      parts.push(`Tendenza nel lavoro: ${activeCard.workFuture}`);
+    }
+    if (activeCard.workAdvice) {
+      parts.push(`Orientamento professionale: ${activeCard.workAdvice}`);
+    }
   } else {
     parts.push(`Lettura del presente: ${activeCard.synthesis}`);
     parts.push(`Linea previsionale (futuro): ${activeCard.futureTendency}`);
@@ -673,6 +842,40 @@ export function buildArcanaDialogueReply(
   }
 
   return parts.join('\n\n');
+}
+
+/**
+ * Normalizza una reply Dialogo per confronto: toglie etichette di blocco e collassa spazi.
+ * Usato dagli assert Amore ≠ Lavoro (ENN-112).
+ */
+export function normalizeDialogueReplyContent(text: string): string {
+  return text
+    .split(/\n+/)
+    .map((line) =>
+      line
+        .replace(/^Ambito:\s*(Amore|Lavoro|Futuro|Generale)\s*·\s*/i, '')
+        .replace(
+          /^(Lettura affettiva|Lettura professionale|Lettura del presente|Tendenza in amore|Tendenza nel lavoro|Linea previsionale \(futuro\)|Orientamento affettivo|Orientamento professionale|Orientamento pratico):\s*/i,
+          ''
+        )
+        .trim()
+        .toLowerCase()
+    )
+    .filter(Boolean)
+    .join('\n');
+}
+
+/** True se, a etichette rimosse, la reply Amore e quella Lavoro differiscono. */
+export function loveAndWorkRepliesDiffer(card: ArcanaCard): boolean {
+  const love = buildArcanaDialogueReply('Lettura amore', card, null, {
+    domain: 'love',
+  });
+  const work = buildArcanaDialogueReply('Lettura lavoro', card, null, {
+    domain: 'work',
+  });
+  return (
+    normalizeDialogueReplyContent(love) !== normalizeDialogueReplyContent(work)
+  );
 }
 
 export function buildSpreadSynthesisReply(spread: SpreadDrawItem[]): string {

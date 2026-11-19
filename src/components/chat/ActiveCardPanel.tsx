@@ -135,6 +135,16 @@ export function ActiveCardPanel({
               <p className="text-xs leading-relaxed text-[#E8e1dd]">
                 {activeCard.loveReading}
               </p>
+              {activeCard.loveFuture && (
+                <p className="text-xs leading-relaxed text-[#A39B93] pt-1 border-t border-[#D4AF37]/10">
+                  Futuro: {activeCard.loveFuture}
+                </p>
+              )}
+              {activeCard.loveAdvice && (
+                <p className="text-xs leading-relaxed text-[#A39B93]">
+                  Consiglio: {activeCard.loveAdvice}
+                </p>
+              )}
             </div>
             <div className="rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/15 p-3 space-y-1.5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#D4AF37]">
@@ -143,6 +153,16 @@ export function ActiveCardPanel({
               <p className="text-xs leading-relaxed text-[#E8e1dd]">
                 {activeCard.workReading}
               </p>
+              {activeCard.workFuture && (
+                <p className="text-xs leading-relaxed text-[#A39B93] pt-1 border-t border-[#D4AF37]/10">
+                  Futuro: {activeCard.workFuture}
+                </p>
+              )}
+              {activeCard.workAdvice && (
+                <p className="text-xs leading-relaxed text-[#A39B93]">
+                  Consiglio: {activeCard.workAdvice}
+                </p>
+              )}
             </div>
           </div>
 

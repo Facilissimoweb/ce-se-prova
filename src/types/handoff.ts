@@ -307,5 +307,13 @@ export interface ArcanaCard {
   advice: string;
   loveReading: string;
   workReading: string;
+  /** Tendenza futura dedicata all’ambito affettivo (Dialogo Amore). */
+  loveFuture?: string;
+  /** Tendenza futura dedicata all’ambito professionale (Dialogo Lavoro). */
+  workFuture?: string;
+  /** Consiglio dedicato alle relazioni (Dialogo Amore). */
+  loveAdvice?: string;
+  /** Consiglio dedicato a carriera e progetti (Dialogo Lavoro). */
+  workAdvice?: string;
   maieuticQuestions: string[];
 }
