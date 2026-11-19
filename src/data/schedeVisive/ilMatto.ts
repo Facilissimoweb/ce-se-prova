@@ -3,40 +3,15 @@
  * Wording Maria Teresa Rogani — non alterare il testo italiano.
  */
 
-export interface SchedaVisivaBullet {
-  title: string;
-  body: string;
-}
+import type { SchedaVisivaContent } from './types';
 
-export interface SchedaVisivaDecodeItem {
-  title: string;
-  cosaSiVede: string;
-  cosaComunica: string;
-}
-
-export interface SchedaVisivaGridRow {
-  dettaglio: string;
-  focus: string;
-  messaggio: string;
-}
-
-export interface SchedaVisivaSintesiItem {
-  title: string;
-  body: string;
-}
-
-export interface SchedaVisivaContent {
-  id: string;
-  eyebrow: string;
-  title: string;
-  subtitle: string;
-  imageSrc: string;
-  imageAlt: string;
-  mappa: SchedaVisivaBullet[];
-  decodifica: SchedaVisivaDecodeItem[];
-  griglia: SchedaVisivaGridRow[];
-  sintesi: SchedaVisivaSintesiItem[];
-}
+export type {
+  SchedaVisivaBullet,
+  SchedaVisivaDecodeItem,
+  SchedaVisivaGridRow,
+  SchedaVisivaSintesiItem,
+  SchedaVisivaContent,
+} from './types';
 
 export const SCHEDA_VISIVA_IL_MATTO: SchedaVisivaContent = {
   id: 'il-matto',
@@ -45,6 +20,7 @@ export const SCHEDA_VISIVA_IL_MATTO: SchedaVisivaContent = {
   subtitle: 'Mappa, decodifica e sintesi operativa della composizione di Pamela Colman Smith.',
   imageSrc: '/images/arcani/il-matto-waite.png',
   imageAlt: 'Il Matto — carta Waite-Smith (Pamela Colman Smith)',
+  imageCaption: 'Il Matto · Waite-Smith',
   mappa: [
     {
       title: 'Il Soggetto Centrale',
