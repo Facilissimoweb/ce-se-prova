@@ -19,6 +19,9 @@
  *
  * ENN-120 — Sigillo sezione L'Imperatore (19 carte CSV Maria), inline dopo
  * `{{scheda-visiva:l-imperatore}}` in Dispensa 01 (marker `{{sigillo:l-imperatore}}`).
+ *
+ * ENN-121 — Sigillo sezione Il Papa (21 carte CSV Maria), inline dopo
+ * `{{scheda-visiva:il-papa}}` in Dispensa 01 (marker `{{sigillo:il-papa}}`).
  */
 
 import type { CourseId } from '../../types/handoff';
@@ -43,7 +46,8 @@ export type InlineFlashcardSectionId =
   | 'il-bagatto'
   | 'la-papessa'
   | 'l-imperatrice'
-  | 'l-imperatore';
+  | 'l-imperatore'
+  | 'il-papa';
 
 export const ARCANI_MAGGIORI_MODULE_01_FLASHCARDS: StudyFlashcard[] = [
   {
@@ -1217,6 +1221,162 @@ export const L_IMPERATORE_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
   cards: L_IMPERATORE_SECTION_FLASHCARDS,
 };
 
+/** ENN-121 — flashcard Il Papa (CSV Maria), dopo scheda-visiva in Dispensa 01. */
+export const IL_PAPA_SECTION_FLASHCARDS: StudyFlashcard[] = [
+  {
+    id: 1,
+    question:
+      'Quale posizione ed essenza archetipica incarna Il Papa (V) nel Primo Settenario dei Tarocchi?',
+    answer:
+      "Rappresenta la quinta lama del Primo Settenario e incarna il patto etico, la guida spirituale, la trasmissione dei valori e l'adesione a regole affidabili.",
+  },
+  {
+    id: 2,
+    question:
+      'In che modo Il Papa (V) si collega alla carta precedente dell\'Imperatore (IV)?',
+    answer:
+      'Funge da ponte tra la stabilità materiale dell\'Imperatore e la dimensione morale, pedagogica ed etica.',
+  },
+  {
+    id: 3,
+    question:
+      'Quali eventi o dinamiche segnala la figura del Papa (V) in una lettura in chiave previsionale?',
+    answer:
+      'Segnala contratti chiari, mediazioni riuscite, consulenze autorevoli e alleanze basate sulla fiducia reciproca.',
+  },
+  {
+    id: 4,
+    question:
+      'Quale atteggiamento invita ad assumere la carta del Papa (V) sul piano pratico?',
+    answer:
+      'Invita a procedere con correttezza e trasparenza, avvalendosi di consigli esperti o assumendo un ruolo di guida responsabile.',
+  },
+  {
+    id: 5,
+    question:
+      'Nel mazzo Waite-Smith, come è strutturata la sede/trono del Papa?',
+    answer:
+      'Il Papa siede solennemente su un trono posizionato tra due colonne grigie.',
+  },
+  {
+    id: 6,
+    question:
+      'Qual è il significato simbolico delle due colonne grigie che affiancano Il Papa?',
+    answer:
+      'Evocano la neutralità dell\'istituzione e della tradizione, che proteggono la conoscenza e ne garantiscono la continuità nel tempo.',
+  },
+  {
+    id: 7,
+    question:
+      'Quali abiti e copricapo indossa Il Papa nella rappresentazione Waite-Smith?',
+    answer:
+      'Indossa abiti liturgici di colore rosso e blu e una tiara papale strutturata su tre livelli.',
+  },
+  {
+    id: 8,
+    question:
+      'Cosa tiene nella mano sinistra Il Papa nell\'iconografia Waite-Smith?',
+    answer: 'Una croce pastorale a tre bracci.',
+  },
+  {
+    id: 9,
+    question:
+      'Quale gesto compie la mano destra del Papa nell\'iconografia Waite-Smith?',
+    answer: 'Compie un solenne gesto di benedizione.',
+  },
+  {
+    id: 10,
+    question:
+      'Che cosa simboleggiano congiuntamente il gesto di benedizione e la croce a tre bracci?',
+    answer:
+      'La congiunzione tra la dimensione spirituale, mentale e fisica, unendo visibile e invisibile nella trasmissione della dottrina.',
+  },
+  {
+    id: 11,
+    question: 'Quali oggetti giacciono ai piedi del trono del Papa?',
+    answer: 'Due chiavi incrociate, una dorata e una d\'argento.',
+  },
+  {
+    id: 12,
+    question:
+      'Qual è il significato simbolico delle due chiavi incrociate ai piedi del Papa?',
+    answer:
+      'Rappresentano l\'accesso ai misteri, l\'interpretazione della tradizione e la facoltà di "sciogliere e legare" sul piano pratico ed etico.',
+  },
+  {
+    id: 13,
+    question:
+      'Chi compare davanti al trono del Papa nella scena del Waite-Smith?',
+    answer: 'Due chierici inginocchiati con paramenti ornati da rose e gigli.',
+  },
+  {
+    id: 14,
+    question:
+      'Che cosa simboleggiano i due chierici inginocchiati davanti al Papa?',
+    answer:
+      'Simboleggiano la relazione pedagogica, l\'allievo che riceve l\'insegnamento e il dialogo fondamentale tra guida e discepolo.',
+  },
+  {
+    id: 15,
+    question:
+      'Cosa suggerisce sinteticamente Il Papa (V) quando compare all\'interno di una stesa?',
+    answer:
+      'Suggerisce di fare riferimento a valori etici condivisi, cercare il consiglio di una figura autorevole o formalizzare un accordo equo.',
+  },
+  {
+    id: 16,
+    question:
+      'Qual è il tema principale del Papa (V) nel settore della crescita personale?',
+    answer:
+      "L'etica interiore e la coerenza tra i propri principi fondamentali e le azioni di ogni giorno.",
+  },
+  {
+    id: 17,
+    question:
+      'Qual è il tema principale del Papa (V) nell\'ambito di lavoro e carriera?',
+    answer:
+      "La ricorsa a consulenze esperte, la trasparenza e la formalizzazione di chiare regole d'intesa professionale.",
+  },
+  {
+    id: 18,
+    question:
+      "Qual è il tema principale del Papa (V) nel settore dell'amore e dei rapporti sociali?",
+    answer:
+      'La lealtà, la parola data e la condivisione di ideali profondi a sostegno della stabilità e della fiducia relazionale.',
+  },
+  {
+    id: 19,
+    question:
+      'In che modo Il Papa (V) trasforma la stabilità dell\'Imperatore (IV) sul piano etico?',
+    answer:
+      "La eleva oltre il solo ordine materiale, fornendole una dimensione di guida morale, saggezza pedagogica e principi condivisi.",
+  },
+  {
+    id: 20,
+    question:
+      'Quale ombra o deriva negativa può rappresentare Il Papa (V) se manifesta un\'influenza disfunzionale?',
+    answer:
+      "Una rigida aderenza a dogmi, il conformismo e l'osservanza puramente formale o ipocrita delle convenzioni.",
+  },
+  {
+    id: 21,
+    question:
+      'Qual è lo snodo successivo al Papa (V) all\'interno del Primo Settenario?',
+    answer:
+      'Gli Innamorati (VI), incentrato sul bivio esistenziale e sulla scelta consapevole del cuore.',
+  },
+];
+
+export const IL_PAPA_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
+  courseSlug: 'arcani-maggiori',
+  /** Distinct from module-end seals (`01` / `04`) — section-scoped deck. */
+  moduleNumber: '01-il-papa',
+  title: 'Sigillo di apprendimento · Il Papa',
+  subtitle:
+    'Ripassa Il Papa (V) subito dopo la scheda visiva: tradizione, simboli e chiave previsionale.',
+  cards: IL_PAPA_SECTION_FLASHCARDS,
+};
+
 const INLINE_FLASHCARD_DECKS: Record<
   InlineFlashcardSectionId,
   CourseModuleFlashcardDeck
@@ -1226,6 +1386,7 @@ const INLINE_FLASHCARD_DECKS: Record<
   'la-papessa': LA_PAPESSA_FLASHCARD_DECK,
   'l-imperatrice': L_IMPERATRICE_FLASHCARD_DECK,
   'l-imperatore': L_IMPERATORE_FLASHCARD_DECK,
+  'il-papa': IL_PAPA_FLASHCARD_DECK,
 };
 
 export function getFlashcardDeck(
