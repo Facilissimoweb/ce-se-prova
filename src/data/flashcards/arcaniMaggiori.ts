@@ -1,8 +1,9 @@
 /**
- * ENN-99 — Sigillo di apprendimento · Arcani Maggiori
- * Mapping: course slug `arcani-maggiori`, dispensa moduleNumber `01`
- * (prima dispensa del primo percorso). Deck fornito da Maria (CSV Q/A).
- * Contenuto in-repo: nessuna tabella DB.
+ * Flashcard Sigillo · Arcani Maggiori (in-repo, nessuna tabella DB).
+ *
+ * ENN-99 — Sigillo chiusura Primo Step (58 Q/A Trionfi 0–XXI) su
+ * `moduleNumber: '04'` (laboratorio). Originariamente anche su 01;
+ * ENN-124 ha sostituito il coda Modulo 1.
  *
  * ENN-113 — Sigillo sezione Il Matto (14 carte CSV Maria), inline dopo
  * la scheda «### 0. Il Matto» in Dispensa 01, dopo `{{scheda-visiva:il-matto}}`
@@ -28,6 +29,12 @@
  *
  * ENN-123 — Sigillo sezione Il Carro (25 carte CSV Maria), inline dopo
  * `{{scheda-visiva:il-carro}}` in Dispensa 01 (marker `{{sigillo:il-carro}}`).
+ *
+ * ENN-124 — Sigillo fine Modulo 1 · Primo Settenario (Matto–Carro),
+ * CSV Maria (~50 Q/A). Sostituisce il quiz di chiusura ENN-99 su
+ * `moduleNumber: '01'` (dopo Sintesi / Esercizi). Il deck ENN-99
+ * (58 carte, Trionfi 0–XXI) resta sul laboratorio `moduleNumber: '04'`.
+ * I sigilli per-carta `{{sigillo:…}}` restano invariati.
  */
 
 import type { CourseId } from '../../types/handoff';
@@ -57,7 +64,262 @@ export type InlineFlashcardSectionId =
   | 'gli-amanti'
   | 'il-carro';
 
+/** ENN-124 — Sigillo fine Modulo 1 · Primo Settenario (0–VII), CSV Maria (~48 Q/A). */
 export const ARCANI_MAGGIORI_MODULE_01_FLASHCARDS: StudyFlashcard[] = [
+  {
+    id: 1,
+    question: "Qual è il tema evolutivo centrale dell'intero Primo Settenario (carte 0 – VII) degli Arcani Maggiori?",
+    answer: "La formazione dell'identità, il radicamento nel mondo fisico, l'azione concreta e la conquista della direzione.",
+  },
+  {
+    id: 2,
+    question: "Per quale motivo esoterico e numerico Il Matto (0) non possiede una casella fissa nella sequenza degli Arcani?",
+    answer: "Perché precede ogni schema codificato e sovrastruttura mentale, rappresentando il principio di libertà assoluta ed energia pura prima della manifestazione.",
+  },
+  {
+    id: 3,
+    question: "Nell'iconografia del Matto (0), cosa indicano rispettivamente la piccola sacca e la rosa bianca?",
+    answer: "La sacca rappresenta le esperienze passate ridotte all'essenziale; la rosa bianca simboleggia la purezza d'intenti che guida l'inizio del viaggio.",
+  },
+  {
+    id: 4,
+    question: "Qual è il significato simbolico del cane bianco che affianca Il Matto (0) sull'orlo del dirupo?",
+    answer: "Rappresenta l'istinto primordiale, la fedeltà e l'avvertimento sensoriale viscerale di fronte al salto nell'ignoto.",
+  },
+  {
+    id: 5,
+    question: "In chiave previsionale, quale atteggiamento richiede la comparsa del Matto (0) in una lettura?",
+    answer: "Richiede di fare un salto di fiducia con audacia e spontaneità, affidandosi all'istinto anziché cercare garanzie logiche o protezioni superflue.",
+  },
+  {
+    id: 6,
+    question: "In che modo Il Bagatto (I) trasforma il potenziale originario espresso dal Matto (0)?",
+    answer: "Canalizza l'energia indifferenziata del Matto e la traduce nella prima forma di iniziativa e manifestazione pratica nel mondo materiale.",
+  },
+  {
+    id: 7,
+    question: "Cosa esprime la postura delle mani del Bagatto (I), con la bacchetta rivolta al cielo e la mano sinistra verso terra?",
+    answer: "Simboleggia il principio alchemico ed ermetico \"Come in cielo, così in terra\", fungendo da canale tra il regno delle idee e la realtà fisica.",
+  },
+  {
+    id: 8,
+    question: "Qual è il significato della presenza di tutti e quattro i semi tradizionali sul banco da lavoro del Bagatto (I)?",
+    answer: "Indica la piena ed immediata disponibilità dei quattro elementi (volontà, emozioni, intelletto e materia) per avviare subito qualsiasi progetto.",
+  },
+  {
+    id: 9,
+    question: "Nella lama del Bagatto (I), cosa rappresentano la lemniscata sopra la testa e la veste cinta dall'Uroboro?",
+    answer: "Simboleggiano l'energia vitale inesauribile, la lucidità mentale e la padronanza consapevole dei cicli della manifestazione.",
+  },
+  {
+    id: 10,
+    question: "Come si distinguono i significati delle rose rosse e dei gigli bianchi presenti nell'iconografia del Bagatto (I)?",
+    answer: "Le rose rosse rappresentano la passione creativa e il desiderio fertile; i gigli bianchi indicano la purezza d'intenti che orienta l'azione.",
+  },
+  {
+    id: 11,
+    question: "Qual è l'alternanza fondamentale che caratterizza la \"Diade Creativa\" (Bagatto e Papessa) all'inizio della numerazione?",
+    answer: "L'alternanza tra l'iniziativa estroversa del fare visibile (Il Bagatto) e la gestazione introversa del sapere invisibile (La Papessa).",
+  },
+  {
+    id: 12,
+    question: "Cosa simboleggiano le due colonne B (Boaz) e J (Jachin) tra cui siede La Papessa (II)?",
+    answer: "Rappresentano la dualità cosmica (luce e oscurità, attivo e passivo), rispetto a cui La Papessa si pone come centro di equilibrio e sintesi.",
+  },
+  {
+    id: 13,
+    question: "Qual è il significato profondo della pergamena recante la scritta \"TORA\" nel grembo della Papessa (II)?",
+    answer: "Simboleggia la legge sacra e la conoscenza esoterica parzialmente celata, che si rivela solo a chi sa andare oltre le apparenze di superficie.",
+  },
+  {
+    id: 14,
+    question: "Cosa custodisce il velo decorato con melograni e palme posto alle spalle della Papessa (II)?",
+    answer: "Custodisce l'accesso alle acque dell'inconscio e della saggezza primordiale, unendo gestazione femminile (melograni) e fecondità maschile (palme).",
+  },
+  {
+    id: 15,
+    question: "In chiave previsionale, quale indicazione operativa fornisce la comparsa della Papessa (II) in stesa?",
+    answer: "Sconsiglia l'azione o l'esposizione pubblica immediata, suggerendo di custodire il riserbo, studiare e lasciar maturare gli eventi in profondità.",
+  },
+  {
+    id: 16,
+    question: "In che modo l'energia dell'Imperatrice (III) trasforma la gestazione silenziosa della Papessa (II)?",
+    answer: "Sblocca la carica vitale accumulata nel silenzio e la fa sbocciare all'esterno in fioritura creativa, espressività ed abbondanza manifesta.",
+  },
+  {
+    id: 17,
+    question: "Cosa simboleggiano la corona di 12 stelle a sei punte e lo scettro impugnato dall'Imperatrice (III)?",
+    answer: "Rappresentano il dominio armonico sui 12 mesi dell'anno e sui cicli naturali, unendo l'ispirazione celeste alla capacità di nutrire la materia.",
+  },
+  {
+    id: 18,
+    question: "Qual è il valore simbolico dello scudo a forma di cuore con l'emblema di Venere ai piedi dell'Imperatrice (III)?",
+    answer: "Incarna l'amore, la sensualità, la bellezza e la fertilità generativa che alimentano ogni creazione espressiva.",
+  },
+  {
+    id: 19,
+    question: "Cosa indicano il campo di grano dorato e la cascata nello sfondo dell'Imperatrice (III)?",
+    answer: "Rappresentano la ricchezza del raccolto, la fertilità della natura e il flusso ininterrotto delle energie emotive e creative.",
+  },
+  {
+    id: 20,
+    question: "In che modo L'Imperatore (IV) integra ed equilibra l'energia dell'Imperatrice (III)?",
+    answer: "Fornisce struttura, metodo organizzativo e confini solidi affinché la fioritura dell'Imperatrice si traduca in concretezza duratura.",
+  },
+  {
+    id: 21,
+    question: "Qual è il significato del trono in pietra decorato da quattro teste d'ariete dell'Imperatore (IV)?",
+    answer: "Simboleggia la solidità inamovibile, la tenacia, l'autorità razionale e la spinta propulsiva legata all'energia dell'Ariete.",
+  },
+  {
+    id: 22,
+    question: "Cosa rappresenta l'armatura metallica vista sotto il mantello regale dell'Imperatore (IV)?",
+    answer: "Indica la protezione dei propri confini, la prontezza difensiva e la tutela della stabilità personale e materiale.",
+  },
+  {
+    id: 23,
+    question: "Quali poteri rappresentano rispettivamente lo scettro ad ankh e il globo dorato nelle mani dell'Imperatore (IV)?",
+    answer: "L'ankh (croce ansata) indica il potere di preservare la vita e la saggezza; il globo simboleggia la sovranità e il controllo sul piano fisico.",
+  },
+  {
+    id: 24,
+    question: "Cosa comunicano le rigide montagne rocciose che s'innalzano alle spalle dell'Imperatore (IV)?",
+    answer: "Simboleggiano la fermezza dei principi, la chiarezza razionale e la capacità di resistere alle sfide ambientali mediante la disciplina.",
+  },
+  {
+    id: 25,
+    question: "Quale evoluzione concettuale introduce Il Papa (V) rispetto alla stabilità terrena dell'Imperatore (IV)?",
+    answer: "Eleva l'autorità materiale dell'Imperatore verso una dimensione etica, pedagogica, di guida spirituale e di condivisione dei valori.",
+  },
+  {
+    id: 26,
+    question: "Cosa esprime il gesto di benedizione della mano destra del Papa (V) unito alla croce a tre bracci nella mano sinistra?",
+    answer: "Simboleggia la congiunzione tra le tre dimensioni (spirituale, mentale e fisica) e la trasmissione autorevole della dottrina etica.",
+  },
+  {
+    id: 27,
+    question: "Qual è il significato esoterico e pratico delle due chiavi incrociate ai piedi del trono del Papa (V)?",
+    answer: "Rappresentano la chiave d'accesso ai misteri e la facoltà d'interpretare la tradizione per \"sciogliere e legare\" sul piano pratico ed etico.",
+  },
+  {
+    id: 28,
+    question: "Chi simboleggiano le due figure dei chierici in ginocchio davanti al Papa (V)?",
+    answer: "Rappresentano la relazione pedagogica, il discepolo che accoglie l'insegnamento e l'alleanza basata sull'ascolto e la fiducia reciproca.",
+  },
+  {
+    id: 29,
+    question: "In chiave previsionale, quali scenari annuncia la comparsa del Papa (V) in una stesa?",
+    answer: "Annuncia mediazioni riuscite, stipula di contratti chiari, consulenze di esperti autorevoli e alleanze fondate su principi di trasparenza.",
+  },
+  {
+    id: 30,
+    question: "In che modo la lezione degli Innamorati (VI) si differenzia dall'insegnamento del Papa (V)?",
+    answer: "Mentre Il Papa trasmette regole e principi condivisi dall'alto, Gli Innamorati esigono una scelta personale, autonoma e responsabile dettata dal cuore.",
+  },
+  {
+    id: 31,
+    question: "Cosa simboleggiano i due alberi (Conoscenza e Vita) posti alle spalle della donna e dell'uomo negli Innamorati (VI)?",
+    answer: "L'Albero della Conoscenza (col serpente) indica l'intuizione e la prova del desiderio; l'Albero della Vita (con 12 fiamme) la passione e la volontà.",
+  },
+  {
+    id: 32,
+    question: "Qual è la dinamica psicologica rappresentata dal triangolo dello sguardo nella lama degli Innamorati (VI)?",
+    answer: "L'uomo guarda la donna e la donna guarda l'angelo: l'azione cosciente maschile deve poggiare sull'intuizione femminile per elevarsi alla grazia divina.",
+  },
+  {
+    id: 33,
+    question: "Cosa indica la montagna viola che svetta nello sfondo degli Innamorati (VI)?",
+    answer: "Rappresenta la meta elevata, impegnativa ed evolutiva che attende la coppia dopo che la scelta del cuore è stata compiuta con determinazione.",
+  },
+  {
+    id: 34,
+    question: "In che modo Il Carro (VII) riassume e porta a compimento l'intero percorso del Primo Settenario?",
+    answer: "Traduce l'intenzione e la scelta degli Innamorati in azione coordinata e vittoriosa, guidando l'identità ormai formata alla conquista del mondo.",
+  },
+  {
+    id: 35,
+    question: "Come riesce il condottiero del Carro (VII) a dominare le due sfingi (nera e bianca) pur in assenza di briglie?",
+    answer: "Le domina attraverso il magnetismo della mente disciplinata e della volontà salda, evitando la coercizione fisica o la violenza bruta.",
+  },
+  {
+    id: 36,
+    question: "Cosa rappresentano la struttura kubica di pietra del Carro (VII) e l'armatura del condottiero?",
+    answer: "Simboleggiano il solido radicamento materiale e la protezione dell'identità conquistata attraverso le tappe delle prime sette lame.",
+  },
+  {
+    id: 37,
+    question: "Qual è il significato dell'emblema alchemico del lingam-yoni (trottola) e dello scudo alato sul fronte del Carro (VII)?",
+    answer: "Rappresenta la sintesi dinamica delle polarità maschile e femminile che genera la spinta propulsiva per l'avanzata trionfante.",
+  },
+  {
+    id: 38,
+    question: "In chiave previsionale, quale sviluppo temporale preannuncia l'uscita del Carro (VII)?",
+    answer: "Indica uno sblocco rapido di trattative bloccate, viaggi, spostamenti materiali e un'accelerazione decisiva verso i propri obiettivi.",
+  },
+  {
+    id: 39,
+    question: "Qual è la differenza sostanziale tra l'inizio operativo del Bagatto (I) e la vittoria del Carro (VII)?",
+    answer: "Il Bagatto rappresenta la presa in carico delle risorse iniziali; Il Carro è l'azione matura, coordinata e disciplinata che ottiene il trionfo.",
+  },
+  {
+    id: 40,
+    question: "Come si trasforma il concetto di libertà da Il Matto (0) a Gli Innamorati (VI)?",
+    answer: "Dalla libertà pura e incondizionata del Matto si passa alla libertà matura degli Innamorati, che si manifesta scegliendo con responsabilità.",
+  },
+  {
+    id: 41,
+    question: "Quale funzione svolgono le stelle dorate sul baldacchino azzurro del Carro (VII)?",
+    answer: "Simboleggiano la protezione delle forze celesti e la connessione con l'ispirazione superiore che orienta il cammino terreno verso il successo.",
+  },
+  {
+    id: 42,
+    question: "Che cosa accade se nel Carro (VII) manca la coordinazione interiore del condottiero sulle sfingi?",
+    answer: "Le due forze polari opposte tirano in direzioni contrarie, causando la stasi o una perdita di controllo sulla rotta.",
+  },
+  {
+    id: 43,
+    question: "Qual è la differenza fondamentale tra l'autorità dell'Imperatore (IV) e l'autorità del Papa (V)?",
+    answer: "L'Imperatore esercita un'autorità temporale, razionale e strutturale sul piano fisico; Il Papa esercita una guida morale, etica e pedagogica.",
+  },
+  {
+    id: 44,
+    question: "Per quale ragione esoterica La Papessa (II) è raffigurata con un velo che nasconde uno specchio d'acqua?",
+    answer: "Perché le acque dell'inconscio e della conoscenza profonda devono essere protette e svelate soltanto dopo una matura gestazione interiore.",
+  },
+  {
+    id: 45,
+    question: "Quale duplice valenza assume il simbolo del serpente nel Bagatto (Uroboro) e negli Innamorati (Albero della Conoscenza)?",
+    answer: "Nel Bagatto rappresenta la ciclicità dell'energia vitale; negli Innamorati evoca la prova del desiderio e l'insorgere della consapevolezza.",
+  },
+  {
+    id: 46,
+    question: "Cosa indica il ruscello d'acqua che fluisce ai piedi del paesaggio roccioso dell'Imperatore (IV)?",
+    answer: "Simboleggia la presenza persistente delle emozioni e della linfa vitale che scorre sottotraccia anche nell'ambito della rigidità razionale.",
+  },
+  {
+    id: 47,
+    question: "Come si riflette il principio femminile nel Primo Settenario attraverso La Papessa (II) e L'Imperatrice (III)?",
+    answer: "La Papessa incarna la ricettività introversa e la custodia della sapienza; L'Imperatrice incarna la fecondità estroversa e la fioritura creativa.",
+  },
+  {
+    id: 48,
+    question: "Perché l'Arcangelo Raffaele sorge sopra un sole radioso nella lama degli Innamorati (VI)?",
+    answer: "Per benedire la scelta consapevole del cuore, portando guarigione emotiva ed elevazione spirituale all'unione delle polarità.",
+  },
+  {
+    id: 49,
+    question: "Qual è il significato simbolico della tiara papale a tre livelli presente sia sulla Papessa (II) sia sul Papa (V)?",
+    answer: "Rappresenta la sovranità e la padronanza della conoscenza sui tre mondi: spirituale, mentale e fisico.",
+  },
+  {
+    id: 50,
+    question: "Quale Arcano conclude ufficialmente il Primo Settenario celebrando la conquista dell'autonomia personale?",
+    answer: "Il Carro (VII).",
+  },
+];
+
+/** ENN-99 — 58 flashcard chiusura Primo Step (Trionfi 0–XXI), Sigillo modulo 04. */
+export const ARCANI_MAGGIORI_MODULE_04_FLASHCARDS: StudyFlashcard[] = [
   {
     id: 1,
     question: "Qual è il tema centrale e la dinamica trasformativa del Primo Settenario (0 – VII) degli Arcani Maggiori?",
@@ -350,24 +612,22 @@ export const ARCANI_MAGGIORI_MODULE_01_FLASHCARDS: StudyFlashcard[] = [
   },
 ];
 
-const MAGGIORI_SEAL_META = {
-  courseSlug: 'arcani-maggiori' as const,
-  title: 'Sigillo di apprendimento · Arcani Maggiori',
-  cards: ARCANI_MAGGIORI_MODULE_01_FLASHCARDS,
-};
-
 export const FLASHCARD_DECKS: CourseModuleFlashcardDeck[] = [
   {
-    ...MAGGIORI_SEAL_META,
+    courseSlug: 'arcani-maggiori',
     moduleNumber: '01',
+    title: 'Sigillo di apprendimento · Primo Settenario',
     subtitle:
-      'Ripassa i Trionfi (0–XXI) dopo la prima dispensa del Primo Step (architettura e Primo Settenario).',
+      'Ripassa Matto–Carro (0–VII) dopo Sintesi ed Esercizi del Modulo 1.',
+    cards: ARCANI_MAGGIORI_MODULE_01_FLASHCARDS,
   },
   {
-    ...MAGGIORI_SEAL_META,
+    courseSlug: 'arcani-maggiori',
     moduleNumber: '04',
+    title: 'Sigillo di apprendimento · Arcani Maggiori',
     subtitle:
       'Chiusura del Primo Step: ripassa i Trionfi (0–XXI) dopo il laboratorio pratico e i protocolli di verifica.',
+    cards: ARCANI_MAGGIORI_MODULE_04_FLASHCARDS,
   },
 ];
 
