@@ -92,7 +92,7 @@ export function CorsiScreen({
     scrollToElement(checkoutSectionRef.current, { behavior: 'smooth' });
   };
 
-  /** ENN-128 — open Modulo 01 anteprima (nested under the 4-moduli program). */
+  /** ENN-129 — open Modulo 01 anteprima (account-parity Dispensa reader). */
   const handleMaggioriMattoPreview = () => {
     onChangeCourseId('arcani-maggiori');
     // Preview mounts only when Maggiori is the active workbench course.
@@ -399,7 +399,8 @@ export function CorsiScreen({
         })}
       </section>
 
-      {/* Interactive Syllabus + Visual Workbench — Maggiori anteprima lives under Modulo 01 (ENN-128) */}
+      {/* Interactive Syllabus + Visual Workbench.
+          Maggiori (ENN-129): account-parity Dispensa 01 reader (truncated after Il Matto). */}
       <section
         id={SCROLL_LANDMARKS.corsiWorkbench}
         ref={workbenchSectionRef}
@@ -410,7 +411,9 @@ export function CorsiScreen({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#D4AF37]/15 pb-6">
           <div className="space-y-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-              Programma Dettagliato &amp; Laboratorio Visivo
+              {activeCourse.id === 'arcani-maggiori'
+                ? 'Anteprima Dispensa · Area Personale'
+                : 'Programma Dettagliato & Laboratorio Visivo'}
             </p>
             <h2
               id="workbench-heading"
@@ -419,7 +422,9 @@ export function CorsiScreen({
               {activeCourse.orderLabel.split('·')[0].trim()}. {activeCourse.title}
             </h2>
             <p className="text-xs md:text-sm text-[#A39B93]">
-              {activeCourse.levelLabel} · {activeCourse.formatLabel}
+              {activeCourse.id === 'arcani-maggiori'
+                ? 'Stessa UI dell’Area Personale · Modulo 01 fino a Il Matto'
+                : `${activeCourse.levelLabel} · ${activeCourse.formatLabel}`}
             </p>
           </div>
 
@@ -450,26 +455,24 @@ export function CorsiScreen({
           </div>
         </div>
 
-        {/* 12-col Split: 4 Modules Syllabus + Domain Visual Sandbox.
-            Maggiori: anteprima bound under Modulo 01 only (full-width modules). */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div
-            className={
-              activeCourse.id === 'arcani-maggiori'
-                ? 'lg:col-span-12 space-y-4'
-                : 'lg:col-span-6 space-y-4'
+        {activeCourse.id === 'arcani-maggiori' ? (
+          <MaggioriMattoPreview
+            priceEur={
+              educationalCourses.find((c) => c.id === 'arcani-maggiori')
+                ?.priceEur ?? 190
             }
-          >
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-              <Layers className="w-4 h-4" aria-hidden="true" />
-              <span>Struttura in 4 Moduli</span>
-            </div>
+            onEnroll={() => handleEnrollCourse('arcani-maggiori')}
+          />
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-6 space-y-4">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                <Layers className="w-4 h-4" aria-hidden="true" />
+                <span>Struttura in 4 Moduli</span>
+              </div>
 
-            <div className="space-y-3">
-              {activeCourse.modules.map((mod) => {
-                const showMaggioriModuloPreview =
-                  activeCourse.id === 'arcani-maggiori' && mod.number === '01';
-                return (
+              <div className="space-y-3">
+                {activeCourse.modules.map((mod) => (
                   <div
                     key={mod.number}
                     className="rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/18 p-4 md:p-5 space-y-2"
@@ -489,27 +492,11 @@ export function CorsiScreen({
                     <p className="text-xs md:text-sm leading-relaxed text-[#A39B93]">
                       {mod.summary}
                     </p>
-
-                    {showMaggioriModuloPreview && (
-                      <div className="pt-3">
-                        <MaggioriMattoPreview
-                          nested
-                          priceEur={
-                            educationalCourses.find(
-                              (c) => c.id === 'arcani-maggiori'
-                            )?.priceEur ?? 190
-                          }
-                          onEnroll={() => handleEnrollCourse('arcani-maggiori')}
-                        />
-                      </div>
-                    )}
                   </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
 
-          {activeCourse.id !== 'arcani-maggiori' && (
             <div className="lg:col-span-6 space-y-4">
               <div className="flex items-center justify-between gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
                 <span>Anteprima Didattica Interattiva</span>
@@ -526,8 +513,8 @@ export function CorsiScreen({
                 <SpreadGeometryExplorer />
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </section>
 
       {/* Paid Course Enrollment & Stripe Checkout Handoff */}

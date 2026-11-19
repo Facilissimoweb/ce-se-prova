@@ -1,29 +1,41 @@
 /**
- * ENN-126 / ENN-128 — Public Corsi preview slice for Arcani Maggiori · Modulo 01.
- * Architecture (mazzo / Tre Settenari / intro Primo Settenario) + Il Matto.
- * Reuses live Dispensa 01 + Sigillo data; never invents copy.
+ * ENN-126 / ENN-128 / ENN-129 — Public Corsi preview slice for Arcani Maggiori · Modulo 01.
+ * Same Dispensa 01 source as Area Personale; truncated after Il Matto (before Bagatto).
  */
 
-import { ARCANI_MAGGIORI_DISPENSE } from './arcaniMaggioriDispense';
+import {
+  ARCANI_MAGGIORI_DISPENSE,
+  type MaggioriDispensaSeed,
+} from './arcaniMaggioriDispense';
 import {
   IL_MATTO_FLASHCARD_DECK,
-  IL_MATTO_SECTION_FLASHCARDS,
   type CourseModuleFlashcardDeck,
 } from '../flashcards/arcaniMaggiori';
 
 /** First heading after Matto embeds — hard stop so Bagatto+ stay private. */
-const AFTER_MATTO_HEADING =
+export const AFTER_MATTO_HEADING =
   '### La Diade Creativa: Il Bagatto (I) e La Papessa (II)';
 
 /** Must appear in the public slice (architecture before Il Matto). */
 const ARCHITECTURE_MARKERS = [
   '## 1. Architettura Didattica e la Mappa dei Tre Settenari',
   '### Mappa dei Tre Cicli',
-  '## 2. Il Primo Settenario: La Formazione dell\'Identità (0 – VII)',
-  '### 0. Il Matto – L\'Inizio Non Condizionato',
+  "## 2. Il Primo Settenario: La Formazione dell'Identità (0 – VII)",
+  "### 0. Il Matto – L'Inizio Non Condizionato",
+  '{{scheda-visiva:il-matto}}',
+  '{{sigillo:il-matto}}',
 ] as const;
 
-export const MAGGIORI_MATTO_PREVIEW_FLASHCARD_COUNT = 3;
+/** Dispensa 01 seed (metadata + full markdown) from the Maggiori catalog. */
+export function getMaggioriDispensa01(): MaggioriDispensaSeed {
+  const mod01 = ARCANI_MAGGIORI_DISPENSE.find((d) => d.moduleNumber === '01');
+  if (!mod01) {
+    throw new Error(
+      'Dispensa Maggiori 01 missing — cannot build Modulo 1 preview.'
+    );
+  }
+  return mod01;
+}
 
 /**
  * Markdown for the public Modulo 01 anteprima:
@@ -31,12 +43,7 @@ export const MAGGIORI_MATTO_PREVIEW_FLASHCARD_COUNT = 3;
  * + Il Matto (bullets + scheda visiva + Sigillo embeds). Stops before Bagatto.
  */
 export function getMaggioriMattoPreviewMarkdown(): string {
-  const mod01 = ARCANI_MAGGIORI_DISPENSE.find((d) => d.moduleNumber === '01');
-  if (!mod01) {
-    throw new Error('Dispensa Maggiori 01 missing — cannot build Modulo 1 preview.');
-  }
-
-  const { contentMarkdown } = mod01;
+  const { contentMarkdown } = getMaggioriDispensa01();
   const end = contentMarkdown.indexOf(AFTER_MATTO_HEADING);
 
   if (end < 0) {
@@ -57,16 +64,12 @@ export function getMaggioriMattoPreviewMarkdown(): string {
   return slice;
 }
 
-/** First N Sigillo Matto cards for the free Corsi teaser (not the full deck). */
-export function getMaggioriMattoPreviewFlashcardDeck(
-  count: number = MAGGIORI_MATTO_PREVIEW_FLASHCARD_COUNT
-): CourseModuleFlashcardDeck {
-  const cards = IL_MATTO_SECTION_FLASHCARDS.slice(0, Math.max(1, count));
-  return {
-    courseSlug: IL_MATTO_FLASHCARD_DECK.courseSlug,
-    moduleNumber: '01-preview',
-    title: 'Sigillo di apprendimento · Il Matto',
-    subtitle: `Assaggio pubblico: ${cards.length} di ${IL_MATTO_SECTION_FLASHCARDS.length} carte. Tocca la carta per rivelare la risposta.`,
-    cards,
-  };
+/** Full Il Matto Sigillo deck — same as Area Personale (not a truncated sample). */
+export function getMaggioriMattoPreviewFlashcardDeck(): CourseModuleFlashcardDeck {
+  return IL_MATTO_FLASHCARD_DECK;
+}
+
+/** Sidebar rows for the public account-parity chrome (01 open; 02–04 locked). */
+export function getMaggioriPreviewSidebarDispense(): MaggioriDispensaSeed[] {
+  return ARCANI_MAGGIORI_DISPENSE;
 }

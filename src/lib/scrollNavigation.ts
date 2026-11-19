@@ -14,7 +14,7 @@ export const SCROLL_LANDMARKS = {
   homeDidattica: 'home-didattica',
   corsiWorkbench: 'corsi-workbench',
   corsiCheckout: 'corsi-checkout',
-  /** Public Maggiori teaser — nested under Modulo 01 (ENN-128) */
+  /** Public Maggiori anteprima — account-parity Dispensa 01 (ENN-129) */
   corsiMaggioriPreview: 'corsi-maggiori-preview',
   /** Area Riservata — course strip / dispense list / active dispensa reader */
   reservedPercorsi: 'reserved-percorsi',
