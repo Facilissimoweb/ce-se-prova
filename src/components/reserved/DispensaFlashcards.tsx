@@ -94,9 +94,14 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
         <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]/90 mb-3">
           {flipped ? 'Risposta' : 'Domanda'}
         </p>
-        <p className="font-display text-base md:text-lg leading-relaxed text-[#F4F1EA]">
+        {/* h2-matching body: Plus Jakarta (not Cinzel/small-caps); Q gold, A white */}
+        <h2
+          className={`flashcard-body-text normal-case ${
+            flipped ? 'flashcard-body-answer' : 'flashcard-body-question'
+          }`}
+        >
           {flipped ? current.answer : current.question}
-        </p>
+        </h2>
         <p className="mt-5 text-[11px] text-[#A39B93] group-hover:text-[#E6C65C] transition-colors">
           {flipped ? 'Tocca per tornare alla domanda' : 'Tocca per rivelare la risposta'}
         </p>

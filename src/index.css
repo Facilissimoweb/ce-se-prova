@@ -61,6 +61,34 @@
   font-family: var(--font-sans);
 }
 
+/**
+ * Flashcard body (ENN-105) — match Area Riservata / site h2:
+ * Plus Jakarta semibold, sentence case (avoid Cinzel small-caps look).
+ */
+.flashcard-body-text {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.25rem; /* text-xl — mobile h2 */
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  text-wrap: pretty;
+}
+
+@media (min-width: 768px) {
+  .flashcard-body-text {
+    font-size: 1.5rem; /* text-2xl */
+    line-height: 1.3;
+  }
+}
+
+.flashcard-body-question {
+  color: #d4af37;
+}
+
+.flashcard-body-answer {
+  color: #f4f1ea;
+}
+
 .glass-tier-1 {
   background-color: rgba(26, 22, 21, 0.75);
   backdrop-filter: blur(12px);
