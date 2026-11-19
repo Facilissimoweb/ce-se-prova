@@ -15,8 +15,8 @@ interface MaggioriMattoPreviewBodyProps {
 }
 
 /**
- * Shared real Matto slice (ENN-126/127): dispensa bullets + scheda visiva + Sigillo sample.
- * Used by the public preview section and the Corsi Maggiori anteprima slot.
+ * Shared Modulo 01 anteprima body (ENN-126–128): architecture + Il Matto
+ * (bullets + scheda visiva + Sigillo sample). Bound to the module structure.
  */
 export function MaggioriMattoPreviewBody({
   compact = false,

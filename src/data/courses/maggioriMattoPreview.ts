@@ -1,5 +1,6 @@
 /**
- * ENN-126 — Public Corsi preview slice for Arcani Maggiori · Il Matto.
+ * ENN-126 / ENN-128 — Public Corsi preview slice for Arcani Maggiori · Modulo 01.
+ * Architecture (mazzo / Tre Settenari / intro Primo Settenario) + Il Matto.
  * Reuses live Dispensa 01 + Sigillo data; never invents copy.
  */
 
@@ -10,34 +11,50 @@ import {
   type CourseModuleFlashcardDeck,
 } from '../flashcards/arcaniMaggiori';
 
-/** Heading that opens the Matto scheda inside Dispensa 01. */
-const MATTO_HEADING = '### 0. Il Matto – L\'Inizio Non Condizionato';
 /** First heading after Matto embeds — hard stop so Bagatto+ stay private. */
-const AFTER_MATTO_HEADING = '### La Diade Creativa: Il Bagatto (I) e La Papessa (II)';
+const AFTER_MATTO_HEADING =
+  '### La Diade Creativa: Il Bagatto (I) e La Papessa (II)';
+
+/** Must appear in the public slice (architecture before Il Matto). */
+const ARCHITECTURE_MARKERS = [
+  '## 1. Architettura Didattica e la Mappa dei Tre Settenari',
+  '### Mappa dei Tre Cicli',
+  '## 2. Il Primo Settenario: La Formazione dell\'Identità (0 – VII)',
+  '### 0. Il Matto – L\'Inizio Non Condizionato',
+] as const;
 
 export const MAGGIORI_MATTO_PREVIEW_FLASHCARD_COUNT = 3;
 
 /**
- * Markdown for the public preview: Matto heading + 3 bullets +
- * `{{scheda-visiva:il-matto}}` + `{{sigillo:il-matto}}` only.
+ * Markdown for the public Modulo 01 anteprima:
+ * dispensa intro + architettura / Tre Settenari + apertura Primo Settenario
+ * + Il Matto (bullets + scheda visiva + Sigillo embeds). Stops before Bagatto.
  */
 export function getMaggioriMattoPreviewMarkdown(): string {
   const mod01 = ARCANI_MAGGIORI_DISPENSE.find((d) => d.moduleNumber === '01');
   if (!mod01) {
-    throw new Error('Dispensa Maggiori 01 missing — cannot build Matto preview.');
+    throw new Error('Dispensa Maggiori 01 missing — cannot build Modulo 1 preview.');
   }
 
   const { contentMarkdown } = mod01;
-  const start = contentMarkdown.indexOf(MATTO_HEADING);
   const end = contentMarkdown.indexOf(AFTER_MATTO_HEADING);
 
-  if (start < 0 || end < 0 || end <= start) {
+  if (end < 0) {
     throw new Error(
-      'Could not locate Il Matto slice boundaries in Dispensa 01 markdown.'
+      'Could not locate Il Matto slice end boundary in Dispensa 01 markdown.'
     );
   }
 
-  return contentMarkdown.slice(start, end).trim();
+  const slice = contentMarkdown.slice(0, end).trim();
+  for (const marker of ARCHITECTURE_MARKERS) {
+    if (!slice.includes(marker)) {
+      throw new Error(
+        `Modulo 1 preview missing architecture marker: ${marker}`
+      );
+    }
+  }
+
+  return slice;
 }
 
 /** First N Sigillo Matto cards for the free Corsi teaser (not the full deck). */
@@ -47,7 +64,7 @@ export function getMaggioriMattoPreviewFlashcardDeck(
   const cards = IL_MATTO_SECTION_FLASHCARDS.slice(0, Math.max(1, count));
   return {
     courseSlug: IL_MATTO_FLASHCARD_DECK.courseSlug,
-    moduleNumber: '01-il-matto-preview',
+    moduleNumber: '01-preview',
     title: 'Sigillo di apprendimento · Il Matto',
     subtitle: `Assaggio pubblico: ${cards.length} di ${IL_MATTO_SECTION_FLASHCARDS.length} carte. Tocca la carta per rivelare la risposta.`,
     cards,
