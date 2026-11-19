@@ -66,6 +66,8 @@ La dinamica iniziale del manifestato divide il cammino tra azione visibile e ges
 
 {{scheda-visiva:il-bagatto}}
 
+{{sigillo:il-bagatto}}
+
 ### 2. La Papessa (II) – La Gestazione e la Saggezza del Silenzio
 
 - **Simbologia ed Essenza**: Seduta immobile e velata tra i pilastri del tempio, con il sacro libro chiuso o socchiuso; custodisce la conoscenza sottile senza agire all'esterno.

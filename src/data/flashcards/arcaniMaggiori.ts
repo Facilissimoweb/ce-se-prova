@@ -7,6 +7,9 @@
  * ENN-113 — Sigillo sezione Il Matto (14 carte CSV Maria), inline dopo
  * la scheda «### 0. Il Matto» in Dispensa 01, dopo `{{scheda-visiva:il-matto}}`
  * (marker `{{sigillo:il-matto}}` — ENN-113 / ordine ENN-114).
+ *
+ * ENN-116 — Sigillo sezione Il Bagatto (21 carte CSV Maria), inline dopo
+ * `{{scheda-visiva:il-bagatto}}` in Dispensa 01 (marker `{{sigillo:il-bagatto}}`).
  */
 
 import type { CourseId } from '../../types/handoff';
@@ -26,7 +29,7 @@ export interface CourseModuleFlashcardDeck {
 }
 
 /** Inline section seals (not module-end decks). Key = `{{sigillo:<id>}}`. */
-export type InlineFlashcardSectionId = 'il-matto';
+export type InlineFlashcardSectionId = 'il-matto' | 'il-bagatto';
 
 export const ARCANI_MAGGIORI_MODULE_01_FLASHCARDS: StudyFlashcard[] = [
   {
@@ -451,11 +454,158 @@ export const IL_MATTO_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
   cards: IL_MATTO_SECTION_FLASHCARDS,
 };
 
+/** ENN-116 — 21 flashcard Il Bagatto (CSV Maria), dopo scheda-visiva in Dispensa 01. */
+export const IL_BAGATTO_SECTION_FLASHCARDS: StudyFlashcard[] = [
+  {
+    id: 1,
+    question:
+      'Quale posizione occupa Il Bagatto nella sequenza numerica degli Arcani Maggiori?',
+    answer: 'Apre la sequenza numerica recando il numero I.',
+  },
+  {
+    id: 2,
+    question: 'Tra quali due stati Il Bagatto funge da ponte operativo?',
+    answer:
+      'Funge da ponte tra il potenziale indifferenziato del Matto (0) e la manifestazione concreta nella materia.',
+  },
+  {
+    id: 3,
+    question:
+      'Quali elementi o strumenti tradizionali sono disposti sul banco di lavoro del Bagatto?',
+    answer: 'Tutti i quattro elementi dei semi: bastoni, coppe, spade e denari.',
+  },
+  {
+    id: 4,
+    question: 'Cosa incarna Il Bagatto a livello simbolico e archetipico?',
+    answer:
+      "L'iniziativa immediata, il talento allo stato puro, la destrezza e la capacità di avviare processi sfruttando le risorse già disponibili.",
+  },
+  {
+    id: 5,
+    question:
+      'Che cosa segnala la comparsa del Bagatto in una lettura in chiave previsionale?',
+    answer:
+      "Intraprendenza, sveltezza e un invito ad avviare operativamente un'azione, progetto o trattativa nei primissimi giorni a venire.",
+  },
+  {
+    id: 6,
+    question:
+      'Nella raffigurazione Waite-Smith, quale postura assumono le mani del Bagatto?',
+    answer:
+      'La mano destra eleva una bacchetta verso il cielo, mentre la mano sinistra indica la terra.',
+  },
+  {
+    id: 7,
+    question:
+      'Qual è il significato della postura delle mani del Bagatto ("Come in cielo, così in terra")?',
+    answer:
+      'Rappresenta la funzione di canale mediatore tra il regno delle idee e della volontà spirituale e la sua realizzazione sul piano fisico.',
+  },
+  {
+    id: 8,
+    question:
+      "Nel simbolismo del banco del Bagatto, a quale piano di realtà corrisponde l'elemento Bastoni (Fuoco)?",
+    answer: 'Alla volontà.',
+  },
+  {
+    id: 9,
+    question:
+      "Nel simbolismo del banco del Bagatto, a quale piano di realtà corrisponde l'elemento Coppe (Acqua)?",
+    answer: 'Alle emozioni.',
+  },
+  {
+    id: 10,
+    question:
+      "Nel simbolismo del banco del Bagatto, a quale piano di realtà corrisponde l'elemento Spade (Aria)?",
+    answer: "All'intelletto.",
+  },
+  {
+    id: 11,
+    question:
+      "Nel simbolismo del banco del Bagatto, a quale piano di realtà corrisponde l'elemento Denari (Terra)?",
+    answer: 'Alla materia.',
+  },
+  {
+    id: 12,
+    question:
+      'Quale simbolo iconografico brilla sopra la testa del Bagatto nella versione Waite-Smith?',
+    answer: "La lemniscata (il simbolo dell'infinito).",
+  },
+  {
+    id: 13,
+    question: 'Da quale elemento simbolico è cinta la veste del Bagatto?',
+    answer: "Dall'Uroboro, ossia un serpente che si morde la coda.",
+  },
+  {
+    id: 14,
+    question:
+      "Cosa indicano congiuntamente la lemniscata e l'Uroboro nell'iconografia del Bagatto?",
+    answer:
+      "L'energia vitale inesauribile, la lucidità mentale e la padronanza dei cicli della manifestazione.",
+  },
+  {
+    id: 15,
+    question:
+      'Nel pergolato che incornicia il Bagatto, cosa simboleggiano le rose rosse?',
+    answer: 'Il desiderio fertile e la passione creativa.',
+  },
+  {
+    id: 16,
+    question:
+      'Nel pergolato che incornicia il Bagatto, cosa simboleggiano i gigli bianchi?',
+    answer: "La purezza d'intenti che guida l'azione.",
+  },
+  {
+    id: 17,
+    question:
+      'Quale atteggiamento disfunzionale invita a superare il Bagatto sul piano della crescita personale?',
+    answer:
+      "Posticipare l'espressione di sé in attesa di acquisire ulteriori competenze, sottovalutando i talenti di cui si dispone già.",
+  },
+  {
+    id: 18,
+    question:
+      'In ambito lavorativo, quale micro-esercizio pratico incarna lo spirito del Bagatto?',
+    answer:
+      "Stendere una bozza provvisoria (es. traccia di 5 punti) di un'idea in sospeso, senza attendere condizioni perfette.",
+  },
+  {
+    id: 19,
+    question:
+      'Nei rapporti affettivi e sociali, perché Il Bagatto privilegia le azioni pratiche rispetto alle pure intenzioni?',
+    answer:
+      'Perché i gesti tangibili e la presenza concreta facilitano la connessione relazionale più dei discorsi o pensieri teorici.',
+  },
+  {
+    id: 20,
+    question:
+      'La spinta indifferenziata e aperta del Matto (0) trova nel Bagatto (I) la sua prima forma di _____.',
+    answer: 'canalizzazione operativa (nel mondo materiale)',
+  },
+  {
+    id: 21,
+    question:
+      "Quale Arcano Maggiore rappresenta la carta contigua al Bagatto nell'ambito della Diade Creativa?",
+    answer: 'La Papessa (II).',
+  },
+];
+
+export const IL_BAGATTO_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
+  courseSlug: 'arcani-maggiori',
+  /** Distinct from module-end seals (`01` / `04`) — section-scoped deck. */
+  moduleNumber: '01-il-bagatto',
+  title: 'Sigillo di apprendimento · Il Bagatto',
+  subtitle:
+    'Ripassa Il Bagatto (I) subito dopo la scheda visiva: iniziativa, simboli e chiave previsionale.',
+  cards: IL_BAGATTO_SECTION_FLASHCARDS,
+};
+
 const INLINE_FLASHCARD_DECKS: Record<
   InlineFlashcardSectionId,
   CourseModuleFlashcardDeck
 > = {
   'il-matto': IL_MATTO_FLASHCARD_DECK,
+  'il-bagatto': IL_BAGATTO_FLASHCARD_DECK,
 };
 
 export function getFlashcardDeck(
