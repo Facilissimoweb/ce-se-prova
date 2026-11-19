@@ -13,12 +13,11 @@ import {
 } from 'lucide-react';
 import type { CourseId, StripeCheckoutHandoffPayload } from '../types/handoff';
 import { educationalCourses, siteContent } from '../data/siteContent';
-import { MAJOR_ARCANA } from '../data/majorArcana';
 import { CopyText } from '../components/CopyText';
-import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
 import { ResilientImage } from '../components/ResilientImage';
 import { COURSE_SECTION_IMAGES } from '../data/sectionImages';
 import { MaggioriMattoPreview } from '../components/corsi/MaggioriMattoPreview';
+import { MaggioriMattoPreviewBody } from '../components/corsi/MaggioriMattoPreviewBody';
 import { MinorArcanaSuitsPlate, SpreadGeometryExplorer } from '../components/CourseVisuals';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -32,6 +31,7 @@ import {
   scrollToId,
 } from '../lib/scrollNavigation';
 import { whatsappHref } from '../lib/siteContacts';
+import { MAGGIORI_MATTO_PREVIEW_FLASHCARD_COUNT } from '../data/courses/maggioriMattoPreview';
 
 interface CorsiScreenProps {
   showCmsKeys: boolean;
@@ -40,13 +40,6 @@ interface CorsiScreenProps {
   onOpenChat: () => void;
   onOpenReservedArea: () => void;
 }
-
-const SAMPLE_MAJOR_ARCANA = [
-  MAJOR_ARCANA[0],
-  MAJOR_ARCANA[9],
-  MAJOR_ARCANA[17],
-  MAJOR_ARCANA[21],
-];
 
 export function CorsiScreen({
   showCmsKeys,
@@ -60,7 +53,6 @@ export function CorsiScreen({
     educationalCourses.find((c) => c.id === selectedCourseId) ??
     educationalCourses[0];
 
-  const [sampleArcanaIdx, setSampleArcanaIdx] = useState<number>(0);
   const [fullName, setFullName] = useState(user?.displayName ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
   const [phoneWhatsApp, setPhoneWhatsApp] = useState('');
@@ -198,9 +190,6 @@ export function CorsiScreen({
     }
   };
 
-  const activeSampleArcana =
-    SAMPLE_MAJOR_ARCANA[sampleArcanaIdx] ?? SAMPLE_MAJOR_ARCANA[0];
-
   return (
     <div
       id={SCROLL_LANDMARKS.corsi}
@@ -295,7 +284,9 @@ export function CorsiScreen({
                     {course.orderLabel}
                   </span>
                   <span className="text-[#A39B93] tabular-nums">
-                    {course.lessonsCount} lezioni · {course.totalHours}
+                    {course.id === 'arcani-maggiori'
+                      ? `${course.lessonsCount} moduli · ${course.totalHours}`
+                      : `${course.lessonsCount} lezioni · ${course.totalHours}`}
                   </span>
                 </div>
 
@@ -507,7 +498,7 @@ export function CorsiScreen({
               <span>Anteprima Didattica Interattiva</span>
               <span className="text-[#A39B93] font-normal normal-case">
                 {activeCourse.id === 'arcani-maggiori'
-                  ? 'Assaggio Il Matto + mappa carte'
+                  ? 'Scheda reale · Il Matto'
                   : activeCourse.id === 'arcani-minori'
                     ? 'Atlante dei 4 Semi'
                     : 'Schemi di Stesa'}
@@ -516,11 +507,7 @@ export function CorsiScreen({
 
             {activeCourse.id === 'arcani-maggiori' && (
               <div className="space-y-4">
-                <button
-                  type="button"
-                  onClick={handleMaggioriMattoPreview}
-                  className="w-full text-left rounded-xl border border-[#D4AF37]/35 bg-[#D4AF37]/10 p-4 md:p-5 space-y-2 hover:bg-[#D4AF37]/14 hover:border-[#D4AF37]/55 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
-                >
+                <div className="rounded-xl border border-[#D4AF37]/35 bg-[#D4AF37]/10 p-4 md:p-5 space-y-2">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37] inline-flex items-center gap-1.5">
                     <Eye className="w-3.5 h-3.5" aria-hidden="true" />
                     Contenuto reale · Dispensa 01
@@ -529,58 +516,22 @@ export function CorsiScreen({
                     Anteprima gratuita · Il Matto
                   </p>
                   <p className="text-xs md:text-sm text-[#A39B93] leading-relaxed">
-                    Bullet della scheda, widget scheda visiva e 3 flashcard del
-                    Sigillo — scorri all&apos;assaggio sopra il programma.
+                    Bullet della scheda, widget scheda visiva e{' '}
+                    {MAGGIORI_MATTO_PREVIEW_FLASHCARD_COUNT} flashcard del
+                    Sigillo — stesso assaggio dell&apos;Area Riservata, senza
+                    login.
                   </p>
-                </button>
-
-                <div className="grid grid-cols-4 gap-2.5">
-                  {SAMPLE_MAJOR_ARCANA.map((card, idx) => {
-                    const current = idx === sampleArcanaIdx;
-                    return (
-                      <button
-                        key={card.id}
-                        type="button"
-                        onClick={() => setSampleArcanaIdx(idx)}
-                        aria-pressed={current}
-                        className={`rounded-xl p-2 border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
-                          current
-                            ? 'bg-[#D4AF37]/15 border-[#D4AF37]'
-                            : 'bg-[#12100E]/75 border-[#D4AF37]/20 hover:border-[#D4AF37]/45'
-                        }`}
-                      >
-                        <MajorArcanaArtwork
-                          number={card.number}
-                          numeral={card.numeral}
-                          name={card.name}
-                          className="w-full h-auto rounded"
-                        />
-                        <p className="mt-1.5 text-[11px] font-display text-center text-[#F4F1EA] truncate">
-                          {card.numeral}
-                        </p>
-                      </button>
-                    );
-                  })}
+                  <button
+                    type="button"
+                    onClick={handleMaggioriMattoPreview}
+                    className="text-xs font-medium text-[#E6C65C] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded"
+                  >
+                    Apri anche la sezione anteprima sopra il programma
+                  </button>
                 </div>
 
-                <div className="rounded-xl bg-[#12100E]/80 border border-[#D4AF37]/20 p-5 space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="font-display text-lg text-[#F4F1EA]">
-                      {activeSampleArcana.numeral} · {activeSampleArcana.name}
-                    </h3>
-                    <span className="text-xs text-[#D4AF37]">
-                      {activeSampleArcana.element}
-                    </span>
-                  </div>
-                  <p className="text-xs md:text-sm text-[#E8e1dd] leading-relaxed">
-                    <strong className="text-[#D4AF37] font-medium">Lettura del Presente:</strong>{' '}
-                    {activeSampleArcana.synthesis}
-                  </p>
-                  <p className="text-xs md:text-sm text-[#A39B93] leading-relaxed">
-                    <strong className="text-[#F4F1EA] font-medium">Direzione Previsionale:</strong>{' '}
-                    {activeSampleArcana.futureTendency}
-                  </p>
-                </div>
+                {/* ENN-127 — real Matto scheda (no mock presente/previsione map) */}
+                <MaggioriMattoPreviewBody compact />
               </div>
             )}
 
@@ -892,7 +843,9 @@ export function CorsiScreen({
             <div className="flex items-center justify-between gap-2">
               <dt className="text-[#A39B93]">Contenuti</dt>
               <dd className="text-[#F4F1EA] font-medium tabular-nums">
-                {activeCourse.lessonsCount} lezioni ({activeCourse.totalHours})
+                {activeCourse.id === 'arcani-maggiori'
+                  ? `${activeCourse.lessonsCount} moduli (${activeCourse.totalHours})`
+                  : `${activeCourse.lessonsCount} lezioni (${activeCourse.totalHours})`}
               </dd>
             </div>
             <div className="flex items-center justify-between gap-2">
@@ -902,7 +855,7 @@ export function CorsiScreen({
             <div className="flex items-start justify-between gap-4">
               <dt className="text-[#A39B93] shrink-0">Materiali</dt>
               <dd className="text-[#F4F1EA] font-medium text-right">
-                Video HD + Dispense PDF + Sessione Q&amp;A
+                {activeCourse.formatLabel}
               </dd>
             </div>
           </dl>

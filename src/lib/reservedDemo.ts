@@ -43,10 +43,10 @@ const DEMO_COURSE_SEEDS: DemoCourseSeed[] = [
     title: 'Arcani Maggiori',
     subtitle: 'Primo Step · Tre Settenari da 0 a XXI · Presente e Previsione',
     description:
-      'Dispensa formativa completa del Primo Step: mappa dei Tre Settenari, studio dei 22 Trionfi dal Matto al Mondo.',
+      'Dispensa formativa completa del Primo Step: mappa dei Tre Settenari, studio dei 22 Trionfi dal Matto al Mondo, schede visive e Sigillo.',
     priceEur: 190,
-    lessonsCount: 12,
-    totalHours: '8h 30m video',
+    lessonsCount: 4,
+    totalHours: 'dispense + Sigillo',
     levelLabel: 'Livello Base e Intermedio',
     sortOrder: 1,
     dispense: ARCANI_MAGGIORI_DISPENSE,

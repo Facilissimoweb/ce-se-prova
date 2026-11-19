@@ -1,14 +1,7 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { ArrowRight, Eye, Lock } from 'lucide-react';
-import { DispensaFlashcards } from '../reserved/DispensaFlashcards';
-import { DispensaSchedaVisiva } from '../reserved/DispensaSchedaVisiva';
-import { FormattedDispensaBody } from '../reserved/FormattedDispensaBody';
-import {
-  getMaggioriMattoPreviewFlashcardDeck,
-  getMaggioriMattoPreviewMarkdown,
-  MAGGIORI_MATTO_PREVIEW_FLASHCARD_COUNT,
-} from '../../data/courses/maggioriMattoPreview';
-import { getSchedaVisiva } from '../../data/schedeVisive';
+import { MaggioriMattoPreviewBody } from './MaggioriMattoPreviewBody';
+import { MAGGIORI_MATTO_PREVIEW_FLASHCARD_COUNT } from '../../data/courses/maggioriMattoPreview';
 import { IL_MATTO_SECTION_FLASHCARDS } from '../../data/flashcards/arcaniMaggiori';
 import { SCROLL_LANDMARKS } from '../../lib/scrollNavigation';
 
@@ -25,22 +18,6 @@ export function MaggioriMattoPreview({
   priceEur,
   onEnroll,
 }: MaggioriMattoPreviewProps) {
-  const markdown = useMemo(() => getMaggioriMattoPreviewMarkdown(), []);
-  const previewDeck = useMemo(
-    () => getMaggioriMattoPreviewFlashcardDeck(MAGGIORI_MATTO_PREVIEW_FLASHCARD_COUNT),
-    []
-  );
-  const scheda = getSchedaVisiva('il-matto');
-
-  const embeds = useMemo(() => {
-    const map: Record<string, React.ReactNode> = {};
-    if (scheda) {
-      map['scheda-visiva:il-matto'] = <DispensaSchedaVisiva content={scheda} />;
-    }
-    map['sigillo:il-matto'] = <DispensaFlashcards deck={previewDeck} />;
-    return map;
-  }, [scheda, previewDeck]);
-
   const remainingCards = Math.max(
     0,
     IL_MATTO_SECTION_FLASHCARDS.length - MAGGIORI_MATTO_PREVIEW_FLASHCARD_COUNT
@@ -72,9 +49,7 @@ export function MaggioriMattoPreview({
         </p>
       </header>
 
-      <div className="rounded-xl border border-[#D4AF37]/18 bg-[#12100E]/65 p-4 sm:p-5 md:p-6">
-        <FormattedDispensaBody markdown={markdown} embeds={embeds} />
-      </div>
+      <MaggioriMattoPreviewBody />
 
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 rounded-xl border border-[#D4AF37]/22 bg-[#D4AF37]/8 p-4 md:p-5">
         <div className="flex-1 space-y-1.5 min-w-0">
