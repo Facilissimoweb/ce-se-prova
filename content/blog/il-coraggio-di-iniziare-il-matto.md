@@ -78,4 +78,4 @@ A conclusione dello studio di questa prima lama, invitiamo lo studente a verific
 2. **Il Simbolo dello Sguardo e del Precipizio**: Qual è il significato ermeneutico del camminare sull'orlo di un dirupo mantenendo lo sguardo rivolto verso l'alto nell'illustrazione di Pamela Colman Smith?
 3. **Valutazione in Stesa**: Quando analizzi una stesa in cui compare Il Matto, quali criteri adotti per distinguere se il movimento indicato rappresenta una sana libertà evolutiva o una leggerezza imprudente priva di ancoraggio terreno?
 
-Se stai studiando la **Dispensa 01 — Architettura e Primo Settenario** in Area Riservata, usa questo pezzo insieme alla scheda e al sigillo del Matto: il Blog non sostituisce la dispensa, la estende con un ritmo di studio.
+Se stai studiando la **Dispensa 01 — Architettura e Primo Settenario** in Area Riservata, usa questo pezzo insieme alla scheda e al sigillo del Matto: il Blog non sostituisce la dispensa, la estende con un ritmo di studio. Quando sei pronto per il primo numero, continua con [Il Bagatto / Il Mago (I)](/news/la-scintilla-del-talento-il-bagatto).

@@ -37,7 +37,10 @@ import { NewsScreen } from './screens/NewsScreen';
 import { ContattiScreen } from './screens/ContattiScreen';
 import { SocialShareButtons } from './components/SocialShareButtons';
 import { DocumentSeo } from './components/DocumentSeo';
-import { MAGGIORI_MODULO_01_BLOG_SLUG } from './data/maggioriGatedBlog';
+import {
+  MAGGIORI_BAGATTO_BLOG_SLUG,
+  MAGGIORI_MODULO_01_BLOG_SLUG,
+} from './data/maggioriGatedBlog';
 import { legalContent } from './data/legalContent';
 import {
   PATH_CHANGE_EVENT,
@@ -432,6 +435,9 @@ export function App() {
               onOpenReservedArea={() => handleNavigate('area-riservata')}
               onOpenMaggioriModuloBlog={() =>
                 handleOpenBlogPost(MAGGIORI_MODULO_01_BLOG_SLUG)
+              }
+              onOpenMaggioriBagattoBlog={() =>
+                handleOpenBlogPost(MAGGIORI_BAGATTO_BLOG_SLUG)
               }
             />
           )}
