@@ -50,6 +50,8 @@ Il primo ciclo è la fase di radicamento e di costruzione della personalità cos
 - **Significato Profondo**: slancio genuino, apertura incondizionata al nuovo, coraggio di slegarsi dai condizionamenti, fiducia nel cammino. Ogni inizio autentico richiede il rischio dell'ignoto e lo spogliamento dalle protezioni superflue.
 - **In Chiave Previsionale**: cambiamento improvviso di rotta, partenza imminente, salto di fiducia, novità inattesa. Chiede audacia, spontaneità e istinto pionieristico, senza garanzie logiche paralizzanti.
 
+{{sigillo:il-matto}}
+
 ### La Diade Creativa: Il Bagatto (I) e La Papessa (II)
 
 La dinamica iniziale del manifestato divide il cammino tra azione visibile e gestazione interiore.

@@ -3,6 +3,9 @@
  * Mapping: course slug `arcani-maggiori`, dispensa moduleNumber `01`
  * (prima dispensa del primo percorso). Deck fornito da Maria (CSV Q/A).
  * Contenuto in-repo: nessuna tabella DB.
+ *
+ * ENN-113 — Sigillo sezione Il Matto (14 carte CSV Maria), inline dopo
+ * la scheda «### 0. Il Matto» in Dispensa 01 (marker `{{sigillo:il-matto}}`).
  */
 
 import type { CourseId } from '../../types/handoff';
@@ -20,6 +23,9 @@ export interface CourseModuleFlashcardDeck {
   subtitle: string;
   cards: StudyFlashcard[];
 }
+
+/** Inline section seals (not module-end decks). Key = `{{sigillo:<id>}}`. */
+export type InlineFlashcardSectionId = 'il-matto';
 
 export const ARCANI_MAGGIORI_MODULE_01_FLASHCARDS: StudyFlashcard[] = [
   {
@@ -335,6 +341,122 @@ export const FLASHCARD_DECKS: CourseModuleFlashcardDeck[] = [
   },
 ];
 
+/** ENN-113 — 14 flashcard Il Matto (CSV Maria), dopo la scheda Matto in Dispensa 01. */
+export const IL_MATTO_SECTION_FLASHCARDS: StudyFlashcard[] = [
+  {
+    id: 1,
+    question:
+      "Dove si colloca la carta de Il Matto (0) all'interno della sequenza numerica dei Tarocchi?",
+    answer:
+      'Si colloca al di fuori della numerazione sequenziale, poiché precede ogni schema, regola o sovrastruttura mentale.',
+  },
+  {
+    id: 2,
+    question:
+      "Qual è l'essenza archetipica fondamentale rappresentata da Il Matto?",
+    answer:
+      "Rappresenta l'energia pura prima della cristallizzazione nella materia, la libertà assoluta, l'ignoto e il passo sul precipizio.",
+  },
+  {
+    id: 3,
+    question:
+      "Cosa insegna Il Matto riguardo all'inizio di un percorso autentico?",
+    answer:
+      "Insegna che per iniziare davvero è necessario accettare il rischio dell'ignoto e spogliarsi delle protezioni superflue.",
+  },
+  {
+    id: 4,
+    question:
+      'In chiave previsionale, cosa indica la comparsa de Il Matto in una lettura?',
+    answer:
+      "Anticipa un cambiamento improvviso di rotta, una partenza imminente, un salto di fiducia o una novità inattesa che richiede audacia e istinto pionieristico.",
+  },
+  {
+    id: 5,
+    question:
+      "Nell'iconografia Waite-Smith, cosa simboleggiano l'orlo del precipizio e lo sguardo rivolto verso l'alto?",
+    answer:
+      "Simboleggiano l'abbandono alle correnti dell'esistenza e la disponibilità al nuovo, ma indicano anche distrazione dai pericoli immediati del terreno.",
+  },
+  {
+    id: 6,
+    question: 'Cosa rappresenta la sacca appesa al bastone de Il Matto?',
+    answer: "Rappresenta le esperienze passate ridotte all'essenziale.",
+  },
+  {
+    id: 7,
+    question:
+      'Qual è il significato simbolico della rosa bianca tenuta nella mano destra del Matto?',
+    answer:
+      "Simboleggia la purezza d'intenti che accompagna l'inizio del viaggio.",
+  },
+  {
+    id: 8,
+    question:
+      'Qual è la funzione simbolica del cane bianco che affianca Il Matto?',
+    answer:
+      "Rappresenta l'istinto, la fedeltà o l'avvertimento sensoriale di fronte al passo che sta per compiersi.",
+  },
+  {
+    id: 9,
+    question:
+      'Quale avvertimento pragmatico racchiude la figura de Il Matto quando indica un nuovo inizio?',
+    answer:
+      "Invita ad agire con freschezza e audacia senza tuttavia ignorare il piano d'appoggio concreto.",
+  },
+  {
+    id: 10,
+    question:
+      "Nell'ambito della crescita personale, quale condizionamento mentale viene messo in discussione da Il Matto?",
+    answer:
+      'La tendenza della mente a richiedere conferme e garanzie immediate prima di muovere anche un solo passo.',
+  },
+  {
+    id: 11,
+    question:
+      'In che modo Il Matto si differenzia strutturalmente dalla stabilità di un Re o dalla gestione numerica?',
+    answer:
+      'Il Matto è energia pura, spontanea e priva di sovrastrutture, mentre i Re rappresentano la stabilità consolidata e i numeri la gestione ciclica e ordinata.',
+  },
+  {
+    id: 12,
+    question:
+      "Nel lavoro e nella carriera, quale atteggiamento limita l'espressione dell'energia de Il Matto?",
+    answer:
+      "Trattenere un'idea o un progetto potenziale in attesa di una struttura o di una garanzia perfetta.",
+  },
+  {
+    id: 13,
+    question: "Nei rapporti sociali, come si manifesta l'energia de Il Matto?",
+    answer:
+      'Attraverso il superamento delle difese e delle aspettative rigide, favorendo la leggerezza e il dialogo spontaneo.',
+  },
+  {
+    id: 14,
+    question:
+      'Qual è il criterio per valutare se Il Matto indica una sana libertà evolutiva o una leggerezza imprudente?',
+    answer:
+      "Analizzare se la decisione è mossa da una genuina fiducia e purezza d'intenti o se ignora completamente la realtà e il piano d'appoggio concreto.",
+  },
+];
+
+export const IL_MATTO_FLASHCARD_DECK: CourseModuleFlashcardDeck = {
+  courseSlug: 'arcani-maggiori',
+  /** Distinct from module-end seals (`01` / `04`) — section-scoped deck. */
+  moduleNumber: '01-il-matto',
+  title: 'Sigillo di apprendimento · Il Matto',
+  subtitle:
+    'Ripassa Il Matto (0) subito dopo la scheda del Primo Settenario: essenza, simbologia e chiave previsionale.',
+  cards: IL_MATTO_SECTION_FLASHCARDS,
+};
+
+const INLINE_FLASHCARD_DECKS: Record<
+  InlineFlashcardSectionId,
+  CourseModuleFlashcardDeck
+> = {
+  'il-matto': IL_MATTO_FLASHCARD_DECK,
+};
+
 export function getFlashcardDeck(
   courseSlug: string,
   moduleNumber: string
@@ -344,5 +466,19 @@ export function getFlashcardDeck(
       (d) => d.courseSlug === courseSlug && d.moduleNumber === moduleNumber
     ) ?? null
   );
+}
+
+/** Section seal embedded mid-dispensa via `{{sigillo:<id>}}`. */
+export function getInlineFlashcardDeck(
+  sectionId: string
+): CourseModuleFlashcardDeck | null {
+  return INLINE_FLASHCARD_DECKS[sectionId as InlineFlashcardSectionId] ?? null;
+}
+
+/** Strip embed markers from plain-text downloads / exports. */
+export function stripFlashcardEmbedMarkers(markdown: string): string {
+  return markdown
+    .replace(/^\{\{sigillo:[\w-]+\}\}\s*$/gm, '')
+    .replace(/\n{3,}/g, '\n\n');
 }
 

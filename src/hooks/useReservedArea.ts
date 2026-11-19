@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { stripFlashcardEmbedMarkers } from '../data/flashcards/arcaniMaggiori';
 import { readJsonResponse } from '../lib/readJsonResponse';
 import {
   RESERVED_DEMO_UID,
@@ -226,7 +227,8 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
     courseTitle: string,
     dispensa: ReservedUnlockedDispensa
   ) => {
-    const fileContent = `# Tarot Italia · Maria Teresa Rogani\nPercorso: ${courseTitle}\nModulo ${dispensa.moduleNumber}: ${dispensa.title}\n${dispensa.subtitle}\n\nPunti Chiave:\n${dispensa.keyTakeaways.map((k) => `- ${k}`).join('\n')}\n\n${dispensa.contentMarkdown}\n`;
+    const body = stripFlashcardEmbedMarkers(dispensa.contentMarkdown);
+    const fileContent = `# Tarot Italia · Maria Teresa Rogani\nPercorso: ${courseTitle}\nModulo ${dispensa.moduleNumber}: ${dispensa.title}\n${dispensa.subtitle}\n\nPunti Chiave:\n${dispensa.keyTakeaways.map((k) => `- ${k}`).join('\n')}\n\n${body}\n`;
     const blob = new Blob([fileContent], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

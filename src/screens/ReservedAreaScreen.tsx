@@ -17,7 +17,10 @@ import { FormattedDispensaBody } from '../components/reserved/FormattedDispensaB
 import { DispensaFlashcards } from '../components/reserved/DispensaFlashcards';
 import { ReservedLoginGate } from '../components/reserved/ReservedLoginGate';
 import { ReservedNotesPanel } from '../components/reserved/ReservedNotesPanel';
-import { getFlashcardDeck } from '../data/flashcards/arcaniMaggiori';
+import {
+  getFlashcardDeck,
+  getInlineFlashcardDeck,
+} from '../data/flashcards/arcaniMaggiori';
 import { useReservedArea } from '../hooks/useReservedArea';
 import {
   SCROLL_LANDMARKS,
@@ -94,6 +97,23 @@ export function ReservedAreaScreen({
   const activeFlashcardDeck = useMemo(() => {
     if (!activeCourse || !activeDispensa) return null;
     return getFlashcardDeck(activeCourse.slug, activeDispensa.moduleNumber);
+  }, [activeCourse, activeDispensa]);
+
+  /** ENN-113 — section seals mid-dispensa (e.g. Il Matto after its scheda). */
+  const dispensaFlashcardEmbeds = useMemo(() => {
+    if (
+      !activeCourse ||
+      !activeDispensa ||
+      activeCourse.slug !== 'arcani-maggiori' ||
+      activeDispensa.moduleNumber !== '01'
+    ) {
+      return undefined;
+    }
+    const mattoDeck = getInlineFlashcardDeck('il-matto');
+    if (!mattoDeck) return undefined;
+    return {
+      'il-matto': <DispensaFlashcards deck={mattoDeck} />,
+    };
   }, [activeCourse, activeDispensa]);
 
   const pendingScrollRef = useRef<ReservedScrollTarget>(null);
@@ -519,8 +539,11 @@ export function ReservedAreaScreen({
                     </div>
                   )}
 
-                  {/* Formatted Dispensa Body */}
-                  <FormattedDispensaBody markdown={activeDispensa.contentMarkdown} />
+                  {/* Formatted Dispensa Body (+ inline sigilli, e.g. Il Matto) */}
+                  <FormattedDispensaBody
+                    markdown={activeDispensa.contentMarkdown}
+                    embeds={dispensaFlashcardEmbeds}
+                  />
 
                   {activeFlashcardDeck && (
                     <>

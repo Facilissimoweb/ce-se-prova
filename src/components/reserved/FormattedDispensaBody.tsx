@@ -14,13 +14,35 @@ function renderInlineBold(text: string): React.ReactNode {
   });
 }
 
-export function FormattedDispensaBody({ markdown }: { markdown: string }) {
+const SIGILLO_EMBED_RE = /^\{\{sigillo:([\w-]+)\}\}$/;
+
+export function FormattedDispensaBody({
+  markdown,
+  embeds,
+}: {
+  markdown: string;
+  /** Rendered when the markdown contains `{{sigillo:<id>}}` (ENN-113+). */
+  embeds?: Record<string, React.ReactNode>;
+}) {
   const lines = markdown.split('\n');
   return (
     <div className="space-y-3 text-sm md:text-[15px] leading-relaxed text-[#E8e1dd]">
       {lines.map((rawLine, idx) => {
         const line = rawLine.trim();
         if (!line) return <div key={idx} className="h-1" aria-hidden="true" />;
+
+        const embedMatch = line.match(SIGILLO_EMBED_RE);
+        if (embedMatch) {
+          const embedId = embedMatch[1];
+          const node = embeds?.[embedId];
+          if (!node) return null;
+          return (
+            <div key={idx} className="py-2">
+              {node}
+            </div>
+          );
+        }
+
         if (line.startsWith('## ')) {
           return (
             <h4
