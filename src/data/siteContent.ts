@@ -203,27 +203,6 @@ export const siteContent = {
       liveText:
         'I materiali didattici di questo percorso saranno distribuiti a breve. Restate in ascolto: la formazione Tarot Italia è in preparazione con cura.',
     },
-    obscureKicker: {
-      cmsKey: '[COPY: siteContent.corsi.obscureKicker]',
-      liveText: 'Didattica a breve',
-    },
-    obscureTitle: {
-      cmsKey: '[COPY: siteContent.corsi.obscureTitle]',
-      liveText: 'I percorsi formativi sono in preparazione',
-    },
-    obscureBody: {
-      cmsKey: '[COPY: siteContent.corsi.obscureBody]',
-      liveText:
-        'Questa pagina resta oscurata finché i materiali Tarot Italia non saranno pronti. Catalogo e iscrizioni non sono ancora disponibili: la didattica arriverà con cura, a breve.',
-    },
-    obscureCtaConsulti: {
-      cmsKey: '[COPY: siteContent.corsi.obscureCtaConsulti]',
-      liveText: 'Esplora i Consulti',
-    },
-    obscureCtaHome: {
-      cmsKey: '[COPY: siteContent.corsi.obscureCtaHome]',
-      liveText: 'Torna alla Home',
-    },
     checkoutNote: {
       cmsKey: '[COPY: siteContent.corsi.checkoutNote]',
       liveText:
