@@ -25,6 +25,7 @@ import { ChiSonoScreen } from './screens/ChiSonoScreen';
 import { ConsultiScreen } from './screens/ConsultiScreen';
 import { CorsiScreen } from './screens/CorsiScreen';
 import { ReservedAreaScreen } from './screens/ReservedAreaScreen';
+import { ApprofondimentiTerzoSettenarioScreen } from './screens/ApprofondimentiTerzoSettenarioScreen';
 import { BookingScreen } from './screens/BookingScreen';
 import { ChatScreen } from './screens/ChatScreen';
 import { PrivacyScreen } from './screens/PrivacyScreen';
@@ -354,6 +355,12 @@ export function App() {
   };
 
   const isAuxScreen = AUX_SCREENS.includes(activeScreen);
+  /** Highlight Area personale when on gated Maggiori approfondimenti (ENN-106). */
+  const topBarScreen: ScreenId = isAuxScreen
+    ? 'home'
+    : activeScreen === 'approfondimenti-terzo-settenario'
+      ? 'area-riservata'
+      : activeScreen;
 
   return (
     <AuthProvider>
@@ -363,7 +370,7 @@ export function App() {
         <AmbientSanctuaryBackground />
 
         <TopBar
-          activeScreen={isAuxScreen ? 'home' : activeScreen}
+          activeScreen={topBarScreen}
           onNavigate={handleNavigate}
           onOpenHandoff={() => setIsHandoffOpen(true)}
           onOpenPrivacy={() => setIsPrivacyOpen(true)}
@@ -413,6 +420,10 @@ export function App() {
               onNavigate={handleNavigate}
               onSelectCourse={handleSelectCourseAndNavigate}
             />
+          )}
+
+          {activeScreen === 'approfondimenti-terzo-settenario' && (
+            <ApprofondimentiTerzoSettenarioScreen onNavigate={handleNavigate} />
           )}
 
           {activeScreen === 'booking' && (

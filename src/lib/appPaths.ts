@@ -7,6 +7,8 @@ export const SCREEN_PATHS: Record<ScreenId, string> = {
   consulti: '/consulti',
   corsi: '/corsi',
   'area-riservata': '/area-riservata',
+  'approfondimenti-terzo-settenario':
+    '/area-riservata/approfondimenti-terzo-settenario',
   booking: '/prenota',
   chat: '/dialogo',
   news: '/news',
@@ -26,6 +28,10 @@ const PATH_ALIASES: Record<string, ScreenId> = {
   '/corsi': 'corsi',
   '/area-riservata': 'area-riservata',
   '/riservata': 'area-riservata',
+  '/area-riservata/approfondimenti-terzo-settenario':
+    'approfondimenti-terzo-settenario',
+  '/riservata/approfondimenti-terzo-settenario':
+    'approfondimenti-terzo-settenario',
   '/prenota': 'booking',
   '/prenotazione': 'booking',
   '/dialogo': 'chat',
