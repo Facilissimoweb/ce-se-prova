@@ -1,4 +1,5 @@
 import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Check, ChevronDown, Globe } from 'lucide-react';
 import {
   loadSavedCookiePreferences,
@@ -287,19 +288,64 @@ type Props = {
   onRequestConsent?: () => void;
 };
 
-/** Preferred menu width; clamped so the panel never leaves the viewport (ENN-142). */
+/** Preferred menu size; clamped so the panel never leaves the viewport (ENN-142). */
 const GT_MENU_WIDTH_PX = 288; // 18rem — room for ZH / JA / AR labels
 const GT_MENU_VIEWPORT_PAD_PX = 12;
+const GT_MENU_MAX_HEIGHT_PX = 352; // 22rem
+const GT_MENU_MIN_HEIGHT_PX = 48; // at least one row
 
-type HeaderMenuPos = { top: number; left: number; width: number };
+type HeaderMenuPos = {
+  top: number;
+  left: number;
+  width: number;
+  maxHeight: number;
+};
+
+function readSafeAreaInsetTop(): number {
+  // CSS env() is not readable via getPropertyValue on :root in all engines.
+  const probe = document.createElement('div');
+  probe.style.cssText =
+    'position:fixed;top:0;left:0;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top,0px)';
+  document.body.appendChild(probe);
+  const value = Number.parseFloat(getComputedStyle(probe).paddingTop) || 0;
+  probe.remove();
+  return value;
+}
 
 function clampHeaderMenuPos(trigger: DOMRect): HeaderMenuPos {
   const pad = GT_MENU_VIEWPORT_PAD_PX;
-  const width = Math.min(GT_MENU_WIDTH_PX, window.innerWidth - pad * 2);
+  const vv = window.visualViewport;
+  const viewLeft = vv?.offsetLeft ?? 0;
+  const viewTop = vv?.offsetTop ?? 0;
+  const viewWidth = vv?.width ?? window.innerWidth;
+  const viewHeight = vv?.height ?? window.innerHeight;
+  const safeTop = readSafeAreaInsetTop();
+
+  const width = Math.min(GT_MENU_WIDTH_PX, viewWidth - pad * 2);
   // Prefer right-align under the trigger; slide in if that would clip.
   let left = trigger.right - width;
-  left = Math.max(pad, Math.min(left, window.innerWidth - pad - width));
-  return { top: trigger.bottom + 6, left, width };
+  left = Math.max(
+    viewLeft + pad,
+    Math.min(left, viewLeft + viewWidth - pad - width)
+  );
+
+  // Prefer below the trigger; never above safe-area / viewport pad (first row visible).
+  const minTop = viewTop + Math.max(pad, safeTop + pad);
+  const maxBottom = viewTop + viewHeight - pad;
+  let top = Math.max(minTop, trigger.bottom + 6);
+  let maxHeight = Math.min(GT_MENU_MAX_HEIGHT_PX, viewHeight * 0.7);
+
+  if (top + GT_MENU_MIN_HEIGHT_PX > maxBottom) {
+    // Not enough room below — open upward, still clamped under safe-area.
+    const upwardBottom = Math.max(minTop + GT_MENU_MIN_HEIGHT_PX, trigger.top - 6);
+    maxHeight = Math.min(maxHeight, upwardBottom - minTop);
+    top = Math.max(minTop, upwardBottom - maxHeight);
+  } else {
+    maxHeight = Math.min(maxHeight, maxBottom - top);
+  }
+  maxHeight = Math.max(GT_MENU_MIN_HEIGHT_PX, maxHeight);
+
+  return { top, left, width, maxHeight };
 }
 
 function BrandedLanguageMenu({
@@ -317,6 +363,7 @@ function BrandedLanguageMenu({
   );
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const listId = useId();
   const active = langByCode(current);
 
@@ -327,9 +374,15 @@ function BrandedLanguageMenu({
   useEffect(() => {
     if (!open) return;
     const onPointer = (event: MouseEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false);
+      const target = event.target as Node;
+      // Portaled list lives outside rootRef — treat both as "inside".
+      if (
+        rootRef.current?.contains(target) ||
+        listRef.current?.contains(target)
+      ) {
+        return;
       }
+      setOpen(false);
     };
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setOpen(false);
@@ -342,7 +395,7 @@ function BrandedLanguageMenu({
     };
   }, [open]);
 
-  // Header dropdown: fixed + clamp so narrow screens don't clip left (ENN-142).
+  // Header dropdown: portal + clamp so it never clips under header blur/safe-area (ENN-142).
   useLayoutEffect(() => {
     if (variant !== 'header' || !open) {
       setHeaderMenuPos(null);
@@ -356,9 +409,13 @@ function BrandedLanguageMenu({
     update();
     window.addEventListener('resize', update);
     window.addEventListener('scroll', update, true);
+    window.visualViewport?.addEventListener('resize', update);
+    window.visualViewport?.addEventListener('scroll', update);
     return () => {
       window.removeEventListener('resize', update);
       window.removeEventListener('scroll', update, true);
+      window.visualViewport?.removeEventListener('resize', update);
+      window.visualViewport?.removeEventListener('scroll', update);
     };
   }, [open, variant]);
 
@@ -464,50 +521,58 @@ function BrandedLanguageMenu({
         />
       </button>
 
-      {open && headerMenuPos && (
-        <ul
-          id={listId}
-          role="listbox"
-          aria-label="Lingua del sito"
-          style={{
-            top: headerMenuPos.top,
-            left: headerMenuPos.left,
-            width: headerMenuPos.width,
-          }}
-          className="fixed z-[70] max-h-[min(70vh,22rem)] overflow-y-auto rounded-xl border border-[#D4AF37]/25 bg-[#12100E]/98 py-1 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md"
-        >
-          {GT_LANGUAGES.map((lang) => {
-            const selected = lang.code === current;
-            return (
-              <li key={lang.code} role="option" aria-selected={selected}>
-                <button
-                  type="button"
-                  onClick={() => pick(lang.code)}
-                  disabled={switching}
-                  className={`flex w-full min-h-[44px] items-center justify-between gap-3 px-3 py-2 text-left text-xs transition-colors focus-visible:outline-none focus-visible:bg-[#D4AF37]/12 disabled:opacity-60 ${
-                    selected
-                      ? 'bg-[#D4AF37]/12 text-[#D4AF37]'
-                      : 'text-[#F4F1EA] hover:bg-[#D4AF37]/08'
-                  }`}
-                >
-                  <span className="flex min-w-0 items-center gap-2.5">
-                    <span className="text-base leading-none" aria-hidden>
-                      {lang.flag}
+      {open &&
+        headerMenuPos &&
+        createPortal(
+          <ul
+            ref={listRef}
+            id={listId}
+            role="listbox"
+            aria-label="Lingua del sito"
+            style={{
+              top: headerMenuPos.top,
+              left: headerMenuPos.left,
+              width: headerMenuPos.width,
+              maxHeight: headerMenuPos.maxHeight,
+            }}
+            className="fixed z-[70] overflow-y-auto rounded-xl border border-[#D4AF37]/25 bg-[#12100E]/98 py-1 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md notranslate"
+            translate="no"
+          >
+            {GT_LANGUAGES.map((lang) => {
+              const selected = lang.code === current;
+              return (
+                <li key={lang.code} role="option" aria-selected={selected}>
+                  <button
+                    type="button"
+                    onClick={() => pick(lang.code)}
+                    disabled={switching}
+                    className={`flex w-full min-h-[44px] items-center justify-between gap-3 px-3 py-2 text-left text-xs transition-colors focus-visible:outline-none focus-visible:bg-[#D4AF37]/12 disabled:opacity-60 ${
+                      selected
+                        ? 'bg-[#D4AF37]/12 text-[#D4AF37]'
+                        : 'text-[#F4F1EA] hover:bg-[#D4AF37]/08'
+                    }`}
+                  >
+                    <span className="flex min-w-0 items-center gap-2.5">
+                      <span className="text-base leading-none" aria-hidden>
+                        {lang.flag}
+                      </span>
+                      <span className="font-semibold tracking-[0.06em]">
+                        {lang.short}
+                      </span>
+                      <span className="truncate text-[#A39B93]">
+                        {lang.label}
+                      </span>
                     </span>
-                    <span className="font-semibold tracking-[0.06em]">
-                      {lang.short}
-                    </span>
-                    <span className="truncate text-[#A39B93]">{lang.label}</span>
-                  </span>
-                  {selected && (
-                    <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                  )}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+                    {selected && (
+                      <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>,
+          document.body
+        )}
     </div>
   );
 }
