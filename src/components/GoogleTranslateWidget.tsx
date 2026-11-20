@@ -6,12 +6,20 @@ import {
   subscribeCookieConsent,
 } from '../lib/cookieConsent';
 import { setSiteLanguage } from '../i18n';
+import {
+  GT_HOST_ID,
+  GT_PAGE_LANG,
+  clearGoogtransHash,
+  expireGoogtransCookies,
+  googleTranslateElementReady,
+  readGoogTransLang,
+  requestGoogleTranslateRefresh,
+  startGoogleTranslateSpaBridge,
+  writeGoogtransCookie,
+} from '../lib/googleTranslateRuntime';
 
 const GT_SCRIPT_ID = 'tarot_italia_google_translate_script';
-export const GT_HOST_ID = 'tarot_italia_google_translate_host';
-
-/** Google Translate pageLanguage (site source). */
-const GT_PAGE_LANG = 'it';
+export { GT_HOST_ID, readGoogTransLang } from '../lib/googleTranslateRuntime';
 
 type GtLang = {
   /** Google Translate code (`zh-CN`, `pt`, …). `it` = original / reset. */
@@ -72,86 +80,10 @@ function googleTranslateApi(): GoogleTranslateNs | undefined {
   return (window as Window & { google?: GoogleTranslateNs }).google;
 }
 
-/** Host-only + Domain= variants GT / we may have written (ENN-142 stuck switches). */
-function googtransDomainCandidates(): string[] {
-  const host = window.location.hostname;
-  const domains: string[] = [''];
-  if (
-    host &&
-    host !== 'localhost' &&
-    !/^\d{1,3}(\.\d{1,3}){3}$/.test(host)
-  ) {
-    domains.push(host);
-    const parts = host.split('.');
-    for (let i = 0; i <= parts.length - 2; i++) {
-      domains.push(`.${parts.slice(i).join('.')}`);
-    }
-  }
-  return [...new Set(domains)];
-}
-
-function expireGoogtransCookies() {
-  const expire = 'expires=Thu, 01 Jan 1970 00:00:00 GMT';
-  const paths = ['/', window.location.pathname || '/'];
-  for (const domain of googtransDomainCandidates()) {
-    const domainPart = domain ? `domain=${domain}; ` : '';
-    for (const path of paths) {
-      document.cookie = `googtrans=; ${domainPart}path=${path}; ${expire}`;
-    }
-  }
-}
-
-function clearGoogtransHash() {
-  if (!window.location.hash.toLowerCase().includes('googtrans')) return;
-  const url = `${window.location.pathname}${window.location.search}`;
-  window.history.replaceState(null, '', url);
-}
-
-function parseGoogtransTarget(raw: string): string | null {
-  try {
-    const value = decodeURIComponent(raw.trim());
-    // Forms: /it/en, /auto/en, en
-    const parts = value.split('/').filter(Boolean);
-    if (parts.length >= 2) return parts[parts.length - 1];
-    if (parts.length === 1 && parts[0] !== GT_PAGE_LANG) return parts[0];
-  } catch {
-    /* ignore */
-  }
-  return null;
-}
-
-/** Read active GT target from cookie or hash; default Italian source. */
-export function readGoogTransLang(): string {
-  const cookie = document.cookie.match(/(?:^|;\s*)googtrans=([^;]*)/);
-  if (cookie?.[1]) {
-    const fromCookie = parseGoogtransTarget(cookie[1]);
-    if (fromCookie) return fromCookie;
-  }
-  const hash = window.location.hash.match(
-    /googtrans\(([^|)]+)\|([^)]+)\)/i
-  );
-  if (hash?.[2]) return hash[2];
-  return GT_PAGE_LANG;
-}
-
-function writeGoogtransCookie(target: string) {
-  // Always wipe every domain/path variant first — stale /it/en next to /it/es freezes GT.
-  expireGoogtransCookies();
-  const value = `/${GT_PAGE_LANG}/${target}`;
-  document.cookie = `googtrans=${value}; path=/`;
-  const host = window.location.hostname;
-  // Browsers reject Domain= for raw IPs (localhost / 127.0.0.1).
-  if (host && !/^\d{1,3}(\.\d{1,3}){3}$/.test(host) && host !== 'localhost') {
-    document.cookie = `googtrans=${value}; domain=${host}; path=/`;
-    const parts = host.split('.');
-    if (parts.length >= 2) {
-      document.cookie = `googtrans=${value}; domain=.${parts.slice(-2).join('.')}; path=/`;
-    }
-  }
-}
-
 /** Prevent double-clicks / overlapping reloads while a switch is in flight. */
 let gtLangSwitchLock = false;
+
+let spaBridgeStop: (() => void) | undefined;
 
 /**
  * Apply a browsing language via googtrans.
@@ -211,6 +143,13 @@ function clearGoogleTranslateArtifacts(clearCookies: boolean) {
 
 let gtInjected = false;
 
+function ensureSpaBridge() {
+  if (!spaBridgeStop) {
+    spaBridgeStop = startGoogleTranslateSpaBridge();
+  }
+  requestGoogleTranslateRefresh(160);
+}
+
 function mountTranslateElement() {
   const host = document.getElementById(GT_HOST_ID);
   const TranslateElement = googleTranslateApi()?.translate?.TranslateElement;
@@ -225,11 +164,14 @@ function mountTranslateElement() {
     },
     GT_HOST_ID
   );
+  ensureSpaBridge();
   return true;
 }
 
 function unloadGoogleTranslate() {
   gtInjected = false;
+  spaBridgeStop?.();
+  spaBridgeStop = undefined;
   document.getElementById(GT_SCRIPT_ID)?.remove();
   const host = document.getElementById(GT_HOST_ID);
   if (host) host.innerHTML = '';
@@ -250,10 +192,12 @@ function injectGoogleTranslate() {
   if (existing) {
     // Script already present (Strict remount / prior inject): remount gadget if needed.
     if (
-      googleTranslateApi()?.translate?.TranslateElement &&
+      googleTranslateElementReady() &&
       !document.querySelector(`#${GT_HOST_ID} .goog-te-gadget`)
     ) {
       mountTranslateElement();
+    } else {
+      ensureSpaBridge();
     }
     gtInjected = true;
     return;

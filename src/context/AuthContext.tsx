@@ -17,6 +17,7 @@ import {
   RESERVED_DEMO_UID,
   isReservedDemoRequested,
 } from '../lib/reservedDemo';
+import { notifyGoogleTranslateRefresh } from '../lib/googleTranslateRuntime';
 
 interface AuthContextValue {
   user: User | null;
@@ -77,6 +78,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
+      // Post-login React mounts (Area Personale / corsi) need a GT re-scan (ENN-148).
+      notifyGoogleTranslateRefresh();
     });
     return () => unsubscribe();
   }, []);
@@ -90,6 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const result = await signInWithPopup(auth, googleAuthProvider);
       setUser(result.user);
+      notifyGoogleTranslateRefresh();
       return result.user;
     } catch (err: unknown) {
       const code =
