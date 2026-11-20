@@ -12,7 +12,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useCourseEntitlement } from '../hooks/useCourseEntitlement';
 import { useAuth } from '../context/AuthContext';
-import { isSiteLang, type SiteLang } from '../i18n/types';
+import { requestGoogleTranslateRefresh } from '../lib/googleTranslateRuntime';
 import {
   NINA_CHAT_OPEN_EVENT,
   type NinaChatOpenDetail,
@@ -28,14 +28,16 @@ import { NinaMessageBody } from './chat/NinaMessageBody';
 import { readGoogTransLang } from './GoogleTranslateWidget';
 import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
 
-/** Curated i18n packs for seed greetings; other GT langs fall back to English. */
-function greetingI18nLang(gtCode: string): SiteLang {
-  const primary = gtCode.trim().toLowerCase().split('-')[0] || 'it';
-  if (isSiteLang(primary)) return primary;
-  return primary === 'it' ? 'it' : 'en';
-}
-
-type ChatTurn = { role: 'user' | 'assistant'; content: string };
+/**
+ * Thread turns. `skipGt` marks copy already localized for googtrans
+ * (API /api/chat replies, user input). Seed chrome stays Italian DOM
+ * source so GT can translate (ENN-158) — never English default for JA.
+ */
+type ChatTurn = {
+  role: 'user' | 'assistant';
+  content: string;
+  skipGt?: boolean;
+};
 type NinaMode = 'welcome' | 'studio';
 
 type ChatStatusResponse = {
@@ -105,7 +107,11 @@ export function ChatFab() {
   const [statusLoading, setStatusLoading] = useState(false);
   const [chatAvailable, setChatAvailable] = useState(false);
   const [turns, setTurns] = useState<ChatTurn[]>(() => [
-    { role: 'assistant', content: t('nina.welcome') },
+    {
+      role: 'assistant',
+      // Always Italian DOM source — GT translates (ENN-158).
+      content: i18n.getFixedT('it', 'common')('nina.welcome'),
+    },
   ]);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
@@ -117,13 +123,16 @@ export function ChatFab() {
   const { getIdToken } = useAuth();
   const canUseStudio = entitlement.owns;
 
+  /** Italian seed only — never EN fallback for JA/other GT langs (ENN-158). */
   function greetingFor(nextMode: NinaMode): string {
-    // GT forces react-i18next to IT; seed greeting follows googtrans (ENN-143).
-    const gt = typeof document !== 'undefined' ? readGoogTransLang() : 'it';
-    const tf = i18n.getFixedT(greetingI18nLang(gt), 'common');
+    const tf = i18n.getFixedT('it', 'common');
     return nextMode === 'studio'
       ? tf('nina.welcomeStudio')
       : tf('nina.welcome');
+  }
+
+  function seedTurn(nextMode: NinaMode): ChatTurn {
+    return { role: 'assistant', content: greetingFor(nextMode) };
   }
 
   /** Active Google Translate browsing language (`/it/<lang>` cookie/hash). */
@@ -137,30 +146,41 @@ export function ChatFab() {
       return;
     }
     setMode(nextMode);
-    setTurns([{ role: 'assistant', content: greetingFor(nextMode) }]);
+    setTurns([seedTurn(nextMode)]);
     setSendError(null);
     setShowStudioCta(false);
     setDraft('');
   }
 
-  // Refresh greeting when language changes and thread is still the default only
+  // Keep seed greeting on Italian source when i18n/mode changes (still GT-able).
   useEffect(() => {
     setTurns((prev) => {
-      if (prev.length === 1 && prev[0]?.role === 'assistant') {
-        return [{ role: 'assistant', content: greetingFor(mode) }];
+      if (
+        prev.length === 1 &&
+        prev[0]?.role === 'assistant' &&
+        !prev[0]?.skipGt
+      ) {
+        return [seedTurn(mode)];
       }
       return prev;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- greetingFor binds t/mode
-  }, [i18n.language, mode, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- seedTurn binds i18n/mode
+  }, [i18n.language, mode]);
+
+  // Panel remounts chrome + seed — re-apply googtrans (same as Sigillo ENN-157).
+  useEffect(() => {
+    if (!open) return;
+    requestGoogleTranslateRefresh(160);
+  }, [open, mode, turns.length, showStudioCta, sending]);
 
   // If Studio entitlement is lost, fall back to welcome.
   useEffect(() => {
     if (!canUseStudio && mode === 'studio') {
       setMode('welcome');
-      setTurns([{ role: 'assistant', content: t('nina.welcome') }]);
+      setTurns([seedTurn('welcome')]);
     }
-  }, [canUseStudio, mode, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canUseStudio, mode]);
 
   useEffect(() => {
     if (!open) return;
@@ -180,19 +200,19 @@ export function ChatFab() {
       if (isCompact) setToolsOpen(false);
       if (requested === 'studio' && !canUseStudio) {
         setMode('welcome');
-        setTurns([{ role: 'assistant', content: t('nina.welcome') }]);
+        setTurns([seedTurn('welcome')]);
         setShowStudioCta(true);
         return;
       }
       setMode(requested);
-      setTurns([{ role: 'assistant', content: greetingFor(requested) }]);
+      setTurns([seedTurn(requested)]);
       setShowStudioCta(false);
       setSendError(null);
     };
     window.addEventListener(NINA_CHAT_OPEN_EVENT, onOpen);
     return () => window.removeEventListener(NINA_CHAT_OPEN_EVENT, onOpen);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canUseStudio, isCompact, setToolsOpen, t]);
+  }, [canUseStudio, isCompact, setToolsOpen]);
 
   // Lock page scroll while Nina covers the viewport (ENN-69).
   useEffect(() => {
@@ -253,7 +273,10 @@ export function ChatFab() {
     const history = turns
       .filter((turn) => turn.role === 'user' || turn.role === 'assistant')
       .slice(-12);
-    setTurns((prev) => [...prev, { role: 'user', content: message }]);
+    setTurns((prev) => [
+      ...prev,
+      { role: 'user', content: message, skipGt: true },
+    ]);
     setSending(true);
 
     try {
@@ -295,7 +318,11 @@ export function ChatFab() {
         if (data.reply) {
           setTurns((prev) => [
             ...prev,
-            { role: 'assistant', content: data.reply as string },
+            {
+              role: 'assistant',
+              content: data.reply as string,
+              skipGt: true,
+            },
           ]);
         } else {
           setSendError(safeUserError(t('nina.studioLockedHint')));
@@ -311,12 +338,19 @@ export function ChatFab() {
 
       // Unclear intent / empty-confused → Nina asks to rephrase in-thread.
       if (data.code === 'unclear' || data.code === 'empty') {
-        const rephrase =
-          (typeof data.reply === 'string' && data.reply.trim()) ||
-          t('nina.errorRephrase');
+        const apiReply =
+          typeof data.reply === 'string' && data.reply.trim()
+            ? data.reply.trim()
+            : '';
         setTurns((prev) => [
           ...prev,
-          { role: 'assistant', content: rephrase },
+          apiReply
+            ? { role: 'assistant', content: apiReply, skipGt: true }
+            : {
+                role: 'assistant',
+                // Italian DOM source — GT translates (no EN hardcode).
+                content: i18n.getFixedT('it', 'common')('nina.errorRephrase'),
+              },
         ]);
         return;
       }
@@ -334,14 +368,17 @@ export function ChatFab() {
       if (!data.reply || looksLikeNinaProviderLeak(data.reply)) {
         setTurns((prev) => [
           ...prev,
-          { role: 'assistant', content: t('nina.errorRephrase') },
+          {
+            role: 'assistant',
+            content: i18n.getFixedT('it', 'common')('nina.errorRephrase'),
+          },
         ]);
         return;
       }
 
       setTurns((prev) => [
         ...prev,
-        { role: 'assistant', content: data.reply as string },
+        { role: 'assistant', content: data.reply as string, skipGt: true },
       ]);
     } catch {
       setSendError(t('nina.errorOffline'));
@@ -475,32 +512,36 @@ export function ChatFab() {
             {chatAvailable && (
               <div className="mb-2 flex min-h-0 min-w-0 flex-1 flex-col">
                 {/*
-                  Thread is notranslate: replies already follow googtrans via /api/chat.
-                  Chrome/labels above stay free so GT can still translate UI (ENN-143).
-                  Sigillo flashcards + scheda composizione + titles + corsi/dispensa follow GT (ENN-157).
+                  ENN-158: chrome + seed welcome stay GT-able (Italian DOM source).
+                  Only API/user bubbles use notranslate — replies already follow
+                  googtrans via /api/chat (ENN-143). Never default seed to English.
                 */}
                 <div
                   ref={threadRef}
-                  className="mb-2 min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain rounded-xl border border-[#D4AF37]/12 bg-[#0F0D0B]/70 p-2.5 notranslate"
-                  translate="no"
+                  className="mb-2 min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain rounded-xl border border-[#D4AF37]/12 bg-[#0F0D0B]/70 p-2.5"
                   aria-live="polite"
                 >
-                  {turns.map((turn, index) => (
-                    <div
-                      key={`${turn.role}-${index}`}
-                      className={
-                        turn.role === 'user'
-                          ? 'ml-6 break-words rounded-lg bg-[#D4AF37]/15 px-2.5 py-2 text-sm text-[#F4F1EA] whitespace-pre-wrap'
-                          : 'mr-2 break-words rounded-lg bg-[#1C1916] px-2.5 py-2.5'
-                      }
-                    >
-                      {turn.role === 'assistant' ? (
-                        <NinaMessageBody content={turn.content} />
-                      ) : (
-                        turn.content
-                      )}
-                    </div>
-                  ))}
+                  {turns.map((turn, index) => {
+                    const baseClass =
+                      turn.role === 'user'
+                        ? 'ml-6 break-words rounded-lg bg-[#D4AF37]/15 px-2.5 py-2 text-sm text-[#F4F1EA] whitespace-pre-wrap'
+                        : 'mr-2 break-words rounded-lg bg-[#1C1916] px-2.5 py-2.5';
+                    return (
+                      <div
+                        key={`${turn.role}-${index}`}
+                        className={
+                          turn.skipGt ? `${baseClass} notranslate` : baseClass
+                        }
+                        {...(turn.skipGt ? { translate: 'no' as const } : {})}
+                      >
+                        {turn.role === 'assistant' ? (
+                          <NinaMessageBody content={turn.content} />
+                        ) : (
+                          turn.content
+                        )}
+                      </div>
+                    );
+                  })}
                   {sending && (
                     <div className="mr-4 flex items-center gap-2 rounded-lg bg-[#1C1916] px-2.5 py-2 text-sm text-[#A39B93]">
                       <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
@@ -513,15 +554,29 @@ export function ChatFab() {
                   <label htmlFor={composerId} className="sr-only">
                     Messaggio per Nina
                   </label>
-                  <textarea
-                    id={composerId}
-                    rows={1}
-                    value={draft}
-                    onChange={(e) => setDraft(e.target.value)}
-                    disabled={sending}
-                    placeholder="Scrivi qui…"
-                    className="min-h-[2.5rem] min-w-0 flex-1 resize-none rounded-xl border border-[#D4AF37]/20 bg-[#12100E] px-3 py-2 text-sm text-[#F4F1EA] placeholder:text-[#6F675F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:opacity-60"
-                  />
+                  {/*
+                    GT does not translate HTML placeholder attrs — use a visible
+                    Italian text node so googtrans can localize «Scrivi qui…».
+                  */}
+                  <div className="relative min-h-[2.5rem] min-w-0 flex-1">
+                    {!draft.trim() && (
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute top-2 left-3 right-3 text-sm leading-snug text-[#6F675F]"
+                      >
+                        Scrivi qui…
+                      </span>
+                    )}
+                    <textarea
+                      id={composerId}
+                      rows={1}
+                      value={draft}
+                      onChange={(e) => setDraft(e.target.value)}
+                      disabled={sending}
+                      placeholder=""
+                      className="min-h-[2.5rem] w-full resize-none rounded-xl border border-[#D4AF37]/20 bg-[#12100E] px-3 py-2 text-sm text-[#F4F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:opacity-60"
+                    />
+                  </div>
                   <button
                     type="submit"
                     disabled={sending || !draft.trim()}
