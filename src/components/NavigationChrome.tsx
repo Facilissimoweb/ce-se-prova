@@ -298,14 +298,6 @@ export function TopBar({
                 </span>
               </div>
 
-              <GoogleTranslateWidget
-                variant="drawer"
-                onRequestConsent={() => {
-                  setMobileMenuOpen(false);
-                  onOpenPrivacy();
-                }}
-              />
-
               <nav aria-label={t('nav.pagesAria')} className="space-y-2.5">
                 {navItems.map((item) => {
                   const Icon = item.icon;
