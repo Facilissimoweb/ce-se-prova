@@ -1,5 +1,5 @@
-import React, { useEffect, useId, useState } from 'react';
-import { Globe } from 'lucide-react';
+import React, { useEffect, useId, useRef, useState } from 'react';
+import { Check, ChevronDown, Globe } from 'lucide-react';
 import {
   loadSavedCookiePreferences,
   subscribeCookieConsent,
@@ -8,6 +8,47 @@ import { setSiteLanguage } from '../i18n';
 
 const GT_SCRIPT_ID = 'tarot_italia_google_translate_script';
 export const GT_HOST_ID = 'tarot_italia_google_translate_host';
+
+/** Google Translate pageLanguage (site source). */
+const GT_PAGE_LANG = 'it';
+
+type GtLang = {
+  /** Google Translate code (`zh-CN`, `pt`, …). `it` = original / reset. */
+  code: string;
+  short: string;
+  label: string;
+  flag: string;
+};
+
+/**
+ * Curated browsing languages (ENN-141).
+ * IT is always first so users can leave a stuck foreign GT session.
+ */
+export const GT_LANGUAGES: readonly GtLang[] = [
+  { code: 'it', short: 'IT', label: 'Italiano', flag: '🇮🇹' },
+  { code: 'en', short: 'EN', label: 'English', flag: '🇬🇧' },
+  { code: 'es', short: 'ES', label: 'Español', flag: '🇪🇸' },
+  { code: 'fr', short: 'FR', label: 'Français', flag: '🇫🇷' },
+  { code: 'de', short: 'DE', label: 'Deutsch', flag: '🇩🇪' },
+  { code: 'pt', short: 'PT', label: 'Português', flag: '🇧🇷' },
+  { code: 'zh-CN', short: 'ZH', label: '中文 (简体)', flag: '🇨🇳' },
+  { code: 'ja', short: 'JA', label: '日本語', flag: '🇯🇵' },
+  { code: 'ar', short: 'AR', label: 'العربية', flag: '🇸🇦' },
+  { code: 'ru', short: 'RU', label: 'Русский', flag: '🇷🇺' },
+  { code: 'uk', short: 'UK', label: 'Українська', flag: '🇺🇦' },
+  { code: 'pl', short: 'PL', label: 'Polski', flag: '🇵🇱' },
+  { code: 'nl', short: 'NL', label: 'Nederlands', flag: '🇳🇱' },
+  { code: 'ro', short: 'RO', label: 'Română', flag: '🇷🇴' },
+  { code: 'sv', short: 'SV', label: 'Svenska', flag: '🇸🇪' },
+  { code: 'tr', short: 'TR', label: 'Türkçe', flag: '🇹🇷' },
+  { code: 'el', short: 'EL', label: 'Ελληνικά', flag: '🇬🇷' },
+  { code: 'ko', short: 'KO', label: '한국어', flag: '🇰🇷' },
+  { code: 'hi', short: 'HI', label: 'हिन्दी', flag: '🇮🇳' },
+] as const;
+
+const GT_INCLUDED = GT_LANGUAGES.filter((l) => l.code !== 'it')
+  .map((l) => l.code)
+  .join(',');
 
 type TranslateElementCtor = {
   new (options: Record<string, unknown>, elementId: string): unknown;
@@ -30,6 +71,73 @@ function googleTranslateApi(): GoogleTranslateNs | undefined {
   return (window as Window & { google?: GoogleTranslateNs }).google;
 }
 
+function expireGoogtransCookies() {
+  const expire = 'expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+  const host = window.location.hostname;
+  document.cookie = `googtrans=; ${expire}`;
+  document.cookie = `googtrans=; domain=${host}; ${expire}`;
+  const parts = host.split('.');
+  if (parts.length >= 2) {
+    document.cookie = `googtrans=; domain=.${parts.slice(-2).join('.')}; ${expire}`;
+  }
+}
+
+function clearGoogtransHash() {
+  if (!window.location.hash.toLowerCase().includes('googtrans')) return;
+  const url = `${window.location.pathname}${window.location.search}`;
+  window.history.replaceState(null, '', url);
+}
+
+/** Read active GT target from cookie or hash; default Italian source. */
+export function readGoogTransLang(): string {
+  const cookie = document.cookie.match(/(?:^|;\s*)googtrans=([^;]*)/);
+  if (cookie?.[1]) {
+    try {
+      const value = decodeURIComponent(cookie[1].trim());
+      // Forms: /it/en  or  /auto/en
+      const parts = value.split('/').filter(Boolean);
+      if (parts.length >= 2) return parts[parts.length - 1];
+      if (parts.length === 1 && parts[0] !== GT_PAGE_LANG) return parts[0];
+    } catch {
+      /* ignore */
+    }
+  }
+  const hash = window.location.hash.match(
+    /googtrans\(([^|)]+)\|([^)]+)\)/i
+  );
+  if (hash?.[2]) return hash[2];
+  return GT_PAGE_LANG;
+}
+
+function writeGoogtransCookie(target: string) {
+  const value = `/${GT_PAGE_LANG}/${target}`;
+  document.cookie = `googtrans=${value}; path=/`;
+  const host = window.location.hostname;
+  // Browsers reject Domain= for raw IPs (localhost / 127.0.0.1).
+  if (host && !/^\d{1,3}(\.\d{1,3}){3}$/.test(host) && host !== 'localhost') {
+    document.cookie = `googtrans=${value}; domain=${host}; path=/`;
+  }
+}
+
+/**
+ * Apply a browsing language via googtrans.
+ * IT clears cookie/hash, restores page.lang, and reloads to Italian source.
+ */
+export function applyGoogTransLang(code: string) {
+  void setSiteLanguage('it');
+  if (code === GT_PAGE_LANG || code === '') {
+    expireGoogtransCookies();
+    clearGoogtransHash();
+    document.documentElement.lang = GT_PAGE_LANG;
+    document.documentElement.classList.remove('translated-ltr', 'translated-rtl');
+    window.location.reload();
+    return;
+  }
+  writeGoogtransCookie(code);
+  clearGoogtransHash();
+  window.location.reload();
+}
+
 function clearGoogleTranslateArtifacts() {
   document
     .querySelectorAll(
@@ -38,9 +146,8 @@ function clearGoogleTranslateArtifacts() {
     .forEach((el) => el.remove());
   document.documentElement.classList.remove('translated-ltr', 'translated-rtl');
   document.body?.style.removeProperty('top');
-  const expire = 'expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
-  document.cookie = `googtrans=; ${expire}`;
-  document.cookie = `googtrans=; domain=${window.location.hostname}; ${expire}`;
+  expireGoogtransCookies();
+  clearGoogtransHash();
 }
 
 function unloadGoogleTranslate() {
@@ -74,9 +181,8 @@ function injectGoogleTranslate() {
     host.innerHTML = '';
     new TranslateElement(
       {
-        pageLanguage: 'it',
-        includedLanguages:
-          'en,es,fr,de,pt,ar,zh-CN,ja,ko,ru,nl,pl,ro,sv,tr,uk,el,hi',
+        pageLanguage: GT_PAGE_LANG,
+        includedLanguages: GT_INCLUDED,
         layout: TranslateElement.InlineLayout?.SIMPLE ?? 0,
         autoDisplay: false,
       },
@@ -92,6 +198,13 @@ function injectGoogleTranslate() {
   document.body.appendChild(script);
 }
 
+function langByCode(code: string): GtLang {
+  return (
+    GT_LANGUAGES.find((l) => l.code === code) ??
+    GT_LANGUAGES[0]
+  );
+}
+
 type Props = {
   variant?: 'header' | 'drawer';
   className?: string;
@@ -99,9 +212,176 @@ type Props = {
   onRequestConsent?: () => void;
 };
 
+function BrandedLanguageMenu({
+  variant,
+  className = '',
+}: {
+  variant: 'header' | 'drawer';
+  className?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [current, setCurrent] = useState(GT_PAGE_LANG);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const listId = useId();
+  const active = langByCode(current);
+
+  useEffect(() => {
+    setCurrent(readGoogTransLang());
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointer = (event: MouseEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', onPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const pick = (code: string) => {
+    setOpen(false);
+    if (code === current) return;
+    applyGoogTransLang(code);
+  };
+
+  if (variant === 'drawer') {
+    return (
+      <div
+        className={`space-y-2 notranslate ${className}`}
+        translate="no"
+        ref={rootRef}
+      >
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+          Traduci il sito
+        </p>
+        <p className="text-xs leading-relaxed text-[#A39B93]">
+          Fonte: italiano. Scegli IT per tornare all&apos;originale. I materiali
+          didattici hanno file curati a parte (Corsi / Area Riservata).
+        </p>
+        <ul
+          role="listbox"
+          aria-label="Lingua del sito"
+          className="max-h-[min(55vh,22rem)] overflow-y-auto rounded-xl border border-[#D4AF37]/25 bg-[#151311]/90 py-1"
+        >
+          {GT_LANGUAGES.map((lang) => {
+            const selected = lang.code === current;
+            return (
+              <li key={lang.code} role="option" aria-selected={selected}>
+                <button
+                  type="button"
+                  onClick={() => pick(lang.code)}
+                  className={`flex w-full min-h-[44px] items-center justify-between gap-3 px-3 py-2 text-left text-xs transition-colors focus-visible:outline-none focus-visible:bg-[#D4AF37]/12 ${
+                    selected
+                      ? 'bg-[#D4AF37]/12 text-[#D4AF37]'
+                      : 'text-[#F4F1EA] hover:bg-[#D4AF37]/08'
+                  }`}
+                >
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <span className="text-base leading-none" aria-hidden>
+                      {lang.flag}
+                    </span>
+                    <span className="font-semibold tracking-[0.06em]">
+                      {lang.short}
+                    </span>
+                    <span className="truncate text-[#A39B93]">{lang.label}</span>
+                  </span>
+                  {selected && (
+                    <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={rootRef}
+      className={`relative notranslate ${className}`}
+      translate="no"
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        aria-controls={listId}
+        aria-label={`Lingua del sito: ${active.label}`}
+        title="Traduci il sito"
+        className="inline-flex min-h-[40px] max-w-[11.5rem] items-center gap-1.5 rounded-lg border border-[#D4AF37]/25 bg-[#151311]/70 px-2 py-1.5 text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/55 hover:text-[#D4AF37] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+      >
+        <span className="text-sm leading-none" aria-hidden>
+          {active.flag}
+        </span>
+        <Globe className="hidden h-3.5 w-3.5 shrink-0 text-[#D4AF37] sm:block" aria-hidden />
+        <span className="truncate text-[11px] font-semibold tracking-[0.08em]">
+          {active.short}
+        </span>
+        <ChevronDown
+          className={`h-3.5 w-3.5 shrink-0 text-[#A39B93] transition-transform ${
+            open ? 'rotate-180' : ''
+          }`}
+          aria-hidden
+        />
+      </button>
+
+      {open && (
+        <ul
+          id={listId}
+          role="listbox"
+          aria-label="Lingua del sito"
+          className="absolute right-0 top-[calc(100%+0.35rem)] z-[70] max-h-[min(70vh,22rem)] min-w-[14rem] overflow-y-auto rounded-xl border border-[#D4AF37]/25 bg-[#12100E]/98 py-1 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md"
+        >
+          {GT_LANGUAGES.map((lang) => {
+            const selected = lang.code === current;
+            return (
+              <li key={lang.code} role="option" aria-selected={selected}>
+                <button
+                  type="button"
+                  onClick={() => pick(lang.code)}
+                  className={`flex w-full min-h-[44px] items-center justify-between gap-3 px-3 py-2 text-left text-xs transition-colors focus-visible:outline-none focus-visible:bg-[#D4AF37]/12 ${
+                    selected
+                      ? 'bg-[#D4AF37]/12 text-[#D4AF37]'
+                      : 'text-[#F4F1EA] hover:bg-[#D4AF37]/08'
+                  }`}
+                >
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <span className="text-base leading-none" aria-hidden>
+                      {lang.flag}
+                    </span>
+                    <span className="font-semibold tracking-[0.06em]">
+                      {lang.short}
+                    </span>
+                    <span className="truncate text-[#A39B93]">{lang.label}</span>
+                  </span>
+                  {selected && (
+                    <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 /**
- * Brand-styled Google Website Translator (ENN-140).
- * Single DOM host lives in the header variant; drawer only shows consent / hint.
+ * Brand-styled Google Website Translator control (ENN-140 / ENN-141).
+ * Custom gold/obsidian dropdown with flags; GT gadget stays injected but hidden.
  * Script loads only after marketing / third-party cookie consent.
  */
 export function GoogleTranslateWidget({
@@ -110,7 +390,10 @@ export function GoogleTranslateWidget({
   onRequestConsent,
 }: Props) {
   const labelId = useId();
-  const [marketingAllowed, setMarketingAllowed] = useState(false);
+  /** null = consent not read yet — never unload/clear googtrans during this gap. */
+  const [marketingAllowed, setMarketingAllowed] = useState<boolean | null>(
+    null
+  );
 
   useEffect(() => {
     const prefs = loadSavedCookiePreferences();
@@ -122,12 +405,23 @@ export function GoogleTranslateWidget({
 
   useEffect(() => {
     if (variant !== 'header') return;
+    if (marketingAllowed === null) return;
     if (marketingAllowed) {
       injectGoogleTranslate();
     } else {
       unloadGoogleTranslate();
     }
   }, [marketingAllowed, variant]);
+
+  if (marketingAllowed === null) {
+    if (variant === 'drawer') return null;
+    return (
+      <div
+        className={`inline-flex min-h-[40px] w-[4.5rem] ${className}`}
+        aria-hidden
+      />
+    );
+  }
 
   if (!marketingAllowed) {
     if (variant === 'drawer') {
@@ -172,35 +466,17 @@ export function GoogleTranslateWidget({
   }
 
   if (variant === 'drawer') {
-    return (
-      <div className={`space-y-2 notranslate ${className}`} translate="no">
-        <p
-          id={labelId}
-          className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]"
-        >
-          Traduci il sito
-        </p>
-        <p className="text-xs leading-relaxed text-[#A39B93]">
-          Usa il selettore lingua nella barra in alto. Fonte: italiano. I
-          materiali didattici hanno file curati a parte (Corsi / Area
-          Riservata).
-        </p>
-      </div>
-    );
+    return <BrandedLanguageMenu variant="drawer" className={className} />;
   }
 
   return (
-    <div
-      className={`tarot-gt-shell notranslate flex min-h-[40px] max-w-[9.5rem] items-center rounded-lg border border-[#D4AF37]/25 bg-[#151311]/70 px-1.5 ${className}`}
-      translate="no"
-      title="Traduci il sito con Google"
-      aria-label="Traduci il sito"
-    >
-      <Globe
-        className="ml-0.5 h-3.5 w-3.5 shrink-0 text-[#D4AF37]"
+    <div className={`relative ${className}`}>
+      <div
+        id={GT_HOST_ID}
+        className="tarot-gt-host tarot-gt-host--hidden"
         aria-hidden
       />
-      <div id={GT_HOST_ID} className="tarot-gt-host min-w-0 flex-1" />
+      <BrandedLanguageMenu variant="header" />
     </div>
   );
 }
