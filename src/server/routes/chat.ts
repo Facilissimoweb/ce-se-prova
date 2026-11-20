@@ -1,8 +1,8 @@
 import {
+  buildNinaSystemPrompt,
   createGroqChatCompletion,
   isGroqChatConfigured,
   resolveGroqChatModel,
-  TAROT_ITALIA_CHAT_SYSTEM_PROMPT,
   type GroqChatFailureCode,
   type GroqChatMessage,
 } from '../../lib/groqChat.ts';
@@ -76,6 +76,13 @@ function chatFailureResponse(code: GroqChatFailureCode | string): ApiResult {
         error:
           'Il modello Groq non è disponibile. Controlla GROQ_CHAT_MODEL oppure il default del sito, poi riprova. Nel frattempo usa WhatsApp, Telegram o email.',
       });
+    case 'GROQ_CHAT_PAYLOAD':
+      return json(502, {
+        available: true,
+        code: 'payload',
+        error:
+          'La richiesta a Nina è troppo ampia per il modello. Prova una domanda più breve o specifica un solo Arcano, poi riprova. Nel frattempo usa WhatsApp, Telegram o email.',
+      });
     case 'GROQ_CHAT_EMPTY':
       return json(502, {
         available: true,
@@ -110,8 +117,9 @@ export async function postChatMessage(body: Record<string, unknown>): Promise<Ap
   }
 
   const history = asHistory(body.history);
+  const systemPrompt = buildNinaSystemPrompt({ message, history });
   const messages: GroqChatMessage[] = [
-    { role: 'system', content: TAROT_ITALIA_CHAT_SYSTEM_PROMPT },
+    { role: 'system', content: systemPrompt },
     ...history,
     { role: 'user', content: message },
   ];

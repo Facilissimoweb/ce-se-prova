@@ -85,148 +85,317 @@ D5. Come si svolge la lettura, e mi serve una conoscenza preliminare?
 R5. Non \xE8 richiesta alcuna conoscenza preliminare della simbologia o del linguaggio degli arcani. Lavoro integrando la lettura viva della cartomanzia con un percorso di riflessione profonda: ti accolgo esattamente dove ti trovi, guidandoti passo dopo passo attraverso le immagini per decifrare la tua storia. I consulti online avvengono esclusivamente in modalit\xE0 chiamata vocale.
 
 ## Dialogo Tarot
-Spazio interattivo sul sito con i 22 Arcani Maggiori (riflessione guidata). Non sostituisce un consulto umano con Maria Teresa. Non mescolare i testi del Dialogo Tarot con le schede didattiche Maggiori qui sotto: sono percorsi distinti.
+Spazio interattivo sul sito con i 22 Arcani Maggiori (riflessione guidata). Non sostituisce un consulto umano con Maria Teresa. Non mescolare i testi del Dialogo Tarot con le schede didattiche Maggiori: sono percorsi distinti.
 
 ## CTA
 - Quando serve un consulto autentico, una prenotazione o un dubbio personale, invita a **Parla con Maria Teresa** (sezione fissa sotto la chat: Prenota, WhatsApp, Telegram, email).
 - Non aggiungere blocchi CTA markdown n\xE9 elenchi di bottoni nel messaggio.`;
-var NINA_CHAT_MAGGIORI_KNOWLEDGE = `## Arcani Maggiori \u2014 schede didattiche ufficiali (Trionfi 0\u2013XXI)
-
-Fonte: dispensa formativa Area Personale Tarot Italia (Tre Settenari) e, dove indicato, schede visive Waite-Smith (Pamela Colman Smith) gi\xE0 pubblicate sul sito. Usa SOLO questi contenuti. Non inventare dettagli iconografici, simboli o attributi assenti da queste schede. Non mescolare con i testi del Dialogo Tarot.
-
-Struttura di risposta (quando chiedono un Arcano Maggiore, soprattutto \xABcom\u2019\xE8 visivamente\xBB, simbologia, significato, luce/ombra, previsione):
-1. **Simbologia** (e, se presente nella scheda, cues Waite-Smith)
-2. **Significato / senso profondo**
-3. **Luce / ombra** \u2014 solo se presente sotto (per 0\u2013VII dalle schede: evolutiva = luce, attenzione = ombra); se assente, non inventarla
-4. **In chiave previsionale**
-Tono: caldo, rigoroso, Tarot Italia \u2014 non teatrale. Risposte concise a paragrafi; puoi usare i quattro campi come mini-sezioni. Per approfondimenti da corsista o consulto vivo, invita a **Parla con Maria Teresa** / corso Maggiori.
-
-Architettura (Tre Settenari): 22 lame (0\u2013XXI). Primo (0\u2013VII) formazione dell\u2019identit\xE0 e radicamento; Secondo (VIII\u2013XIV) prova etica e interiorizzazione; Terzo (XV\u2013XXI) Ombra, liberazione e compiutezza.
-
-### 0. Il Matto \u2014 L\u2019Inizio Non Condizionato
-- **Simbologia**: soglia fuori dalla numerazione sequenziale; passo sul precipizio; libert\xE0 assoluta; energia pura prima di ogni cristallizzazione. **Waite-Smith (scheda ufficiale)**: giovane in abiti ricchi e colorati cammina sull\u2019orlo di un precipizio con lo sguardo in alto; sulla spalla un bastone con piccola sacca; nella mano destra una rosa bianca; cane bianco che salta accanto; sole luminoso alle spalle. Orlo + sguardo in alto = abbandono al nuovo e rischio di ignorare i pericoli immediati; sacca = esperienze ridotte all\u2019essenziale; rosa bianca = purezza d\u2019intenti; cane = istinto/fedelt\xE0/avvertimento; sole = luce che accompagna l\u2019apertura.
-- **Significato / senso profondo**: slancio genuino, apertura incondizionata al nuovo, coraggio di slegarsi dai condizionamenti, fiducia nel cammino; ogni inizio autentico richiede il rischio dell\u2019ignoto e lo spogliamento dalle protezioni superflue.
-- **Luce / ombra**: Luce \u2014 inizio di un percorso nuovo, scelta che rompe la routine, viaggio o decisione coraggiosa fuori dagli schemi. Ombra \u2014 ritrovare leggerezza senza ignorare il piano d\u2019appoggio concreto o i pericoli immediati del terreno.
-- **In chiave previsionale**: cambiamento improvviso di rotta, partenza imminente, salto di fiducia, novit\xE0 inattesa; chiede audacia, spontaneit\xE0 e istinto pionieristico, senza garanzie logiche paralizzanti.
-
-### I. Il Bagatto \u2014 L\u2019Iniziativa e il Talento all\u2019Opera
-- **Simbologia**: alla guida della numerazione; sul banco tutti gli strumenti primari (bastoni, coppe, spade, denari); padrone delle risorse operative. **Waite-Smith**: giovane eretto dietro un tavolo, tunica bianca e mantello rosso; mano destra con bacchetta verso l\u2019alto, sinistra verso terra; lemniscata (infinito) sul capo; uroboro in vita; sul tavolo i quattro semi; luce dorata, rose rosse e gigli bianchi. Asse cielo\u2013terra = \xABcome in alto, cos\xEC in basso\xBB; quattro semi = risorse gi\xE0 disponibili.
-- **Significato / senso profondo**: iniziativa immediata, talento puro, destrezza, attivazione con ci\xF2 che \xE8 gi\xE0 disponibile, senza attendere condizioni ideali.
-- **Luce / ombra**: Luce \u2014 volont\xE0 consapevole, iniziativa mirata, avvio concreto con gli strumenti a disposizione. Ombra \u2014 evitare manipolazione, illusione o dispersione delle abilit\xE0.
-- **In chiave previsionale**: azione pratica immediata; \xABmettere le mani in pasta\xBB, concretizzare un progetto o un\u2019azione nei primissimi giorni.
-
-### II. La Papessa \u2014 La Gestazione e la Saggezza del Silenzio
-- **Simbologia**: seduta immobile e velata tra i pilastri del tempio; libro chiuso o socchiuso; conoscenza sottile senza agire all\u2019esterno. **Waite-Smith**: donna solenne su trono, mantello blu, croce dorata sul petto; corona/tiara e velo; rotolo TORA; luna crescente ai piedi; colonne B (nera) e J (bianca); velo con melograni e palme; acqua dietro il velo.
-- **Significato / senso profondo**: gestazione silenziosa, verit\xE0 intuita prima di essere detta, sapienza del tempo, attesa fertile; ogni vera creazione richiede raccoglimento.
-- **Luce / ombra**: Luce \u2014 ascolto interiore, intuizione, studio, riservatezza, maturazione prima di agire. Ombra \u2014 non confondere prudenza con chiusura eccessiva, passivit\xE0 o elusione del confronto.
-- **In chiave previsionale**: non \xE8 il momento di agire o esporre idee; custodire, studiare, riflettere, lasciare maturare gli eventi.
-
-### III. L\u2019Imperatrice \u2014 La Fioritura Creativa e l\u2019Abbondanza
-- **Simbologia**: fioritura sensibile, abbondanza generativa, forma e vita alle idee. **Waite-Smith**: donna regale in radura, veste con melagrane; corona di dodici stelle; scettro; scudo a cuore con Venere; grano, bosco, acqua.
-- **Significato / senso profondo**: vitalit\xE0 rigogliosa, espressione creativa, potere generativo della parola; armonia che trasforma l\u2019impulso in manifestazione ricca.
-- **Luce / ombra**: Luce \u2014 fertilit\xE0 creativa o materiale, cura, crescita, abbondanza. Ombra \u2014 distinguere abbondanza che nutre da eccesso, iperprotettivit\xE0 o dispersione.
-- **In chiave previsionale**: espansione prospera, intese riuscite, fioritura di idee, fecondit\xE0 nei progetti, armonia relazionale.
-
-### IV. L\u2019Imperatore \u2014 La Stabilit\xE0 Strutturale e il Metodo
-- **Simbologia**: autorit\xE0 e concretezza; stabilit\xE0, metodo, confini, gestione organizzata. **Waite-Smith**: sovrano su trono di pietra con teste d\u2019ariete; armatura e mantello rosso; scettro con ankh e globo; montagne aride alle spalle.
-- **Significato / senso profondo**: autorit\xE0 saggia, protezione, governo della realt\xE0; forza strutturale per dare durata e confini a quanto creato.
-- **Luce / ombra**: Luce \u2014 strutturare, confini netti, pragmatismo, leadership protettiva. Ombra \u2014 distinguere guida solida da rigidit\xE0 autoritaria.
-- **In chiave previsionale**: consolidamento lavorativo o finanziario, basi solide, referente autorevole, gestione metodica.
-
-### V. Il Papa \u2014 Il Patto Etico e la Guida Spettabile
-- **Simbologia**: guida spirituale o professionale; trasmissione di valori e regole. **Waite-Smith**: figura tra due colonne, triregno, casula rossa; benedizione con due dita; bastone a tripla croce; due discepoli; due chiavi.
-- **Significato / senso profondo**: patto etico, trasmissione della sapienza, mediazione; alleanza tra aspirazioni individuali e tradizione.
-- **Luce / ombra**: Luce \u2014 studio, mentore, principi etici, coerenza di percorso. Ombra \u2014 distinguere orientamento saggio da conformismo dogmatico.
-- **In chiave previsionale**: contratti chiari, mediazioni riuscite, consulenze autorevoli, alleanze basate sulla fiducia.
-
-### VI. Gli Innamorati / Gli Amanti \u2014 Il Bivio e la Scelta del Cuore
-- **Simbologia**: figura al bivio, incontro, affetto, responsabilit\xE0 della decisione. **Waite-Smith**: uomo e donna nudi in paesaggio luminoso; albero della vita (dodici fiamme) e albero della conoscenza con serpente; angelo e sole radioso sopra.
-- **Significato / senso profondo**: scelta consapevole del cuore e responsabilit\xE0 verso la propria direzione; optare con convinzione escludendo le altre strade.
-- **Luce / ombra**: Luce \u2014 scelta del cuore, relazione/partnership autentica, responsabilit\xE0 del bivio. Ombra \u2014 distinguere unione consapevole da attrazione impulsiva non vagliata.
-- **In chiave previsionale**: decisioni sentimentali o professionali ineludibili; scelta d\u2019amore o di valore; allineamento con i desideri profondi.
-
-### VII. Il Carro \u2014 L\u2019Azione Coordinata e la Vittoria Disciplinata
-- **Simbologia**: condottiero sul Carro trionfale; governa le forze opposte. **Waite-Smith**: giovane coronato su carro di pietra, scettro, baldacchino stellato, disco alato; due sfingi bianca e nera senza redini visibili; citt\xE0 e acqua sullo sfondo. Governo luce/ombra e polarit\xE0 tramite baricentro interiore, non costrizione meccanica.
-- **Significato / senso profondo**: azione coordinata, controllo sapiente delle polarit\xE0, vittoria grazie a determinazione e rigore.
-- **Luce / ombra**: Luce \u2014 superamento di ostacoli, direzione, viaggio, conquista. Ombra \u2014 distinguere conquista centrata da accelerazione forzata e rigida.
-- **In chiave previsionale**: sblocco rapido di trattative o stagnazioni, viaggi, spostamenti, accelerazione decisiva verso gli obiettivi.
-
-### VIII. La Giustizia \u2014 Ordine, Misura e Causa-Effetto
-- **Simbologia**: figura regale in trono, spada verticale e bilancia in equilibrio; ordine cosmico, imparzialit\xE0, conseguenze lineari.
-- **Significato / senso profondo**: responsabilit\xE0, onest\xE0 intellettuale, equilibrio, rigore etico; ogni azione genera conseguenza; la chiarezza mentale guida l\u2019emotivit\xE0.
-- **In chiave previsionale**: questioni legali o burocratiche, contratti equi, necessit\xE0 di fare ordine, risposta meritata e oggettiva.
-
-### IX. L\u2019Eremita \u2014 Luce Interiore e Tempo della Ricerca
+var NINA_MAGGIORI_CARDS = [
+  {
+    id: 0,
+    roman: "0",
+    title: "Il Matto",
+    aliases: ["matto", "il matto", "fool"],
+    body: `### 0. Il Matto \u2014 L\u2019Inizio Non Condizionato
+- **Simbologia**: soglia fuori numerazione; passo sul precipizio; libert\xE0 prima di ogni cristallizzazione. **Waite**: giovane in abiti colorati sull\u2019orlo, sguardo in alto; bastone con sacca; rosa bianca; cane bianco; sole alle spalle. Orlo+sguardo=abbandono al nuovo e rischio; sacca=essenziale; rosa=purezza; cane=istinto/avvertimento; sole=luce sull\u2019apertura.
+- **Senso**: slancio genuino, apertura incondizionata, coraggio di slegarsi dai condizionamenti; ogni inizio autentico richiede il rischio dell\u2019ignoto.
+- **Luce/ombra**: Luce \u2014 percorso nuovo, rottura di routine, viaggio coraggioso. Ombra \u2014 leggerezza senza ignorare il terreno concreto.
+- **Previsione**: cambio di rotta, partenza, salto di fiducia, novit\xE0; chiede audacia e istinto, senza garanzie paralizzanti.`
+  },
+  {
+    id: 1,
+    roman: "I",
+    title: "Il Bagatto",
+    aliases: ["bagatto", "il bagatto", "mago", "magician"],
+    body: `### I. Il Bagatto \u2014 L\u2019Iniziativa e il Talento
+- **Simbologia**: guida della numerazione; sul banco bastoni, coppe, spade, denari. **Waite**: giovane al tavolo, tunica bianca/mantello rosso; bacchetta su, mano a terra; lemniscata; uroboro; quattro semi; rose e gigli. Asse cielo\u2013terra; risorse gi\xE0 disponibili.
+- **Senso**: iniziativa immediata, talento, destrezza, agire con ci\xF2 che c\u2019\xE8 gi\xE0.
+- **Luce/ombra**: Luce \u2014 volont\xE0 mirata, avvio concreto. Ombra \u2014 manipolazione, illusione, dispersione.
+- **Previsione**: azione pratica immediata; concretizzare un progetto nei primi giorni.`
+  },
+  {
+    id: 2,
+    roman: "II",
+    title: "La Papessa",
+    aliases: ["papessa", "la papessa", "sacerdotessa", "high priestess"],
+    body: `### II. La Papessa \u2014 Gestazione e Saggezza del Silenzio
+- **Simbologia**: seduta velata tra pilastri; libro chiuso/socchiuso; conoscenza sottile. **Waite**: trono, mantello blu, croce dorata; corona/velo; rotolo TORA; luna ai piedi; colonne B/J; velo con melograni; acqua dietro.
+- **Senso**: gestazione silenziosa, verit\xE0 intuita, attesa fertile; creazione richiede raccoglimento.
+- **Luce/ombra**: Luce \u2014 ascolto, intuizione, studio, maturazione. Ombra \u2014 chiusura eccessiva, passivit\xE0.
+- **Previsione**: non agire/esporre ora; custodire, studiare, lasciare maturare.`
+  },
+  {
+    id: 3,
+    roman: "III",
+    title: "L\u2019Imperatrice",
+    aliases: ["imperatrice", "l'imperatrice", "empress"],
+    body: `### III. L\u2019Imperatrice \u2014 Fioritura e Abbondanza
+- **Simbologia**: fioritura sensibile, forma e vita alle idee. **Waite**: donna in radura, veste con melagrane; corona di 12 stelle; scettro; scudo Venere; grano, bosco, acqua.
+- **Senso**: vitalit\xE0, espressione creativa, potere generativo; impulso che diventa manifestazione.
+- **Luce/ombra**: Luce \u2014 fertilit\xE0, cura, crescita. Ombra \u2014 eccesso, iperprotettivit\xE0, dispersione.
+- **Previsione**: espansione, intese, fioritura di idee, armonia relazionale.`
+  },
+  {
+    id: 4,
+    roman: "IV",
+    title: "L\u2019Imperatore",
+    aliases: ["imperatore", "l'imperatore", "emperor"],
+    body: `### IV. L\u2019Imperatore \u2014 Stabilit\xE0 e Metodo
+- **Simbologia**: autorit\xE0, confini, gestione organizzata. **Waite**: trono di pietra con arieti; armatura e mantello rosso; ankh e globo; montagne aride.
+- **Senso**: autorit\xE0 saggia, protezione, governo della realt\xE0; struttura che d\xE0 durata.
+- **Luce/ombra**: Luce \u2014 strutturare, pragmatismo, leadership. Ombra \u2014 rigidit\xE0 autoritaria.
+- **Previsione**: consolidamento, basi solide, referente autorevole, gestione metodica.`
+  },
+  {
+    id: 5,
+    roman: "V",
+    title: "Il Papa",
+    aliases: ["il papa", "papa", "ierofante", "hierophant"],
+    body: `### V. Il Papa \u2014 Patto Etico e Guida
+- **Simbologia**: guida spirituale/professionale; trasmissione di valori. **Waite**: tra due colonne, triregno, casula rossa; benedizione a due dita; tripla croce; due discepoli; due chiavi.
+- **Senso**: patto etico, mediazione; alleanza tra aspirazioni e tradizione.
+- **Luce/ombra**: Luce \u2014 studio, mentore, etica. Ombra \u2014 conformismo dogmatico.
+- **Previsione**: contratti chiari, mediazioni, consulenze, alleanze di fiducia.`
+  },
+  {
+    id: 6,
+    roman: "VI",
+    title: "Gli Amanti",
+    aliases: ["amanti", "gli amanti", "innamorati", "lovers"],
+    body: `### VI. Gli Amanti \u2014 Il Bivio e la Scelta del Cuore
+- **Simbologia**: bivio, incontro, responsabilit\xE0 della decisione. **Waite**: uomo e donna nudi; albero della vita (12 fiamme) e della conoscenza con serpente; angelo e sole.
+- **Senso**: scelta consapevole del cuore; optare escludendo le altre strade.
+- **Luce/ombra**: Luce \u2014 scelta autentica, partnership, responsabilit\xE0. Ombra \u2014 attrazione impulsiva non vagliata.
+- **Previsione**: decisioni sentimentali/professionali ineludibili; allineamento ai desideri profondi.`
+  },
+  {
+    id: 7,
+    roman: "VII",
+    title: "Il Carro",
+    aliases: ["il carro", "carro", "chariot"],
+    body: `### VII. Il Carro \u2014 Azione Coordinata e Vittoria
+- **Simbologia**: condottiero che governa forze opposte. **Waite**: giovane coronato su carro di pietra, scettro, baldacchino stellato; due sfingi B/N senza redini; citt\xE0 e acqua. Governo via baricentro interiore.
+- **Senso**: controllo sapiente delle polarit\xE0; vittoria con determinazione e rigore.
+- **Luce/ombra**: Luce \u2014 direzione, viaggio, conquista. Ombra \u2014 accelerazione forzata.
+- **Previsione**: sblocco di stagnazioni, viaggi, accelerazione verso obiettivi.`
+  },
+  {
+    id: 8,
+    roman: "VIII",
+    title: "La Giustizia",
+    aliases: ["giustizia", "la giustizia", "justice"],
+    body: `### VIII. La Giustizia \u2014 Ordine e Causa-Effetto
+- **Simbologia**: figura in trono, spada verticale e bilancia; imparzialit\xE0, conseguenze lineari.
+- **Senso**: responsabilit\xE0, onest\xE0, equilibrio etico; ogni azione genera conseguenza.
+- **Previsione**: questioni legali/burocratiche, contratti equi, ordine, risposta meritata.`
+  },
+  {
+    id: 9,
+    roman: "IX",
+    title: "L\u2019Eremita",
+    aliases: ["eremita", "l'eremita", "hermit"],
+    body: `### IX. L\u2019Eremita \u2014 Luce Interiore
 - **Simbologia**: saggio nel mantello, lanterna nella notte; protegge e illumina il cammino.
-- **Significato / senso profondo**: raccoglimento, solitudine rigenerante, ricerca della verit\xE0 interiore, prudenza; distacco temporaneo dal frastuono.
-- **In chiave previsionale**: rallentamento, studio, introspezione, cautela e riserbo, senza affrettare i tempi.
-
-### X. La Ruota di Fortuna \u2014 Ciclo, Mutamento e Imprevisto
-- **Simbologia**: ruota in movimento e figure in evoluzione; cicli vitali e mutevolezza.
-- **Significato / senso profondo**: accettazione del cambiamento, ciclicit\xE0, sblocco della stagnazione; adattarsi con flessibilit\xE0.
-- **In chiave previsionale**: svolta improvvisa, colpo di scena, nuovo ciclo, ribaltamento rapido di una situazione bloccata.
-
-### XI. La Forza \u2014 Dominio Istintivo e Coraggio Gentile
-- **Simbologia**: una donna apre o chiude con dolcezza le fauci di un leone, senza violenza.
-- **Significato / senso profondo**: dominio delle passioni tramite consapevolezza, coraggio interiore, pazienza; integrare gli impulsi anzich\xE9 reprimerli.
-- **In chiave previsionale**: superare una prova complessa con determinazione e autocontrollo; armonia nelle tensioni.
-
-### XII. L\u2019Appeso \u2014 Sosta Volontaria e Cambio di Prospettiva
-- **Simbologia**: figura a testa in gi\xF9, serena; l\u2019energia fluisce verso l\u2019alto.
-- **Significato / senso profondo**: sosta necessaria, sacrificio come \xABrendere sacro\xBB, rinuncia al controllo rigido, capovolgimento di sguardo.
-- **In chiave previsionale**: blocco o attesa utile a riconsiderare le priorit\xE0; lasciare andare la fretta e accettare la pausa.
-
-### XIII. L\u2019Arcano Senza Nome / La Morte \u2014 Trasmutazione e Taglio Netto
-- **Simbologia**: scheletro che falcia; dal terreno emergono germogli; potatura indispensabile alla vita.
-- **Significato / senso profondo**: fine radicale di un ciclo, distacco da ci\xF2 che \xE8 obsoleto, trasformazione e rinascita per fare spazio al nuovo.
-- **In chiave previsionale**: chiusura netta e cambiamento drastico; se accolto senza resistenza, apre a rinnovamento totale.
-
-### XIV. La Temperanza \u2014 Alchimia Quotidiana e Moderazione
-- **Simbologia**: figura alata che travasa liquido tra due vasi; flusso continuo di armonia.
-- **Significato / senso profondo**: misura, guarigione, pazienza alchemica, riconciliazione, compromesso e pace interiore.
-- **In chiave previsionale**: risoluzione pacifica, cure efficaci, tempi di recupero fluidi, fase di stabilizzazione e cooperazione.
-
-### XV. Il Diavolo \u2014 Ombra, Materia e Fascino del Potere
+- **Senso**: raccoglimento, solitudine rigenerante, ricerca interiore, prudenza.
+- **Previsione**: rallentamento, studio, introspezione, riserbo senza affrettare.`
+  },
+  {
+    id: 10,
+    roman: "X",
+    title: "La Ruota di Fortuna",
+    aliases: ["ruota di fortuna", "ruota della fortuna", "wheel of fortune"],
+    body: `### X. La Ruota di Fortuna \u2014 Ciclo e Mutamento
+- **Simbologia**: ruota in movimento; cicli vitali e mutevolezza.
+- **Senso**: accettazione del cambiamento, sblocco della stagnazione; flessibilit\xE0.
+- **Previsione**: svolta improvvisa, nuovo ciclo, ribaltamento di una situazione bloccata.`
+  },
+  {
+    id: 11,
+    roman: "XI",
+    title: "La Forza",
+    aliases: ["la forza", "forza", "strength"],
+    body: `### XI. La Forza \u2014 Dominio Istintivo
+- **Simbologia**: donna che apre/chiude con dolcezza le fauci di un leone, senza violenza.
+- **Senso**: dominio delle passioni con consapevolezza; integrare gli impulsi.
+- **Previsione**: superare una prova con determinazione e autocontrollo.`
+  },
+  {
+    id: 12,
+    roman: "XII",
+    title: "L\u2019Appeso",
+    aliases: ["appeso", "l'appeso", "hanged man"],
+    body: `### XII. L\u2019Appeso \u2014 Sosta e Cambio di Prospettiva
+- **Simbologia**: figura a testa in gi\xF9, serena; energia verso l\u2019alto.
+- **Senso**: sosta necessaria, sacrificio come \xABrendere sacro\xBB, capovolgimento di sguardo.
+- **Previsione**: attesa utile a riconsiderare priorit\xE0; lasciare andare la fretta.`
+  },
+  {
+    id: 13,
+    roman: "XIII",
+    title: "La Morte",
+    aliases: ["la morte", "morte", "death", "arcano senza nome", "senza nome"],
+    body: `### XIII. L\u2019Arcano Senza Nome / La Morte \u2014 Trasmutazione
+- **Simbologia**: scheletro che falcia; germogli dal terreno; potatura indispensabile.
+- **Senso**: fine di un ciclo, distacco dall\u2019obsoleto, trasformazione per fare spazio.
+- **Previsione**: chiusura netta; se accolta, apre a rinnovamento totale.`
+  },
+  {
+    id: 14,
+    roman: "XIV",
+    title: "La Temperanza",
+    aliases: ["temperanza", "la temperanza", "temperance"],
+    body: `### XIV. La Temperanza \u2014 Alchimia e Moderazione
+- **Simbologia**: figura alata che travasa liquido tra due vasi; flusso di armonia.
+- **Senso**: misura, guarigione, pazienza, riconciliazione, pace interiore.
+- **Previsione**: risoluzione pacifica, cure, recupero, cooperazione.`
+  },
+  {
+    id: 15,
+    roman: "XV",
+    title: "Il Diavolo",
+    aliases: ["diavolo", "il diavolo", "devil"],
+    body: `### XV. Il Diavolo \u2014 Ombra e Materia
 - **Simbologia**: creatura alata su due figure legate in modo blando ma consenziente.
-- **Significato / senso profondo**: confronto con l\u2019Ombra, attaccamento alla materia, passioni, denaro, dipendenze, falsi poteri; riconoscere i desideri inconsci per riprendere il controllo.
-- **In chiave previsionale**: passioni forti, dinamiche di potere o manipolazione, profitto materiale; necessit\xE0 di liberarsi da legami tossici.
-
-### XVI. La Torre \u2014 Folgore, Crollo e Liberazione
-- **Simbologia**: torre colpita dal fulmine; corona che salta; figure che precipitano tra scintille.
-- **Significato / senso profondo**: rottura delle false certezze, crollo di strutture non pi\xF9 aderenti alla verit\xE0, liberazione catartica attraverso la crisi.
-- **In chiave previsionale**: cambiamento drastico e inatteso che rompe la stagnazione e libera nuove energie.
-
-### XVII. Le Stelle \u2014 Speranza, Ispirazione e Guarigione
+- **Senso**: confronto con l\u2019Ombra, attaccamenti, passioni, dipendenze; riconoscere i desideri inconsci.
+- **Previsione**: passioni forti, dinamiche di potere; liberarsi da legami tossici.`
+  },
+  {
+    id: 16,
+    roman: "XVI",
+    title: "La Torre",
+    aliases: ["la torre", "torre", "tower"],
+    body: `### XVI. La Torre \u2014 Folgore e Liberazione
+- **Simbologia**: torre colpita dal fulmine; corona che salta; figure che precipitano.
+- **Senso**: rottura di false certezze; liberazione catartica attraverso la crisi.
+- **Previsione**: cambiamento drastico che rompe la stagnazione e libera energie.`
+  },
+  {
+    id: 17,
+    roman: "XVII",
+    title: "Le Stelle",
+    aliases: ["le stelle", "stelle", "la stella", "the star"],
+    body: `### XVII. Le Stelle \u2014 Speranza e Guarigione
 - **Simbologia**: figura nuda che versa linfa su terra e acqua, sotto stelle radiose.
-- **Significato / senso profondo**: guida celeste, fiducia, chiarezza d\u2019intenti, ispirazione, guarigione dopo la Torre.
-- **In chiave previsionale**: serenit\xE0 ritrovata, prospettive favorevoli, successo creativo, protezione, conferma del cammino.
-
-### XVIII. La Luna \u2014 Inconscio, Illusioni e Percorso Notturno
+- **Senso**: guida celeste, fiducia, ispirazione, guarigione dopo la Torre.
+- **Previsione**: serenit\xE0, prospettive favorevoli, successo creativo, conferma del cammino.`
+  },
+  {
+    id: 18,
+    roman: "XVIII",
+    title: "La Luna",
+    aliases: ["la luna", "luna", "the moon"],
+    body: `### XVIII. La Luna \u2014 Inconscio e Percorso Notturno
 - **Simbologia**: Luna piena, gambero dalle acque, lupi e torri lontane.
-- **Significato / senso profondo**: regno dell\u2019inconscio, sogni, paure ancestrali, intuito viscerale, illusioni e nebbie da attraversare con la luce interiore.
-- **In chiave previsionale**: incertezza, segreti, malintesi; procedere ascoltando l\u2019istinto senza paralisi ansiosa.
-
-### XIX. Il Sole \u2014 Chiarezza, Gioia e Realizzazione Visibile
+- **Senso**: inconscio, sogni, paure, intuito; illusioni da attraversare con luce interiore.
+- **Previsione**: incertezza, segreti, malintesi; procedere ascoltando l\u2019istinto.`
+  },
+  {
+    id: 19,
+    roman: "XIX",
+    title: "Il Sole",
+    aliases: ["il sole", "sole", "the sun"],
+    body: `### XIX. Il Sole \u2014 Chiarezza e Realizzazione
 - **Simbologia**: Sole radioso; bambini festosi in un prato fiorito.
-- **Significato / senso profondo**: verit\xE0 svelata, gioia, trasparenza, calore umano, successo pubblico, vitalit\xE0 cosciente.
-- **In chiave previsionale**: successo, chiarezza nei rapporti, accordi fortunati, vitalit\xE0, trionfo di un progetto portato alla luce.
+- **Senso**: verit\xE0 svelata, gioia, trasparenza, successo pubblico, vitalit\xE0.
+- **Previsione**: successo, chiarezza nei rapporti, accordi fortunati, trionfo di un progetto.`
+  },
+  {
+    id: 20,
+    roman: "XX",
+    title: "Il Giudizio",
+    aliases: ["il giudizio", "giudizio", "judgement", "judgment"],
+    body: `### XX. Il Giudizio \u2014 Chiamata e Risveglio
+- **Simbologia**: angelo con tromba; figure dai sepolcri, braccia aperte.
+- **Senso**: chiamata alla consapevolezza, risveglio, perdono, liberazione dai giudizi.
+- **Previsione**: svolta decisiva, notizie importanti, riconciliazione rinnovante.`
+  },
+  {
+    id: 21,
+    roman: "XXI",
+    title: "Il Mondo",
+    aliases: ["il mondo", "mondo", "the world"],
+    body: `### XXI. Il Mondo \u2014 Compiutezza
+- **Simbologia**: figura danzante nella mandorla, circondata dai quattro viventi (Toro, Leone, Aquila, Angelo).
+- **Senso**: Compimento dell\u2019Opera, integrazione dei settenari, armonia universale.
+- **Previsione**: successo totale, chiusura trionfante, viaggi, massima espansione.`
+  }
+];
+var NINA_CHAT_MAGGIORI_FRAME = `## Arcani Maggiori \u2014 schede didattiche ufficiali (Trionfi 0\u2013XXI)
 
-### XX. Il Giudizio \u2014 Chiamata, Risveglio e Rinnovamento
-- **Simbologia**: angelo con tromba; figure che emergono dai sepolcri, braccia aperte.
-- **Significato / senso profondo**: chiamata alla consapevolezza, risveglio, perdono, liberazione dai giudizi limitanti.
-- **In chiave previsionale**: svolta decisiva, notizie importanti, riconciliazione che rinnova l\u2019esistenza.
+Fonte: dispensa Area Personale Tarot Italia e, dove indicato, schede visive Waite-Smith (0\u2013VII). Usa SOLO le schede iniettate sotto (se presenti). Non inventare iconografia. Non mescolare con Dialogo Tarot.
 
-### XXI. Il Mondo \u2014 Compiutezza e Cerchio Perfetto
-- **Simbologia**: figura danzante nella mandorla di foglie, circondata dai quattro viventi (Toro, Leone, Aquila, Angelo).
-- **Significato / senso profondo**: Compimento dell\u2019Opera, integrazione dei settenari, realizzazione e armonia universale.
-- **In chiave previsionale**: successo totale, chiusura trionfante di un ciclo, viaggi internazionali, massima espansione.
-`;
+Struttura risposta (quando chiedono un Arcano Maggiore \u2014 aspetto visivo, simbologia, significato, luce/ombra, previsione):
+1. **Simbologia** (+ cues Waite se in scheda)
+2. **Significato / senso**
+3. **Luce / ombra** \u2014 solo se presente; altrimenti non inventarla
+4. **In chiave previsionale**
+Tono: caldo, rigoroso, Tarot Italia. Per approfondimenti: **Parla con Maria Teresa** / corso Maggiori.
+
+Architettura: 22 lame (0\u2013XXI). Primo (0\u2013VII) identit\xE0; Secondo (VIII\u2013XIV) prova etica; Terzo (XV\u2013XXI) Ombra e compiutezza.
+Elenco: 0 Matto \xB7 I Bagatto \xB7 II Papessa \xB7 III Imperatrice \xB7 IV Imperatore \xB7 V Papa \xB7 VI Amanti \xB7 VII Carro \xB7 VIII Giustizia \xB7 IX Eremita \xB7 X Ruota \xB7 XI Forza \xB7 XII Appeso \xB7 XIII Morte \xB7 XIV Temperanza \xB7 XV Diavolo \xB7 XVI Torre \xB7 XVII Stelle \xB7 XVIII Luna \xB7 XIX Sole \xB7 XX Giudizio \xB7 XXI Mondo.
+Se manca la scheda dettagliata nel contesto, chiedi quale Trionfo (0\u2013XXI) e non inventare dettagli Waite.`;
+var MAX_INJECTED_CARDS = 3;
+function normalizeForMatch(text) {
+  return text.toLowerCase().normalize("NFD").replace(new RegExp("\\p{M}", "gu"), "");
+}
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function selectMaggioriCardsForText(text) {
+  const hay = normalizeForMatch(text);
+  if (!hay.trim()) return [];
+  const matched = [];
+  for (const card of NINA_MAGGIORI_CARDS) {
+    const hit = card.aliases.some((alias) => {
+      const needle = normalizeForMatch(alias);
+      if (!needle) return false;
+      if (needle.includes(" ")) return hay.includes(needle);
+      return new RegExp(
+        `(?:^|[^a-z0-9])${escapeRegExp(needle)}(?:[^a-z0-9]|$)`
+      ).test(hay);
+    });
+    const romanCue = new RegExp(
+      `(?:^|[^a-z0-9])(?:arcano|trionfo|lama|lame|carta)\\s*(?:n[\xB0o.]?\\s*)?(?:${escapeRegExp(card.roman.toLowerCase())}|${card.id})(?:[^a-z0-9]|$)`
+    );
+    if (hit || romanCue.test(hay)) {
+      matched.push(card);
+    }
+    if (matched.length >= MAX_INJECTED_CARDS) break;
+  }
+  return matched;
+}
+function formatMaggioriKnowledgeForCards(cards) {
+  if (cards.length === 0) {
+    return `${NINA_CHAT_MAGGIORI_FRAME}
+
+(Nessuna scheda Trionfo iniettata in questo turno: se chiedono un Arcano specifico, rispondi in sintesi dall\u2019elenco e invita a nominare il Trionfo, oppure usa solo quanto gi\xE0 detto in chat senza inventare Waite.)`;
+  }
+  return `${NINA_CHAT_MAGGIORI_FRAME}
+
+### Schede iniettate per questa conversazione
+${cards.map((c) => c.body).join("\n\n")}`;
+}
+function buildMaggioriKnowledgeForMessages(params) {
+  const parts = [params.message];
+  const history = params.history ?? [];
+  for (const turn of history.slice(-6)) {
+    if (typeof turn.content === "string" && turn.content.trim()) {
+      parts.push(turn.content);
+    }
+  }
+  const cards = selectMaggioriCardsForText(parts.join("\n"));
+  return formatMaggioriKnowledgeForCards(cards);
+}
+function buildAllMaggioriKnowledge() {
+  return formatMaggioriKnowledgeForCards(NINA_MAGGIORI_CARDS);
+}
+var NINA_CHAT_MAGGIORI_KNOWLEDGE = buildAllMaggioriKnowledge();
 
 // src/lib/groqChat.ts
 var GROQ_CHAT_ENV_KEY = "TAROTITALIACHATGENERICAGROQ_API_KEY";
 var GROQ_CHAT_DEFAULT_MODEL = "openai/gpt-oss-20b";
 var GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions";
-var TAROT_ITALIA_CHAT_SYSTEM_PROMPT = `Sei Nina, l\u2019assistente virtuale ufficiale e la guida di accoglienza di Tarot Italia (tarotitalia.com), il progetto di Maria Teresa Rogani dedicato a tarologia, cartomanzia evolutiva e ricerca esoterica.
+var NINA_CHAT_PERSONA = `Sei Nina, l\u2019assistente virtuale ufficiale e la guida di accoglienza di Tarot Italia (tarotitalia.com), il progetto di Maria Teresa Rogani dedicato a tarologia, cartomanzia evolutiva e ricerca esoterica.
 
 Tono e stile:
 - Empatico, caldo, profondo, rigoroso e rispettoso; sensibilit\xE0 simbolica unita a chiarezza pratica.
@@ -238,7 +407,7 @@ Cosa puoi fare:
 - Orientare su consulti (prezzi e modalit\xE0 ufficiali), Dialogo Tarot, corsi/didattica, contatti e orari pubblici usando solo la \xABConoscenza ufficiale del sito\xBB sotto.
 - Se chiedono i prezzi: elenca le quattro tariffe con **\u20AC19 / \u20AC50 / \u20AC75 / \u20AC90** e ricorda Breve **solo online** + Maggiori e Minori in ogni sessione.
 - Se chiedono temi FAQ (metodo, etica, preparazione, riservatezza, \xABMi pensa?\xBB, 78 Arcani): usa le Q&A ufficiali della conoscenza (Home + Consulti), in sintesi fedele.
-- Se chiedono un Arcano Maggiore (Trionfi 0\u2013XXI) \u2014 aspetto visivo, simbologia, significato, luce/ombra, chiave previsionale: usa le **schede didattiche ufficiali Maggiori** sotto, con la stessa struttura (Simbologia \u2192 Significato \u2192 Luce/ombra se presente \u2192 In chiave previsionale). Per l\u2019iconografia Waite-Smith cita solo i cues gi\xE0 nelle schede (Primo Settenario completo; per VIII\u2013XXI solo quanto scritto in Simbologia). Non inventare simboli, colori o attributi.
+- Se chiedono un Arcano Maggiore (Trionfi 0\u2013XXI) \u2014 aspetto visivo, simbologia, significato, luce/ombra, chiave previsionale: usa le **schede didattiche ufficiali Maggiori** sotto (solo quelle iniettate per questo turno), con la stessa struttura (Simbologia \u2192 Significato \u2192 Luce/ombra se presente \u2192 In chiave previsionale). Per l\u2019iconografia Waite-Smith cita solo i cues gi\xE0 nelle schede. Non inventare simboli, colori o attributi.
 - Spiegare l\u2019approccio olistico (ascolto del presente + lettura delle possibili evoluzioni, rispetto del libero arbitrio).
 - Guidare alla prenotazione via WhatsApp (Stripe in pausa) e alla sezione \xABParla con Maria Teresa\xBB.
 
@@ -264,11 +433,22 @@ Formato messaggio (obbligatorio \u2014 mobile-friendly):
 - Scrivi in **paragrafi brevi** (1\u20133 frasi), separati da una riga vuota. Niente \xABmuri\xBB di testo.
 - Usa **grassetto** con moderazione solo su parole chiave empatiche o di sostegno (es. **ascolto**, **sicuro**, **insieme**, **Maria Teresa**, **\u20AC19**). Non mettere intere frasi in grassetto.
 - Non usare HTML. Markdown consentito: paragrafi e **grassetto**. Evita link markdown di contatto ([Prenota], [WhatsApp], [Telegram], [Email]) e non aggiungere blocchi CTA dopo --- : i pulsanti Prenota / WhatsApp / Telegram / email sono gi\xE0 nella sezione fissa \xABParla con Maria Teresa\xBB sotto la chat.
-- Quando inviti al contatto (prenotazione, consulto autentico, approfondimento), chiudi con una frase breve che rimanda a quella sezione (es. \xABTrovi Prenota, WhatsApp, Telegram ed email nella sezione Parla con Maria Teresa qui sotto.\xBB). Niente elenchi di bottoni nel messaggio.
+- Quando inviti al contatto (prenotazione, consulto autentico, approfondimento), chiudi con una frase breve che rimanda a quella sezione (es. \xABTrovi Prenota, WhatsApp, Telegram ed email nella sezione Parla con Maria Teresa qui sotto.\xBB). Niente elenchi di bottoni nel messaggio.`;
+function buildNinaSystemPrompt(params) {
+  const maggiori = buildMaggioriKnowledgeForMessages({
+    message: params.message,
+    history: params.history
+  });
+  return `${NINA_CHAT_PERSONA}
 
 ${NINA_CHAT_SITE_KNOWLEDGE}
 
-${NINA_CHAT_MAGGIORI_KNOWLEDGE}`;
+${maggiori}`;
+}
+var TAROT_ITALIA_CHAT_SYSTEM_PROMPT = buildNinaSystemPrompt({
+  message: "",
+  history: []
+});
 function readGroqApiKey() {
   const raw = process.env[GROQ_CHAT_ENV_KEY];
   if (typeof raw !== "string") return null;
@@ -285,7 +465,10 @@ function isGroqChatConfigured() {
 function classifyGroqHttpFailure(status, providerMessage) {
   const msg = (providerMessage || "").toLowerCase();
   if (status === 401 || status === 403) return "GROQ_CHAT_AUTH";
-  if (status === 400 || status === 404 || msg.includes("model") || msg.includes("decommission") || msg.includes("deprecated") || msg.includes("not found")) {
+  if (status === 413 || msg.includes("request too large") || msg.includes("payload too large") || msg.includes("context_length") || msg.includes("context length") || msg.includes("too many tokens") || msg.includes("maximum context")) {
+    return "GROQ_CHAT_PAYLOAD";
+  }
+  if (status === 400 || status === 404 || msg.includes("decommission") || msg.includes("deprecated") || msg.includes("model_not_found") || msg.includes("model not found") || msg.includes("model") && (msg.includes("does not exist") || msg.includes("unavailable") || msg.includes("invalid"))) {
     return "GROQ_CHAT_MODEL";
   }
   return "GROQ_CHAT_UPSTREAM";
@@ -388,6 +571,12 @@ function chatFailureResponse(code) {
         code: "model",
         error: "Il modello Groq non \xE8 disponibile. Controlla GROQ_CHAT_MODEL oppure il default del sito, poi riprova. Nel frattempo usa WhatsApp, Telegram o email."
       });
+    case "GROQ_CHAT_PAYLOAD":
+      return json(502, {
+        available: true,
+        code: "payload",
+        error: "La richiesta a Nina \xE8 troppo ampia per il modello. Prova una domanda pi\xF9 breve o specifica un solo Arcano, poi riprova. Nel frattempo usa WhatsApp, Telegram o email."
+      });
     case "GROQ_CHAT_EMPTY":
       return json(502, {
         available: true,
@@ -416,8 +605,9 @@ async function postChatMessage(body) {
     });
   }
   const history = asHistory(body.history);
+  const systemPrompt = buildNinaSystemPrompt({ message, history });
   const messages = [
-    { role: "system", content: TAROT_ITALIA_CHAT_SYSTEM_PROMPT },
+    { role: "system", content: systemPrompt },
     ...history,
     { role: "user", content: message }
   ];
