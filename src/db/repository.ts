@@ -211,6 +211,38 @@ export async function findCourseBySlug(courseSlug: string) {
   return courseRows[0] ?? null;
 }
 
+/**
+ * True when the Firebase user has an active `course_purchases` row for the slug
+ * (same unlock signal as Area Riservata `isUnlocked` / gated blog).
+ */
+export async function userOwnsCourse(params: {
+  uid: string;
+  email: string;
+  courseSlug: string;
+  displayName?: string | null;
+}): Promise<boolean> {
+  await ensureCatalogSeeded();
+  const course = await findCourseBySlug(params.courseSlug);
+  if (!course) return false;
+  const dbUser = await getOrCreateUser(
+    params.uid,
+    params.email,
+    params.displayName
+  );
+  const purchaseRows = await db
+    .select({ id: coursePurchases.id })
+    .from(coursePurchases)
+    .where(
+      and(
+        eq(coursePurchases.userId, dbUser.id),
+        eq(coursePurchases.courseId, course.id),
+        eq(coursePurchases.status, 'active')
+      )
+    )
+    .limit(1);
+  return Boolean(purchaseRows[0]);
+}
+
 export async function findCoursePurchaseByStripeSession(stripeSessionId: string) {
   const rows = await db
     .select()

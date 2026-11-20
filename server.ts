@@ -166,7 +166,16 @@ async function startServer() {
   });
 
   app.post('/api/chat', async (req, res) => {
-    sendResult(res, await postChatMessage(bodyRecord(req)));
+    sendResult(
+      res,
+      await postChatMessage({
+        body: bodyRecord(req),
+        authorization:
+          typeof req.headers.authorization === 'string'
+            ? req.headers.authorization
+            : undefined,
+      })
+    );
   });
 
   app.get('/api/reserved/overview', requireAuth, async (req: AuthRequest, res) => {

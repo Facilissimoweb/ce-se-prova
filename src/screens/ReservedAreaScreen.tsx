@@ -8,7 +8,9 @@ import {
   Download,
   Lock,
   LogOut,
+  MessageCircle,
   Save,
+  Sparkles,
 } from 'lucide-react';
 import type { CourseId, ScreenId } from '../types/handoff';
 import { useAuth } from '../context/AuthContext';
@@ -29,6 +31,7 @@ import {
   MAGGIORI_BAGATTO_BLOG_SLUG,
   MAGGIORI_MODULO_01_BLOG_SLUG,
 } from '../data/maggioriGatedBlog';
+import { openNinaChat } from '../lib/ninaChatOpen';
 import {
   SCROLL_LANDMARKS,
   scrollToIdAfterPaint,
@@ -261,6 +264,19 @@ export function ReservedAreaScreen({
         </div>
 
         <div className="grid grid-cols-2 gap-3 w-full md:w-auto md:min-w-[20rem] shrink-0">
+          {overview?.courses.some(
+            (c) => c.slug === 'arcani-maggiori' && c.isUnlocked
+          ) && (
+            <button
+              type="button"
+              onClick={() => openNinaChat({ mode: 'studio' })}
+              className="col-span-2 w-full px-3 py-2.5 min-h-[44px] rounded-lg border border-[#D4AF37]/45 bg-[#D4AF37]/12 hover:border-[#D4AF37] hover:bg-[#D4AF37]/20 text-xs md:text-sm font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+            >
+              <Sparkles className="w-4 h-4 text-[#D4AF37] shrink-0" aria-hidden />
+              Apri Nina Studio
+              <MessageCircle className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" aria-hidden />
+            </button>
+          )}
           <button
             type="button"
             onClick={() => onNavigate('corsi')}

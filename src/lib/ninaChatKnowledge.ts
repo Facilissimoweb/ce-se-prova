@@ -93,7 +93,21 @@ D5. Come si svolge la lettura, e mi serve una conoscenza preliminare?
 R5. Non è richiesta alcuna conoscenza preliminare della simbologia o del linguaggio degli arcani. Lavoro integrando la lettura viva della cartomanzia con un percorso di riflessione profonda: ti accolgo esattamente dove ti trovi, guidandoti passo dopo passo attraverso le immagini per decifrare la tua storia. I consulti online avvengono esclusivamente in modalità chiamata vocale.
 
 ## Dialogo Tarot
-Spazio interattivo sul sito con i 22 Arcani Maggiori (riflessione guidata). Non sostituisce un consulto umano con Maria Teresa. Non mescolare i testi del Dialogo Tarot con le schede didattiche Maggiori: sono percorsi distinti.
+Spazio interattivo sul sito con i 22 Arcani Maggiori (riflessione guidata). Non sostituisce un consulto umano con Maria Teresa. Non mescolare i testi del Dialogo Tarot con le schede didattiche Maggiori: sono percorsi distinti. Dialogo Tarot ≠ Nina Studio ≠ chat di accoglienza.
+
+## Mappa del sito (orientamento)
+- **Home** — panoramica, consulti, didattica
+- **Chi sono** — percorso di Maria Teresa Rogani
+- **Consulti** — tariffe e modalità
+- **Dialogo Tarot** — percorso interattivo 22 Maggiori (separato da Nina)
+- **Corsi** — Maggiori (€190), Minori (€210), Metodi di Stesura (€240); checkout Maggiori su /corsi
+- **Blog / News** — articoli (alcuni approfondimenti Maggiori riservati ai corsisti)
+- **Contatti** — email, telefono, mappa Macerata
+- **Prenota** — richiesta appuntamento via WhatsApp (Stripe in pausa per i consulti)
+- **Area Riservata** — dispense e percorsi dopo acquisto / accesso Google
+
+## Chi sono (sintesi leggera)
+Maria Teresa Rogani · Operatore Olistico (L. 4/2013). Formazione in comunicazione visiva / Accademia di Belle Arti; sguardo su composizione, colore e simboli nel contesto storico e iconografico. Integra tarologia esoterica, tradizione Rider-Waite-Smith e pratiche olistiche di ascolto. Per il racconto completo: pagina **Chi sono**.
 
 ## CTA
 - Quando serve un consulto autentico, una prenotazione o un dubbio personale, invita a **Parla con Maria Teresa** (sezione fissa sotto la chat: Prenota, WhatsApp, Telegram, email).
@@ -363,12 +377,24 @@ Se manca la scheda dettagliata nel contesto, chiedi quale Trionfo (0–XXI) e no
 
 const MAX_INJECTED_CARDS = 3;
 
+/** Soft-lock copy when welcome chat asks for deep Maggiori study (ENN-137). */
+export const NINA_STUDIO_SOFT_LOCK_REPLY = `Quella domanda entra nello **studio didattico degli Arcani Maggiori** (simbologia, senso, luce/ombra, chiave previsionale).
+
+Qui in **accoglienza** ti oriento su prezzi, prenotazione WhatsApp, mappa del sito e Chi sono — senza le schede profonde del corso.
+
+**Nina Studio** si sblocca con l’acquisto del percorso **Arcani Maggiori** (stesso accesso dell’Area Riservata e del blog riservato). Trovi il checkout su **Corsi → Arcani Maggiori**.
+
+Per un consulto personale con Maria Teresa, usa **Parla con Maria Teresa** qui sotto.`;
+
 function normalizeForMatch(text: string): string {
   return text
     .toLowerCase()
     .normalize('NFD')
     .replace(/\p{M}/gu, '');
 }
+
+const DEEP_STUDY_CUES =
+  /\b(simbolog\w*|iconograf\w*|waite|smith|luce\s*\/?\s*ombra|ombra|prevision\w*|senso\s+profond|significat\w*|scheda\s+visiv|trionf\w*|arcano\s+maggior|maggiori\s+didatt)/;
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -440,6 +466,28 @@ export function buildMaggioriKnowledgeForMessages(params: {
   }
   const cards = selectMaggioriCardsForText(parts.join('\n'));
   return formatMaggioriKnowledgeForCards(cards);
+}
+
+/**
+ * Welcome-mode soft lock: named Trionfo and/or deep study cues
+ * (simbologia / Waite / luce-ombra / previsione). ENN-137.
+ */
+export function looksLikeDeepMaggioriStudy(params: {
+  message: string;
+  history?: Array<{ role: string; content: string }>;
+}): boolean {
+  const parts = [params.message];
+  for (const turn of (params.history ?? []).slice(-4)) {
+    if (typeof turn.content === 'string' && turn.content.trim()) {
+      parts.push(turn.content);
+    }
+  }
+  const hay = normalizeForMatch(parts.join('\n'));
+  if (!hay.trim()) return false;
+  const named = selectMaggioriCardsForText(hay).length > 0;
+  const deepCue = DEEP_STUDY_CUES.test(hay);
+  // Named Trionfo alone is enough (visual / meaning asks); deep cues alone too.
+  return named || deepCue;
 }
 
 /**

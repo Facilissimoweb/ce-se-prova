@@ -1,7 +1,23 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
-import { CalendarDays, Loader2, Mail, MessageCircle, Send, X } from 'lucide-react';
+import {
+  CalendarDays,
+  Loader2,
+  Lock,
+  Mail,
+  MessageCircle,
+  Send,
+  Sparkles,
+  X,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useCourseEntitlement } from '../hooks/useCourseEntitlement';
+import { useAuth } from '../context/AuthContext';
 import { getSiteLanguage } from '../i18n';
+import {
+  NINA_CHAT_OPEN_EVENT,
+  type NinaChatOpenDetail,
+} from '../lib/ninaChatOpen';
+import { SCROLL_LANDMARKS } from '../lib/scrollNavigation';
 import {
   SITE_EMAIL,
   telegramHref,
@@ -11,6 +27,7 @@ import { NinaMessageBody } from './chat/NinaMessageBody';
 import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
 
 type ChatTurn = { role: 'user' | 'assistant'; content: string };
+type NinaMode = 'welcome' | 'studio';
 
 type ChatStatusResponse = {
   available?: boolean;
@@ -20,6 +37,10 @@ type ChatPostResponse = {
   available?: boolean;
   reply?: string;
   error?: string;
+  code?: string;
+  locked?: boolean;
+  checkoutPath?: string;
+  mode?: NinaMode;
 };
 
 function WhatsAppLogo({ className }: { className?: string }) {
@@ -62,6 +83,7 @@ const linkClass =
  * (cookie → a11y → chat → Torna su).
  * Live chat via server `/api/chat` (Groq / Nina) when
  * `TAROTITALIACHATGENERICAGROQ_API_KEY` is set on Vercel; otherwise contacts only.
+ * ENN-137: welcome (free) vs Nina Studio (Maggiori entitlement).
  * On mobile, only visible when «Strumenti» is open.
  */
 export function ChatFab() {
@@ -70,6 +92,7 @@ export function ChatFab() {
   const composerId = useId();
   const threadRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<NinaMode>('welcome');
   const [statusLoading, setStatusLoading] = useState(false);
   const [chatAvailable, setChatAvailable] = useState(false);
   const [turns, setTurns] = useState<ChatTurn[]>(() => [
@@ -78,18 +101,47 @@ export function ChatFab() {
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
+  const [showStudioCta, setShowStudioCta] = useState(false);
   const fabVisible = useLeftToolFabVisible();
   const { isCompact, setToolsOpen } = useLeftToolsMenu();
+  const entitlement = useCourseEntitlement('arcani-maggiori');
+  const { getIdToken } = useAuth();
+  const canUseStudio = entitlement.owns;
 
-  // Refresh welcome when language changes and thread is still the default greeting only
+  function greetingFor(nextMode: NinaMode): string {
+    return nextMode === 'studio' ? t('nina.welcomeStudio') : t('nina.welcome');
+  }
+
+  function switchMode(nextMode: NinaMode) {
+    if (nextMode === 'studio' && !canUseStudio) {
+      setShowStudioCta(true);
+      return;
+    }
+    setMode(nextMode);
+    setTurns([{ role: 'assistant', content: greetingFor(nextMode) }]);
+    setSendError(null);
+    setShowStudioCta(false);
+    setDraft('');
+  }
+
+  // Refresh greeting when language changes and thread is still the default only
   useEffect(() => {
     setTurns((prev) => {
       if (prev.length === 1 && prev[0]?.role === 'assistant') {
-        return [{ role: 'assistant', content: t('nina.welcome') }];
+        return [{ role: 'assistant', content: greetingFor(mode) }];
       }
       return prev;
     });
-  }, [i18n.language, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- greetingFor binds t/mode
+  }, [i18n.language, mode, t]);
+
+  // If Studio entitlement is lost, fall back to welcome.
+  useEffect(() => {
+    if (!canUseStudio && mode === 'studio') {
+      setMode('welcome');
+      setTurns([{ role: 'assistant', content: t('nina.welcome') }]);
+    }
+  }, [canUseStudio, mode, t]);
 
   useEffect(() => {
     if (!open) return;
@@ -99,6 +151,29 @@ export function ChatFab() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
+
+  // Open from Area Riservata (or other CTAs) via CustomEvent.
+  useEffect(() => {
+    const onOpen = (event: Event) => {
+      const detail = (event as CustomEvent<NinaChatOpenDetail>).detail || {};
+      const requested = detail.mode === 'studio' ? 'studio' : 'welcome';
+      setOpen(true);
+      if (isCompact) setToolsOpen(false);
+      if (requested === 'studio' && !canUseStudio) {
+        setMode('welcome');
+        setTurns([{ role: 'assistant', content: t('nina.welcome') }]);
+        setShowStudioCta(true);
+        return;
+      }
+      setMode(requested);
+      setTurns([{ role: 'assistant', content: greetingFor(requested) }]);
+      setShowStudioCta(false);
+      setSendError(null);
+    };
+    window.addEventListener(NINA_CHAT_OPEN_EVENT, onOpen);
+    return () => window.removeEventListener(NINA_CHAT_OPEN_EVENT, onOpen);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canUseStudio, isCompact, setToolsOpen, t]);
 
   // Lock page scroll while Nina covers the viewport (ENN-69).
   useEffect(() => {
@@ -143,29 +218,42 @@ export function ChatFab() {
   useEffect(() => {
     if (!open || !threadRef.current) return;
     threadRef.current.scrollTop = threadRef.current.scrollHeight;
-  }, [open, turns, sending]);
+  }, [open, turns, sending, showStudioCta]);
 
   async function sendMessage(event: React.FormEvent) {
     event.preventDefault();
     const message = draft.trim();
     if (!message || sending || !chatAvailable) return;
 
+    const effectiveMode: NinaMode =
+      mode === 'studio' && canUseStudio ? 'studio' : 'welcome';
+
     setSendError(null);
+    setShowStudioCta(false);
     setDraft('');
     const history = turns
-      .filter((t) => t.role === 'user' || t.role === 'assistant')
+      .filter((turn) => turn.role === 'user' || turn.role === 'assistant')
       .slice(-12);
     setTurns((prev) => [...prev, { role: 'user', content: message }]);
     setSending(true);
 
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (effectiveMode === 'studio') {
+        const token = await getIdToken();
+        if (token) headers.Authorization = `Bearer ${token}`;
+      }
+
       const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           message,
           history,
           lang: getSiteLanguage(),
+          mode: effectiveMode,
         }),
       });
       const data = (await res.json().catch(() => ({}))) as ChatPostResponse;
@@ -173,6 +261,25 @@ export function ChatFab() {
       if (data.available === false) {
         setChatAvailable(false);
         setSendError(data.error || t('nina.errorUnavailable'));
+        return;
+      }
+
+      if (data.code === 'studio_locked' || data.locked) {
+        setShowStudioCta(true);
+        if (data.reply) {
+          setTurns((prev) => [
+            ...prev,
+            { role: 'assistant', content: data.reply as string },
+          ]);
+        } else {
+          setSendError(data.error || t('nina.studioLockedHint'));
+        }
+        return;
+      }
+
+      if (data.code === 'studio_auth') {
+        setSendError(data.error || t('nina.errorGeneric'));
+        setShowStudioCta(true);
         return;
       }
 
@@ -192,6 +299,18 @@ export function ChatFab() {
     }
   }
 
+  const titleLabel =
+    mode === 'studio' && canUseStudio
+      ? t('nina.fabTitleStudio')
+      : t('nina.fabTitleWelcome');
+  const subtitle = statusLoading
+    ? '…'
+    : !chatAvailable
+      ? t('nina.subtitleUnavailable')
+      : mode === 'studio' && canUseStudio
+        ? t('nina.subtitleStudio')
+        : t('nina.subtitleAvailable');
+
   return (
     <>
       {fabVisible && (
@@ -201,10 +320,10 @@ export function ChatFab() {
             setOpen((prev) => !prev);
             if (isCompact) setToolsOpen(false);
           }}
-          aria-label="Apri chat con Nina e contatti"
+          aria-label={titleLabel}
           aria-expanded={open}
           aria-controls={panelId}
-          title="Chat con Nina"
+          title={titleLabel}
           className="fixed bottom-[9.5rem] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[5.75rem] md:left-6"
         >
           <MessageCircle className="h-4 w-4" aria-hidden="true" />
@@ -216,7 +335,7 @@ export function ChatFab() {
           id={panelId}
           role="dialog"
           aria-modal="true"
-          aria-label="Chat con Nina e contatti"
+          aria-label={titleLabel}
           className="fixed inset-0 z-50 flex flex-col overflow-hidden border-0 bg-[#151311] pt-[env(safe-area-inset-top,0px)] pr-[env(safe-area-inset-right,0px)] pb-[env(safe-area-inset-bottom,0px)] pl-[env(safe-area-inset-left,0px)] shadow-[0_16px_40px_rgba(0,0,0,0.5)] md:inset-[max(0.75rem,env(safe-area-inset-top,0px))_max(0.75rem,env(safe-area-inset-right,0px))_max(0.75rem,env(safe-area-inset-bottom,0px))_max(0.75rem,env(safe-area-inset-left,0px))] md:rounded-2xl md:border md:border-[#D4AF37]/30 md:bg-[#151311]/98 md:pt-0 md:pr-0 md:pb-0 md:pl-0 md:backdrop-blur-md"
         >
           <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-2.5 md:px-4 md:pb-4 md:pt-3">
@@ -227,15 +346,13 @@ export function ChatFab() {
                     Tarot Italia
                   </p>
                   <h2 className="font-display text-base leading-none text-[#F4F1EA] sm:text-lg">
-                    Nina
+                    {mode === 'studio' && canUseStudio
+                      ? 'Nina Studio'
+                      : 'Nina'}
                   </h2>
                 </div>
                 <p className="mt-1 text-[11px] leading-snug text-[#A39B93] sm:text-xs">
-                  {statusLoading
-                    ? '…'
-                    : chatAvailable
-                      ? t('nina.subtitleAvailable')
-                      : t('nina.subtitleUnavailable')}
+                  {subtitle}
                 </p>
               </div>
               <button
@@ -247,6 +364,62 @@ export function ChatFab() {
                 <X className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
             </div>
+
+            {/* Mode switch — Accoglienza vs Studio */}
+            <div
+              className="mb-2 flex shrink-0 flex-wrap items-center gap-1.5"
+              role="group"
+              aria-label={t('nina.modeAria')}
+            >
+              <button
+                type="button"
+                aria-pressed={mode === 'welcome'}
+                onClick={() => switchMode('welcome')}
+                className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:text-xs ${
+                  mode === 'welcome'
+                    ? 'border-[#D4AF37]/45 bg-[#D4AF37]/15 text-[#E6C65C]'
+                    : 'border-[#D4AF37]/15 text-[#A39B93] hover:border-[#D4AF37]/30 hover:text-[#F4F1EA]'
+                }`}
+              >
+                <MessageCircle className="h-3 w-3" aria-hidden />
+                {t('nina.modeWelcome')}
+              </button>
+              <button
+                type="button"
+                aria-pressed={mode === 'studio' && canUseStudio}
+                onClick={() => switchMode('studio')}
+                className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:text-xs ${
+                  mode === 'studio' && canUseStudio
+                    ? 'border-[#D4AF37]/45 bg-[#D4AF37]/15 text-[#E6C65C]'
+                    : 'border-[#D4AF37]/15 text-[#A39B93] hover:border-[#D4AF37]/30 hover:text-[#F4F1EA]'
+                }`}
+              >
+                {canUseStudio ? (
+                  <Sparkles className="h-3 w-3" aria-hidden />
+                ) : (
+                  <Lock className="h-3 w-3" aria-hidden />
+                )}
+                {t('nina.modeStudio')}
+              </button>
+            </div>
+
+            {showStudioCta && (
+              <div
+                className="mb-2 shrink-0 rounded-xl border border-[#D4AF37]/25 bg-[#D4AF37]/08 px-3 py-2.5"
+                role="status"
+              >
+                <p className="text-xs leading-relaxed text-[#E8e1dd]">
+                  {t('nina.studioLockedHint')}
+                </p>
+                <a
+                  href={`/corsi#${SCROLL_LANDMARKS.corsiCheckout}`}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/15 px-2.5 py-1.5 text-[11px] font-semibold text-[#E6C65C] transition-colors hover:bg-[#D4AF37]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                >
+                  <Sparkles className="h-3 w-3" aria-hidden />
+                  {t('nina.studioCta')}
+                </a>
+              </div>
+            )}
 
             {chatAvailable && (
               <div className="mb-2 flex min-h-0 min-w-0 flex-1 flex-col">
@@ -274,7 +447,7 @@ export function ChatFab() {
                   {sending && (
                     <div className="mr-4 flex items-center gap-2 rounded-lg bg-[#1C1916] px-2.5 py-2 text-sm text-[#A39B93]">
                       <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
-                      Nina sta ascoltando…
+                      {t('nina.listening')}
                     </div>
                   )}
                 </div>
