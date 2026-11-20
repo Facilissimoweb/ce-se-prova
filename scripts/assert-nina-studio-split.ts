@@ -96,6 +96,32 @@ assert(
   'soft-lock copy names Studio + Maggiori course'
 );
 
+const welcomeZh = buildNinaSystemPrompt({
+  mode: 'welcome',
+  message: 'Quanto costano i consulti?',
+  history: [],
+  lang: 'zh-CN',
+});
+assert(
+  welcomeZh.includes('中文') && welcomeZh.includes('zh-cn'),
+  'welcome prompt instructs Chinese reply for zh-CN'
+);
+assert(
+  !welcomeZh.includes('### 0. Il Matto'),
+  'welcome zh still has no Maggiori card inject'
+);
+
+const studioEn = buildNinaSystemPrompt({
+  mode: 'studio',
+  message: 'Com’è visivamente l’arcano del Matto?',
+  history: [],
+  lang: 'en',
+});
+assert(
+  studioEn.includes('English') && studioEn.includes('### 0. Il Matto'),
+  'studio EN still injects Maggiori + reply-lang suffix'
+);
+
 assert(
   !looksLikeDeepMaggioriStudy({
     message: 'Come prenoto su WhatsApp?',

@@ -12,7 +12,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useCourseEntitlement } from '../hooks/useCourseEntitlement';
 import { useAuth } from '../context/AuthContext';
-import { getSiteLanguage } from '../i18n';
+import { isSiteLang, type SiteLang } from '../i18n/types';
 import {
   NINA_CHAT_OPEN_EVENT,
   type NinaChatOpenDetail,
@@ -24,7 +24,15 @@ import {
   whatsappHref,
 } from '../lib/siteContacts';
 import { NinaMessageBody } from './chat/NinaMessageBody';
+import { readGoogTransLang } from './GoogleTranslateWidget';
 import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
+
+/** Curated i18n packs for seed greetings; other GT langs fall back to English. */
+function greetingI18nLang(gtCode: string): SiteLang {
+  const primary = gtCode.trim().toLowerCase().split('-')[0] || 'it';
+  if (isSiteLang(primary)) return primary;
+  return primary === 'it' ? 'it' : 'en';
+}
 
 type ChatTurn = { role: 'user' | 'assistant'; content: string };
 type NinaMode = 'welcome' | 'studio';
@@ -109,7 +117,17 @@ export function ChatFab() {
   const canUseStudio = entitlement.owns;
 
   function greetingFor(nextMode: NinaMode): string {
-    return nextMode === 'studio' ? t('nina.welcomeStudio') : t('nina.welcome');
+    // GT forces react-i18next to IT; seed greeting follows googtrans (ENN-143).
+    const gt = typeof document !== 'undefined' ? readGoogTransLang() : 'it';
+    const tf = i18n.getFixedT(greetingI18nLang(gt), 'common');
+    return nextMode === 'studio'
+      ? tf('nina.welcomeStudio')
+      : tf('nina.welcome');
+  }
+
+  /** Active Google Translate browsing language (`/it/<lang>` cookie/hash). */
+  function activeChatLang(): string {
+    return typeof document !== 'undefined' ? readGoogTransLang() : 'it';
   }
 
   function switchMode(nextMode: NinaMode) {
@@ -252,7 +270,7 @@ export function ChatFab() {
         body: JSON.stringify({
           message,
           history,
-          lang: getSiteLanguage(),
+          lang: activeChatLang(),
           mode: effectiveMode,
         }),
       });
@@ -423,9 +441,15 @@ export function ChatFab() {
 
             {chatAvailable && (
               <div className="mb-2 flex min-h-0 min-w-0 flex-1 flex-col">
+                {/*
+                  Thread is notranslate: replies already follow googtrans via /api/chat.
+                  Chrome/labels above stay free so GT can still translate UI (ENN-143).
+                  Area Personale / Sigillo / dispensa keep their own notranslate elsewhere.
+                */}
                 <div
                   ref={threadRef}
-                  className="mb-2 min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain rounded-xl border border-[#D4AF37]/12 bg-[#0F0D0B]/70 p-2.5"
+                  className="mb-2 min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain rounded-xl border border-[#D4AF37]/12 bg-[#0F0D0B]/70 p-2.5 notranslate"
+                  translate="no"
                   aria-live="polite"
                 >
                   {turns.map((turn, index) => (

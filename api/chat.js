@@ -10869,6 +10869,208 @@ var init_repository = __esm({
   }
 });
 
+// src/lib/ninaReplyLang.ts
+var NINA_REPLY_LANG_LABELS = {
+  it: "italiano",
+  en: "English",
+  es: "espa\xF1ol",
+  fr: "fran\xE7ais",
+  de: "Deutsch",
+  pt: "portugu\xEAs",
+  "zh-cn": "\u4E2D\u6587\uFF08\u7B80\u4F53\uFF09",
+  zh: "\u4E2D\u6587\uFF08\u7B80\u4F53\uFF09",
+  ja: "\u65E5\u672C\u8A9E",
+  ar: "\u0627\u0644\u0639\u0631\u0628\u064A\u0629",
+  ru: "\u0440\u0443\u0441\u0441\u043A\u0438\u0439",
+  uk: "\u0443\u043A\u0440\u0430\u0457\u043D\u0441\u044C\u043A\u0430",
+  pl: "polski",
+  nl: "Nederlands",
+  ro: "rom\xE2n\u0103",
+  sv: "svenska",
+  tr: "T\xFCrk\xE7e",
+  el: "\u0395\u03BB\u03BB\u03B7\u03BD\u03B9\u03BA\u03AC",
+  ko: "\uD55C\uAD6D\uC5B4",
+  hi: "\u0939\u093F\u0928\u094D\u0926\u0940"
+};
+function normalizeNinaLang(lang) {
+  const raw = (lang || "it").trim().toLowerCase().replace(/_/g, "-");
+  if (!raw) return "it";
+  if (raw === "zh" || raw.startsWith("zh-")) {
+    if (raw.startsWith("zh-tw") || raw.startsWith("zh-hk") || raw.startsWith("zh-hant")) {
+      return raw;
+    }
+    return "zh-cn";
+  }
+  if (NINA_REPLY_LANG_LABELS[raw]) return raw;
+  const primary = raw.split("-")[0] || "it";
+  return primary;
+}
+function ninaReplyLangLabel(lang) {
+  const code = normalizeNinaLang(lang);
+  return NINA_REPLY_LANG_LABELS[code] || NINA_REPLY_LANG_LABELS[code.split("-")[0]] || code;
+}
+function isNinaDefaultLang(lang) {
+  return normalizeNinaLang(lang) === "it";
+}
+var SOFT_LOCK_IT = `Quella domanda entra nello **studio didattico degli Arcani Maggiori** (simbologia, senso, luce/ombra, chiave previsionale).
+
+Qui in **accoglienza** ti oriento su prezzi, prenotazione WhatsApp, mappa del sito e Chi sono \u2014 senza le schede profonde del corso.
+
+**Nina Studio** si sblocca con l\u2019acquisto del percorso **Arcani Maggiori** (stesso accesso dell\u2019Area Riservata e del blog riservato). Trovi il checkout su **Corsi \u2192 Arcani Maggiori**.
+
+Per un consulto personale con Maria Teresa, usa **Parla con Maria Teresa** qui sotto.`;
+var SOFT_LOCK_EN = `That question belongs in the **Maggiori study studio** (symbolism, meaning, light/shadow, predictive key).
+
+Here in **welcome** I can help with prices, WhatsApp booking, the site map, and Chi sono \u2014 not the deep course sheets.
+
+**Nina Studio** unlocks with the **Arcani Maggiori** course (same access as Area Riservata and the reserved blog). Checkout is on **Corsi \u2192 Arcani Maggiori**.
+
+For a personal reading with Maria Teresa, use **Parla con Maria Teresa** below.`;
+var SOFT_LOCK_ES = `Esa pregunta pertenece al **estudio did\xE1ctico de los Arcanos Mayores** (simbolog\xEDa, sentido, luz/sombra, clave previsional).
+
+Aqu\xED en **acogida** te oriento sobre precios, reserva por WhatsApp, mapa del sitio y Chi sono \u2014 sin las fichas profundas del curso.
+
+**Nina Studio** se desbloquea con la compra del recorrido **Arcani Maggiori** (mismo acceso que Area Riservata y el blog reservado). El checkout est\xE1 en **Corsi \u2192 Arcani Maggiori**.
+
+Para una consulta personal con Maria Teresa, usa **Parla con Maria Teresa** abajo.`;
+var SOFT_LOCK_FR = `Cette question rel\xE8ve de l\u2019**atelier didactique des Arcanes Majeurs** (symbolique, sens, lumi\xE8re/ombre, cl\xE9 pr\xE9visionnelle).
+
+Ici en **accueil**, je t\u2019oriente sur les tarifs, la r\xE9servation WhatsApp, le plan du site et Chi sono \u2014 sans les fiches profondes du cours.
+
+**Nina Studio** se d\xE9bloque avec l\u2019achat du parcours **Arcani Maggiori** (m\xEAme acc\xE8s qu\u2019Area Riservata et le blog r\xE9serv\xE9). Le checkout est sur **Corsi \u2192 Arcani Maggiori**.
+
+Pour une consultation personnelle avec Maria Teresa, utilise **Parla con Maria Teresa** ci-dessous.`;
+var SOFT_LOCK_DE = `Diese Frage geh\xF6rt in das **didaktische Studio der Gro\xDFen Arkana** (Symbolik, Sinn, Licht/Schatten, prognostischer Schl\xFCssel).
+
+Hier in der **Willkommens-Chat** helfe ich bei Preisen, WhatsApp-Buchung, Sitemap und Chi sono \u2014 ohne die tiefen Kurskarten.
+
+**Nina Studio** wird mit dem Kauf des Kurses **Arcani Maggiori** freigeschaltet (gleicher Zugang wie Area Riservata und der gesch\xFCtzte Blog). Checkout unter **Corsi \u2192 Arcani Maggiori**.
+
+F\xFCr eine pers\xF6nliche Beratung mit Maria Teresa nutze unten **Parla con Maria Teresa**.`;
+var SOFT_LOCK_PT = `Essa pergunta pertence ao **est\xFAdio did\xE1tico dos Arcanos Maiores** (simbologia, sentido, luz/sombra, chave previsional).
+
+Aqui na **acolhida** oriento sobre pre\xE7os, reserva via WhatsApp, mapa do site e Chi sono \u2014 sem as fichas profundas do curso.
+
+**Nina Studio** desbloqueia com a compra do percurso **Arcani Maggiori** (mesmo acesso da Area Riservata e do blog reservado). O checkout est\xE1 em **Corsi \u2192 Arcani Maggiori**.
+
+Para uma consulta pessoal com Maria Teresa, use **Parla con Maria Teresa** abaixo.`;
+var SOFT_LOCK_ZH = `\u8FD9\u4E2A\u95EE\u9898\u5C5E\u4E8E**\u5927\u963F\u5361\u7EB3\u5B66\u4E60\u5DE5\u4F5C\u5BA4**\uFF08\u8C61\u5F81\u3001\u610F\u4E49\u3001\u5149/\u5F71\u3001\u9884\u793A\u8981\u70B9\uFF09\u3002
+
+\u5728**\u6B22\u8FCE**\u6A21\u5F0F\u91CC\uFF0C\u6211\u53EF\u4EE5\u5E2E\u4F60\u4E86\u89E3\u4EF7\u683C\u3001WhatsApp \u9884\u7EA6\u3001\u7F51\u7AD9\u5730\u56FE\u548C Chi sono\u2014\u2014\u4E0D\u5305\u62EC\u8BFE\u7A0B\u6DF1\u5904\u7684\u8BE6\u8868\u3002
+
+**Nina Studio** \u9700\u8D2D\u4E70 **Arcani Maggiori** \u8BFE\u7A0B\u89E3\u9501\uFF08\u4E0E Area Riservata \u53CA\u4E13\u5C5E\u535A\u5BA2\u76F8\u540C\u6743\u9650\uFF09\u3002\u7ED3\u8D26\u5728 **Corsi \u2192 Arcani Maggiori**\u3002
+
+\u82E5\u9700\u4E0E Maria Teresa \u4E00\u5BF9\u4E00\u54A8\u8BE2\uFF0C\u8BF7\u4F7F\u7528\u4E0B\u65B9\u7684 **Parla con Maria Teresa**\u3002`;
+var SOFT_LOCK_JA = `\u305D\u306E\u8CEA\u554F\u306F**\u5927\u30A2\u30EB\u30AB\u30CA\u5B66\u7FD2\u30B9\u30BF\u30B8\u30AA**\uFF08\u8C61\u5FB4\u30FB\u610F\u5473\u30FB\u5149\u3068\u5F71\u30FB\u4E88\u5146\u306E\u9375\uFF09\u306E\u9818\u57DF\u3067\u3059\u3002
+
+\u3053\u3053\u3067\u306F**\u30A6\u30A7\u30EB\u30AB\u30E0**\u3068\u3057\u3066\u3001\u6599\u91D1\u30FBWhatsApp\u4E88\u7D04\u30FB\u30B5\u30A4\u30C8\u30DE\u30C3\u30D7\u30FBChi sono \u3092\u3054\u6848\u5185\u3057\u307E\u3059\u3002\u30B3\u30FC\u30B9\u306E\u6DF1\u3044\u30B7\u30FC\u30C8\u306F\u542B\u307F\u307E\u305B\u3093\u3002
+
+**Nina Studio** \u306F **Arcani Maggiori** \u30B3\u30FC\u30B9\u8CFC\u5165\u3067\u89E3\u9664\u3055\u308C\u307E\u3059\uFF08Area Riservata / \u9650\u5B9A\u30D6\u30ED\u30B0\u3068\u540C\u3058\u30A2\u30AF\u30BB\u30B9\uFF09\u3002\u30C1\u30A7\u30C3\u30AF\u30A2\u30A6\u30C8\u306F **Corsi \u2192 Arcani Maggiori**\u3002
+
+Maria Teresa \u3068\u306E\u500B\u4EBA\u9451\u5B9A\u306F\u3001\u4E0B\u306E **Parla con Maria Teresa** \u3092\u3054\u5229\u7528\u304F\u3060\u3055\u3044\u3002`;
+var SOFT_LOCK_AR = `\u0647\u0630\u0627 \u0627\u0644\u0633\u0624\u0627\u0644 \u064A\u0646\u062A\u0645\u064A \u0625\u0644\u0649 **\u0627\u0633\u062A\u0648\u062F\u064A\u0648 \u062F\u0631\u0627\u0633\u0629 \u0627\u0644\u0623\u0631\u0643\u0627\u0646\u0627 \u0627\u0644\u0643\u0628\u0631\u0649** (\u0627\u0644\u0631\u0645\u0632\u064A\u0629\u060C \u0627\u0644\u0645\u0639\u0646\u0649\u060C \u0627\u0644\u0646\u0648\u0631/\u0627\u0644\u0638\u0644\u060C \u0627\u0644\u0645\u0641\u062A\u0627\u062D \u0627\u0644\u062A\u0646\u0628\u0624\u064A).
+
+\u0647\u0646\u0627 \u0641\u064A **\u0627\u0644\u062A\u0631\u062D\u064A\u0628** \u0623\u0631\u0634\u062F\u0643 \u0628\u062E\u0635\u0648\u0635 \u0627\u0644\u0623\u0633\u0639\u0627\u0631 \u0648\u062D\u062C\u0632 \u0648\u0627\u062A\u0633\u0627\u0628 \u0648\u062E\u0631\u064A\u0637\u0629 \u0627\u0644\u0645\u0648\u0642\u0639 \u0648Chi sono \u2014 \u062F\u0648\u0646 \u0628\u0637\u0627\u0642\u0627\u062A \u0627\u0644\u062F\u0648\u0631\u0629 \u0627\u0644\u0639\u0645\u064A\u0642\u0629.
+
+\u064A\u064F\u0641\u062A\u062D **Nina Studio** \u0628\u0634\u0631\u0627\u0621 \u0645\u0633\u0627\u0631 **Arcani Maggiori** (\u0646\u0641\u0633 \u0648\u0635\u0648\u0644 Area Riservata \u0648\u0627\u0644\u0645\u062F\u0648\u0646\u0629 \u0627\u0644\u0645\u062D\u062C\u0648\u0632\u0629). \u0627\u0644\u062F\u0641\u0639 \u0639\u0628\u0631 **Corsi \u2192 Arcani Maggiori**.
+
+\u0644\u0627\u0633\u062A\u0634\u0627\u0631\u0629 \u0634\u062E\u0635\u064A\u0629 \u0645\u0639 Maria Teresa\u060C \u0627\u0633\u062A\u062E\u062F\u0645\u064A **Parla con Maria Teresa** \u0623\u062F\u0646\u0627\u0647.`;
+var SOFT_LOCK_RU = `\u042D\u0442\u043E\u0442 \u0432\u043E\u043F\u0440\u043E\u0441 \u043E\u0442\u043D\u043E\u0441\u0438\u0442\u0441\u044F \u043A **\u0443\u0447\u0435\u0431\u043D\u043E\u0439 \u0441\u0442\u0443\u0434\u0438\u0438 \u0421\u0442\u0430\u0440\u0448\u0438\u0445 \u0410\u0440\u043A\u0430\u043D\u043E\u0432** (\u0441\u0438\u043C\u0432\u043E\u043B\u0438\u043A\u0430, \u0441\u043C\u044B\u0441\u043B, \u0441\u0432\u0435\u0442/\u0442\u0435\u043D\u044C, \u043F\u0440\u043E\u0433\u043D\u043E\u0441\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439 \u043A\u043B\u044E\u0447).
+
+\u0412 \u0440\u0435\u0436\u0438\u043C\u0435 **\u043F\u0440\u0438\u0432\u0435\u0442\u0441\u0442\u0432\u0438\u044F** \u044F \u043F\u043E\u043C\u043E\u0433\u0430\u044E \u0441 \u0446\u0435\u043D\u0430\u043C\u0438, \u0437\u0430\u043F\u0438\u0441\u044C\u044E \u0447\u0435\u0440\u0435\u0437 WhatsApp, \u043A\u0430\u0440\u0442\u043E\u0439 \u0441\u0430\u0439\u0442\u0430 \u0438 Chi sono \u2014 \u0431\u0435\u0437 \u0433\u043B\u0443\u0431\u043E\u043A\u0438\u0445 \u043A\u0430\u0440\u0442\u043E\u0447\u0435\u043A \u043A\u0443\u0440\u0441\u0430.
+
+**Nina Studio** \u043E\u0442\u043A\u0440\u044B\u0432\u0430\u0435\u0442\u0441\u044F \u043F\u043E\u0441\u043B\u0435 \u043F\u043E\u043A\u0443\u043F\u043A\u0438 \u043A\u0443\u0440\u0441\u0430 **Arcani Maggiori** (\u0442\u043E\u0442 \u0436\u0435 \u0434\u043E\u0441\u0442\u0443\u043F, \u0447\u0442\u043E Area Riservata \u0438 \u0437\u0430\u043A\u0440\u044B\u0442\u044B\u0439 \u0431\u043B\u043E\u0433). \u041E\u0444\u043E\u0440\u043C\u043B\u0435\u043D\u0438\u0435: **Corsi \u2192 Arcani Maggiori**.
+
+\u0414\u043B\u044F \u043B\u0438\u0447\u043D\u043E\u0439 \u043A\u043E\u043D\u0441\u0443\u043B\u044C\u0442\u0430\u0446\u0438\u0438 \u0441 Maria Teresa \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439\u0442\u0435 **Parla con Maria Teresa** \u043D\u0438\u0436\u0435.`;
+var SOFT_LOCK_KO = `\uADF8 \uC9C8\uBB38\uC740 **\uBA54\uC774\uC800 \uC544\uB974\uCE74\uB098 \uD559\uC2B5 \uC2A4\uD29C\uB514\uC624**(\uC0C1\uC9D5, \uC758\uBBF8, \uBE5B/\uADF8\uB9BC\uC790, \uC608\uC9C0 \uD0A4)\uC5D0 \uD574\uB2F9\uD569\uB2C8\uB2E4.
+
+\uC5EC\uAE30 **\uD658\uC601** \uBAA8\uB4DC\uC5D0\uC11C\uB294 \uAC00\uACA9, WhatsApp \uC608\uC57D, \uC0AC\uC774\uD2B8\uB9F5, Chi sono\uB97C \uC548\uB0B4\uD569\uB2C8\uB2E4. \uCF54\uC2A4\uC758 \uAE4A\uC740 \uC2DC\uD2B8\uB294 \uD3EC\uD568\uB418\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.
+
+**Nina Studio**\uB294 **Arcani Maggiori** \uCF54\uC2A4 \uAD6C\uB9E4\uB85C \uC7A0\uAE08 \uD574\uC81C\uB429\uB2C8\uB2E4(Area Riservata / \uC804\uC6A9 \uBE14\uB85C\uADF8\uC640 \uB3D9\uC77C \uC811\uADFC). \uACB0\uC81C\uB294 **Corsi \u2192 Arcani Maggiori**.
+
+Maria Teresa\uC640 \uAC1C\uC778 \uC0C1\uB2F4\uC740 \uC544\uB798 **Parla con Maria Teresa**\uB97C \uC774\uC6A9\uD574 \uC8FC\uC138\uC694.`;
+var SOFT_LOCK_BY_LANG = {
+  it: SOFT_LOCK_IT,
+  en: SOFT_LOCK_EN,
+  es: SOFT_LOCK_ES,
+  fr: SOFT_LOCK_FR,
+  de: SOFT_LOCK_DE,
+  pt: SOFT_LOCK_PT,
+  "zh-cn": SOFT_LOCK_ZH,
+  zh: SOFT_LOCK_ZH,
+  ja: SOFT_LOCK_JA,
+  ar: SOFT_LOCK_AR,
+  ru: SOFT_LOCK_RU,
+  ko: SOFT_LOCK_KO
+};
+function ninaStudioSoftLockReply(lang) {
+  const code = normalizeNinaLang(lang);
+  return SOFT_LOCK_BY_LANG[code] || SOFT_LOCK_BY_LANG[code.split("-")[0]] || SOFT_LOCK_EN;
+}
+var GATE_IT = {
+  studioAuth: "Per Nina Studio accedi con Google (stesso account dell\u2019Area Riservata).",
+  studioLocked: "Nina Studio si sblocca con l\u2019acquisto del corso Arcani Maggiori (stesso accesso dell\u2019Area Riservata). Trovi il checkout su Corsi.",
+  studioLockedDemo: "Nina Studio \xE8 riservata a chi ha acquistato Arcani Maggiori. Apri Corsi per il checkout.",
+  studioEntitlement: "Non riesco a verificare l\u2019accesso a Nina Studio in questo momento. Riprova tra poco oppure apri l\u2019Area Riservata."
+};
+var GATE_EN = {
+  studioAuth: "To use Nina Studio, sign in with Google (same account as Area Riservata).",
+  studioLocked: "Nina Studio unlocks with the Arcani Maggiori course (same access as Area Riservata). Checkout is on Corsi.",
+  studioLockedDemo: "Nina Studio is for Arcani Maggiori students. Open Corsi for checkout.",
+  studioEntitlement: "I cannot verify Nina Studio access right now. Try again shortly or open Area Riservata."
+};
+var GATE_ES = {
+  studioAuth: "Para Nina Studio, inicia sesi\xF3n con Google (la misma cuenta de Area Riservata).",
+  studioLocked: "Nina Studio se desbloquea con el curso Arcani Maggiori (mismo acceso que Area Riservata). El checkout est\xE1 en Corsi.",
+  studioLockedDemo: "Nina Studio es para quien ha comprado Arcani Maggiori. Abre Corsi para el checkout.",
+  studioEntitlement: "No puedo verificar el acceso a Nina Studio ahora. Prueba de nuevo o abre Area Riservata."
+};
+var GATE_FR = {
+  studioAuth: "Pour Nina Studio, connecte-toi avec Google (le m\xEAme compte qu\u2019Area Riservata).",
+  studioLocked: "Nina Studio se d\xE9bloque avec le cours Arcani Maggiori (m\xEAme acc\xE8s qu\u2019Area Riservata). Checkout sur Corsi.",
+  studioLockedDemo: "Nina Studio est r\xE9serv\xE9e \xE0 qui a achet\xE9 Arcani Maggiori. Ouvre Corsi pour le checkout.",
+  studioEntitlement: "Je ne peux pas v\xE9rifier l\u2019acc\xE8s \xE0 Nina Studio pour le moment. R\xE9essaie bient\xF4t ou ouvre Area Riservata."
+};
+var GATE_DE = {
+  studioAuth: "F\xFCr Nina Studio bitte mit Google anmelden (dasselbe Konto wie Area Riservata).",
+  studioLocked: "Nina Studio wird mit dem Kurs Arcani Maggiori freigeschaltet (gleicher Zugang wie Area Riservata). Checkout unter Corsi.",
+  studioLockedDemo: "Nina Studio ist f\xFCr K\xE4ufer von Arcani Maggiori. \xD6ffne Corsi f\xFCr den Checkout.",
+  studioEntitlement: "Ich kann den Zugang zu Nina Studio gerade nicht pr\xFCfen. Bitte sp\xE4ter erneut versuchen oder Area Riservata \xF6ffnen."
+};
+var GATE_PT = {
+  studioAuth: "Para Nina Studio, entra com Google (a mesma conta da Area Riservata).",
+  studioLocked: "Nina Studio desbloqueia com o curso Arcani Maggiori (mesmo acesso da Area Riservata). Checkout em Corsi.",
+  studioLockedDemo: "Nina Studio \xE9 para quem comprou Arcani Maggiori. Abre Corsi para o checkout.",
+  studioEntitlement: "N\xE3o consigo verificar o acesso a Nina Studio agora. Tenta de novo ou abre a Area Riservata."
+};
+var GATE_ZH = {
+  studioAuth: "\u4F7F\u7528 Nina Studio \u8BF7\u7528 Google \u767B\u5F55\uFF08\u4E0E Area Riservata \u540C\u4E00\u8D26\u53F7\uFF09\u3002",
+  studioLocked: "Nina Studio \u9700\u8D2D\u4E70 Arcani Maggiori \u8BFE\u7A0B\u89E3\u9501\uFF08\u4E0E Area Riservata \u76F8\u540C\u6743\u9650\uFF09\u3002\u7ED3\u8D26\u5728 Corsi\u3002",
+  studioLockedDemo: "Nina Studio \u4EC5\u9650\u5DF2\u8D2D\u4E70 Arcani Maggiori \u7684\u7528\u6237\u3002\u8BF7\u6253\u5F00 Corsi \u7ED3\u8D26\u3002",
+  studioEntitlement: "\u6682\u65F6\u65E0\u6CD5\u9A8C\u8BC1 Nina Studio \u8BBF\u95EE\u6743\u9650\u3002\u8BF7\u7A0D\u540E\u91CD\u8BD5\u6216\u6253\u5F00 Area Riservata\u3002"
+};
+var GATE_JA = {
+  studioAuth: "Nina Studio \u3092\u4F7F\u3046\u306B\u306F Google \u3067\u30ED\u30B0\u30A4\u30F3\u3057\u3066\u304F\u3060\u3055\u3044\uFF08Area Riservata \u3068\u540C\u3058\u30A2\u30AB\u30A6\u30F3\u30C8\uFF09\u3002",
+  studioLocked: "Nina Studio \u306F Arcani Maggiori \u30B3\u30FC\u30B9\u8CFC\u5165\u3067\u89E3\u9664\u3055\u308C\u307E\u3059\uFF08Area Riservata \u3068\u540C\u3058\u30A2\u30AF\u30BB\u30B9\uFF09\u3002\u30C1\u30A7\u30C3\u30AF\u30A2\u30A6\u30C8\u306F Corsi\u3002",
+  studioLockedDemo: "Nina Studio \u306F Arcani Maggiori \u8CFC\u5165\u8005\u5411\u3051\u3067\u3059\u3002Corsi \u3067\u30C1\u30A7\u30C3\u30AF\u30A2\u30A6\u30C8\u3057\u3066\u304F\u3060\u3055\u3044\u3002",
+  studioEntitlement: "\u3044\u307E Nina Studio \u306E\u30A2\u30AF\u30BB\u30B9\u3092\u78BA\u8A8D\u3067\u304D\u307E\u305B\u3093\u3002\u3057\u3070\u3089\u304F\u3057\u3066\u304B\u3089\u518D\u8A66\u884C\u3059\u308B\u304B\u3001Area Riservata \u3092\u958B\u3044\u3066\u304F\u3060\u3055\u3044\u3002"
+};
+var GATE_BY_LANG = {
+  it: GATE_IT,
+  en: GATE_EN,
+  es: GATE_ES,
+  fr: GATE_FR,
+  de: GATE_DE,
+  pt: GATE_PT,
+  "zh-cn": GATE_ZH,
+  zh: GATE_ZH,
+  ja: GATE_JA
+};
+function ninaStudioGateCopy(lang) {
+  const code = normalizeNinaLang(lang);
+  return GATE_BY_LANG[code] || GATE_BY_LANG[code.split("-")[0]] || GATE_EN;
+}
+
 // src/lib/ninaChatKnowledge.ts
 var NINA_CHAT_SITE_KNOWLEDGE = `Conoscenza ufficiale del sito (fonte: copy pubblico Tarot Italia \u2014 usa SOLO questi fatti; stile FAQ breve e caldo; per prezzi e FAQ cita le risposte qui sotto, senza inventare):
 
@@ -11220,13 +11422,7 @@ Architettura: 22 lame (0\u2013XXI). Primo (0\u2013VII) identit\xE0; Secondo (VII
 Elenco: 0 Matto \xB7 I Bagatto \xB7 II Papessa \xB7 III Imperatrice \xB7 IV Imperatore \xB7 V Papa \xB7 VI Amanti \xB7 VII Carro \xB7 VIII Giustizia \xB7 IX Eremita \xB7 X Ruota \xB7 XI Forza \xB7 XII Appeso \xB7 XIII Morte \xB7 XIV Temperanza \xB7 XV Diavolo \xB7 XVI Torre \xB7 XVII Stelle \xB7 XVIII Luna \xB7 XIX Sole \xB7 XX Giudizio \xB7 XXI Mondo.
 Se manca la scheda dettagliata nel contesto, chiedi quale Trionfo (0\u2013XXI) e non inventare dettagli Waite.`;
 var MAX_INJECTED_CARDS = 3;
-var NINA_STUDIO_SOFT_LOCK_REPLY = `Quella domanda entra nello **studio didattico degli Arcani Maggiori** (simbologia, senso, luce/ombra, chiave previsionale).
-
-Qui in **accoglienza** ti oriento su prezzi, prenotazione WhatsApp, mappa del sito e Chi sono \u2014 senza le schede profonde del corso.
-
-**Nina Studio** si sblocca con l\u2019acquisto del percorso **Arcani Maggiori** (stesso accesso dell\u2019Area Riservata e del blog riservato). Trovi il checkout su **Corsi \u2192 Arcani Maggiori**.
-
-Per un consulto personale con Maria Teresa, usa **Parla con Maria Teresa** qui sotto.`;
+var NINA_STUDIO_SOFT_LOCK_REPLY = ninaStudioSoftLockReply("it");
 function normalizeForMatch(text2) {
   return text2.toLowerCase().normalize("NFD").replace(new RegExp("\\p{M}", "gu"), "");
 }
@@ -11353,22 +11549,16 @@ Limiti (obbligatori):
 Formato messaggio (obbligatorio \u2014 mobile-friendly):
 - Paragrafi brevi; per Maggiori puoi usare i quattro campi didattici in forma breve.
 - **Grassetto** con moderazione. Niente HTML. CTA contatto \u2192 sezione **Parla con Maria Teresa** sotto la chat.`;
-var NINA_REPLY_LANG = {
-  it: "italiano",
-  en: "English",
-  es: "espa\xF1ol",
-  fr: "fran\xE7ais",
-  de: "Deutsch"
-};
 function ninaReplyLanguageSuffix(lang) {
-  const code = (lang || "it").trim().toLowerCase().split("-")[0];
-  if (code === "it") return "";
-  const label = NINA_REPLY_LANG[code] || NINA_REPLY_LANG.it;
+  if (isNinaDefaultLang(lang)) return "";
+  const code = normalizeNinaLang(lang);
+  const label = ninaReplyLangLabel(code);
   return `
 
-## Lingua di risposta (ENN-136)
-L\u2019utente ha scelto la lingua del sito: **${label}** (\`${code}\`).
-Rispondi SEMPRE in ${label}. I fatti ufficiali sopra restano la fonte (prezzi, FAQ, Maggiori); traducili fedelmente senza inventare. I nomi \xABTarot Italia\xBB, \xABMaria Teresa Rogani\xBB, \xABNina\xBB, \xABNina Studio\xBB e i prezzi in EUR restano invariati.`;
+## Lingua di risposta (ENN-143 \xB7 Google Translate)
+L\u2019utente sta navigando il sito nella lingua di Google Traduttore: **${label}** (\`${code}\`).
+Rispondi SEMPRE in ${label}. La conoscenza ufficiale sopra resta in italiano come fonte (prezzi, FAQ, Maggiori): traducila fedelmente nella risposta senza inventare e senza riscrivere/ripetere l\u2019intero blocco conoscenza in un\u2019altra lingua nel system prompt.
+I nomi \xABTarot Italia\xBB, \xABMaria Teresa Rogani\xBB, \xABNina\xBB, \xABNina Studio\xBB, \xABArcani Maggiori\xBB, \xABDialogo Tarot\xBB e i prezzi in EUR restano invariati.`;
 }
 function buildNinaSystemPrompt(params) {
   const mode = params.mode === "studio" ? "studio" : "welcome";
@@ -11613,16 +11803,20 @@ function isDevDemoStudioAuth(authorization) {
   if (token !== DEMO_RESERVED_TOKEN) return false;
   return process.env.NODE_ENV !== "production" || process.env.ALLOW_DIRECT_UNLOCK === "true";
 }
-async function assertNinaStudioAccess(authorization) {
+async function assertNinaStudioAccess(authorization, lang) {
+  const gate = ninaStudioGateCopy(lang);
   if (isDevDemoStudioAuth(authorization)) {
     return null;
   }
   const auth2 = await verifyBearerToken(authorization, "required");
   if (!auth2.ok) {
+    if (auth2.error) {
+      console.warn("Nina Studio auth denied:", auth2.error);
+    }
     return json(auth2.status, {
       available: true,
       code: "studio_auth",
-      error: auth2.error || "Per Nina Studio accedi con Google (stesso account dell\u2019Area Riservata)."
+      error: gate.studioAuth
     });
   }
   const user = auth2.user;
@@ -11630,7 +11824,7 @@ async function assertNinaStudioAccess(authorization) {
     return json(401, {
       available: true,
       code: "studio_auth",
-      error: "Per Nina Studio accedi con Google (stesso account dell\u2019Area Riservata)."
+      error: gate.studioAuth
     });
   }
   if (user.uid === DEMO_RESERVED_UID) {
@@ -11640,7 +11834,7 @@ async function assertNinaStudioAccess(authorization) {
     return json(403, {
       available: true,
       code: "studio_locked",
-      error: "Nina Studio \xE8 riservata a chi ha acquistato Arcani Maggiori. Apri Corsi per il checkout.",
+      error: gate.studioLockedDemo,
       checkoutPath: "/corsi#checkout"
     });
   }
@@ -11656,7 +11850,7 @@ async function assertNinaStudioAccess(authorization) {
       return json(403, {
         available: true,
         code: "studio_locked",
-        error: "Nina Studio si sblocca con l\u2019acquisto del corso Arcani Maggiori (stesso accesso dell\u2019Area Riservata). Trovi il checkout su Corsi.",
+        error: gate.studioLocked,
         checkoutPath: "/corsi#checkout"
       });
     }
@@ -11666,7 +11860,7 @@ async function assertNinaStudioAccess(authorization) {
     return json(503, {
       available: true,
       code: "studio_entitlement",
-      error: "Non riesco a verificare l\u2019accesso a Nina Studio in questo momento. Riprova tra poco oppure apri l\u2019Area Riservata."
+      error: gate.studioEntitlement
     });
   }
 }
@@ -11723,9 +11917,11 @@ async function postChatMessage(params) {
   }
   const mode = parseMode(body.mode);
   const history = asHistory(body.history);
-  const lang = typeof body.lang === "string" ? body.lang.trim().toLowerCase() : "it";
+  const lang = normalizeNinaLang(
+    typeof body.lang === "string" ? body.lang : "it"
+  );
   if (mode === "studio") {
-    const denied = await assertNinaStudioAccess(authorization);
+    const denied = await assertNinaStudioAccess(authorization, lang);
     if (denied) return denied;
   } else if (looksLikeDeepMaggioriStudy({ message, history })) {
     return json(200, {
@@ -11733,7 +11929,7 @@ async function postChatMessage(params) {
       mode: "welcome",
       locked: true,
       code: "studio_locked",
-      reply: NINA_STUDIO_SOFT_LOCK_REPLY,
+      reply: ninaStudioSoftLockReply(lang),
       checkoutPath: "/corsi#checkout"
     });
   }

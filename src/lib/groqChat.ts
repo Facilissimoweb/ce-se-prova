@@ -9,6 +9,11 @@ import {
   buildMaggioriKnowledgeForMessages,
   NINA_CHAT_SITE_KNOWLEDGE,
 } from './ninaChatKnowledge.ts';
+import {
+  isNinaDefaultLang,
+  normalizeNinaLang,
+  ninaReplyLangLabel,
+} from './ninaReplyLang.ts';
 
 export const GROQ_CHAT_ENV_KEY = 'TAROTITALIACHATGENERICAGROQ_API_KEY';
 export const GROQ_CHAT_DEFAULT_MODEL = 'openai/gpt-oss-20b'; // was llama-3.1-8b-instant (retired 2026-08-16)
@@ -72,23 +77,16 @@ Formato messaggio (obbligatorio — mobile-friendly):
 - Paragrafi brevi; per Maggiori puoi usare i quattro campi didattici in forma breve.
 - **Grassetto** con moderazione. Niente HTML. CTA contatto → sezione **Parla con Maria Teresa** sotto la chat.`;
 
-const NINA_REPLY_LANG: Record<string, string> = {
-  it: 'italiano',
-  en: 'English',
-  es: 'español',
-  fr: 'français',
-  de: 'Deutsch',
-};
-
 function ninaReplyLanguageSuffix(lang?: string): string {
-  const code = (lang || 'it').trim().toLowerCase().split('-')[0];
-  if (code === 'it') return '';
-  const label = NINA_REPLY_LANG[code] || NINA_REPLY_LANG.it;
+  if (isNinaDefaultLang(lang)) return '';
+  const code = normalizeNinaLang(lang);
+  const label = ninaReplyLangLabel(code);
   return `
 
-## Lingua di risposta (ENN-136)
-L’utente ha scelto la lingua del sito: **${label}** (\`${code}\`).
-Rispondi SEMPRE in ${label}. I fatti ufficiali sopra restano la fonte (prezzi, FAQ, Maggiori); traducili fedelmente senza inventare. I nomi «Tarot Italia», «Maria Teresa Rogani», «Nina», «Nina Studio» e i prezzi in EUR restano invariati.`;
+## Lingua di risposta (ENN-143 · Google Translate)
+L’utente sta navigando il sito nella lingua di Google Traduttore: **${label}** (\`${code}\`).
+Rispondi SEMPRE in ${label}. La conoscenza ufficiale sopra resta in italiano come fonte (prezzi, FAQ, Maggiori): traducila fedelmente nella risposta senza inventare e senza riscrivere/ripetere l’intero blocco conoscenza in un’altra lingua nel system prompt.
+I nomi «Tarot Italia», «Maria Teresa Rogani», «Nina», «Nina Studio», «Arcani Maggiori», «Dialogo Tarot» e i prezzi in EUR restano invariati.`;
 }
 
 /**

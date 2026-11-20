@@ -6,6 +6,8 @@
  * When knowledge changes, rebuild api/chat.js.
  */
 
+import { ninaStudioSoftLockReply } from './ninaReplyLang.ts';
+
 /** Fatti pubblici e FAQ del sito (copy ufficiale, fedele). */
 export const NINA_CHAT_SITE_KNOWLEDGE = `Conoscenza ufficiale del sito (fonte: copy pubblico Tarot Italia — usa SOLO questi fatti; stile FAQ breve e caldo; per prezzi e FAQ cita le risposte qui sotto, senza inventare):
 
@@ -377,14 +379,13 @@ Se manca la scheda dettagliata nel contesto, chiedi quale Trionfo (0–XXI) e no
 
 const MAX_INJECTED_CARDS = 3;
 
-/** Soft-lock copy when welcome chat asks for deep Maggiori study (ENN-137). */
-export const NINA_STUDIO_SOFT_LOCK_REPLY = `Quella domanda entra nello **studio didattico degli Arcani Maggiori** (simbologia, senso, luce/ombra, chiave previsionale).
+/**
+ * Soft-lock copy when welcome chat asks for deep Maggiori study (ENN-137).
+ * Prefer `ninaStudioSoftLockReply(lang)` so GT browsing language is respected (ENN-143).
+ */
+export const NINA_STUDIO_SOFT_LOCK_REPLY = ninaStudioSoftLockReply('it');
 
-Qui in **accoglienza** ti oriento su prezzi, prenotazione WhatsApp, mappa del sito e Chi sono — senza le schede profonde del corso.
-
-**Nina Studio** si sblocca con l’acquisto del percorso **Arcani Maggiori** (stesso accesso dell’Area Riservata e del blog riservato). Trovi il checkout su **Corsi → Arcani Maggiori**.
-
-Per un consulto personale con Maria Teresa, usa **Parla con Maria Teresa** qui sotto.`;
+export { ninaStudioSoftLockReply };
 
 function normalizeForMatch(text: string): string {
   return text
