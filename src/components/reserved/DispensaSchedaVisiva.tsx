@@ -66,6 +66,15 @@ function AccordionSection({
   );
 }
 
+/** Didactic body stays Italian for study precision (ENN-155). */
+function SchedaBody({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="notranslate space-y-3" translate="no">
+      {children}
+    </div>
+  );
+}
+
 export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
   const baseId = useId();
   const [openSections, setOpenSections] = useState<Record<SectionId, boolean>>({
@@ -79,11 +88,10 @@ export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
-  // ENN-154 — intentional notranslate: schede visive stay IT (precision widgets).
+  // ENN-155 — chrome / section titles follow GT; didactic lists stay notranslate.
   return (
     <section
-      className="notranslate space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-4 md:p-6"
-      translate="no"
+      className="space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-4 md:p-6"
       aria-label={`Scheda visiva: ${content.title}`}
     >
       <div className="space-y-1.5">
@@ -125,16 +133,18 @@ export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
           <p className="text-[11px] uppercase tracking-[0.06em] text-[#E6C65C] font-semibold">
             Mappa della Composizione Visiva (Pamela Colman Smith)
           </p>
-          <ul className="space-y-3">
-            {content.mappa.map((item) => (
-              <li key={item.title} className="space-y-1">
-                <p className="font-body font-semibold text-[#F4F1EA] text-sm">
-                  {item.title}
-                </p>
-                <p>{item.body}</p>
-              </li>
-            ))}
-          </ul>
+          <SchedaBody>
+            <ul className="space-y-3">
+              {content.mappa.map((item) => (
+                <li key={item.title} className="space-y-1">
+                  <p className="font-body font-semibold text-[#F4F1EA] text-sm">
+                    {item.title}
+                  </p>
+                  <p>{item.body}</p>
+                </li>
+              ))}
+            </ul>
+          </SchedaBody>
         </AccordionSection>
 
         <AccordionSection
@@ -146,28 +156,30 @@ export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
           <p className="text-[11px] uppercase tracking-[0.06em] text-[#E6C65C] font-semibold">
             Decodifica Visiva: Elemento per Elemento
           </p>
-          <ul className="space-y-4">
-            {content.decodifica.map((item) => (
-              <li
-                key={item.title}
-                className="space-y-2 rounded-lg border border-[#D4AF37]/12 bg-[#12100E]/40 p-3"
-              >
-                <p className="font-body font-semibold text-[#F4F1EA] text-sm">
-                  {item.title}
-                </p>
-                <p>
-                  <span className="text-[#D4AF37] font-medium">Cosa si vede: </span>
-                  {item.cosaSiVede}
-                </p>
-                <p>
-                  <span className="text-[#D4AF37] font-medium">
-                    Cosa comunica visivamente:{' '}
-                  </span>
-                  {item.cosaComunica}
-                </p>
-              </li>
-            ))}
-          </ul>
+          <SchedaBody>
+            <ul className="space-y-4">
+              {content.decodifica.map((item) => (
+                <li
+                  key={item.title}
+                  className="space-y-2 rounded-lg border border-[#D4AF37]/12 bg-[#12100E]/40 p-3"
+                >
+                  <p className="font-body font-semibold text-[#F4F1EA] text-sm">
+                    {item.title}
+                  </p>
+                  <p>
+                    <span className="text-[#D4AF37] font-medium">Cosa si vede: </span>
+                    {item.cosaSiVede}
+                  </p>
+                  <p>
+                    <span className="text-[#D4AF37] font-medium">
+                      Cosa comunica visivamente:{' '}
+                    </span>
+                    {item.cosaComunica}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </SchedaBody>
         </AccordionSection>
 
         <AccordionSection
@@ -179,50 +191,52 @@ export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
           <p className="text-[11px] uppercase tracking-[0.06em] text-[#E6C65C] font-semibold">
             Griglia di Osservazione Rapida in Stesa
           </p>
-          {/* Mobile: stacked rows; sm+: compact table */}
-          <div className="space-y-3 sm:hidden">
-            {content.griglia.map((row) => (
-              <div
-                key={row.dettaglio}
-                className="rounded-lg border border-[#D4AF37]/12 bg-[#12100E]/40 p-3 space-y-2"
-              >
-                <p className="font-body font-semibold text-[#F4F1EA]">{row.dettaglio}</p>
-                <p>
-                  <span className="text-[#D4AF37] font-medium">Focus: </span>
-                  {row.focus}
-                </p>
-                <p>
-                  <span className="text-[#D4AF37] font-medium">Messaggio: </span>
-                  {row.messaggio}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="hidden sm:block overflow-x-auto -mx-1">
-            <table className="w-full min-w-[480px] text-left text-sm border-collapse">
-              <thead>
-                <tr className="border-b border-[#D4AF37]/25 text-[#E6C65C]">
-                  <th className="py-2 pr-3 font-semibold font-body">Dettaglio Visivo</th>
-                  <th className="py-2 pr-3 font-semibold font-body">Focus dell&apos;Osservazione</th>
-                  <th className="py-2 font-semibold font-body">Messaggio Chiave</th>
-                </tr>
-              </thead>
-              <tbody>
-                {content.griglia.map((row) => (
-                  <tr
-                    key={row.dettaglio}
-                    className="border-b border-[#D4AF37]/12 align-top"
-                  >
-                    <td className="py-2.5 pr-3 font-semibold text-[#F4F1EA]">
-                      {row.dettaglio}
-                    </td>
-                    <td className="py-2.5 pr-3">{row.focus}</td>
-                    <td className="py-2.5">{row.messaggio}</td>
+          <SchedaBody>
+            {/* Mobile: stacked rows; sm+: compact table */}
+            <div className="space-y-3 sm:hidden">
+              {content.griglia.map((row) => (
+                <div
+                  key={row.dettaglio}
+                  className="rounded-lg border border-[#D4AF37]/12 bg-[#12100E]/40 p-3 space-y-2"
+                >
+                  <p className="font-body font-semibold text-[#F4F1EA]">{row.dettaglio}</p>
+                  <p>
+                    <span className="text-[#D4AF37] font-medium">Focus: </span>
+                    {row.focus}
+                  </p>
+                  <p>
+                    <span className="text-[#D4AF37] font-medium">Messaggio: </span>
+                    {row.messaggio}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="hidden sm:block overflow-x-auto -mx-1">
+              <table className="w-full min-w-[480px] text-left text-sm border-collapse">
+                <thead>
+                  <tr className="border-b border-[#D4AF37]/25 text-[#E6C65C]">
+                    <th className="py-2 pr-3 font-semibold font-body">Dettaglio Visivo</th>
+                    <th className="py-2 pr-3 font-semibold font-body">Focus dell&apos;Osservazione</th>
+                    <th className="py-2 font-semibold font-body">Messaggio Chiave</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {content.griglia.map((row) => (
+                    <tr
+                      key={row.dettaglio}
+                      className="border-b border-[#D4AF37]/12 align-top"
+                    >
+                      <td className="py-2.5 pr-3 font-semibold text-[#F4F1EA]">
+                        {row.dettaglio}
+                      </td>
+                      <td className="py-2.5 pr-3">{row.focus}</td>
+                      <td className="py-2.5">{row.messaggio}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </SchedaBody>
         </AccordionSection>
 
         <AccordionSection
@@ -234,16 +248,18 @@ export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
           <p className="text-[11px] uppercase tracking-[0.06em] text-[#E6C65C] font-semibold">
             Sintesi Operativa della Scheda
           </p>
-          <ul className="space-y-3">
-            {content.sintesi.map((item) => (
-              <li key={item.title} className="space-y-1">
-                <p className="font-body font-semibold text-[#F4F1EA] text-sm">
-                  {item.title}
-                </p>
-                <p>{item.body}</p>
-              </li>
-            ))}
-          </ul>
+          <SchedaBody>
+            <ul className="space-y-3">
+              {content.sintesi.map((item) => (
+                <li key={item.title} className="space-y-1">
+                  <p className="font-body font-semibold text-[#F4F1EA] text-sm">
+                    {item.title}
+                  </p>
+                  <p>{item.body}</p>
+                </li>
+              ))}
+            </ul>
+          </SchedaBody>
         </AccordionSection>
       </div>
     </section>

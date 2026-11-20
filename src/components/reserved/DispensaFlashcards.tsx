@@ -62,11 +62,10 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
 
   if (!current || total === 0) return null;
 
-  // ENN-154 — intentional notranslate: Sigillo Q/A stay IT for study precision.
+  // ENN-155 — chrome / titles follow GT; only Q/A study text stays notranslate.
   return (
     <section
-      className="notranslate space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-5 md:p-6"
-      translate="no"
+      className="space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-5 md:p-6"
       aria-label="Sigillo di apprendimento con flashcard"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -96,11 +95,12 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
         <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]/90 mb-3">
           {flipped ? 'Risposta' : 'Domanda'}
         </p>
-        {/* h2-matching body: Plus Jakarta (not Cinzel/small-caps); Q gold, A white */}
+        {/* Precision: keep Italian Q/A body for study (ENN-155). */}
         <h2
-          className={`flashcard-body-text normal-case ${
+          className={`notranslate flashcard-body-text normal-case ${
             flipped ? 'flashcard-body-answer' : 'flashcard-body-question'
           }`}
+          translate="no"
         >
           {flipped ? current.answer : current.question}
         </h2>
