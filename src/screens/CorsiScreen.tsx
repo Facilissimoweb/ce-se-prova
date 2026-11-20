@@ -27,9 +27,8 @@ import {
 } from '../lib/formValidation';
 import {
   SCROLL_LANDMARKS,
-  afterNextPaint,
   scrollToElement,
-  scrollToId,
+  scrollToIdAfterPaint,
 } from '../lib/scrollNavigation';
 import { whatsappHref } from '../lib/siteContacts';
 
@@ -104,8 +103,9 @@ export function CorsiScreen({
   const handleMaggioriMattoPreview = () => {
     onChangeCourseId('arcani-maggiori');
     // Preview mounts only when Maggiori is the active workbench course.
-    afterNextPaint(() => {
-      scrollToId(SCROLL_LANDMARKS.corsiMaggioriPreview, { behavior: 'smooth' });
+    // Settle retries cover remount + GT layout shift (ENN-149).
+    scrollToIdAfterPaint(SCROLL_LANDMARKS.corsiMaggioriPreview, {
+      behavior: 'smooth',
     });
   };
 
