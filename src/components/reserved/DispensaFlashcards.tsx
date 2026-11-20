@@ -7,6 +7,7 @@ import {
   Shuffle,
 } from 'lucide-react';
 import type { CourseModuleFlashcardDeck } from '../../data/flashcards/arcaniMaggiori';
+import { requestGoogleTranslateRefresh } from '../../lib/googleTranslateRuntime';
 
 interface DispensaFlashcardsProps {
   deck: CourseModuleFlashcardDeck;
@@ -32,6 +33,12 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
     setIndex(0);
     setFlipped(false);
   }, [baseOrder, deck.courseSlug, deck.moduleNumber]);
+
+  // ENN-156 — chrome (Domanda/Risposta/hints) remounts on flip/nav; re-apply GT.
+  // Q/A <h2> stays notranslate — refresh must not strip that protection.
+  useEffect(() => {
+    requestGoogleTranslateRefresh(160);
+  }, [deck.courseSlug, deck.moduleNumber, index, flipped]);
 
   const cardById = useMemo(() => {
     const map = new Map(deck.cards.map((c) => [c.id, c]));
