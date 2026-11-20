@@ -1,5 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { CalendarDays, Loader2, Mail, MessageCircle, Send, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { getSiteLanguage } from '../i18n';
 import {
   SITE_EMAIL,
   telegramHref,
@@ -55,12 +57,6 @@ function TelegramLogo({ className }: { className?: string }) {
 const linkClass =
   'flex min-w-0 items-center justify-center gap-1.5 rounded-lg border border-[#D4AF37]/15 bg-[#12100E]/55 px-2 py-1.5 text-[11px] font-semibold leading-tight text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:justify-start sm:gap-2 sm:px-2.5 sm:py-2 sm:text-xs';
 
-const WELCOME_ASSISTANT = `Ciao, sono **Nina**, l’assistente virtuale di Tarot Italia.
-
-Sono qui per **accoglierti** e orientarti con calma.
-
-Quando vorrai un consulto autentico, ti accompagno verso **Maria Teresa** — usa la sezione **Parla con Maria Teresa** qui sotto.`;
-
 /**
  * Left FAB stack: under accessibility, above Torna su
  * (cookie → a11y → chat → Torna su).
@@ -69,20 +65,31 @@ Quando vorrai un consulto autentico, ti accompagno verso **Maria Teresa** — us
  * On mobile, only visible when «Strumenti» is open.
  */
 export function ChatFab() {
+  const { t, i18n } = useTranslation('common');
   const panelId = useId();
   const composerId = useId();
   const threadRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
   const [chatAvailable, setChatAvailable] = useState(false);
-  const [turns, setTurns] = useState<ChatTurn[]>([
-    { role: 'assistant', content: WELCOME_ASSISTANT },
+  const [turns, setTurns] = useState<ChatTurn[]>(() => [
+    { role: 'assistant', content: t('nina.welcome') },
   ]);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
   const fabVisible = useLeftToolFabVisible();
   const { isCompact, setToolsOpen } = useLeftToolsMenu();
+
+  // Refresh welcome when language changes and thread is still the default greeting only
+  useEffect(() => {
+    setTurns((prev) => {
+      if (prev.length === 1 && prev[0]?.role === 'assistant') {
+        return [{ role: 'assistant', content: t('nina.welcome') }];
+      }
+      return prev;
+    });
+  }, [i18n.language, t]);
 
   useEffect(() => {
     if (!open) return;
@@ -155,24 +162,22 @@ export function ChatFab() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, history }),
+        body: JSON.stringify({
+          message,
+          history,
+          lang: getSiteLanguage(),
+        }),
       });
       const data = (await res.json().catch(() => ({}))) as ChatPostResponse;
 
       if (data.available === false) {
         setChatAvailable(false);
-        setSendError(
-          data.error ||
-            'Nina non è ancora attiva. Usa i contatti qui sotto per parlare con Maria Teresa.'
-        );
+        setSendError(data.error || t('nina.errorUnavailable'));
         return;
       }
 
       if (!res.ok || !data.reply) {
-        setSendError(
-          data.error ||
-            'Non riesco a rispondere in questo momento. Riprova o usa i contatti.'
-        );
+        setSendError(data.error || t('nina.errorGeneric'));
         return;
       }
 
@@ -181,9 +186,7 @@ export function ChatFab() {
         { role: 'assistant', content: data.reply as string },
       ]);
     } catch {
-      setSendError(
-        'Connessione interrotta. Riprova tra poco oppure usa WhatsApp, Telegram o email.'
-      );
+      setSendError(t('nina.errorOffline'));
     } finally {
       setSending(false);
     }
@@ -229,10 +232,10 @@ export function ChatFab() {
                 </div>
                 <p className="mt-1 text-[11px] leading-snug text-[#A39B93] sm:text-xs">
                   {statusLoading
-                    ? 'Verifico Nina…'
+                    ? '…'
                     : chatAvailable
-                      ? 'Assistente virtuale di Maria Teresa. Per un consulto autentico, usa Parla con Maria Teresa qui sotto.'
-                      : 'Nina non è attiva. Usa Parla con Maria Teresa qui sotto.'}
+                      ? t('nina.subtitleAvailable')
+                      : t('nina.subtitleUnavailable')}
                 </p>
               </div>
               <button
@@ -312,16 +315,16 @@ export function ChatFab() {
                 chatAvailable ? 'shrink-0' : 'mt-auto shrink-0'
               }`}
               role="group"
-              aria-label="Parla con Maria Teresa"
+              aria-label={t('nina.sectionAria')}
             >
               <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                Parla con Maria Teresa
+                {t('cta.talkMaria')}
               </p>
               <ul className="grid grid-cols-2 gap-1.5 md:grid-cols-4">
                 <li>
                   <a href="/prenota" className={linkClass}>
                     <CalendarDays className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" aria-hidden="true" />
-                    Prenota
+                    {t('cta.book')}
                   </a>
                 </li>
                 <li>
@@ -334,7 +337,7 @@ export function ChatFab() {
                     className={linkClass}
                   >
                     <WhatsAppLogo className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />
-                    WhatsApp
+                    {t('cta.whatsapp')}
                   </a>
                 </li>
                 <li>

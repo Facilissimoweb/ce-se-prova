@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ScreenId } from '../types/handoff';
 import { blogSlugFromPath, PATH_CHANGE_EVENT } from '../lib/appPaths';
 import { applyDocumentSeo } from '../lib/seo';
@@ -9,6 +10,7 @@ type Props = {
 
 /** Route-aware document title / meta / JSON-LD for the SPA. */
 export function DocumentSeo({ activeScreen }: Props) {
+  const { i18n } = useTranslation();
   const [blogSlug, setBlogSlug] = useState<string | null>(() =>
     typeof window !== 'undefined'
       ? blogSlugFromPath(window.location.pathname)
@@ -30,7 +32,7 @@ export function DocumentSeo({ activeScreen }: Props) {
 
   useEffect(() => {
     applyDocumentSeo(activeScreen);
-  }, [activeScreen, blogSlug]);
+  }, [activeScreen, blogSlug, i18n.language]);
 
   return null;
 }

@@ -434,6 +434,23 @@ Formato messaggio (obbligatorio \u2014 mobile-friendly):
 - Usa **grassetto** con moderazione solo su parole chiave empatiche o di sostegno (es. **ascolto**, **sicuro**, **insieme**, **Maria Teresa**, **\u20AC19**). Non mettere intere frasi in grassetto.
 - Non usare HTML. Markdown consentito: paragrafi e **grassetto**. Evita link markdown di contatto ([Prenota], [WhatsApp], [Telegram], [Email]) e non aggiungere blocchi CTA dopo --- : i pulsanti Prenota / WhatsApp / Telegram / email sono gi\xE0 nella sezione fissa \xABParla con Maria Teresa\xBB sotto la chat.
 - Quando inviti al contatto (prenotazione, consulto autentico, approfondimento), chiudi con una frase breve che rimanda a quella sezione (es. \xABTrovi Prenota, WhatsApp, Telegram ed email nella sezione Parla con Maria Teresa qui sotto.\xBB). Niente elenchi di bottoni nel messaggio.`;
+var NINA_REPLY_LANG = {
+  it: "italiano",
+  en: "English",
+  es: "espa\xF1ol",
+  fr: "fran\xE7ais",
+  de: "Deutsch"
+};
+function ninaReplyLanguageSuffix(lang) {
+  const code = (lang || "it").trim().toLowerCase().split("-")[0];
+  if (code === "it") return "";
+  const label = NINA_REPLY_LANG[code] || NINA_REPLY_LANG.it;
+  return `
+
+## Lingua di risposta (ENN-136)
+L\u2019utente ha scelto la lingua del sito: **${label}** (\`${code}\`).
+Rispondi SEMPRE in ${label}. I fatti ufficiali sopra restano la fonte (prezzi, FAQ, Maggiori); traducili fedelmente senza inventare. I nomi \xABTarot Italia\xBB, \xABMaria Teresa Rogani\xBB, \xABNina\xBB e i prezzi in EUR restano invariati.`;
+}
 function buildNinaSystemPrompt(params) {
   const maggiori = buildMaggioriKnowledgeForMessages({
     message: params.message,
@@ -443,7 +460,7 @@ function buildNinaSystemPrompt(params) {
 
 ${NINA_CHAT_SITE_KNOWLEDGE}
 
-${maggiori}`;
+${maggiori}${ninaReplyLanguageSuffix(params.lang)}`;
 }
 var TAROT_ITALIA_CHAT_SYSTEM_PROMPT = buildNinaSystemPrompt({
   message: "",
@@ -605,7 +622,8 @@ async function postChatMessage(body) {
     });
   }
   const history = asHistory(body.history);
-  const systemPrompt = buildNinaSystemPrompt({ message, history });
+  const lang = typeof body.lang === "string" ? body.lang.trim().toLowerCase() : "it";
+  const systemPrompt = buildNinaSystemPrompt({ message, history, lang });
   const messages = [
     { role: "system", content: systemPrompt },
     ...history,

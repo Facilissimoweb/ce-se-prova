@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Check, ChevronDown, Mail, MapPin, MessageCircle, Phone, ShieldCheck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { ConsultationTariff, CourseId, ScreenId } from '../types/handoff';
+import { siteContent } from '../data/siteContent';
 import {
-  consultationTariffs,
-  educationalCourses,
-  holisticFaqs,
-  siteContent,
-} from '../data/siteContent';
+  useLocalizedCourses,
+  useLocalizedHolisticFaqs,
+  useLocalizedTariffs,
+} from '../i18n/useLocalizedCatalog';
 import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
 import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
@@ -56,6 +57,10 @@ export function HomeScreen({
   onOpenHandoff,
   onOpenPrivacy,
 }: HomeScreenProps) {
+  const { t } = useTranslation('common');
+  const consultationTariffs = useLocalizedTariffs();
+  const educationalCourses = useLocalizedCourses();
+  const holisticFaqs = useLocalizedHolisticFaqs();
   const [openFaqId, setOpenFaqId] = useState<string | null>(holisticFaqs[0]?.id ?? null);
   const atmosferaVideoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -151,7 +156,7 @@ export function HomeScreen({
               onClick={() => onNavigate('consulti')}
               className="cta-label px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 shrink-0 transition-all duration-150 hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
             >
-              Scegli il Consulto
+              {t('home.chooseReading')}
               <ArrowRight className="w-4 h-4 shrink-0" />
             </button>
 
@@ -161,7 +166,7 @@ export function HomeScreen({
               className="cta-label px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37]/5 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/12 hover:border-[#D4AF37] text-[#F4F1EA] text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
             >
               <MessageCircle className="w-4 h-4 text-[#D4AF37] shrink-0" />
-              Apri Dialogo Tarot
+              {t('home.openDialogue')}
             </button>
           </div>
         </div>
@@ -290,7 +295,7 @@ export function HomeScreen({
             onClick={() => onNavigate('consulti')}
             className="text-sm font-medium text-[#D4AF37] hover:text-[#E6C65C] inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 self-start md:self-auto"
           >
-            Esplora area Consulti <ArrowRight className="w-4 h-4" />
+            {t('home.exploreConsulti')} <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
@@ -392,7 +397,7 @@ export function HomeScreen({
                         : 'bg-[#D4AF37]/10 border border-[#D4AF37]/35 hover:bg-[#D4AF37] hover:text-[#12100E] text-[#F4F1EA]'
                     }`}
                   >
-                    Scegli e Prenota ({tariff.durationMinutes}m)
+                    {t('home.bookTariff', { minutes: tariff.durationMinutes })}
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -678,7 +683,7 @@ export function HomeScreen({
               className="cta-label px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs md:text-sm font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-2 shrink-0 transition-colors"
             >
               <MessageCircle className="w-4 h-4 text-[#D4AF37] shrink-0" />
-              WhatsApp
+              {t('cta.whatsapp')}
             </a>
             <a
               href={`tel:${SITE_PHONE_TEL}`}

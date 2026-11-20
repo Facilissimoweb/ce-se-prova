@@ -1,4 +1,12 @@
 import type { ScreenId } from '../types/handoff';
+import { applyDocumentLang } from '../i18n/applyDocumentLang';
+import { seoTranslations } from '../i18n/locales/seo';
+import {
+  DEFAULT_LANG,
+  LANG_OG,
+  type SiteLang,
+} from '../i18n/types';
+import { getSiteLanguage } from '../i18n/index';
 import { blogSlugFromPath, pathForBlogPost, pathForScreen } from './appPaths';
 import { getBlogPostBySlug, type BlogPost } from './blogPosts';
 import { holisticFaqs, consultiFaqs } from '../data/siteContent';
@@ -98,8 +106,19 @@ const PAGE_SEO: Record<ScreenId, PageSeo> = {
   },
 };
 
-export function pageSeoForScreen(screen: ScreenId): PageSeo {
-  return PAGE_SEO[screen] ?? PAGE_SEO.home;
+export function pageSeoForScreen(
+  screen: ScreenId,
+  lang: SiteLang = DEFAULT_LANG
+): PageSeo {
+  const base = PAGE_SEO[screen] ?? PAGE_SEO.home;
+  if (lang === DEFAULT_LANG) return base;
+  const overlay = seoTranslations[lang]?.[screen];
+  if (!overlay) return base;
+  return {
+    ...base,
+    title: overlay.title,
+    description: overlay.description,
+  };
 }
 
 export function pageTitleForScreen(screen: ScreenId): string {
@@ -294,7 +313,10 @@ function applySeoPayload(options: {
   upsertMeta({ attr: 'property', key: 'og:description' }, options.description);
   upsertMeta({ attr: 'property', key: 'og:type' }, options.ogType || 'website');
   upsertMeta({ attr: 'property', key: 'og:site_name' }, SEO_SITE_NAME);
-  upsertMeta({ attr: 'property', key: 'og:locale' }, 'it_IT');
+  upsertMeta(
+    { attr: 'property', key: 'og:locale' },
+    LANG_OG[getSiteLanguage()]
+  );
   upsertMeta({ attr: 'property', key: 'og:image' }, image);
   if (canonical.startsWith('http')) {
     upsertMeta({ attr: 'property', key: 'og:url' }, canonical);
@@ -328,7 +350,13 @@ function applySeoPayload(options: {
 export function applyDocumentSeo(screen: ScreenId): void {
   if (typeof document === 'undefined') return;
 
-  // Per-article SEO when on /news/<slug>
+  const lang = getSiteLanguage();
+  applyDocumentLang(
+    lang,
+    typeof window !== 'undefined' ? window.location.pathname : undefined
+  );
+
+  // Per-article SEO when on /news/<slug> (articles remain IT-authored for now)
   if (screen === 'news' && typeof window !== 'undefined') {
     const slug = blogSlugFromPath(window.location.pathname);
     if (slug) {
@@ -337,7 +365,7 @@ export function applyDocumentSeo(screen: ScreenId): void {
         const title = `${post.title} — Tarot Italia`;
         const description =
           post.description ||
-          pageSeoForScreen('news').description;
+          pageSeoForScreen('news', lang).description;
         applySeoPayload({
           title,
           description,
@@ -352,7 +380,7 @@ export function applyDocumentSeo(screen: ScreenId): void {
     }
   }
 
-  const seo = pageSeoForScreen(screen);
+  const seo = pageSeoForScreen(screen, lang);
   const path = canonicalPathForScreen(screen);
   const origin = getSiteOrigin();
   const canonical = absoluteUrl(path, origin);

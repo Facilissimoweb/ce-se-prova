@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import { getSiteLanguage, maggioriNameFor } from '../../i18n';
 import type { ArcanaCard } from '../../types/handoff';
 import type { SpreadDrawItem } from '../../data/majorArcana';
 import { MajorArcanaArtwork } from '../MajorArcanaArtwork';
@@ -23,9 +24,11 @@ export function ActiveCardPanel({
   onAskQuestion,
   onBookConsult,
 }: ActiveCardPanelProps) {
+  const lang = getSiteLanguage();
+  const displayName = maggioriNameFor(lang, activeCard.id, activeCard.name);
   return (
     <section
-      aria-label={`Arcano selezionato ${activeCard.name}`}
+      aria-label={`Arcano selezionato ${displayName}`}
       className="lg:col-span-5 p-5 md:p-6 border-b lg:border-b-0 lg:border-r border-[#D4AF37]/15 flex flex-col gap-5 bg-[#151311]/55"
     >
       {activeSpread && (
@@ -50,7 +53,7 @@ export function ActiveCardPanel({
                   <MajorArcanaArtwork
                     number={item.card.number}
                     numeral={item.card.numeral}
-                    name={item.card.name}
+                    name={maggioriNameFor(lang, item.card.id, item.card.name)}
                     compact
                     className="w-full h-auto rounded-lg"
                   />
@@ -70,7 +73,7 @@ export function ActiveCardPanel({
             {activeSpread ? 'Focus Carta Selezionata' : 'Arcano Attivo'}
           </p>
           <h2 className="font-body font-semibold tracking-[-0.02em] text-xl text-[#F4F1EA]">
-            {activeCard.name} · {activeCard.numeral}
+            {displayName} · {activeCard.numeral}
           </h2>
         </div>
 
@@ -107,7 +110,7 @@ export function ActiveCardPanel({
               <MajorArcanaArtwork
                 number={activeCard.number}
                 numeral={activeCard.numeral}
-                name={activeCard.name}
+                name={displayName}
                 className="w-full h-auto"
               />
             </div>
@@ -181,7 +184,7 @@ export function ActiveCardPanel({
       ) : (
         <div className="space-y-3">
           <p className="text-xs text-[#A39B93]">
-            Seleziona una domanda legata a {activeCard.name} ({activeCard.numeral}) per
+            Seleziona una domanda legata a {displayName} ({activeCard.numeral}) per
             esplorarla nel dialogo:
           </p>
           {activeCard.maieuticQuestions.map((question) => (

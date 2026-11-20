@@ -1,4 +1,6 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { cmsKeyToContentKey, DEFAULT_LANG, getSiteLanguage } from '../i18n';
 import type { CopyEntry } from '../types/handoff';
 
 interface CopyTextProps {
@@ -10,8 +12,11 @@ interface CopyTextProps {
 /**
  * Renders live editorial prose by default, or the exact [COPY: ...] CMS key
  * when the developer/operator toggles CMS Key Inspection mode.
+ * Non-IT locales resolve overlays from the `content` i18n namespace (ENN-136).
  */
 export function CopyText({ entry, showKeys, className = '' }: CopyTextProps) {
+  const { t, i18n } = useTranslation('content');
+
   if (showKeys) {
     return (
       <span
@@ -23,5 +28,18 @@ export function CopyText({ entry, showKeys, className = '' }: CopyTextProps) {
     );
   }
 
-  return <span className={className}>{entry.liveText}</span>;
+  const lang = getSiteLanguage();
+  let text = entry.liveText;
+  if (lang !== DEFAULT_LANG) {
+    const key = cmsKeyToContentKey(entry.cmsKey);
+    const translated = t(key, { defaultValue: entry.liveText });
+    if (translated && translated !== key) {
+      text = translated;
+    }
+  }
+
+  // Bind i18n.language so CopyText re-renders on language change
+  void i18n.language;
+
+  return <span className={className}>{text}</span>;
 }

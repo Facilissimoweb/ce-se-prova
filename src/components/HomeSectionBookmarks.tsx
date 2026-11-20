@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { BookOpen, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { scrollToId } from '../lib/scrollNavigation';
 
 export const HOME_CONSULTI_SECTION_ID = 'home-consulti';
@@ -11,21 +12,6 @@ type BookmarkTarget = {
   shortLabel: string;
   icon: React.ComponentType<{ className?: string }>;
 };
-
-const BOOKMARKS: BookmarkTarget[] = [
-  {
-    id: HOME_CONSULTI_SECTION_ID,
-    label: 'Consulti',
-    shortLabel: 'Consulti',
-    icon: Sparkles,
-  },
-  {
-    id: HOME_DIDATTICA_SECTION_ID,
-    label: 'Didattica',
-    shortLabel: 'Didattica',
-    icon: BookOpen,
-  },
-];
 
 function scrollToSection(id: string) {
   // Clear sticky header + the home bookmark chip strip (~3.25rem).
@@ -42,6 +28,24 @@ type Props = {
  * for Consulti and Didattica.
  */
 export function HomeSectionBookmarks({ visible }: Props) {
+  const { t } = useTranslation('common');
+  const bookmarks: BookmarkTarget[] = useMemo(
+    () => [
+      {
+        id: HOME_CONSULTI_SECTION_ID,
+        label: t('home.bookmarkConsulti'),
+        shortLabel: t('home.bookmarkConsulti'),
+        icon: Sparkles,
+      },
+      {
+        id: HOME_DIDATTICA_SECTION_ID,
+        label: t('home.bookmarkDidattica'),
+        shortLabel: t('home.bookmarkDidattica'),
+        icon: BookOpen,
+      },
+    ],
+    [t]
+  );
   const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -50,7 +54,7 @@ export function HomeSectionBookmarks({ visible }: Props) {
       return;
     }
 
-    const nodes = BOOKMARKS.map((b) => document.getElementById(b.id)).filter(
+    const nodes = bookmarks.map((b) => document.getElementById(b.id)).filter(
       (n): n is HTMLElement => Boolean(n)
     );
     if (nodes.length === 0) return;
@@ -73,7 +77,7 @@ export function HomeSectionBookmarks({ visible }: Props) {
 
     nodes.forEach((n) => observer.observe(n));
     return () => observer.disconnect();
-  }, [visible]);
+  }, [visible, bookmarks]);
 
   if (!visible) return null;
 
@@ -83,10 +87,10 @@ export function HomeSectionBookmarks({ visible }: Props) {
       <div className="pointer-events-none sticky top-[calc(4.75rem+env(safe-area-inset-top,0px))] z-20 -mx-1 mb-2 md:top-[calc(5rem+env(safe-area-inset-top,0px))]">
         <div className="pointer-events-auto flex justify-center px-1 py-2">
           <nav
-            aria-label="Segnalibri sezioni Home"
+            aria-label={t('home.bookmarksAria')}
             className="inline-flex items-center gap-1 rounded-full border border-[#D4AF37]/20 bg-[#151311]/82 p-1 shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md"
           >
-            {BOOKMARKS.map((item) => {
+            {bookmarks.map((item) => {
               const Icon = item.icon;
               const isActive = activeId === item.id;
               return (
@@ -112,10 +116,10 @@ export function HomeSectionBookmarks({ visible }: Props) {
 
       {/* Right-edge bookmark tabs — avoid FloatingSideRail (xl:right-6) */}
       <aside
-        aria-label="Segnalibri laterali Consulti e Didattica"
+        aria-label={t('home.bookmarksAria')}
         className="pointer-events-none fixed right-0 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-2 md:flex xl:right-[4.75rem]"
       >
-        {BOOKMARKS.map((item) => {
+        {bookmarks.map((item) => {
           const Icon = item.icon;
           const isActive = activeId === item.id;
           return (

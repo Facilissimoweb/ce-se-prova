@@ -177,8 +177,30 @@ export function notifyPathChange(): void {
   window.dispatchEvent(new Event(PATH_CHANGE_EVENT));
 }
 
+/** Preserve `?lang=` (and other SPA-safe params) across client navigations. */
+function preservedSearch(extraSearch = ''): string {
+  try {
+    const current = new URLSearchParams(window.location.search);
+    const next = new URLSearchParams(
+      extraSearch.startsWith('?') ? extraSearch.slice(1) : extraSearch
+    );
+    const lang = current.get('lang');
+    if (lang && !next.has('lang')) {
+      next.set('lang', lang);
+    }
+    const qs = next.toString();
+    return qs ? `?${qs}` : '';
+  } catch {
+    return extraSearch
+      ? extraSearch.startsWith('?')
+        ? extraSearch
+        : `?${extraSearch}`
+      : '';
+  }
+}
+
 export function navigateBlogPost(slug: string): void {
-  window.history.pushState({}, '', pathForBlogPost(slug));
+  window.history.pushState({}, '', `${pathForBlogPost(slug)}${preservedSearch()}`);
   notifyPathChange();
 }
 
@@ -223,7 +245,7 @@ export function bootstrapScreenFromLocation(
 
 export function navigatePath(screen: ScreenId, search = ''): void {
   const path = pathForScreen(screen);
-  const url = search ? `${path}${search.startsWith('?') ? search : `?${search}`}` : path;
+  const url = `${path}${preservedSearch(search)}`;
   window.history.pushState({}, '', url);
   notifyPathChange();
 }

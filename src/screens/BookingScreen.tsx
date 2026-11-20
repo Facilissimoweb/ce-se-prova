@@ -11,7 +11,8 @@ import {
   Send,
 } from 'lucide-react';
 import type { BookingDraft, ConsultationTariff } from '../types/handoff';
-import { consultationTariffs, siteContent } from '../data/siteContent';
+import { siteContent } from '../data/siteContent';
+import { useLocalizedTariffs } from '../i18n/useLocalizedCatalog';
 import { CopyText } from '../components/CopyText';
 import { BookingCalendar } from '../components/booking/BookingCalendar';
 import { CheckoutReturnBanner } from '../components/CheckoutReturnBanner';
@@ -58,6 +59,7 @@ export function BookingScreen({
   onOpenChat,
 }: BookingScreenProps) {
   const { user, getIdToken } = useAuth();
+  const consultationTariffs = useLocalizedTariffs();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [calendarMonth, setCalendarMonth] = useState<Date>(() => {
     const d = getNextAvailableDate();

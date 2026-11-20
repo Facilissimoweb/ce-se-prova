@@ -12,7 +12,8 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import type { CourseId, StripeCheckoutHandoffPayload } from '../types/handoff';
-import { educationalCourses, siteContent } from '../data/siteContent';
+import { siteContent } from '../data/siteContent';
+import { useLocalizedCourses } from '../i18n/useLocalizedCatalog';
 import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
 import { COURSE_SECTION_IMAGES } from '../data/sectionImages';
@@ -54,6 +55,7 @@ export function CorsiScreen({
   onOpenMaggioriBagattoBlog,
 }: CorsiScreenProps) {
   const { user, signInWithGoogle, getIdToken } = useAuth();
+  const educationalCourses = useLocalizedCourses();
   const activeCourse =
     educationalCourses.find((c) => c.id === selectedCourseId) ??
     educationalCourses[0];
