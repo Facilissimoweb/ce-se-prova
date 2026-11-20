@@ -109,7 +109,32 @@ const scheda = readFileSync(
 );
 assert(
   flash.includes('notranslate') && scheda.includes('notranslate'),
-  'Sigillo + schede keep intentional notranslate'
+  'Sigillo + schede keep intentional notranslate on body'
+);
+assert(
+  !/<section\b[^>]*\bnotranslate\b/.test(flash) &&
+    !/<section\b[^>]*translate="no"/.test(flash),
+  'Sigillo shell section is GT-able (ENN-155)'
+);
+assert(
+  !/<section\b[^>]*\bnotranslate\b/.test(scheda) &&
+    !/<section\b[^>]*translate="no"/.test(scheda),
+  'Scheda shell section is GT-able (ENN-155)'
+);
+assert(
+  /Layers[\s\S]{0,120}Sigillo di apprendimento/.test(flash) &&
+    !/className="[^"]*notranslate[^"]*"[\s\S]{0,80}Sigillo di apprendimento/.test(
+      flash
+    ),
+  'Sigillo eyebrow label is outside notranslate'
+);
+assert(
+  /SECTION_LABELS[\s\S]*mappa:\s*'Mappa della composizione'/.test(scheda) &&
+    scheda.includes('Mappa della Composizione Visiva') &&
+    !/className="[^"]*notranslate[^"]*"[\s\S]{0,160}Mappa della Composizione Visiva/.test(
+      scheda
+    ),
+  'Mappa section titles are outside notranslate'
 );
 
 const catalog = readFileSync(
