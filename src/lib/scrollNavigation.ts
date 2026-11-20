@@ -1,9 +1,17 @@
 /**
  * SPA scroll helpers for mobile-first deep links.
  * Sticky header is ~4.75rem (+ safe-area); section targets must clear it.
+ *
+ * ENN-149 — settle retries + GT layout events so A→B landings stay correct
+ * when Google Translate rewrites the DOM after the first paint.
  */
 
-import { isGoogtransHash } from './googleTranslateRuntime';
+import {
+  GT_LAYOUT_EVENT,
+  GT_PAGE_LANG,
+  isGoogtransHash,
+  readGoogTransLang,
+} from './googleTranslateRuntime';
 
 export const SITE_HEADER_OFFSET_PX = 76; // 4.75rem — matches NavigationChrome mobile header
 export const SITE_HEADER_OFFSET_MD_PX = 80; // 5rem desktop
@@ -54,6 +62,13 @@ const HASH_SECTION_ALIASES: Record<string, string> = {
   dialogo: SCROLL_LANDMARKS.dialogo,
 };
 
+/** How close (px) the landmark top must sit under the sticky header. */
+export const LANDING_TOLERANCE_PX = 14;
+
+const SETTLE_DELAYS_MS = [0, 50, 160, 360] as const;
+/** Extra beats while GT is rewriting text / wrapping fonts (ENN-149). */
+const SETTLE_DELAYS_GT_MS = [0, 50, 120, 280, 520, 900, 1400] as const;
+
 export function normalizeHash(hash: string): string {
   return hash.replace(/^#/, '').trim().toLowerCase();
 }
@@ -98,6 +113,33 @@ export function captureScrollY(): number {
   return window.scrollY || window.pageYOffset || 0;
 }
 
+function gtBrowsingActive(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return readGoogTransLang() !== GT_PAGE_LANG;
+  } catch {
+    return false;
+  }
+}
+
+/** Signed error: landmark top minus sticky header (+ extra). 0 = perfect landing. */
+export function landingErrorPx(
+  el: Element,
+  extraOffset = 0
+): number {
+  const offset =
+    getStickyHeaderOffsetPx() + Math.max(0, extraOffset);
+  return el.getBoundingClientRect().top - offset;
+}
+
+export function isLandingSettled(
+  el: Element,
+  extraOffset = 0,
+  tolerance = LANDING_TOLERANCE_PX
+): boolean {
+  return Math.abs(landingErrorPx(el, extraOffset)) <= tolerance;
+}
+
 /** Disable CSS `scroll-behavior: smooth` for one programmatic jump. */
 function withInstantScroll(run: () => void): void {
   const root = document.documentElement;
@@ -135,8 +177,9 @@ export function scrollToElement(
   const behavior = options?.behavior ?? 'smooth';
   const offset =
     getStickyHeaderOffsetPx() + Math.max(0, options?.extraOffset ?? 0);
+  // captureScrollY — not window.scrollY — so body-fixed drawer unlock is correct.
   const top =
-    el.getBoundingClientRect().top + window.scrollY - offset;
+    el.getBoundingClientRect().top + captureScrollY() - offset;
   scrollWindowTo(top, behavior);
   return true;
 }
@@ -150,22 +193,41 @@ export function scrollToId(
 }
 
 /**
- * Run after the next paints so SPA remount + sticky header + mobile menu
- * body-unlock have settled. Retries once more on a macrotask for races.
+ * Run `fn` after paint, then on settle delay beats (longer when GT is active).
  */
 export function afterNextPaint(fn: () => void): () => void {
+  return afterLayoutSettle(fn);
+}
+
+/**
+ * Multi-beat settle scheduler. GT-aware by default so Translate DOM mutations
+ * get corrective passes (ENN-149).
+ */
+export function afterLayoutSettle(
+  fn: () => void,
+  options?: { gtAware?: boolean }
+): () => void {
   let cancelled = false;
   let raf1 = 0;
   let raf2 = 0;
-  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timers: ReturnType<typeof setTimeout>[] = [];
+  const gtAware = options?.gtAware !== false;
+  const delays =
+    gtAware && gtBrowsingActive() ? SETTLE_DELAYS_GT_MS : SETTLE_DELAYS_MS;
+
+  const run = () => {
+    if (!cancelled) fn();
+  };
 
   raf1 = requestAnimationFrame(() => {
     raf2 = requestAnimationFrame(() => {
-      if (cancelled) return;
-      fn();
-      timer = setTimeout(() => {
-        if (!cancelled) fn();
-      }, 50);
+      for (const ms of delays) {
+        if (ms === 0) {
+          run();
+        } else {
+          timers.push(setTimeout(run, ms));
+        }
+      }
     });
   });
 
@@ -173,7 +235,7 @@ export function afterNextPaint(fn: () => void): () => void {
     cancelled = true;
     cancelAnimationFrame(raf1);
     cancelAnimationFrame(raf2);
-    if (timer !== undefined) clearTimeout(timer);
+    for (const t of timers) clearTimeout(t);
   };
 }
 
@@ -181,17 +243,55 @@ export function afterNextPaint(fn: () => void): () => void {
 export function scrollToTopAfterPaint(
   behavior: ScrollBehavior = 'auto'
 ): () => void {
-  return afterNextPaint(() => scrollWindowTo(0, behavior));
+  return afterLayoutSettle(() => scrollWindowTo(0, behavior));
 }
 
-/** Scroll to a landmark after paint (hash / product CTAs). */
+/**
+ * Scroll to a landmark after paint, then correct until settled (or retries
+ * exhaust). Also re-corrects when GT fires layout events mid-flight.
+ */
 export function scrollToIdAfterPaint(
   id: string,
   options?: { behavior?: ScrollBehavior; extraOffset?: number }
 ): () => void {
-  return afterNextPaint(() => {
-    if (!scrollToId(id, { behavior: options?.behavior ?? 'auto', ...options })) {
-      scrollWindowTo(0, 'auto');
+  if (typeof window === 'undefined') return () => undefined;
+
+  let cancelled = false;
+  let first = true;
+  const behavior = options?.behavior ?? 'auto';
+  const extraOffset = options?.extraOffset ?? 0;
+
+  const correct = () => {
+    if (cancelled) return;
+    const el = document.getElementById(id);
+    if (!el) {
+      if (first) scrollWindowTo(0, 'auto');
+      first = false;
+      return;
     }
-  });
+    if (!first && isLandingSettled(el, extraOffset)) return;
+    scrollToElement(el, {
+      behavior: first ? behavior : 'auto',
+      extraOffset,
+    });
+    first = false;
+  };
+
+  const stopSettle = afterLayoutSettle(correct);
+  const onGtLayout = () => {
+    if (cancelled) return;
+    // GT rewrote text — force another correction even if previously settled.
+    first = false;
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (isLandingSettled(el, extraOffset)) return;
+    scrollToElement(el, { behavior: 'auto', extraOffset });
+  };
+  window.addEventListener(GT_LAYOUT_EVENT, onGtLayout);
+
+  return () => {
+    cancelled = true;
+    stopSettle();
+    window.removeEventListener(GT_LAYOUT_EVENT, onGtLayout);
+  };
 }

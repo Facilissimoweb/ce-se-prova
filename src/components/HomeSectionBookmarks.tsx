@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { BookOpen, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { scrollToId } from '../lib/scrollNavigation';
+import { scrollToIdAfterPaint } from '../lib/scrollNavigation';
 
 export const HOME_CONSULTI_SECTION_ID = 'home-consulti';
 export const HOME_DIDATTICA_SECTION_ID = 'home-didattica';
@@ -15,7 +15,8 @@ type BookmarkTarget = {
 
 function scrollToSection(id: string) {
   // Clear sticky header + the home bookmark chip strip (~3.25rem).
-  scrollToId(id, { behavior: 'smooth', extraOffset: 52 });
+  // After-paint settle covers GT layout shift (ENN-149).
+  scrollToIdAfterPaint(id, { behavior: 'smooth', extraOffset: 52 });
 }
 
 type Props = {
