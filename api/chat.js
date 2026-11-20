@@ -10869,6 +10869,260 @@ var init_repository = __esm({
   }
 });
 
+// src/data/ninaMaggioriCards.generated.ts
+var NINA_MAGGIORI_CARDS_GENERATED = [
+  {
+    "id": 0,
+    "roman": "0",
+    "title": "Il Matto",
+    "aliases": [
+      "matto",
+      "il matto",
+      "fool"
+    ],
+    "body": "### 0. Il Matto \u2014 L\u2019Inizio Non Condizionato\n- **Simbologia**: Il Matto (0) rappresenta la soglia fuori dalla numerazione sequenziale; passo sul precipizio; libert\xE0 assoluta. Precede ogni schema, regola o sovrastruttura mentale: energia pura prima di ogni cristallizzazione materiale. **Waite**: Un giovane vestito con abiti ricchi e colorati cammina spensierato sull'orlo di un precipizio. \xB7 Lo sguardo \xE8 rivolto verso l'alto, mentre il passo avanza lungo il bordo del dirupo. \xB7 Porta su una spalla un bastone a cui \xE8 appesa una piccola sacca e tiene nella mano destra una rosa bianca. \xB7 Un piccolo cane bianco gli salta accanto e un sole luminoso sple\u2026\n- **Senso**: slancio genuino, apertura incondizionata al nuovo, coraggio di slegarsi dai condizionamenti, fiducia nel cammino. Ogni inizio autentico richiede il rischio dell'ignoto e lo spogliamento dalle protezioni superflue.\n- **Luce/ombra**: Luce \u2014 Segna l'inizio di un percorso nuovo, una scelta che rompe con la routine, un viaggio o una decisione coraggiosa e fuori dagli schemi. Ombra \u2014 Invita a ritrovare leggerezza e apertura mentale, p\u2026"
+  },
+  {
+    "id": 1,
+    "roman": "I",
+    "title": "Il Bagatto",
+    "aliases": [
+      "bagatto",
+      "il bagatto",
+      "mago",
+      "magician"
+    ],
+    "body": "### I. Il Bagatto \u2014 L\u2019Iniziativa e il Talento\n- **Simbologia**: Situato alla guida della numerazione, il Bagatto (o Giocoliere) dispone sul banco di tutti gli strumenti primari (bastoni, coppe, spade e denari). \xC8 il padrone delle risorse operative e delle potenzialit\xE0 materiali per cominciare subito. **Waite**: Un giovane uomo dal portamento sicuro \xE8 in piedi dietro un tavolo, vestito con una tunica bianca stretta in vita e un mantello rosso drappeggiato sulle spalle. \xB7 Il volto \xE8 rivolto frontalmente verso l'osservatore con espressione concentrata; il braccio destro \xE8 levato verso l'alto e impugna una bacchetta bianca a due punte, mentre l'indice della mano sin\u2026\n- **Senso**: iniziativa immediata, talento puro, destrezza, attivazione dei processi con ci\xF2 che \xE8 gi\xE0 disponibile, senza attendere condizioni ideali.\n- **Luce/ombra**: Luce \u2014 Segna il momento in cui l'energia libera diventa volont\xE0 consapevole, iniziativa mirata, padronanza delle proprie capacit\xE0 e avvio concreto di un progetto grazie agli strumenti gi\xE0 a disposizione. Ombra \u2014 Invita a verificare che la destrezza e il pote\u2026"
+  },
+  {
+    "id": 2,
+    "roman": "II",
+    "title": "La Papessa",
+    "aliases": [
+      "papessa",
+      "la papessa",
+      "sacerdotessa",
+      "high priestess"
+    ],
+    "body": "### II. La Papessa \u2014 Gestazione e Saggezza del Silenzio\n- **Simbologia**: Seduta immobile e velata tra i pilastri del tempio, con il sacro libro chiuso o socchiuso; custodisce la conoscenza sottile senza agire all'esterno. **Waite**: Una donna maestosa e solenne siede immobile su un trono in pietra, avvolta in un ampio mantello blu che scende fino ai piedi e in una veste chiara decorata con una grande croce solare dorata sul petto. \xB7 Il volto \xE8 rivolto frontalmente con espressione calma, raccolta e impassibile; le mani sono posate con compostezza in grembo, mentre ai piedi si distende\u2026\n- **Senso**: gestazione silenziosa, verit\xE0 intuita prima di essere detta, sapienza del tempo, attesa fertile. Ogni vera creazione richiede raccoglimento e maturazione interiore.\n- **Luce/ombra**: Luce \u2014 Segna un momento di ascolto interiore, intuizione lucidamente percepita, studio approfondito, riservatezza strategica e maturazione silenziosa prima di agire. Ombra \u2014 Invita a distinguere tra saggia prudenza/custodia interiore e chiusura eccessiva, passivit\xE0, segreto tenace o elusione del confronto con\u2026"
+  },
+  {
+    "id": 3,
+    "roman": "III",
+    "title": "L\u2019Imperatrice",
+    "aliases": [
+      "imperatrice",
+      "l'imperatrice",
+      "empress"
+    ],
+    "body": "### III. L\u2019Imperatrice \u2014 Fioritura e Abbondanza\n- **Simbologia**: fioritura sensibile, abbondanza generativa, capacit\xE0 di dare forma e vita alle idee con espressivit\xE0, comunicazione e cura fertile dei progetti. **Waite**: Una donna regale e sensuale, dal portamento rilassato e accogliente, siede su un ampio cuscino morbido in una radura boschiva, indossando una veste ampia e fluente ornata da melagrane. \xB7 Il volto \xE8 rivolto verso l'osservatore con un'espressione serena, materna e appagata; il busto \xE8 leggermente reclinato all'indietro e una mano poggia con naturalezza sul\u2026\n- **Senso**: vitalit\xE0 rigogliosa, espressione creativa senza vincoli, potere generativo della parola; armonia che trasforma l'impulso in manifestazione ricca.\n- **Luce/ombra**: Luce \u2014 Segna un momento di fertilit\xE0 creativa o materiale, cura, crescita armoniosa, sensualit\xE0, abbondanza e maturazione naturale di ci\xF2 che \xE8 stato seminato. Ombra \u2014 Invita a distinguere tra l'abbondanza che nutre e l'eccesso che appesantisce, come iperprotettivit\xE0, dipendenza affettiva, pigrizia o dispersione nell'indulgere.\n- **Previsio\u2026"
+  },
+  {
+    "id": 4,
+    "roman": "IV",
+    "title": "L\u2019Imperatore",
+    "aliases": [
+      "imperatore",
+      "l'imperatore",
+      "emperor"
+    ],
+    "body": "### IV. L\u2019Imperatore \u2014 Stabilit\xE0 e Metodo\n- **Simbologia**: autorit\xE0 e concretezza; stabilit\xE0, metodo rigoroso, confini solidi, gestione organizzata del mondo materiale. **Waite**: Un sovrano maturo e severo siede dritto su un trono massiccio in pietra, ornato da quattro teste d'ariete; indossa un'armatura sotto un mantello rosso. \xB7 La postura \xE8 eretta e ferma sul trono; l'espressione \xE8 severa e autorevole, senza concessioni al rilassamento o alla sensualit\xE0 dell'Imperatrice. \xB7 Nella mano destra tiene uno scettro sormontato da una c\u2026\n- **Senso**: autorit\xE0 saggia, protezione, governo della realt\xE0 senza tentennamenti; forza strutturale per dare durata e confini certi a quanto creato.\n- **Luce/ombra**: Luce \u2014 Quando questa carta compare in una stesa, indica la necessit\xE0 di strutturare un progetto, di fissare confini netti, di agire con pragmatismo e leadership, oppure la presenza di una figura autorevole o paterna che offre protezione e regole solide. Ombra \u2014 All'interno di una stesa, questa lama indica il bisogno di darsi regole chiare, di assumere una responsabilit\xE0 concreta, di cons\u2026"
+  },
+  {
+    "id": 5,
+    "roman": "V",
+    "title": "Il Papa",
+    "aliases": [
+      "il papa",
+      "papa",
+      "ierofante",
+      "hierophant"
+    ],
+    "body": "### V. Il Papa \u2014 Patto Etico e Guida\n- **Simbologia**: guida spirituale o professionale; maestro che trasmette valori condivisi e facilita l'adesione a regole e principi codificati. **Waite**: Una figura sacra siede tra due colonne grigie su un podio elevato, indossando un triregno a tre livelli, una casula rossa e un camice bianco. \xB7 Con la mano destra compie un gesto di benedizione o insegnamento (con due dita alzate e due piegate), mentre nella sinistra regge un bastone papale a tripla croce. \xB7 Nella sinistra regge un bastone papale a tripla\u2026\n- **Senso**: patto etico, trasmissione della sapienza, mediazione illuminata; alleanza tra aspirazioni individuali e tradizione o struttura sociale.\n- **Luce/ombra**: Luce \u2014 Quando questa carta compare in una stesa, indica un percorso di studio o formazione, il consiglio di un mentore o di una figura esperta, il rispetto di principi etici o istituzionali, oppure l'invito a dare coerenza e metodo al proprio cammino. Ombra \u2014 All'interno di una stesa, questa lama indica il valore dello studio metodico, l'incontro con un maestro o una guida, l'a\u2026"
+  },
+  {
+    "id": 6,
+    "roman": "VI",
+    "title": "Gli Amanti",
+    "aliases": [
+      "amanti",
+      "gli amanti",
+      "innamorati",
+      "lovers"
+    ],
+    "body": "### VI. Gli Amanti \u2014 Il Bivio e la Scelta del Cuore\n- **Simbologia**: la figura umana al bivio, di fronte all'incontro, all'affetto e alla responsabilit\xE0 della decisione. **Waite**: Un uomo e una donna stanno nudi l'uno di fronte all'altra in un paesaggio paradisiaco e luminoso. \xB7 La nudit\xE0 e la prossimit\xE0 dei due personaggi indicano l'apertura, la vulnerabilit\xE0 e l'unione tra opposti che si riconoscono senza maschere. \xB7 Alle spalle dell'uomo si erge l'albero della vita con dodici fiamme, mentre alle spalle della donna si innalza l'a\u2026\n- **Senso**: scelta consapevole del cuore e responsabilit\xE0 verso la propria direzione emotiva ed esistenziale; optare con convinzione per una strada escludendo le altre.\n- **Luce/ombra**: Luce \u2014 Quando questa carta compare in una stesa, indica una scelta importante dettata dal cuore o da un'adesione interiore profonda, una relazione significativa o una partnership basata sull'armonia e sulla risonanza, oppure il momento di assumersi la responsabilit\xE0 di un bivio evitando di delegare la decisione ad autorit\xE0 esterne. Ombra \u2014 All'interno di una stesa, qu\u2026"
+  },
+  {
+    "id": 7,
+    "roman": "VII",
+    "title": "Il Carro",
+    "aliases": [
+      "il carro",
+      "carro",
+      "chariot"
+    ],
+    "body": "### VII. Il Carro \u2014 Azione Coordinata e Vittoria\n- **Simbologia**: il condottiero guida il Carro trionfale e governa con maestria le forze opposte che muovono il veicolo. **Waite**: Un giovane condottiero coronato, con una stella a otto punte sulla fronte e una corazza decorata con mezze lune, siede eretto su un carro di pietra aperto, tenendo nella mano destra uno scettro e mantenendo una postura ferma e centrata nonostante il movimento. \xB7 Il carro \xE8 sormontato da un baldacchino a quattro colonne sostenuto da un drappo stellato blu\u2026\n- **Senso**: azione coordinata, controllo sapiente delle polarit\xE0 energetiche, vittoria grazie a determinazione e rigore.\n- **Luce/ombra**: Luce \u2014 Quando questa carta compare in una stesa, indica il superamento di un ostacolo attraverso la determinazione, la spinta verso un obiettivo concreto, la gestione di tensioni interne o esterne e il viaggio \u2014 fisico, professionale o evolutivo \u2014 che porta a una conquista. Ombra \u2014 All'interno di una stesa, questa lama incarna la traduzione di una decisione in movimento deciso, direzione mirata, avanzamento, control\u2026"
+  },
+  {
+    "id": 8,
+    "roman": "VIII",
+    "title": "La Giustizia",
+    "aliases": [
+      "giustizia",
+      "la giustizia",
+      "justice"
+    ],
+    "body": "### VIII. La Giustizia \u2014 Ordine e Causa-Effetto\n- **Simbologia**: figura regale in trono, spada verticale e bilancia in equilibrio; ordine cosmico, imparzialit\xE0 e linearit\xE0 delle conseguenze.\n- **Senso**: responsabilit\xE0, onest\xE0 intellettuale, equilibrio, rigore etico. Ogni azione genera conseguenza; la chiarezza mentale guida l'emotivit\xE0.\n- **Previsione**: questioni legali o burocratiche, contratti equi, necessit\xE0 di fare ordine, risposta meritata e oggettiva."
+  },
+  {
+    "id": 9,
+    "roman": "IX",
+    "title": "L\u2019Eremita",
+    "aliases": [
+      "eremita",
+      "l'eremita",
+      "hermit"
+    ],
+    "body": "### IX. L\u2019Eremita \u2014 Luce Interiore\n- **Simbologia**: saggio nel mantello, lanterna nella notte; protegge e illumina il cammino.\n- **Senso**: raccoglimento, solitudine rigenerante, ricerca della verit\xE0 interiore, prudenza; distacco temporaneo dal frastuono per trovare risposte autentiche.\n- **Previsione**: rallentamento, studio, introspezione, cautela e riserbo, senza affrettare i tempi."
+  },
+  {
+    "id": 10,
+    "roman": "X",
+    "title": "La Ruota di Fortuna",
+    "aliases": [
+      "ruota di fortuna",
+      "ruota della fortuna",
+      "wheel of fortune"
+    ],
+    "body": "### X. La Ruota di Fortuna \u2014 Ciclo e Mutamento\n- **Simbologia**: ruota in movimento e figure in evoluzione; cicli vitali e mutevolezza delle circostanze.\n- **Senso**: accettazione del cambiamento, ciclicit\xE0, sblocco della stagnazione; adattarsi con flessibilit\xE0.\n- **Previsione**: svolta improvvisa, colpo di scena, nuovo ciclo, ribaltamento rapido di una situazione bloccata."
+  },
+  {
+    "id": 11,
+    "roman": "XI",
+    "title": "La Forza",
+    "aliases": [
+      "la forza",
+      "forza",
+      "strength"
+    ],
+    "body": "### XI. La Forza \u2014 Dominio Istintivo\n- **Simbologia**: una donna apre o chiude con dolcezza le fauci di un leone, senza violenza.\n- **Senso**: dominio delle passioni tramite consapevolezza, coraggio interiore, pazienza, gestione saggia dell'energia; integrare gli impulsi anzich\xE9 reprimerli.\n- **Previsione**: superare una prova complessa con determinazione e autocontrollo; armonia nelle tensioni."
+  },
+  {
+    "id": 12,
+    "roman": "XII",
+    "title": "L\u2019Appeso",
+    "aliases": [
+      "appeso",
+      "l'appeso",
+      "hanged man"
+    ],
+    "body": "### XII. L\u2019Appeso \u2014 Sosta e Cambio di Prospettiva\n- **Simbologia**: figura a testa in gi\xF9, serena; l'energia fluisce verso l'alto.\n- **Senso**: sosta necessaria, sacrificio come \xABrendere sacro\xBB, rinuncia al controllo rigido, capovolgimento di sguardo.\n- **Previsione**: blocco o attesa utile a riconsiderare le priorit\xE0, lasciando andare la fretta e accettando la pausa."
+  },
+  {
+    "id": 13,
+    "roman": "XIII",
+    "title": "La Morte",
+    "aliases": [
+      "la morte",
+      "morte",
+      "death",
+      "arcano senza nome",
+      "senza nome"
+    ],
+    "body": "### XIII. La Morte \u2014 Trasmutazione\n- **Simbologia**: scheletro che falcia; dal terreno emergono germogli; potatura indispensabile alla vita.\n- **Senso**: fine radicale di un ciclo, distacco da ci\xF2 che \xE8 obsoleto, trasformazione e rinascita per fare spazio al nuovo.\n- **Previsione**: chiusura netta e cambiamento drastico; se accolto senza resistenza, apre a rinnovamento totale."
+  },
+  {
+    "id": 14,
+    "roman": "XIV",
+    "title": "La Temperanza",
+    "aliases": [
+      "temperanza",
+      "la temperanza",
+      "temperance"
+    ],
+    "body": "### XIV. La Temperanza \u2014 Alchimia e Moderazione\n- **Simbologia**: figura alata che travasa liquido tra due vasi; flusso continuo di armonia.\n- **Senso**: misura, guarigione, pazienza alchemica, riconciliazione, compromesso e pace interiore.\n- **Previsione**: risoluzione pacifica, cure efficaci, tempi di recupero fluidi, fase di stabilizzazione in cui regna la cooperazione."
+  },
+  {
+    "id": 15,
+    "roman": "XV",
+    "title": "Il Diavolo",
+    "aliases": [
+      "diavolo",
+      "il diavolo",
+      "devil"
+    ],
+    "body": "### XV. Il Diavolo \u2014 Ombra, Materia e Fascino del Potere\n- **Simbologia**: creatura alata su due figure legate in modo blando ma consenziente.\n- **Senso**: confronto con l'Ombra, attaccamento alla materia, passioni, denaro, dipendenze, falsi poteri. Riconoscere i desideri inconsci per riprendere il controllo. Mette l'allievo a confronto diretto con la propria Ombra, le passioni viscerali, i condizionamenti materiali, le dipendenze e i falsi poteri a cui ci si assoggetta in modo consenziente. In chiave pratica, segnala dinamiche di manipolazione o attaccamenti tossici da cui \xE8 necessario riprendere il controllo.\n- **Pratica corso**: Diagnosi dell'Ombra (Il Diavolo) \u2014 Riconosci dove stai cedendo la tua autonomia in cambio di sicurezza o profitto immediato, identificando i vincoli a cui stai acconsentendo per timore.\n- **Previsione**: passioni forti, dinamiche di potere o manipolazione, profitto materiale; necessit\xE0 di liberarsi da legami tossici."
+  },
+  {
+    "id": 16,
+    "roman": "XVI",
+    "title": "La Torre",
+    "aliases": [
+      "la torre",
+      "torre",
+      "tower"
+    ],
+    "body": "### XVI. La Torre \u2014 Folgore e Liberazione\n- **Simbologia**: torre colpita dal fulmine; corona che salta; figure che precipitano tra scintille.\n- **Senso**: rottura delle false certezze, crollo di strutture non pi\xF9 aderenti alla verit\xE0, liberazione catartica attraverso la crisi. Interviene con una folgore liberatoria che fa crollare le strutture rigide e le false certezze costruite sull'illusione. Sebbene vissuta come una crisi dirompente, rappresenta una rottura indispensabile per spezzare la stagnazione e ripartire dall'autenticit\xE0.\n- **Pratica corso**: Gestione della crisi (La Torre) \u2014 Se la struttura rigida crolla all'improvviso (un imprevisto lavorativo o una rottura), evita di tentare di ricostruire le vecchie certezze illusorie. Accogli la rottura come una liberazione catartica indispensabile per ricostruire su basi di reale autenticit\xE0.\n- **Previsione**: cambiamento drastico e inatteso che rompe la stagnazione e libera nuove energie."
+  },
+  {
+    "id": 17,
+    "roman": "XVII",
+    "title": "Le Stelle",
+    "aliases": [
+      "le stelle",
+      "stelle",
+      "la stella",
+      "the star"
+    ],
+    "body": "### XVII. Le Stelle \u2014 Speranza e Guarigione\n- **Simbologia**: figura nuda che versa linfa su terra e acqua, sotto stelle radiose.\n- **Senso**: guida celeste, fiducia, chiarezza d'intenti, ispirazione, guarigione dopo la Torre. Portano la grazia, la speranza e la guarigione dopo la tempesta della Torre. Rappresentano la connessione diretta con il proprio talento originario, infondendo fiducia nel futuro e ispirazione creativa.\n- **Previsione**: serenit\xE0 ritrovata, prospettive favorevoli, successo creativo, protezione, conferma del cammino."
+  },
+  {
+    "id": 18,
+    "roman": "XVIII",
+    "title": "La Luna",
+    "aliases": [
+      "la luna",
+      "luna",
+      "the moon"
+    ],
+    "body": "### XVIII. La Luna \u2014 Inconscio e Percorso Notturno\n- **Simbologia**: Luna piena, gambero dalle acque, lupi e torri lontane.\n- **Senso**: regno dell'inconscio, sogni, paure ancestrali, intuito viscerale, illusioni e nebbie da attraversare con la luce interiore. Immerge il viandante nel regno dell'inconscio, dei sogni e delle paure ancestrali. Insegna a navigare le nebbie emotive e le illusioni ascoltando l'intuito profondo, senza farsi paralizzare dalle ansie.\n- **Previsione**: incertezza, segreti, malintesi; procedere ascoltando l'istinto senza paralisi ansiosa."
+  },
+  {
+    "id": 19,
+    "roman": "XIX",
+    "title": "Il Sole",
+    "aliases": [
+      "il sole",
+      "sole",
+      "the sun"
+    ],
+    "body": "### XIX. Il Sole \u2014 Chiarezza e Realizzazione\n- **Simbologia**: Sole radioso; bambini festosi in un prato fiorito.\n- **Senso**: verit\xE0 svelata, gioia, trasparenza, calore umano, successo pubblico, vitalit\xE0 cosciente. Rappresenta la verit\xE0 svelata, la gioia radiosa, la trasparenza e la realizzazione visibile. Dissipa ogni ombra, garantendo chiarezza nei rapporti, vitalit\xE0 e successo pubblico.\n- **Previsione**: successo, chiarezza nei rapporti, accordi fortunati, vitalit\xE0, trionfo di un progetto portato alla luce."
+  },
+  {
+    "id": 20,
+    "roman": "XX",
+    "title": "Il Giudizio",
+    "aliases": [
+      "il giudizio",
+      "giudizio",
+      "judgement",
+      "judgment"
+    ],
+    "body": "### XX. Il Giudizio \u2014 Chiamata e Risveglio\n- **Simbologia**: angelo con tromba; figure che emergono dai sepolcri, braccia aperte.\n- **Senso**: chiamata alla consapevolezza, risveglio, perdono, liberazione dai giudizi limitanti. Suona la chiamata alla consapevolezza e al risveglio spirituale. Invita al perdono e alla liberazione dai vecchi giudizi limitanti, permettendo di rinascere a una nuova vita.\n- **Previsione**: svolta decisiva, notizie importanti, riconciliazione che rinnova l'esistenza."
+  },
+  {
+    "id": 21,
+    "roman": "XXI",
+    "title": "Il Mondo",
+    "aliases": [
+      "il mondo",
+      "mondo",
+      "the world"
+    ],
+    "body": "### XXI. Il Mondo \u2014 Compiutezza\n- **Simbologia**: figura danzante nella mandorla di foglie, circondata dai quattro viventi (Toro, Leone, Aquila, Angelo).\n- **Senso**: Compimento dell'Opera, integrazione dei settenari, realizzazione e armonia universale. Costituisce il coronamento trionfante e la compiutezza del Grande Opera. Simboleggia l'integrazione armonica di tutte le tappe vissute nei tre settenari e il compimento perfetto della ricerca.\n- **Previsione**: successo totale, chiusura trionfante di un ciclo, viaggi internazionali, massima espansione."
+  }
+];
+
 // src/lib/ninaReplyLang.ts
 var NINA_REPLY_LANG_LABELS = {
   it: "italiano",
@@ -11177,244 +11431,15 @@ Maria Teresa Rogani \xB7 Operatore Olistico (L. 4/2013). Formazione in comunicaz
 ## CTA
 - Quando serve un consulto autentico, una prenotazione o un dubbio personale, invita a **Parla con Maria Teresa** (sezione fissa sotto la chat: Prenota, WhatsApp, Telegram, email).
 - Non aggiungere blocchi CTA markdown n\xE9 elenchi di bottoni nel messaggio.`;
-var NINA_MAGGIORI_CARDS = [
-  {
-    id: 0,
-    roman: "0",
-    title: "Il Matto",
-    aliases: ["matto", "il matto", "fool"],
-    body: `### 0. Il Matto \u2014 L\u2019Inizio Non Condizionato
-- **Simbologia**: soglia fuori numerazione; passo sul precipizio; libert\xE0 prima di ogni cristallizzazione. **Waite**: giovane in abiti colorati sull\u2019orlo, sguardo in alto; bastone con sacca; rosa bianca; cane bianco; sole alle spalle. Orlo+sguardo=abbandono al nuovo e rischio; sacca=essenziale; rosa=purezza; cane=istinto/avvertimento; sole=luce sull\u2019apertura.
-- **Senso**: slancio genuino, apertura incondizionata, coraggio di slegarsi dai condizionamenti; ogni inizio autentico richiede il rischio dell\u2019ignoto.
-- **Luce/ombra**: Luce \u2014 percorso nuovo, rottura di routine, viaggio coraggioso. Ombra \u2014 leggerezza senza ignorare il terreno concreto.
-- **Previsione**: cambio di rotta, partenza, salto di fiducia, novit\xE0; chiede audacia e istinto, senza garanzie paralizzanti.`
-  },
-  {
-    id: 1,
-    roman: "I",
-    title: "Il Bagatto",
-    aliases: ["bagatto", "il bagatto", "mago", "magician"],
-    body: `### I. Il Bagatto \u2014 L\u2019Iniziativa e il Talento
-- **Simbologia**: guida della numerazione; sul banco bastoni, coppe, spade, denari. **Waite**: giovane al tavolo, tunica bianca/mantello rosso; bacchetta su, mano a terra; lemniscata; uroboro; quattro semi; rose e gigli. Asse cielo\u2013terra; risorse gi\xE0 disponibili.
-- **Senso**: iniziativa immediata, talento, destrezza, agire con ci\xF2 che c\u2019\xE8 gi\xE0.
-- **Luce/ombra**: Luce \u2014 volont\xE0 mirata, avvio concreto. Ombra \u2014 manipolazione, illusione, dispersione.
-- **Previsione**: azione pratica immediata; concretizzare un progetto nei primi giorni.`
-  },
-  {
-    id: 2,
-    roman: "II",
-    title: "La Papessa",
-    aliases: ["papessa", "la papessa", "sacerdotessa", "high priestess"],
-    body: `### II. La Papessa \u2014 Gestazione e Saggezza del Silenzio
-- **Simbologia**: seduta velata tra pilastri; libro chiuso/socchiuso; conoscenza sottile. **Waite**: trono, mantello blu, croce dorata; corona/velo; rotolo TORA; luna ai piedi; colonne B/J; velo con melograni; acqua dietro.
-- **Senso**: gestazione silenziosa, verit\xE0 intuita, attesa fertile; creazione richiede raccoglimento.
-- **Luce/ombra**: Luce \u2014 ascolto, intuizione, studio, maturazione. Ombra \u2014 chiusura eccessiva, passivit\xE0.
-- **Previsione**: non agire/esporre ora; custodire, studiare, lasciare maturare.`
-  },
-  {
-    id: 3,
-    roman: "III",
-    title: "L\u2019Imperatrice",
-    aliases: ["imperatrice", "l'imperatrice", "empress"],
-    body: `### III. L\u2019Imperatrice \u2014 Fioritura e Abbondanza
-- **Simbologia**: fioritura sensibile, forma e vita alle idee. **Waite**: donna in radura, veste con melagrane; corona di 12 stelle; scettro; scudo Venere; grano, bosco, acqua.
-- **Senso**: vitalit\xE0, espressione creativa, potere generativo; impulso che diventa manifestazione.
-- **Luce/ombra**: Luce \u2014 fertilit\xE0, cura, crescita. Ombra \u2014 eccesso, iperprotettivit\xE0, dispersione.
-- **Previsione**: espansione, intese, fioritura di idee, armonia relazionale.`
-  },
-  {
-    id: 4,
-    roman: "IV",
-    title: "L\u2019Imperatore",
-    aliases: ["imperatore", "l'imperatore", "emperor"],
-    body: `### IV. L\u2019Imperatore \u2014 Stabilit\xE0 e Metodo
-- **Simbologia**: autorit\xE0, confini, gestione organizzata. **Waite**: trono di pietra con arieti; armatura e mantello rosso; ankh e globo; montagne aride.
-- **Senso**: autorit\xE0 saggia, protezione, governo della realt\xE0; struttura che d\xE0 durata.
-- **Luce/ombra**: Luce \u2014 strutturare, pragmatismo, leadership. Ombra \u2014 rigidit\xE0 autoritaria.
-- **Previsione**: consolidamento, basi solide, referente autorevole, gestione metodica.`
-  },
-  {
-    id: 5,
-    roman: "V",
-    title: "Il Papa",
-    aliases: ["il papa", "papa", "ierofante", "hierophant"],
-    body: `### V. Il Papa \u2014 Patto Etico e Guida
-- **Simbologia**: guida spirituale/professionale; trasmissione di valori. **Waite**: tra due colonne, triregno, casula rossa; benedizione a due dita; tripla croce; due discepoli; due chiavi.
-- **Senso**: patto etico, mediazione; alleanza tra aspirazioni e tradizione.
-- **Luce/ombra**: Luce \u2014 studio, mentore, etica. Ombra \u2014 conformismo dogmatico.
-- **Previsione**: contratti chiari, mediazioni, consulenze, alleanze di fiducia.`
-  },
-  {
-    id: 6,
-    roman: "VI",
-    title: "Gli Amanti",
-    aliases: ["amanti", "gli amanti", "innamorati", "lovers"],
-    body: `### VI. Gli Amanti \u2014 Il Bivio e la Scelta del Cuore
-- **Simbologia**: bivio, incontro, responsabilit\xE0 della decisione. **Waite**: uomo e donna nudi; albero della vita (12 fiamme) e della conoscenza con serpente; angelo e sole.
-- **Senso**: scelta consapevole del cuore; optare escludendo le altre strade.
-- **Luce/ombra**: Luce \u2014 scelta autentica, partnership, responsabilit\xE0. Ombra \u2014 attrazione impulsiva non vagliata.
-- **Previsione**: decisioni sentimentali/professionali ineludibili; allineamento ai desideri profondi.`
-  },
-  {
-    id: 7,
-    roman: "VII",
-    title: "Il Carro",
-    aliases: ["il carro", "carro", "chariot"],
-    body: `### VII. Il Carro \u2014 Azione Coordinata e Vittoria
-- **Simbologia**: condottiero che governa forze opposte. **Waite**: giovane coronato su carro di pietra, scettro, baldacchino stellato; due sfingi B/N senza redini; citt\xE0 e acqua. Governo via baricentro interiore.
-- **Senso**: controllo sapiente delle polarit\xE0; vittoria con determinazione e rigore.
-- **Luce/ombra**: Luce \u2014 direzione, viaggio, conquista. Ombra \u2014 accelerazione forzata.
-- **Previsione**: sblocco di stagnazioni, viaggi, accelerazione verso obiettivi.`
-  },
-  {
-    id: 8,
-    roman: "VIII",
-    title: "La Giustizia",
-    aliases: ["giustizia", "la giustizia", "justice"],
-    body: `### VIII. La Giustizia \u2014 Ordine e Causa-Effetto
-- **Simbologia**: figura in trono, spada verticale e bilancia; imparzialit\xE0, conseguenze lineari.
-- **Senso**: responsabilit\xE0, onest\xE0, equilibrio etico; ogni azione genera conseguenza.
-- **Previsione**: questioni legali/burocratiche, contratti equi, ordine, risposta meritata.`
-  },
-  {
-    id: 9,
-    roman: "IX",
-    title: "L\u2019Eremita",
-    aliases: ["eremita", "l'eremita", "hermit"],
-    body: `### IX. L\u2019Eremita \u2014 Luce Interiore
-- **Simbologia**: saggio nel mantello, lanterna nella notte; protegge e illumina il cammino.
-- **Senso**: raccoglimento, solitudine rigenerante, ricerca interiore, prudenza.
-- **Previsione**: rallentamento, studio, introspezione, riserbo senza affrettare.`
-  },
-  {
-    id: 10,
-    roman: "X",
-    title: "La Ruota di Fortuna",
-    aliases: ["ruota di fortuna", "ruota della fortuna", "wheel of fortune"],
-    body: `### X. La Ruota di Fortuna \u2014 Ciclo e Mutamento
-- **Simbologia**: ruota in movimento; cicli vitali e mutevolezza.
-- **Senso**: accettazione del cambiamento, sblocco della stagnazione; flessibilit\xE0.
-- **Previsione**: svolta improvvisa, nuovo ciclo, ribaltamento di una situazione bloccata.`
-  },
-  {
-    id: 11,
-    roman: "XI",
-    title: "La Forza",
-    aliases: ["la forza", "forza", "strength"],
-    body: `### XI. La Forza \u2014 Dominio Istintivo
-- **Simbologia**: donna che apre/chiude con dolcezza le fauci di un leone, senza violenza.
-- **Senso**: dominio delle passioni con consapevolezza; integrare gli impulsi.
-- **Previsione**: superare una prova con determinazione e autocontrollo.`
-  },
-  {
-    id: 12,
-    roman: "XII",
-    title: "L\u2019Appeso",
-    aliases: ["appeso", "l'appeso", "hanged man"],
-    body: `### XII. L\u2019Appeso \u2014 Sosta e Cambio di Prospettiva
-- **Simbologia**: figura a testa in gi\xF9, serena; energia verso l\u2019alto.
-- **Senso**: sosta necessaria, sacrificio come \xABrendere sacro\xBB, capovolgimento di sguardo.
-- **Previsione**: attesa utile a riconsiderare priorit\xE0; lasciare andare la fretta.`
-  },
-  {
-    id: 13,
-    roman: "XIII",
-    title: "La Morte",
-    aliases: ["la morte", "morte", "death", "arcano senza nome", "senza nome"],
-    body: `### XIII. L\u2019Arcano Senza Nome / La Morte \u2014 Trasmutazione
-- **Simbologia**: scheletro che falcia; germogli dal terreno; potatura indispensabile.
-- **Senso**: fine di un ciclo, distacco dall\u2019obsoleto, trasformazione per fare spazio.
-- **Previsione**: chiusura netta; se accolta, apre a rinnovamento totale.`
-  },
-  {
-    id: 14,
-    roman: "XIV",
-    title: "La Temperanza",
-    aliases: ["temperanza", "la temperanza", "temperance"],
-    body: `### XIV. La Temperanza \u2014 Alchimia e Moderazione
-- **Simbologia**: figura alata che travasa liquido tra due vasi; flusso di armonia.
-- **Senso**: misura, guarigione, pazienza, riconciliazione, pace interiore.
-- **Previsione**: risoluzione pacifica, cure, recupero, cooperazione.`
-  },
-  {
-    id: 15,
-    roman: "XV",
-    title: "Il Diavolo",
-    aliases: ["diavolo", "il diavolo", "devil"],
-    body: `### XV. Il Diavolo \u2014 Ombra e Materia
-- **Simbologia**: creatura alata su due figure legate in modo blando ma consenziente.
-- **Senso**: confronto con l\u2019Ombra, attaccamenti, passioni, dipendenze; riconoscere i desideri inconsci.
-- **Previsione**: passioni forti, dinamiche di potere; liberarsi da legami tossici.`
-  },
-  {
-    id: 16,
-    roman: "XVI",
-    title: "La Torre",
-    aliases: ["la torre", "torre", "tower"],
-    body: `### XVI. La Torre \u2014 Folgore e Liberazione
-- **Simbologia**: torre colpita dal fulmine; corona che salta; figure che precipitano.
-- **Senso**: rottura di false certezze; liberazione catartica attraverso la crisi.
-- **Previsione**: cambiamento drastico che rompe la stagnazione e libera energie.`
-  },
-  {
-    id: 17,
-    roman: "XVII",
-    title: "Le Stelle",
-    aliases: ["le stelle", "stelle", "la stella", "the star"],
-    body: `### XVII. Le Stelle \u2014 Speranza e Guarigione
-- **Simbologia**: figura nuda che versa linfa su terra e acqua, sotto stelle radiose.
-- **Senso**: guida celeste, fiducia, ispirazione, guarigione dopo la Torre.
-- **Previsione**: serenit\xE0, prospettive favorevoli, successo creativo, conferma del cammino.`
-  },
-  {
-    id: 18,
-    roman: "XVIII",
-    title: "La Luna",
-    aliases: ["la luna", "luna", "the moon"],
-    body: `### XVIII. La Luna \u2014 Inconscio e Percorso Notturno
-- **Simbologia**: Luna piena, gambero dalle acque, lupi e torri lontane.
-- **Senso**: inconscio, sogni, paure, intuito; illusioni da attraversare con luce interiore.
-- **Previsione**: incertezza, segreti, malintesi; procedere ascoltando l\u2019istinto.`
-  },
-  {
-    id: 19,
-    roman: "XIX",
-    title: "Il Sole",
-    aliases: ["il sole", "sole", "the sun"],
-    body: `### XIX. Il Sole \u2014 Chiarezza e Realizzazione
-- **Simbologia**: Sole radioso; bambini festosi in un prato fiorito.
-- **Senso**: verit\xE0 svelata, gioia, trasparenza, successo pubblico, vitalit\xE0.
-- **Previsione**: successo, chiarezza nei rapporti, accordi fortunati, trionfo di un progetto.`
-  },
-  {
-    id: 20,
-    roman: "XX",
-    title: "Il Giudizio",
-    aliases: ["il giudizio", "giudizio", "judgement", "judgment"],
-    body: `### XX. Il Giudizio \u2014 Chiamata e Risveglio
-- **Simbologia**: angelo con tromba; figure dai sepolcri, braccia aperte.
-- **Senso**: chiamata alla consapevolezza, risveglio, perdono, liberazione dai giudizi.
-- **Previsione**: svolta decisiva, notizie importanti, riconciliazione rinnovante.`
-  },
-  {
-    id: 21,
-    roman: "XXI",
-    title: "Il Mondo",
-    aliases: ["il mondo", "mondo", "the world"],
-    body: `### XXI. Il Mondo \u2014 Compiutezza
-- **Simbologia**: figura danzante nella mandorla, circondata dai quattro viventi (Toro, Leone, Aquila, Angelo).
-- **Senso**: Compimento dell\u2019Opera, integrazione dei settenari, armonia universale.
-- **Previsione**: successo totale, chiusura trionfante, viaggi, massima espansione.`
-  }
-];
+var NINA_MAGGIORI_CARDS = NINA_MAGGIORI_CARDS_GENERATED;
 var NINA_CHAT_MAGGIORI_FRAME = `## Arcani Maggiori \u2014 schede didattiche ufficiali (Trionfi 0\u2013XXI)
 
-Fonte: dispensa Area Personale Tarot Italia e, dove indicato, schede visive Waite-Smith (0\u2013VII). Usa SOLO le schede iniettate sotto (se presenti). Non inventare iconografia. Non mescolare con Dialogo Tarot.
+Fonte: dispensa Area Personale Tarot Italia + schede visive Waite-Smith (0\u2013VII) + approfondimenti Terzo Settenario dove presenti. Usa SOLO le schede iniettate sotto (se presenti). Non inventare iconografia Waite assente. Non mescolare con Dialogo Tarot.
 
 Struttura risposta (quando chiedono un Arcano Maggiore \u2014 aspetto visivo, simbologia, significato, luce/ombra, previsione):
 1. **Simbologia** (+ cues Waite se in scheda)
 2. **Significato / senso**
-3. **Luce / ombra** \u2014 solo se presente; altrimenti non inventarla
+3. **Luce / ombra** o **Pratica corso** \u2014 solo se presenti; altrimenti non inventarli
 4. **In chiave previsionale**
 Tono: caldo, rigoroso, Tarot Italia. Per approfondimenti: **Parla con Maria Teresa** / corso Maggiori.
 

@@ -7,11 +7,22 @@ import * as esbuild from 'esbuild';
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 import { buildBlogPosts } from './build-blog.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const entriesDir = path.join(root, 'src', 'server', 'apiEntries');
 const outDir = path.join(root, 'api');
+
+/** ENN-147 — compile Nina Studio Maggiori cards from didactic sources before chat bundle. */
+const ninaMaggiori = spawnSync(
+  'npx',
+  ['tsx', 'scripts/build-nina-maggiori-cards.ts'],
+  { cwd: root, stdio: 'inherit', shell: false }
+);
+if (ninaMaggiori.status !== 0) {
+  process.exit(ninaMaggiori.status ?? 1);
+}
 
 const blog = buildBlogPosts();
 console.log(
