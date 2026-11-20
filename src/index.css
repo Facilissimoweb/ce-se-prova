@@ -790,7 +790,7 @@ html.a11y-reduce-motion .home-hero-nebula__star {
   opacity: 0.3;
 }
 
-/* ——— ENN-140 · Google Website Translator (gold / obsidian) ——— */
+/* ——— ENN-140/141 · Google Website Translator (branded menu; gadget hidden) ——— */
 body {
   top: 0 !important;
 }
@@ -798,8 +798,11 @@ body {
 .goog-te-banner-frame,
 .goog-te-balloon-frame,
 #goog-gt-tt,
-.goog-te-spinner-pos {
+.goog-te-spinner-pos,
+.goog-te-menu-frame {
   display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .skiptranslate iframe,
@@ -809,60 +812,23 @@ body {
   height: 0 !important;
 }
 
-.tarot-gt-shell {
-  overflow: hidden;
+/* Engine host stays in DOM for TranslateElement + googtrans; UI is our dropdown. */
+.tarot-gt-host--hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
-.tarot-gt-host {
-  max-width: 7.5rem;
-}
-
-.tarot-gt-host .goog-te-gadget {
-  font-family: var(--font-sans) !important;
-  font-size: 11px !important;
-  color: #a39b93 !important;
-}
-
-.tarot-gt-host .goog-te-gadget-simple {
-  background-color: transparent !important;
-  border: none !important;
-  padding: 0.15rem 0.25rem !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 0.15rem !important;
-}
-
-.tarot-gt-host .goog-te-gadget-simple .goog-te-menu-value {
-  color: #f4f1ea !important;
-}
-
-.tarot-gt-host .goog-te-gadget-simple .goog-te-menu-value span {
-  color: #f4f1ea !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.06em !important;
-}
-
-.tarot-gt-host .goog-te-gadget-simple .goog-te-menu-value span[style*="border"] {
-  border-color: #d4af37 !important;
-}
-
-.tarot-gt-host .goog-te-gadget img {
+.tarot-gt-host .goog-te-gadget,
+.tarot-gt-host .goog-te-gadget-simple,
+.tarot-gt-host .goog-te-combo {
   display: none !important;
-}
-
-.tarot-gt-host .goog-te-gadget .goog-te-combo {
-  background: #151311 !important;
-  color: #f4f1ea !important;
-  border: 1px solid rgba(212, 175, 55, 0.35) !important;
-  border-radius: 0.5rem !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.04em !important;
-  padding: 0.35rem 0.45rem !important;
-  max-width: 7rem !important;
-}
-
-.goog-te-menu-frame {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45) !important;
-  border: 1px solid rgba(212, 175, 55, 0.25) !important;
 }
