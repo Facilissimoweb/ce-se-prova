@@ -9,8 +9,12 @@ import {
 } from '../../lib/groqChat.ts';
 import {
   looksLikeDeepMaggioriStudy,
-  NINA_STUDIO_SOFT_LOCK_REPLY,
+  ninaStudioSoftLockReply,
 } from '../../lib/ninaChatKnowledge.ts';
+import {
+  normalizeNinaLang,
+  ninaStudioGateCopy,
+} from '../../lib/ninaReplyLang.ts';
 import { verifyBearerToken } from '../authToken.ts';
 import { json, type ApiResult } from '../http.ts';
 
@@ -84,20 +88,25 @@ function isDevDemoStudioAuth(authorization: string | undefined): boolean {
  * Returns null when access is OK; otherwise an ApiResult to send.
  */
 async function assertNinaStudioAccess(
-  authorization: string | undefined
+  authorization: string | undefined,
+  lang?: string
 ): Promise<ApiResult | null> {
+  const gate = ninaStudioGateCopy(lang);
+
   if (isDevDemoStudioAuth(authorization)) {
     return null;
   }
 
   const auth = await verifyBearerToken(authorization, 'required');
   if (!auth.ok) {
+    // Prefer GT-localized gate copy (ENN-143); auth.error stays Italian for logs.
+    if (auth.error) {
+      console.warn('Nina Studio auth denied:', auth.error);
+    }
     return json(auth.status, {
       available: true,
       code: 'studio_auth',
-      error:
-        auth.error ||
-        'Per Nina Studio accedi con Google (stesso account dell’Area Riservata).',
+      error: gate.studioAuth,
     });
   }
 
@@ -106,8 +115,7 @@ async function assertNinaStudioAccess(
     return json(401, {
       available: true,
       code: 'studio_auth',
-      error:
-        'Per Nina Studio accedi con Google (stesso account dell’Area Riservata).',
+      error: gate.studioAuth,
     });
   }
 
@@ -122,8 +130,7 @@ async function assertNinaStudioAccess(
     return json(403, {
       available: true,
       code: 'studio_locked',
-      error:
-        'Nina Studio è riservata a chi ha acquistato Arcani Maggiori. Apri Corsi per il checkout.',
+      error: gate.studioLockedDemo,
       checkoutPath: '/corsi#checkout',
     });
   }
@@ -140,8 +147,7 @@ async function assertNinaStudioAccess(
       return json(403, {
         available: true,
         code: 'studio_locked',
-        error:
-          'Nina Studio si sblocca con l’acquisto del corso Arcani Maggiori (stesso accesso dell’Area Riservata). Trovi il checkout su Corsi.',
+        error: gate.studioLocked,
         checkoutPath: '/corsi#checkout',
       });
     }
@@ -151,8 +157,7 @@ async function assertNinaStudioAccess(
     return json(503, {
       available: true,
       code: 'studio_entitlement',
-      error:
-        'Non riesco a verificare l’accesso a Nina Studio in questo momento. Riprova tra poco oppure apri l’Area Riservata.',
+      error: gate.studioEntitlement,
     });
   }
 }
@@ -223,12 +228,13 @@ export async function postChatMessage(params: {
 
   const mode = parseMode(body.mode);
   const history = asHistory(body.history);
-  const lang =
-    typeof body.lang === 'string' ? body.lang.trim().toLowerCase() : 'it';
+  const lang = normalizeNinaLang(
+    typeof body.lang === 'string' ? body.lang : 'it'
+  );
 
   // Entitlement / soft-lock before Groq — works even if the key is missing.
   if (mode === 'studio') {
-    const denied = await assertNinaStudioAccess(authorization);
+    const denied = await assertNinaStudioAccess(authorization, lang);
     if (denied) return denied;
   } else if (looksLikeDeepMaggioriStudy({ message, history })) {
     // Deterministic soft lock — no Maggiori cards, no Groq spend on jailbreaks.
@@ -237,7 +243,7 @@ export async function postChatMessage(params: {
       mode: 'welcome',
       locked: true,
       code: 'studio_locked',
-      reply: NINA_STUDIO_SOFT_LOCK_REPLY,
+      reply: ninaStudioSoftLockReply(lang),
       checkoutPath: '/corsi#checkout',
     });
   }

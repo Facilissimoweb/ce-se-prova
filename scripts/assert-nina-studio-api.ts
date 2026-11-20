@@ -28,6 +28,21 @@ async function main() {
     'soft-lock reply mentions Nina Studio'
   );
 
+  const softZh = await postChatMessage({
+    body: {
+      message: 'Com’è visivamente l’arcano del Matto?',
+      mode: 'welcome',
+      lang: 'zh-CN',
+    },
+  });
+  const softZhBody = softZh.body as Record<string, unknown>;
+  assert(softZh.status === 200, 'soft-lock zh HTTP 200');
+  assert(
+    typeof softZhBody.reply === 'string' &&
+      String(softZhBody.reply).includes('欢迎'),
+    'soft-lock zh reply is Chinese'
+  );
+
   const prices = await postChatMessage({
     body: { message: 'Quanto costano i consulti?', mode: 'welcome' },
   });
@@ -40,17 +55,23 @@ async function main() {
   );
 
   const denied = await postChatMessage({
-    body: { message: 'ciao', mode: 'studio' },
+    body: { message: 'ciao', mode: 'studio', lang: 'en' },
   });
   const deniedBody = denied.body as Record<string, unknown>;
   assert(denied.status === 401, 'studio without auth → 401');
   assert(deniedBody.code === 'studio_auth', 'studio without auth → studio_auth');
+  assert(
+    typeof deniedBody.error === 'string' &&
+      String(deniedBody.error).toLowerCase().includes('google') &&
+      String(deniedBody.error).toLowerCase().includes('sign in'),
+    'studio auth error localized (en)'
+  );
 
   if (failed > 0) {
     console.error(`\n${failed} assertion(s) failed`);
     process.exit(1);
   }
-  console.log('\nAll ENN-137 API gate assertions passed.');
+  console.log('\nAll ENN-137/ENN-143 API gate assertions passed.');
 }
 
 void main();
