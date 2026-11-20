@@ -477,7 +477,7 @@ export function ChatFab() {
                 {/*
                   Thread is notranslate: replies already follow googtrans via /api/chat.
                   Chrome/labels above stay free so GT can still translate UI (ENN-143).
-                  Sigillo/scheda body keep notranslate; titles + corsi UI + dispensa follow GT (ENN-155).
+                  Sigillo Q/A keep notranslate; scheda composizione + titles + corsi/dispensa follow GT (ENN-156).
                 */}
                 <div
                   ref={threadRef}

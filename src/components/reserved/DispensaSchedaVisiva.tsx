@@ -1,6 +1,7 @@
-import React, { useId, useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 import { ChevronDown, Eye } from 'lucide-react';
 import type { SchedaVisivaContent } from '../../data/schedeVisive/types';
+import { requestGoogleTranslateRefresh } from '../../lib/googleTranslateRuntime';
 
 type SectionId = 'mappa' | 'decodifica' | 'griglia' | 'sintesi';
 
@@ -66,13 +67,9 @@ function AccordionSection({
   );
 }
 
-/** Didactic body stays Italian for study precision (ENN-155). */
+/** Spacing wrapper only — scheda copy must stay GT-able (ENN-156). */
 function SchedaBody({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="notranslate space-y-3" translate="no">
-      {children}
-    </div>
-  );
+  return <div className="space-y-3">{children}</div>;
 }
 
 export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
@@ -88,7 +85,18 @@ export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
-  // ENN-155 — chrome / section titles follow GT; didactic lists stay notranslate.
+  // ENN-156 — after mount / card change / accordion reveal, re-scan for GT.
+  // React remounts wipe TranslateElement font wrappers; SPA bridge alone can
+  // miss late accordion opens during the reapply lock window.
+  useEffect(() => {
+    requestGoogleTranslateRefresh(180);
+  }, [content.id]);
+
+  useEffect(() => {
+    requestGoogleTranslateRefresh(220);
+  }, [openSections]);
+
+  // ENN-155/156 — chrome + composizione map body follow GT (Sigillo Q/A stay protected elsewhere).
   return (
     <section
       className="space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-4 md:p-6"
@@ -166,16 +174,16 @@ export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
                   <p className="font-body font-semibold text-[#F4F1EA] text-sm">
                     {item.title}
                   </p>
-                  <p>
-                    <span className="text-[#D4AF37] font-medium">Cosa si vede: </span>
-                    {item.cosaSiVede}
+                  {/*
+                    Keep label and body as separate block sentences (not one
+                    sentence split across nodes) so Google Translate stays stable.
+                  */}
+                  <p className="text-[#D4AF37] font-medium">Cosa si vede</p>
+                  <p>{item.cosaSiVede}</p>
+                  <p className="text-[#D4AF37] font-medium">
+                    Cosa comunica visivamente
                   </p>
-                  <p>
-                    <span className="text-[#D4AF37] font-medium">
-                      Cosa comunica visivamente:{' '}
-                    </span>
-                    {item.cosaComunica}
-                  </p>
+                  <p>{item.cosaComunica}</p>
                 </li>
               ))}
             </ul>
@@ -200,14 +208,10 @@ export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
                   className="rounded-lg border border-[#D4AF37]/12 bg-[#12100E]/40 p-3 space-y-2"
                 >
                   <p className="font-body font-semibold text-[#F4F1EA]">{row.dettaglio}</p>
-                  <p>
-                    <span className="text-[#D4AF37] font-medium">Focus: </span>
-                    {row.focus}
-                  </p>
-                  <p>
-                    <span className="text-[#D4AF37] font-medium">Messaggio: </span>
-                    {row.messaggio}
-                  </p>
+                  <p className="text-[#D4AF37] font-medium">Focus</p>
+                  <p>{row.focus}</p>
+                  <p className="text-[#D4AF37] font-medium">Messaggio</p>
+                  <p>{row.messaggio}</p>
                 </div>
               ))}
             </div>
