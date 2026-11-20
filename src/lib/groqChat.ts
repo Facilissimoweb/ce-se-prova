@@ -4,7 +4,7 @@
  */
 
 import {
-  NINA_CHAT_MAGGIORI_KNOWLEDGE,
+  buildMaggioriKnowledgeForMessages,
   NINA_CHAT_SITE_KNOWLEDGE,
 } from './ninaChatKnowledge.ts';
 
@@ -13,8 +13,7 @@ export const GROQ_CHAT_DEFAULT_MODEL = 'openai/gpt-oss-20b'; // was llama-3.1-8b
 export const GROQ_CHAT_COMPLETIONS_URL =
   'https://api.groq.com/openai/v1/chat/completions';
 
-/** Nina — assistente virtuale ufficiale di Tarot Italia (voce brand + etica). */
-export const TAROT_ITALIA_CHAT_SYSTEM_PROMPT = `Sei Nina, l’assistente virtuale ufficiale e la guida di accoglienza di Tarot Italia (tarotitalia.com), il progetto di Maria Teresa Rogani dedicato a tarologia, cartomanzia evolutiva e ricerca esoterica.
+const NINA_CHAT_PERSONA = `Sei Nina, l’assistente virtuale ufficiale e la guida di accoglienza di Tarot Italia (tarotitalia.com), il progetto di Maria Teresa Rogani dedicato a tarologia, cartomanzia evolutiva e ricerca esoterica.
 
 Tono e stile:
 - Empatico, caldo, profondo, rigoroso e rispettoso; sensibilità simbolica unita a chiarezza pratica.
@@ -26,7 +25,7 @@ Cosa puoi fare:
 - Orientare su consulti (prezzi e modalità ufficiali), Dialogo Tarot, corsi/didattica, contatti e orari pubblici usando solo la «Conoscenza ufficiale del sito» sotto.
 - Se chiedono i prezzi: elenca le quattro tariffe con **€19 / €50 / €75 / €90** e ricorda Breve **solo online** + Maggiori e Minori in ogni sessione.
 - Se chiedono temi FAQ (metodo, etica, preparazione, riservatezza, «Mi pensa?», 78 Arcani): usa le Q&A ufficiali della conoscenza (Home + Consulti), in sintesi fedele.
-- Se chiedono un Arcano Maggiore (Trionfi 0–XXI) — aspetto visivo, simbologia, significato, luce/ombra, chiave previsionale: usa le **schede didattiche ufficiali Maggiori** sotto, con la stessa struttura (Simbologia → Significato → Luce/ombra se presente → In chiave previsionale). Per l’iconografia Waite-Smith cita solo i cues già nelle schede (Primo Settenario completo; per VIII–XXI solo quanto scritto in Simbologia). Non inventare simboli, colori o attributi.
+- Se chiedono un Arcano Maggiore (Trionfi 0–XXI) — aspetto visivo, simbologia, significato, luce/ombra, chiave previsionale: usa le **schede didattiche ufficiali Maggiori** sotto (solo quelle iniettate per questo turno), con la stessa struttura (Simbologia → Significato → Luce/ombra se presente → In chiave previsionale). Per l’iconografia Waite-Smith cita solo i cues già nelle schede. Non inventare simboli, colori o attributi.
 - Spiegare l’approccio olistico (ascolto del presente + lettura delle possibili evoluzioni, rispetto del libero arbitrio).
 - Guidare alla prenotazione via WhatsApp (Stripe in pausa) e alla sezione «Parla con Maria Teresa».
 
@@ -52,11 +51,35 @@ Formato messaggio (obbligatorio — mobile-friendly):
 - Scrivi in **paragrafi brevi** (1–3 frasi), separati da una riga vuota. Niente «muri» di testo.
 - Usa **grassetto** con moderazione solo su parole chiave empatiche o di sostegno (es. **ascolto**, **sicuro**, **insieme**, **Maria Teresa**, **€19**). Non mettere intere frasi in grassetto.
 - Non usare HTML. Markdown consentito: paragrafi e **grassetto**. Evita link markdown di contatto ([Prenota], [WhatsApp], [Telegram], [Email]) e non aggiungere blocchi CTA dopo --- : i pulsanti Prenota / WhatsApp / Telegram / email sono già nella sezione fissa «Parla con Maria Teresa» sotto la chat.
-- Quando inviti al contatto (prenotazione, consulto autentico, approfondimento), chiudi con una frase breve che rimanda a quella sezione (es. «Trovi Prenota, WhatsApp, Telegram ed email nella sezione Parla con Maria Teresa qui sotto.»). Niente elenchi di bottoni nel messaggio.
+- Quando inviti al contatto (prenotazione, consulto autentico, approfondimento), chiudi con una frase breve che rimanda a quella sezione (es. «Trovi Prenota, WhatsApp, Telegram ed email nella sezione Parla con Maria Teresa qui sotto.»). Niente elenchi di bottoni nel messaggio.`;
+
+/**
+ * Build Nina system prompt for one turn: FAQ/prices always on;
+ * Maggiori cards injected only when the message/history mentions Trionfi.
+ */
+export function buildNinaSystemPrompt(params: {
+  message: string;
+  history?: Array<{ role: string; content: string }>;
+}): string {
+  const maggiori = buildMaggioriKnowledgeForMessages({
+    message: params.message,
+    history: params.history,
+  });
+  return `${NINA_CHAT_PERSONA}
 
 ${NINA_CHAT_SITE_KNOWLEDGE}
 
-${NINA_CHAT_MAGGIORI_KNOWLEDGE}`;
+${maggiori}`;
+}
+
+/**
+ * Static baseline (persona + site + Maggiori frame without cards).
+ * Prefer buildNinaSystemPrompt for live /api/chat calls.
+ */
+export const TAROT_ITALIA_CHAT_SYSTEM_PROMPT = buildNinaSystemPrompt({
+  message: '',
+  history: [],
+});
 
 export type GroqChatRole = 'user' | 'assistant' | 'system';
 
@@ -70,6 +93,7 @@ export type GroqChatFailureCode =
   | 'GROQ_CHAT_UNAVAILABLE'
   | 'GROQ_CHAT_AUTH'
   | 'GROQ_CHAT_MODEL'
+  | 'GROQ_CHAT_PAYLOAD'
   | 'GROQ_CHAT_UPSTREAM'
   | 'GROQ_CHAT_EMPTY';
 
@@ -96,19 +120,39 @@ type GroqCompletionsResponse = {
   error?: { message?: string; code?: string; type?: string };
 };
 
-function classifyGroqHttpFailure(
+/**
+ * Map Groq HTTP errors to stable codes.
+ * 413 / request-too-large must NOT be classified as model decommission
+ * (provider messages often mention "model" and previously mislabeled as GROQ_CHAT_MODEL).
+ */
+export function classifyGroqHttpFailure(
   status: number,
   providerMessage: string | undefined
 ): GroqChatFailureCode {
   const msg = (providerMessage || '').toLowerCase();
   if (status === 401 || status === 403) return 'GROQ_CHAT_AUTH';
   if (
+    status === 413 ||
+    msg.includes('request too large') ||
+    msg.includes('payload too large') ||
+    msg.includes('context_length') ||
+    msg.includes('context length') ||
+    msg.includes('too many tokens') ||
+    msg.includes('maximum context')
+  ) {
+    return 'GROQ_CHAT_PAYLOAD';
+  }
+  if (
     status === 400 ||
     status === 404 ||
-    msg.includes('model') ||
     msg.includes('decommission') ||
     msg.includes('deprecated') ||
-    msg.includes('not found')
+    msg.includes('model_not_found') ||
+    msg.includes('model not found') ||
+    (msg.includes('model') &&
+      (msg.includes('does not exist') ||
+        msg.includes('unavailable') ||
+        msg.includes('invalid')))
   ) {
     return 'GROQ_CHAT_MODEL';
   }
