@@ -53,13 +53,34 @@ Formato messaggio (obbligatorio — mobile-friendly):
 - Non usare HTML. Markdown consentito: paragrafi e **grassetto**. Evita link markdown di contatto ([Prenota], [WhatsApp], [Telegram], [Email]) e non aggiungere blocchi CTA dopo --- : i pulsanti Prenota / WhatsApp / Telegram / email sono già nella sezione fissa «Parla con Maria Teresa» sotto la chat.
 - Quando inviti al contatto (prenotazione, consulto autentico, approfondimento), chiudi con una frase breve che rimanda a quella sezione (es. «Trovi Prenota, WhatsApp, Telegram ed email nella sezione Parla con Maria Teresa qui sotto.»). Niente elenchi di bottoni nel messaggio.`;
 
+const NINA_REPLY_LANG: Record<string, string> = {
+  it: 'italiano',
+  en: 'English',
+  es: 'español',
+  fr: 'français',
+  de: 'Deutsch',
+};
+
+function ninaReplyLanguageSuffix(lang?: string): string {
+  const code = (lang || 'it').trim().toLowerCase().split('-')[0];
+  if (code === 'it') return '';
+  const label = NINA_REPLY_LANG[code] || NINA_REPLY_LANG.it;
+  return `
+
+## Lingua di risposta (ENN-136)
+L’utente ha scelto la lingua del sito: **${label}** (\`${code}\`).
+Rispondi SEMPRE in ${label}. I fatti ufficiali sopra restano la fonte (prezzi, FAQ, Maggiori); traducili fedelmente senza inventare. I nomi «Tarot Italia», «Maria Teresa Rogani», «Nina» e i prezzi in EUR restano invariati.`;
+}
+
 /**
  * Build Nina system prompt for one turn: FAQ/prices always on;
- * Maggiori cards injected only when the message/history mentions Trionfi.
+ * Maggiori cards injected only when the message/history mentions Trionfi (ENN-138).
+ * Optional `lang` appends a reply-language instruction (ENN-136).
  */
 export function buildNinaSystemPrompt(params: {
   message: string;
   history?: Array<{ role: string; content: string }>;
+  lang?: string;
 }): string {
   const maggiori = buildMaggioriKnowledgeForMessages({
     message: params.message,
@@ -69,7 +90,7 @@ export function buildNinaSystemPrompt(params: {
 
 ${NINA_CHAT_SITE_KNOWLEDGE}
 
-${maggiori}`;
+${maggiori}${ninaReplyLanguageSuffix(params.lang)}`;
 }
 
 /**

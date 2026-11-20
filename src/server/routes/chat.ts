@@ -117,7 +117,9 @@ export async function postChatMessage(body: Record<string, unknown>): Promise<Ap
   }
 
   const history = asHistory(body.history);
-  const systemPrompt = buildNinaSystemPrompt({ message, history });
+  const lang =
+    typeof body.lang === 'string' ? body.lang.trim().toLowerCase() : 'it';
+  const systemPrompt = buildNinaSystemPrompt({ message, history, lang });
   const messages: GroqChatMessage[] = [
     { role: 'system', content: systemPrompt },
     ...history,

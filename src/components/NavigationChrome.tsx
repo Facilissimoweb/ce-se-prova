@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ArrowRight,
   BookOpen,
@@ -16,6 +16,8 @@ import {
   User,
   X,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '../i18n/LanguageSwitcher';
 import type { ScreenId } from '../types/handoff';
 import { afterNextPaint, scrollWindowTo } from '../lib/scrollNavigation';
 import { whatsappHref } from '../lib/siteContacts';
@@ -30,53 +32,52 @@ interface TopBarProps {
 }
 
 /** Desktop + mobile page links — Home → Contatti. Area personale stays a CTA below. */
-const NAV_ITEMS: {
+const NAV_ITEM_DEFS: {
   id: ScreenId;
-  label: string;
-  drawerLabel?: string;
-  subtitle: string;
+  labelKey: string;
+  subtitleKey: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
   {
     id: 'home',
-    label: 'Home',
-    subtitle: 'Panoramica e Arcano del Giorno',
+    labelKey: 'nav.home',
+    subtitleKey: 'nav.home.subtitle',
     icon: Compass,
   },
   {
     id: 'chi-sono',
-    label: 'Chi sono',
-    subtitle: 'Formazione e percorso disciplinare',
+    labelKey: 'nav.chiSono',
+    subtitleKey: 'nav.chiSono.subtitle',
     icon: User,
   },
   {
     id: 'consulti',
-    label: 'Consulti',
-    subtitle: 'Chiamata vocale online e tariffe',
+    labelKey: 'nav.consulti',
+    subtitleKey: 'nav.consulti.subtitle',
     icon: Sparkles,
   },
   {
     id: 'chat',
-    label: 'Dialogo',
-    subtitle: 'Interagisci con i 22 Arcani Maggiori',
+    labelKey: 'nav.dialogo',
+    subtitleKey: 'nav.dialogo.subtitle',
     icon: MessageCircle,
   },
   {
     id: 'corsi',
-    label: 'Corsi',
-    subtitle: 'Arcani Maggiori, Minori e Stesure',
+    labelKey: 'nav.corsi',
+    subtitleKey: 'nav.corsi.subtitle',
     icon: BookOpen,
   },
   {
     id: 'news',
-    label: 'Blog',
-    subtitle: 'Articoli e riflessioni',
+    labelKey: 'nav.blog',
+    subtitleKey: 'nav.blog.subtitle',
     icon: Newspaper,
   },
   {
     id: 'contatti',
-    label: 'Contatti',
-    subtitle: 'Email, telefono, mappa e parcheggi',
+    labelKey: 'nav.contatti',
+    subtitleKey: 'nav.contatti.subtitle',
     icon: MapPin,
   },
 ];
@@ -93,6 +94,16 @@ export function TopBar({
   onOpenPrivacy,
   showCmsKeys,
 }: TopBarProps) {
+  const { t } = useTranslation('common');
+  const navItems = useMemo(
+    () =>
+      NAV_ITEM_DEFS.map((item) => ({
+        ...item,
+        label: t(item.labelKey),
+        subtitle: t(item.subtitleKey),
+      })),
+    [t]
+  );
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   /** When true, closing the drawer must not restore mid-page scroll (route change → top). */
   const skipScrollRestoreRef = React.useRef(false);
@@ -184,7 +195,7 @@ export function TopBar({
             data-nowrap-keep
             onClick={() => handleMobileSelect('home')}
             className="flex items-center gap-2 md:gap-3.5 text-left whitespace-nowrap shrink min-w-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-lg py-1"
-            aria-label="Torna alla Home di Tarot Italia"
+            aria-label={t('nav.homeAria')}
           >
             {/* Mobile 72 / desktop 68 — readable next to wordmark, not crowding Prenota */}
             <TarotNavLogo className="h-[4.5rem] w-[4.5rem] md:h-[4.25rem] md:w-[4.25rem] shrink-0 transition-transform duration-200 group-hover:scale-105" />
@@ -196,9 +207,9 @@ export function TopBar({
           {/* Zone 2: Desktop Single-Line Navigation Links */}
           <nav
             className="hidden md:flex items-center gap-4 lg:gap-6"
-            aria-label="Navigazione principale"
+            aria-label={t('nav.aria')}
           >
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const isActive = activeScreen === item.id;
               return (
                 <button
@@ -224,16 +235,17 @@ export function TopBar({
             })}
           </nav>
 
-          {/* Zone 3: Primary CTA (Desktop) + Compact CTA & Hamburger Toggle (Mobile) */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Zone 3: Language + Primary CTA + Hamburger Toggle (Mobile) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <LanguageSwitcher variant="header" className="hidden sm:block" />
             <button
               type="button"
               data-nowrap-keep
               onClick={() => handleMobileSelect('booking')}
               className="px-3 md:px-4 py-2 min-h-[40px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs md:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
             >
-              <span className="sm:hidden">Prenota</span>
-              <span className="hidden sm:inline">Prenota Consulto</span>
+              <span className="sm:hidden">{t('nav.bookShort')}</span>
+              <span className="hidden sm:inline">{t('nav.bookLong')}</span>
             </button>
 
             <button
@@ -242,9 +254,7 @@ export function TopBar({
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-hamburger-menu"
               aria-label={
-                isMobileMenuOpen
-                  ? 'Chiudi menu di navigazione'
-                  : 'Apri menu di navigazione'
+                isMobileMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')
               }
               className={`md:hidden w-11 h-11 rounded-lg border inline-flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
                 isMobileMenuOpen
@@ -273,20 +283,22 @@ export function TopBar({
           id="mobile-hamburger-menu"
           role="dialog"
           aria-modal="true"
-          aria-label="Menu di navigazione mobile"
+          aria-label={t('nav.mobileDialog')}
           className={`md:hidden fixed inset-x-0 bottom-0 ${HEADER_OFFSET_TOP} z-50 bg-[#12100E]/96 backdrop-blur-xl border-t border-[#D4AF37]/20 overflow-y-auto`}
         >
           <div className="min-h-full px-5 py-6 flex flex-col justify-between gap-8 max-w-lg mx-auto pb-[max(6rem,env(safe-area-inset-bottom))]">
             <div className="space-y-6">
               <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                <span>Navigazione Studio</span>
+                <span>{t('nav.studioNav')}</span>
                 <span className="text-[#A39B93] font-normal normal-case">
-                  Chiamata vocale &amp; Studio
+                  {t('nav.studioHint')}
                 </span>
               </div>
 
-              <nav aria-label="Pagine del sito" className="space-y-2.5">
-                {NAV_ITEMS.map((item) => {
+              <LanguageSwitcher variant="drawer" />
+
+              <nav aria-label={t('nav.pagesAria')} className="space-y-2.5">
+                {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeScreen === item.id;
                   return (
@@ -317,7 +329,7 @@ export function TopBar({
                               isActive ? 'text-[#D4AF37]' : 'text-[#F4F1EA]'
                             }`}
                           >
-                            {item.drawerLabel ?? item.label}
+                            {item.label}
                           </span>
                           <span className="block text-xs text-[#A39B93] truncate">
                             {item.subtitle}
@@ -342,7 +354,7 @@ export function TopBar({
                   className="w-full min-h-[48px] px-5 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors"
                 >
                   <Calendar className="w-4 h-4" aria-hidden="true" />
-                  Prenotazioni
+                  {t('nav.bookings')}
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </button>
 
@@ -352,7 +364,7 @@ export function TopBar({
                   className="w-full min-h-[48px] px-5 py-3 rounded-xl bg-[#151311]/90 border border-[#D4AF37]/35 hover:border-[#D4AF37] text-[#F4F1EA] text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors"
                 >
                   <Lock className="w-4 h-4 text-[#D4AF37]" aria-hidden="true" />
-                  Area personale
+                  {t('nav.areaPersonale')}
                   <ArrowRight className="w-4 h-4 text-[#A39B93]" aria-hidden="true" />
                 </button>
               </div>
@@ -369,7 +381,7 @@ export function TopBar({
                   className="min-h-[44px] px-3.5 py-2 rounded-lg bg-[#151311]/85 border border-[#A39B93]/20 hover:border-[#D4AF37] text-xs font-medium text-[#A39B93] hover:text-[#F4F1EA] inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  Privacy &amp; Cookie
+                  {t('nav.privacyCookie')}
                 </button>
 
                 <button
@@ -385,12 +397,12 @@ export function TopBar({
                   }`}
                 >
                   <Code2 className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  Handoff &amp; CMS
+                  {t('nav.handoff')}
                 </button>
               </div>
 
               <p className="text-[11px] text-[#A39B93] text-center">
-                Maria Teresa Rogani · Operatore Olistico L. 4/2013
+                {t('nav.practitionerLine')}
               </p>
             </div>
           </div>
@@ -413,16 +425,17 @@ export function FloatingSideRail({
   onOpenPrivacy,
   showCmsKeys,
 }: FloatingSideRailProps) {
+  const { t } = useTranslation('common');
   return (
     <aside
       className="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 p-2 rounded-full glass-tier-2"
-      aria-label="Azioni rapide Tarot Italia"
+      aria-label={t('rail.aria')}
     >
       <button
         type="button"
         onClick={() => onNavigate('booking')}
-        title="Prenota una sessione"
-        aria-label="Prenota una sessione"
+        title={t('rail.book')}
+        aria-label={t('rail.book')}
         className="w-11 h-11 rounded-full flex items-center justify-center text-[#D4AF37] hover:bg-[#D4AF37]/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
       >
         <Calendar className="w-5 h-5" />
@@ -430,8 +443,8 @@ export function FloatingSideRail({
       <button
         type="button"
         onClick={() => onNavigate('area-riservata')}
-        title="Accedi all'Area Riservata"
-        aria-label="Accedi all'Area Riservata"
+        title={t('rail.reserved')}
+        aria-label={t('rail.reserved')}
         className="w-11 h-11 rounded-full flex items-center justify-center text-[#F4F1EA] hover:text-[#D4AF37] hover:bg-[#D4AF37]/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
       >
         <Lock className="w-4 h-4" />
@@ -439,8 +452,8 @@ export function FloatingSideRail({
       <button
         type="button"
         onClick={() => onNavigate('chat')}
-        title="Dialogo Tarot e Bridge WhatsApp"
-        aria-label="Dialogo Tarot e Bridge WhatsApp"
+        title={t('rail.dialogo')}
+        aria-label={t('rail.dialogo')}
         className="w-11 h-11 rounded-full flex items-center justify-center text-[#F4F1EA] hover:text-[#D4AF37] hover:bg-[#D4AF37]/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
       >
         <MessageCircle className="w-5 h-5" />
@@ -451,8 +464,8 @@ export function FloatingSideRail({
         )}
         target="_blank"
         rel="noopener noreferrer"
-        title="Contatto rapido WhatsApp"
-        aria-label="Contatto rapido WhatsApp"
+        title={t('rail.whatsapp')}
+        aria-label={t('rail.whatsapp')}
         className="w-11 h-11 rounded-full flex items-center justify-center text-[#A39B93] hover:text-[#D4AF37] hover:bg-[#D4AF37]/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
       >
         <PhoneCall className="w-4 h-4" />
@@ -461,8 +474,8 @@ export function FloatingSideRail({
       <button
         type="button"
         onClick={onOpenPrivacy}
-        title="Preferenze Privacy e Cookie"
-        aria-label="Preferenze Privacy e Cookie"
+        title={t('rail.privacy')}
+        aria-label={t('rail.privacy')}
         className="w-11 h-11 rounded-full flex items-center justify-center text-[#A39B93] hover:text-[#D4AF37] hover:bg-[#D4AF37]/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
       >
         <ShieldCheck className="w-4 h-4" />
@@ -470,8 +483,8 @@ export function FloatingSideRail({
       <button
         type="button"
         onClick={onOpenHandoff}
-        title="Apri specifiche CMS & Handoff"
-        aria-label="Apri specifiche CMS e Handoff"
+        title={t('rail.handoff')}
+        aria-label={t('rail.handoff')}
         className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
           showCmsKeys
             ? 'bg-[#D4AF37] text-[#12100E]'

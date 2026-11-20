@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Mail, Phone } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { ConsultationTariff, CourseId, ScreenId } from './types/handoff';
 import { AuthProvider } from './context/AuthContext';
 import {
@@ -90,56 +91,62 @@ type FooterMenuGroup = {
 const FOOTER_CONTACT_BTN_CLASS =
   'flex min-w-0 w-full items-center justify-center gap-1.5 rounded-lg border border-[#D4AF37]/15 bg-[#12100E]/55 px-2.5 py-1.5 text-center text-[11px] font-semibold leading-tight text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:gap-2 sm:px-2.5 sm:py-2 sm:text-xs';
 
-/** Colonne footer allineate allo sguardo Tarot Italia (Servizi / Info / Legale). */
-const FOOTER_MENU_GROUPS: FooterMenuGroup[] = [
-  {
-    title: 'Servizi',
-    ariaLabel: 'Servizi',
-    items: [
-      { kind: 'screen', id: 'consulti', label: 'Consulti' },
-      { kind: 'screen', id: 'corsi', label: 'Corsi' },
-      { kind: 'screen', id: 'chat', label: 'Dialogo' },
-      { kind: 'screen', id: 'booking', label: 'Prenota' },
-      { kind: 'screen', id: 'area-riservata', label: 'Area Riservata' },
-    ],
-  },
-  {
-    title: 'Info',
-    ariaLabel: 'Informazioni',
-    items: [
-      { kind: 'screen', id: 'home', label: 'Home' },
-      { kind: 'screen', id: 'chi-sono', label: 'Chi Sono' },
-      { kind: 'screen', id: 'news', label: 'News / Articoli' },
-      { kind: 'screen', id: 'contatti', label: 'Contatti' },
-      { kind: 'screen', id: 'sitemap', label: 'Mappa del sito' },
-    ],
-  },
-  {
-    title: 'Legale',
-    ariaLabel: 'Informazioni legali',
-    items: [
-      { kind: 'screen', id: 'disclaimer', label: 'Disclaimer' },
-      { kind: 'notice', notice: 'tutela', label: legalContent.tutela.kicker },
-      {
-        kind: 'screen',
-        id: 'privacy',
-        label: legalContent.privacy.sezione,
-      },
-      {
-        kind: 'screen',
-        id: 'termini',
-        label: legalContent.vendita.sezione,
-      },
-      { kind: 'action', action: 'cookies', label: 'Preferenze Cookie' },
-      { kind: 'href', href: '/sitemap.xml', label: 'sitemap.xml' },
-    ],
-  },
-];
-
 const FOOTER_LINK_CLASS =
   'text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors';
 
 export function App() {
+  const { t } = useTranslation('common');
+  const footerMenuGroups: FooterMenuGroup[] = useMemo(
+    () => [
+      {
+        title: t('footer.servizi'),
+        ariaLabel: t('footer.servizi'),
+        items: [
+          { kind: 'screen', id: 'consulti', label: t('footer.consulti') },
+          { kind: 'screen', id: 'corsi', label: t('footer.corsi') },
+          { kind: 'screen', id: 'chat', label: t('footer.dialogo') },
+          { kind: 'screen', id: 'booking', label: t('footer.prenota') },
+          {
+            kind: 'screen',
+            id: 'area-riservata',
+            label: t('footer.areaRiservata'),
+          },
+        ],
+      },
+      {
+        title: t('footer.info'),
+        ariaLabel: t('footer.infoAria'),
+        items: [
+          { kind: 'screen', id: 'home', label: t('footer.home') },
+          { kind: 'screen', id: 'chi-sono', label: t('footer.chiSono') },
+          { kind: 'screen', id: 'news', label: t('footer.news') },
+          { kind: 'screen', id: 'contatti', label: t('footer.contatti') },
+          { kind: 'screen', id: 'sitemap', label: t('footer.sitemap') },
+        ],
+      },
+      {
+        title: t('footer.legale'),
+        ariaLabel: t('footer.legaleAria'),
+        items: [
+          { kind: 'screen', id: 'disclaimer', label: t('footer.disclaimer') },
+          { kind: 'notice', notice: 'tutela', label: legalContent.tutela.kicker },
+          {
+            kind: 'screen',
+            id: 'privacy',
+            label: legalContent.privacy.sezione,
+          },
+          {
+            kind: 'screen',
+            id: 'termini',
+            label: legalContent.vendita.sezione,
+          },
+          { kind: 'action', action: 'cookies', label: t('footer.cookies') },
+          { kind: 'href', href: '/sitemap.xml', label: 'sitemap.xml' },
+        ],
+      },
+    ],
+    [t]
+  );
   const [activeScreen, setActiveScreen] = useState<ScreenId>(() => {
     const fromPath = bootstrapScreenFromLocation(
       window.location.pathname,
@@ -565,7 +572,7 @@ export function App() {
 
             {/* Menù a gruppi: Servizi / Info / Legale — row under brand */}
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6 md:gap-8">
-              {FOOTER_MENU_GROUPS.map((group) => (
+              {footerMenuGroups.map((group) => (
                 <div key={group.title}>
                   <p className="text-[11px] font-semibold uppercase leading-none tracking-[0.18em] text-[#D4AF37]">
                     {group.title}

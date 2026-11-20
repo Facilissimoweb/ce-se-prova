@@ -8,11 +8,11 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import type { ConsultationTariff } from '../types/handoff';
+import { siteContent } from '../data/siteContent';
 import {
-  consultationTariffs,
-  consultiFaqs,
-  siteContent,
-} from '../data/siteContent';
+  useLocalizedConsultiFaqs,
+  useLocalizedTariffs,
+} from '../i18n/useLocalizedCatalog';
 import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
 import { TARIFF_SECTION_IMAGES } from '../data/sectionImages';
@@ -30,6 +30,8 @@ export function ConsultiScreen({
   selectedTariffId,
   onSelectTariffAndBook,
 }: ConsultiScreenProps) {
+  const consultationTariffs = useLocalizedTariffs();
+  const consultiFaqs = useLocalizedConsultiFaqs();
   const [openFaqId, setOpenFaqId] = useState<string | null>(
     consultiFaqs[0]?.id ?? null
   );
