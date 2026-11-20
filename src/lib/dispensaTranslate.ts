@@ -120,6 +120,7 @@ Rules:
 /**
  * Translate Italian Markdown into the active Google Translate language.
  * When lang is Italian, returns the source unchanged (no Groq call).
+ * Always expects Italian input — never curated EN markdown (ENN-154).
  */
 export async function translateDispensaMarkdown(
   italianMarkdown: string,
@@ -142,5 +143,44 @@ export async function translateDispensaMarkdown(
     markdown: translatedChunks.join('\n\n'),
     lang,
     translated: true,
+  };
+}
+
+export type DispensaChromeFields = {
+  title: string;
+  subtitle: string;
+  courseTitle: string;
+};
+
+/**
+ * Translate PDF chrome (title / subtitle / course) from Italian so branded
+ * HTML does not leave fixed IT headings when body is auto-translated.
+ */
+export async function translateDispensaChrome(
+  chrome: DispensaChromeFields,
+  targetLang?: string | null
+): Promise<DispensaChromeFields> {
+  const lang = normalizeNinaLang(targetLang);
+  if (isNinaDefaultLang(lang)) return chrome;
+
+  const label = ninaReplyLangLabel(lang);
+  const payload = [
+    `TITLE: ${chrome.title}`,
+    `SUBTITLE: ${chrome.subtitle || ''}`,
+    `COURSE: ${chrome.courseTitle || ''}`,
+  ].join('\n');
+
+  const reply = await groqTranslateChunk(payload, lang, label);
+  const pick = (key: string, fallback: string) => {
+    const re = new RegExp(`^${key}:\\s*(.*)$`, 'im');
+    const m = reply.match(re);
+    const value = m?.[1]?.trim();
+    return value || fallback;
+  };
+
+  return {
+    title: pick('TITLE', chrome.title),
+    subtitle: pick('SUBTITLE', chrome.subtitle),
+    courseTitle: pick('COURSE', chrome.courseTitle),
   };
 }

@@ -1,7 +1,7 @@
 /**
  * Legacy curated materials locale (ENN-140).
- * ENN-145 Scarica PDF follows Google Translate (`readGoogTransLang`) instead;
- * helpers remain for any leftover IT/EN static asset lookups.
+ * ENN-145 Scarica PDF follows Google Translate (`readGoogTransLang`) instead.
+ * ENN-154 — downloads / PDF source are Italian-only; EN curated files are archive.
  */
 import {
   DEFAULT_LANG,
@@ -12,8 +12,8 @@ import {
 
 export const MATERIALS_LANG_STORAGE_KEY = 'tarot-italia-materials-lang';
 
-/** Languages with curated downloadable Maggiori files in this PR. */
-export const CURATED_DOWNLOAD_LANGS = ['it', 'en'] as const;
+/** Italian is the only materials source language (ENN-154). */
+export const CURATED_DOWNLOAD_LANGS = ['it'] as const;
 export type CuratedDownloadLang = (typeof CURATED_DOWNLOAD_LANGS)[number];
 
 export function isCuratedDownloadLang(
@@ -45,9 +45,9 @@ export function setMaterialsLang(lang: SiteLang): void {
   );
 }
 
-export function resolveDownloadLang(preferred?: SiteLang): CuratedDownloadLang {
-  const lang = preferred ?? getMaterialsLang();
-  return isCuratedDownloadLang(lang) ? lang : 'it';
+/** Always Italian — visitor language comes from googtrans / PDF translate. */
+export function resolveDownloadLang(_preferred?: SiteLang): CuratedDownloadLang {
+  return 'it';
 }
 
 export { SUPPORTED_LANGS, type SiteLang };

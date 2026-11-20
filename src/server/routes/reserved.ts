@@ -19,8 +19,13 @@ import {
 } from '../../lib/dispensaBrandedHtml.ts';
 import {
   isDispensaTranslateConfigured,
+  translateDispensaChrome,
   translateDispensaMarkdown,
 } from '../../lib/dispensaTranslate.ts';
+import {
+  loadMaggioriItalianMarkdown,
+  MAGGIORI_COURSE_SLUG,
+} from '../../lib/maggioriItSource.ts';
 import {
   isNinaDefaultLang,
   normalizeNinaLang,
@@ -41,8 +46,7 @@ import {
   type ApiUser,
 } from '../http.ts';
 
-const MAGGIORI_SLUG = 'arcani-maggiori';
-const MAGGIORI_MODULES = new Set(['01', '02', '03', '04']);
+const MAGGIORI_SLUG = MAGGIORI_COURSE_SLUG;
 
 /** Local Area Riservata demo — DEV / ALLOW_DIRECT_UNLOCK only (mirrors chat). */
 const DEMO_RESERVED_UID = 'demo-reserved-enn103';
@@ -58,29 +62,6 @@ export function isDevDemoReservedAuth(
     process.env.NODE_ENV !== 'production' ||
     process.env.ALLOW_DIRECT_UNLOCK === 'true'
   );
-}
-
-async function loadItalianMaggioriMarkdown(params: {
-  moduleNumber: string;
-  origin: string;
-  fallbackMarkdown?: string;
-}): Promise<string> {
-  const nn = params.moduleNumber.padStart(2, '0');
-  if (MAGGIORI_MODULES.has(nn)) {
-    const url = `${params.origin.replace(/\/$/, '')}/dispense/arcani-maggiori/it/modulo-${nn}.md`;
-    try {
-      const res = await fetch(url);
-      if (res.ok) {
-        const text = (await res.text()).trim();
-        if (text) return text;
-      }
-    } catch (error) {
-      console.warn('Maggiori IT markdown fetch failed:', nn, error);
-    }
-  }
-  const fallback = (params.fallbackMarkdown || '').trim();
-  if (fallback) return stripDispensaEmbedMarkers(fallback);
-  throw new Error('Dispensa non trovata.');
 }
 
 const OVERVIEW_DEGRADED_NOTICE =
@@ -421,10 +402,11 @@ export async function getDispensaPdf(params: {
       });
     }
 
-    // Prefer curated IT files for Maggiori; other courses use DB markdown.
+    // ENN-154 — Maggiori PDF always starts from IT (`public/.../it/` or IT seed).
+    // Never short-circuit to curated EN markdown when lang=en.
     let italianMarkdown: string;
     if (row.courseSlug === MAGGIORI_SLUG) {
-      italianMarkdown = await loadItalianMaggioriMarkdown({
+      italianMarkdown = await loadMaggioriItalianMarkdown({
         moduleNumber: row.moduleNumber,
         origin,
         fallbackMarkdown: row.contentMarkdown,
@@ -436,11 +418,27 @@ export async function getDispensaPdf(params: {
     let markdown = italianMarkdown;
     let outLang = 'it';
     let translated = false;
+    let title = row.title;
+    let subtitle = row.subtitle || '';
+    let courseTitle = row.courseTitle;
     try {
       const result = await translateDispensaMarkdown(italianMarkdown, lang);
       markdown = result.markdown;
       outLang = result.lang;
       translated = result.translated;
+      if (translated) {
+        const chrome = await translateDispensaChrome(
+          {
+            title: row.title,
+            subtitle: row.subtitle || '',
+            courseTitle: row.courseTitle,
+          },
+          lang
+        );
+        title = chrome.title;
+        subtitle = chrome.subtitle;
+        courseTitle = chrome.courseTitle;
+      }
     } catch (error) {
       const code =
         error instanceof Error ? error.message : 'GROQ_CHAT_UPSTREAM';
@@ -456,9 +454,9 @@ export async function getDispensaPdf(params: {
       markdown,
       lang: outLang,
       moduleNumber: row.moduleNumber,
-      title: row.title,
-      subtitle: row.subtitle,
-      courseTitle: row.courseTitle,
+      title,
+      subtitle,
+      courseTitle,
       origin,
       autoPrint: true,
     });
@@ -469,8 +467,9 @@ export async function getDispensaPdf(params: {
       translated,
       filename: dispensaPdfFilename(row.moduleNumber, outLang),
       moduleNumber: row.moduleNumber,
-      title: row.title,
+      title,
       courseSlug: row.courseSlug,
+      sourceLang: 'it',
     });
   } catch (error) {
     return mapSafeError(error, 'Impossibile generare il PDF della dispensa.', {
