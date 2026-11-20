@@ -79,6 +79,7 @@ export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
+  // ENN-154 — intentional notranslate: schede visive stay IT (precision widgets).
   return (
     <section
       className="notranslate space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-4 md:p-6"

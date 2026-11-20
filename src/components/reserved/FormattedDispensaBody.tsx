@@ -28,6 +28,7 @@ export function FormattedDispensaBody({
    */
   embeds?: Record<string, React.ReactNode>;
 }) {
+  // ENN-145 / ENN-154 — no notranslate here: Italian body follows Google Translate.
   const lines = markdown.split('\n');
   return (
     <div

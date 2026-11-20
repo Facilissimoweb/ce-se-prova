@@ -62,6 +62,7 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
 
   if (!current || total === 0) return null;
 
+  // ENN-154 — intentional notranslate: Sigillo Q/A stay IT for study precision.
   return (
     <section
       className="notranslate space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-5 md:p-6"

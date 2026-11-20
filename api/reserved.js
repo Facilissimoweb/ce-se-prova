@@ -1361,7 +1361,7 @@ var SelectionProxyHandler = class _SelectionProxyHandler {
 function mapResultRow(columns, row, joinsNotNullableMap) {
   const nullifyMap = {};
   const result = columns.reduce(
-    (result2, { path, field }, columnIndex) => {
+    (result2, { path: path2, field }, columnIndex) => {
       let decoder;
       if (is(field, Column)) {
         decoder = field;
@@ -1373,8 +1373,8 @@ function mapResultRow(columns, row, joinsNotNullableMap) {
         decoder = field.sql.decoder;
       }
       let node = result2;
-      for (const [pathChunkIndex, pathChunk] of path.entries()) {
-        if (pathChunkIndex < path.length - 1) {
+      for (const [pathChunkIndex, pathChunk] of path2.entries()) {
+        if (pathChunkIndex < path2.length - 1) {
           if (!(pathChunk in node)) {
             node[pathChunk] = {};
           }
@@ -1382,8 +1382,8 @@ function mapResultRow(columns, row, joinsNotNullableMap) {
         } else {
           const rawValue = row[columnIndex];
           const value = node[pathChunk] = rawValue === null ? null : decoder.mapFromDriverValue(rawValue);
-          if (joinsNotNullableMap && is(field, Column) && path.length === 2) {
-            const objectName = path[0];
+          if (joinsNotNullableMap && is(field, Column) && path2.length === 2) {
+            const objectName = path2[0];
             if (!(objectName in nullifyMap)) {
               nullifyMap[objectName] = value === null ? getTableName(field.table) : false;
             } else if (typeof nullifyMap[objectName] === "string" && nullifyMap[objectName] !== getTableName(field.table)) {
@@ -9063,10 +9063,116 @@ async function translateDispensaMarkdown(italianMarkdown, targetLang) {
     translated: true
   };
 }
+async function translateDispensaChrome(chrome, targetLang) {
+  const lang = normalizeNinaLang(targetLang);
+  if (isNinaDefaultLang(lang)) return chrome;
+  const label = ninaReplyLangLabel(lang);
+  const payload = [
+    `TITLE: ${chrome.title}`,
+    `SUBTITLE: ${chrome.subtitle || ""}`,
+    `COURSE: ${chrome.courseTitle || ""}`
+  ].join("\n");
+  const reply = await groqTranslateChunk(payload, lang, label);
+  const pick = (key, fallback) => {
+    const re = new RegExp(`^${key}:\\s*(.*)$`, "im");
+    const m = reply.match(re);
+    const value = m?.[1]?.trim();
+    return value || fallback;
+  };
+  return {
+    title: pick("TITLE", chrome.title),
+    subtitle: pick("SUBTITLE", chrome.subtitle),
+    courseTitle: pick("COURSE", chrome.courseTitle)
+  };
+}
+
+// src/lib/maggioriItSource.ts
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
 
 // src/lib/stripDispensaEmbeds.ts
 function stripDispensaEmbedMarkers(markdown) {
   return markdown.replace(/^\{\{(?:sigillo|scheda-visiva):[\w-]+\}\}\s*$/gm, "").replace(/\n{3,}/g, "\n\n");
+}
+
+// src/lib/maggioriItSource.ts
+var MAGGIORI_COURSE_SLUG = "arcani-maggiori";
+var MAGGIORI_MODULES = /* @__PURE__ */ new Set(["01", "02", "03", "04"]);
+function normalizeMaggioriModule(moduleNumber) {
+  return moduleNumber.padStart(2, "0");
+}
+function maggioriItPublicPath(moduleNumber) {
+  const nn = normalizeMaggioriModule(moduleNumber);
+  if (!MAGGIORI_MODULES.has(nn)) {
+    throw new Error(`Modulo Maggiori non supportato: ${moduleNumber}`);
+  }
+  return `/dispense/arcani-maggiori/it/modulo-${nn}.md`;
+}
+function maggioriItAbsoluteUrl(origin, moduleNumber) {
+  return `${origin.replace(/\/$/, "")}${maggioriItPublicPath(moduleNumber)}`;
+}
+function maggioriItFsPath(projectRoot, moduleNumber) {
+  const nn = normalizeMaggioriModule(moduleNumber);
+  return path.join(
+    projectRoot,
+    "public",
+    "dispense",
+    "arcani-maggiori",
+    "it",
+    `modulo-${nn}.md`
+  );
+}
+function assertMaggioriItSourceUrl(url) {
+  const lower = url.toLowerCase();
+  if (lower.includes("/dispense/arcani-maggiori/en/")) {
+    throw new Error(
+      "ENN-154: Maggiori PDF must not load curated EN markdown as source."
+    );
+  }
+  if (lower.includes("/dispense/arcani-maggiori/") && !lower.includes("/dispense/arcani-maggiori/it/")) {
+    throw new Error(
+      "ENN-154: Maggiori PDF source path must be under .../arcani-maggiori/it/."
+    );
+  }
+}
+function readFsItalian(moduleNumber) {
+  const nn = normalizeMaggioriModule(moduleNumber);
+  if (!MAGGIORI_MODULES.has(nn)) return null;
+  const candidates = [
+    maggioriItFsPath(process.cwd(), nn),
+    // Vercel / bundled cwd may sit under dist — walk up once for public/.
+    maggioriItFsPath(path.resolve(process.cwd(), ".."), nn)
+  ];
+  for (const filePath of candidates) {
+    try {
+      if (!existsSync(filePath)) continue;
+      const text2 = readFileSync(filePath, "utf8").trim();
+      if (text2) return text2;
+    } catch {
+    }
+  }
+  return null;
+}
+async function loadMaggioriItalianMarkdown(params) {
+  const nn = normalizeMaggioriModule(params.moduleNumber);
+  const fromDisk = readFsItalian(nn);
+  if (fromDisk) return fromDisk;
+  if (MAGGIORI_MODULES.has(nn)) {
+    const url = maggioriItAbsoluteUrl(params.origin, nn);
+    assertMaggioriItSourceUrl(url);
+    try {
+      const res = await fetch(url);
+      if (res.ok) {
+        const text2 = (await res.text()).trim();
+        if (text2) return text2;
+      }
+    } catch (error) {
+      console.warn("Maggiori IT markdown fetch failed:", nn, error);
+    }
+  }
+  const fallback = (params.fallbackMarkdown || "").trim();
+  if (fallback) return stripDispensaEmbedMarkers(fallback);
+  throw new Error("Dispensa non trovata.");
 }
 
 // src/lib/stripe.ts
@@ -9251,8 +9357,7 @@ function mapSafeError(error, fallback, statusHints) {
 }
 
 // src/server/routes/reserved.ts
-var MAGGIORI_SLUG = "arcani-maggiori";
-var MAGGIORI_MODULES = /* @__PURE__ */ new Set(["01", "02", "03", "04"]);
+var MAGGIORI_SLUG = MAGGIORI_COURSE_SLUG;
 var DEMO_RESERVED_UID = "demo-reserved-enn103";
 var DEMO_RESERVED_TOKEN = "demo-reserved-token";
 function isDevDemoReservedAuth(authorization) {
@@ -9260,24 +9365,6 @@ function isDevDemoReservedAuth(authorization) {
   const token = authorization.slice("Bearer ".length).trim();
   if (token !== DEMO_RESERVED_TOKEN) return false;
   return process.env.NODE_ENV !== "production" || process.env.ALLOW_DIRECT_UNLOCK === "true";
-}
-async function loadItalianMaggioriMarkdown(params) {
-  const nn = params.moduleNumber.padStart(2, "0");
-  if (MAGGIORI_MODULES.has(nn)) {
-    const url = `${params.origin.replace(/\/$/, "")}/dispense/arcani-maggiori/it/modulo-${nn}.md`;
-    try {
-      const res = await fetch(url);
-      if (res.ok) {
-        const text2 = (await res.text()).trim();
-        if (text2) return text2;
-      }
-    } catch (error) {
-      console.warn("Maggiori IT markdown fetch failed:", nn, error);
-    }
-  }
-  const fallback = (params.fallbackMarkdown || "").trim();
-  if (fallback) return stripDispensaEmbedMarkers(fallback);
-  throw new Error("Dispensa non trovata.");
 }
 var OVERVIEW_DEGRADED_NOTICE = "Area Riservata in modalit\xE0 ridotta: non riusciamo a sincronizzare corsi e prenotazioni con il database in questo momento. Puoi restare autenticata; riprova tra poco.";
 function degradedOverviewFromSeed(user) {
@@ -9546,7 +9633,7 @@ async function getDispensaPdf(params) {
     }
     let italianMarkdown;
     if (row.courseSlug === MAGGIORI_SLUG) {
-      italianMarkdown = await loadItalianMaggioriMarkdown({
+      italianMarkdown = await loadMaggioriItalianMarkdown({
         moduleNumber: row.moduleNumber,
         origin,
         fallbackMarkdown: row.contentMarkdown
@@ -9557,11 +9644,27 @@ async function getDispensaPdf(params) {
     let markdown = italianMarkdown;
     let outLang = "it";
     let translated = false;
+    let title = row.title;
+    let subtitle = row.subtitle || "";
+    let courseTitle = row.courseTitle;
     try {
       const result = await translateDispensaMarkdown(italianMarkdown, lang);
       markdown = result.markdown;
       outLang = result.lang;
       translated = result.translated;
+      if (translated) {
+        const chrome = await translateDispensaChrome(
+          {
+            title: row.title,
+            subtitle: row.subtitle || "",
+            courseTitle: row.courseTitle
+          },
+          lang
+        );
+        title = chrome.title;
+        subtitle = chrome.subtitle;
+        courseTitle = chrome.courseTitle;
+      }
     } catch (error) {
       const code = error instanceof Error ? error.message : "GROQ_CHAT_UPSTREAM";
       console.error("Dispensa PDF translate failed:", code);
@@ -9575,9 +9678,9 @@ async function getDispensaPdf(params) {
       markdown,
       lang: outLang,
       moduleNumber: row.moduleNumber,
-      title: row.title,
-      subtitle: row.subtitle,
-      courseTitle: row.courseTitle,
+      title,
+      subtitle,
+      courseTitle,
       origin,
       autoPrint: true
     });
@@ -9587,8 +9690,9 @@ async function getDispensaPdf(params) {
       translated,
       filename: dispensaPdfFilename(row.moduleNumber, outLang),
       moduleNumber: row.moduleNumber,
-      title: row.title,
-      courseSlug: row.courseSlug
+      title,
+      courseSlug: row.courseSlug,
+      sourceLang: "it"
     });
   } catch (error) {
     return mapSafeError(error, "Impossibile generare il PDF della dispensa.", {
@@ -9874,9 +9978,9 @@ async function requireUser(req, res) {
 async function handler(req, res) {
   try {
     const method = (req.method || "GET").toUpperCase();
-    const path = groupSubpath(req, "reserved");
+    const path2 = groupSubpath(req, "reserved");
     await ensureSchemaOnce();
-    if (path === "overview") {
+    if (path2 === "overview") {
       if (method !== "GET") return methodNotAllowed(res, ["GET"]);
       const user = await requireUser(req, res);
       if (!user) return;
@@ -9884,7 +9988,7 @@ async function handler(req, res) {
       const result = await getReservedOverview(user);
       return sendJson(res, result.status, result.body);
     }
-    if (path === "enroll") {
+    if (path2 === "enroll") {
       if (method !== "POST") return methodNotAllowed(res, ["POST"]);
       const user = await requireUser(req, res);
       if (!user) return;
@@ -9895,7 +9999,7 @@ async function handler(req, res) {
       });
       return sendJson(res, result.status, result.body);
     }
-    if (path === "confirm-stripe") {
+    if (path2 === "confirm-stripe") {
       if (method !== "POST") return methodNotAllowed(res, ["POST"]);
       const user = await requireUser(req, res);
       if (!user) return;
@@ -9905,7 +10009,7 @@ async function handler(req, res) {
       });
       return sendJson(res, result.status, result.body);
     }
-    const dispensaPdf = path.match(/^dispense\/([^/]+)\/pdf$/);
+    const dispensaPdf = path2.match(/^dispense\/([^/]+)\/pdf$/);
     if (dispensaPdf) {
       if (method !== "GET") return methodNotAllowed(res, ["GET"]);
       const demoBypass = isDevDemoReservedAuth(
@@ -9933,7 +10037,7 @@ async function handler(req, res) {
       });
       return sendJson(res, result.status, result.body);
     }
-    const dispensaProgress2 = path.match(/^dispense\/([^/]+)\/progress$/);
+    const dispensaProgress2 = path2.match(/^dispense\/([^/]+)\/progress$/);
     if (dispensaProgress2) {
       if (method !== "PUT") return methodNotAllowed(res, ["PUT"]);
       const user = await requireUser(req, res);
@@ -9945,7 +10049,7 @@ async function handler(req, res) {
       });
       return sendJson(res, result.status, result.body);
     }
-    if (path === "notes") {
+    if (path2 === "notes") {
       if (method === "GET") {
         const user = await requireUser(req, res);
         if (!user) return;
@@ -9964,7 +10068,7 @@ async function handler(req, res) {
       }
       return methodNotAllowed(res, ["GET", "POST"]);
     }
-    const noteById = path.match(/^notes\/([^/]+)$/);
+    const noteById = path2.match(/^notes\/([^/]+)$/);
     if (noteById) {
       const noteId = Number(noteById[1]);
       if (method === "PUT") {
@@ -9985,7 +10089,7 @@ async function handler(req, res) {
       }
       return methodNotAllowed(res, ["PUT", "DELETE"]);
     }
-    return sendJson(res, 404, { error: "Not found", path, method });
+    return sendJson(res, 404, { error: "Not found", path: path2, method });
   } catch (error) {
     console.error("api/reserved handler failed:", error);
     return sendJson(res, 500, {

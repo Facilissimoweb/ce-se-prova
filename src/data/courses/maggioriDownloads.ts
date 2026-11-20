@@ -1,7 +1,8 @@
 /**
- * ENN-145 — Maggiori dispensa download: branded printable HTML in googtrans lang
- * (auto-translated from IT via Groq). Curated static EN markdown is no longer
- * the primary Scarica path (kept on disk as fallback assets only).
+ * ENN-145 / ENN-154 — Maggiori dispensa download: branded printable HTML in
+ * googtrans lang (auto-translated from IT via Groq). Curated static EN markdown
+ * under `public/dispense/.../en/` is archive-only and must never be the PDF
+ * or on-screen source.
  */
 import { buildBrandedDispensaHtml } from '../../lib/dispensaBrandedHtml';
 import { stripDispensaEmbedMarkers } from '../../lib/stripDispensaEmbeds';
@@ -28,6 +29,7 @@ export function openBrandedDispensaPrintHtml(html: string): void {
 /**
  * Entitled Scarica: server builds translated branded HTML.
  * Query `lang` comes from `readGoogTransLang()` (same cookie/hash as Nina).
+ * Server always loads Italian source then translates (ENN-154).
  */
 export async function downloadMaggioriDispensaPdf(params: {
   dispensaId: number;
@@ -91,17 +93,19 @@ export function downloadDispensaBrandedHtmlFallback(params: {
   openBrandedDispensaPrintHtml(html);
 }
 
-/** @deprecated ENN-140 curated MD URL — kept for asset discovery / smoke only. */
+/**
+ * ENN-154 — Static asset discovery for IT Maggiori markdown only.
+ * `preferredLang` is ignored: EN curated files are never returned.
+ */
 export function getMaggioriDispensaDownloadUrl(
   moduleNumber: string,
-  preferredLang: 'it' | 'en' = 'it'
-): { lang: 'it' | 'en'; url: string; filename: string } | null {
+  _preferredLang?: 'it' | 'en'
+): { lang: 'it'; url: string; filename: string } | null {
   const normalized = moduleNumber.padStart(2, '0') as MaggioriModuleNumber;
   if (!MODULES.includes(normalized)) return null;
-  const lang = preferredLang === 'en' ? 'en' : 'it';
   return {
-    lang,
-    url: `/dispense/arcani-maggiori/${lang}/modulo-${normalized}.md`,
-    filename: `tarot-italia-arcani-maggiori-modulo-${normalized}-${lang}.md`,
+    lang: 'it',
+    url: `/dispense/arcani-maggiori/it/modulo-${normalized}.md`,
+    filename: `tarot-italia-arcani-maggiori-modulo-${normalized}-it.md`,
   };
 }
