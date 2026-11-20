@@ -11324,6 +11324,103 @@ function ninaStudioGateCopy(lang) {
   const code = normalizeNinaLang(lang);
   return GATE_BY_LANG[code] || GATE_BY_LANG[code.split("-")[0]] || GATE_EN;
 }
+var UNCLEAR_IT = `Non sono sicura di aver colto bene la tua domanda.
+
+Puoi **riformularla** in modo pi\xF9 chiaro, oppure **specificare l\u2019Arcano** o il tema (prezzi, prenotazione, Chi sono)? Cos\xEC ti rispondo con pi\xF9 precisione.
+
+Per un consulto personale resta **Parla con Maria Teresa** qui sotto.`;
+var UNCLEAR_EN = `I\u2019m not sure I\u2019ve understood your question.
+
+Could you **rephrase** it a little more clearly, or **name the Arcana** / topic (prices, booking, About)? That helps me answer more precisely.
+
+For a personal reading, use **Talk to Maria Teresa** below.`;
+var UNCLEAR_ES = `No estoy segura de haber entendido bien tu pregunta.
+
+\xBFPuedes **reformularla** con m\xE1s claridad, o **indicar el Arcano** o el tema (precios, reserva, Qui\xE9n soy)? As\xED te respondo con m\xE1s precisi\xF3n.
+
+Para una consulta personal, usa **Habla con Maria Teresa** abajo.`;
+var UNCLEAR_FR = `Je ne suis pas s\xFBre d\u2019avoir bien compris ta question.
+
+Peux-tu la **reformuler** plus clairement, ou **pr\xE9ciser l\u2019Arcane** / le sujet (tarifs, r\xE9servation, Qui suis-je) ? Ainsi je r\xE9pondrai avec plus de pr\xE9cision.
+
+Pour une consultation personnelle, utilise **Parler \xE0 Maria Teresa** ci-dessous.`;
+var UNCLEAR_DE = `Ich bin mir nicht sicher, ob ich deine Frage richtig verstanden habe.
+
+Kannst du sie etwas **klarer umformulieren**, oder das **Arkana** / Thema nennen (Preise, Buchung, \xDCber mich)? Dann antworte ich pr\xE4ziser.
+
+F\xFCr eine pers\xF6nliche Beratung nutze unten **Mit Maria Teresa sprechen**.`;
+var UNCLEAR_PT = `N\xE3o tenho a certeza de ter compreendido bem a tua pergunta.
+
+Podes **reformul\xE1-la** com mais clareza, ou **indicar o Arcano** / tema (pre\xE7os, reserva, Chi sono)? Assim respondo com mais precis\xE3o.
+
+Para uma consulta pessoal, usa **Parla con Maria Teresa** abaixo.`;
+var UNCLEAR_ZH = `\u6211\u4E0D\u592A\u786E\u5B9A\u662F\u5426\u7406\u89E3\u4E86\u4F60\u7684\u95EE\u9898\u3002
+
+\u80FD\u5426**\u6362\u4E2A\u8BF4\u6CD5**\u8BF4\u5F97\u66F4\u6E05\u695A\uFF0C\u6216**\u6307\u660E\u5177\u4F53\u963F\u5C14\u5361\u7EB3**/\u4E3B\u9898\uFF08\u4EF7\u683C\u3001\u9884\u7EA6\u3001Chi sono\uFF09\uFF1F\u8FD9\u6837\u6211\u80FD\u7B54\u5F97\u66F4\u51C6\u3002
+
+\u4E2A\u4EBA\u54A8\u8BE2\u8BF7\u4F7F\u7528\u4E0B\u65B9\u7684 **Parla con Maria Teresa**\u3002`;
+var UNCLEAR_JA = `\u3054\u8CEA\u554F\u306E\u610F\u56F3\u3092\u5341\u5206\u306B\u6349\u3048\u304D\u308C\u3066\u3044\u306A\u3044\u304B\u3082\u3057\u308C\u307E\u305B\u3093\u3002
+
+\u3082\u3046\u5C11\u3057**\u308F\u304B\u308A\u3084\u3059\u304F\u8A00\u3044\u63DB\u3048\u308B**\u304B\u3001**\u30A2\u30EB\u30AB\u30CA\u3084\u30C6\u30FC\u30DE**\uFF08\u6599\u91D1\u30FB\u4E88\u7D04\u30FBChi sono\uFF09\u3092\u6307\u5B9A\u3057\u3066\u3082\u3089\u3048\u307E\u3059\u304B\uFF1F\u3088\u308A\u7684\u78BA\u306B\u304A\u7B54\u3048\u3067\u304D\u307E\u3059\u3002
+
+\u500B\u4EBA\u9451\u5B9A\u306F\u4E0B\u306E **Parla con Maria Teresa** \u3092\u3054\u5229\u7528\u304F\u3060\u3055\u3044\u3002`;
+var UNCLEAR_BY_LANG = {
+  it: UNCLEAR_IT,
+  en: UNCLEAR_EN,
+  es: UNCLEAR_ES,
+  fr: UNCLEAR_FR,
+  de: UNCLEAR_DE,
+  pt: UNCLEAR_PT,
+  "zh-cn": UNCLEAR_ZH,
+  zh: UNCLEAR_ZH,
+  ja: UNCLEAR_JA
+};
+function ninaUnclearIntentReply(lang) {
+  const code = normalizeNinaLang(lang);
+  return UNCLEAR_BY_LANG[code] || UNCLEAR_BY_LANG[code.split("-")[0]] || UNCLEAR_EN;
+}
+var OUTAGE_IT = {
+  unavailable: "Nina non \xE8 attiva in questo momento. Puoi scrivere a Maria Teresa su WhatsApp, Telegram o email.",
+  temporary: "In questo momento non riesco a risponderti con serenit\xE0. Riprova tra poco oppure usa WhatsApp, Telegram o email.",
+  tooBroad: "La domanda \xE8 un po\u2019 troppo ampia per questa chat. Prova a **riformularla** in modo pi\xF9 breve, o **specifica un solo Arcano** / un tema, poi riprova. Nel frattempo puoi usare WhatsApp, Telegram o email."
+};
+var OUTAGE_EN = {
+  unavailable: "Nina is not available right now. You can reach Maria Teresa on WhatsApp, Telegram or email.",
+  temporary: "I cannot reply calmly right now. Please try again shortly, or use WhatsApp, Telegram or email.",
+  tooBroad: "That question is a bit too broad for this chat. Please **rephrase** it more briefly, or **name one Arcana** / topic, then try again. Meanwhile you can use WhatsApp, Telegram or email."
+};
+var OUTAGE_ES = {
+  unavailable: "Nina no est\xE1 activa ahora. Puedes escribir a Maria Teresa por WhatsApp, Telegram o email.",
+  temporary: "Ahora mismo no puedo responderte con calma. Reintenta en breve o usa WhatsApp, Telegram o email.",
+  tooBroad: "La pregunta es un poco amplia para este chat. **Reform\xFAlala** m\xE1s breve, o **indica un solo Arcano** / tema, y vuelve a intentarlo. Mientras, WhatsApp, Telegram o email."
+};
+var OUTAGE_FR = {
+  unavailable: "Nina n\u2019est pas active pour le moment. Tu peux \xE9crire \xE0 Maria Teresa sur WhatsApp, Telegram ou email.",
+  temporary: "Je ne peux pas te r\xE9pondre sereinement pour l\u2019instant. R\xE9essaie bient\xF4t, ou utilise WhatsApp, Telegram ou email.",
+  tooBroad: "La question est un peu trop large pour ce chat. **Reformule**-la plus bri\xE8vement, ou **pr\xE9cise un seul Arcane** / sujet, puis r\xE9essaie. En attendant : WhatsApp, Telegram ou email."
+};
+var OUTAGE_DE = {
+  unavailable: "Nina ist gerade nicht aktiv. Du kannst Maria Teresa per WhatsApp, Telegram oder E-Mail erreichen.",
+  temporary: "Ich kann gerade nicht ruhig antworten. Bitte gleich erneut versuchen oder WhatsApp, Telegram oder E-Mail nutzen.",
+  tooBroad: "Die Frage ist f\xFCr diesen Chat etwas zu weit. Bitte **k\xFCrzer umformulieren** oder **ein Arkana** / Thema nennen, dann erneut versuchen. Zwischenzeitlich: WhatsApp, Telegram oder E-Mail."
+};
+var OUTAGE_BY_LANG = {
+  it: OUTAGE_IT,
+  en: OUTAGE_EN,
+  es: OUTAGE_ES,
+  fr: OUTAGE_FR,
+  de: OUTAGE_DE
+};
+function ninaSoftOutageCopy(lang) {
+  const code = normalizeNinaLang(lang);
+  return OUTAGE_BY_LANG[code] || OUTAGE_BY_LANG[code.split("-")[0]] || OUTAGE_EN;
+}
+function looksLikeNinaProviderLeak(text2) {
+  const raw = text2.trim();
+  if (!raw) return true;
+  const lower = raw.toLowerCase();
+  return /\bgroq\b/.test(lower) || /\bgrok\b/.test(lower) || /tarotitaliachatgenericagroq/.test(lower) || /api[_ -]?key/.test(lower) || /openai\/gpt/.test(lower) || /problema con (groq|grok)/.test(lower);
+}
 
 // src/lib/ninaChatKnowledge.ts
 var NINA_CHAT_SITE_KNOWLEDGE = `Conoscenza ufficiale del sito (fonte: copy pubblico Tarot Italia \u2014 usa SOLO questi fatti; stile FAQ breve e caldo; per prezzi e FAQ cita le risposte qui sotto, senza inventare):
@@ -11545,6 +11642,7 @@ Limiti (obbligatori) \u2014 Nina Studio \xE8 un altro prodotto:
 - Non mescolare Dialogo Tarot (percorso interattivo a pagamento/riflessione) con questa chat n\xE9 con Nina Studio.
 - Non sostituisci pareri medici, psicologici, legali o finanziari.
 - Non inventare prezzi, promozioni, date corsi o orari oltre la conoscenza ufficiale.
+- Se la domanda \xE8 confusa, vuota di senso o non capisci l\u2019intento: chiedi con tono caldo di **riformulare** o di **specificare l\u2019Arcano / il tema** \u2014 mai citare fornitori tecnici, API, Groq/Grok o messaggi di errore.
 - Risposte concise; etica ferma contro violenza, abusi, contenuti illeciti.
 
 Formato messaggio (obbligatorio \u2014 mobile-friendly):
@@ -11569,6 +11667,7 @@ Limiti (obbligatori):
 - Non mescolare i testi del Dialogo Tarot con le schede didattiche Maggiori.
 - Non sostituisci pareri medici, psicologici, legali o finanziari.
 - Non inventare prezzi o promozioni oltre la conoscenza ufficiale.
+- Se la domanda \xE8 confusa o non capisci l\u2019intento: chiedi di **riformulare** o di **specificare l\u2019Arcano** \u2014 mai citare fornitori tecnici, API, Groq/Grok o messaggi di errore.
 - Etica ferma: rifiuta violenza, abusi, contenuti illeciti.
 
 Formato messaggio (obbligatorio \u2014 mobile-friendly):
@@ -11889,43 +11988,54 @@ async function assertNinaStudioAccess(authorization, lang) {
     });
   }
 }
-function chatFailureResponse(code) {
+function chatFailureResponse(code, lang) {
+  const outage = ninaSoftOutageCopy(lang);
   switch (code) {
     case "GROQ_CHAT_UNAVAILABLE":
+      console.error(
+        "Nina chat unavailable: missing TAROTITALIACHATGENERICAGROQ_API_KEY (Maria logs only)"
+      );
       return json(503, {
         available: false,
         code: "missing_key",
-        error: "Nina non \xE8 ancora attiva: manca la chiave Groq su Vercel (TAROTITALIACHATGENERICAGROQ_API_KEY). Puoi scrivere a Maria Teresa su WhatsApp, Telegram o email."
+        error: outage.unavailable
       });
     case "GROQ_CHAT_AUTH":
+      console.error(
+        "Nina chat auth failure vs Groq (Maria logs only) \u2014 check TAROTITALIACHATGENERICAGROQ_API_KEY"
+      );
       return json(502, {
         available: true,
         code: "auth",
-        error: "Nina non riesce ad autenticarsi con Groq. Verifica la chiave TAROTITALIACHATGENERICAGROQ_API_KEY su Vercel (Production e Preview), poi ridistribuisci. Nel frattempo usa WhatsApp, Telegram o email."
+        error: outage.temporary
       });
     case "GROQ_CHAT_MODEL":
+      console.error(
+        "Nina chat model failure (Maria logs only) \u2014 check GROQ_CHAT_MODEL / default"
+      );
       return json(502, {
         available: true,
         code: "model",
-        error: "Il modello Groq non \xE8 disponibile. Controlla GROQ_CHAT_MODEL oppure il default del sito, poi riprova. Nel frattempo usa WhatsApp, Telegram o email."
+        error: outage.temporary
       });
     case "GROQ_CHAT_PAYLOAD":
       return json(502, {
         available: true,
         code: "payload",
-        error: "La richiesta a Nina \xE8 troppo ampia per il modello. Prova una domanda pi\xF9 breve o specifica un solo Arcano, poi riprova. Nel frattempo usa WhatsApp, Telegram o email."
+        error: outage.tooBroad
       });
     case "GROQ_CHAT_EMPTY":
-      return json(502, {
+      return json(200, {
         available: true,
-        code: "empty",
-        error: "Nina non ha ricevuto una risposta utile. Riprova tra poco oppure usa WhatsApp, Telegram o email."
+        code: "unclear",
+        reply: ninaUnclearIntentReply(lang)
       });
     default:
+      console.error("Nina chat upstream failure (Maria logs only):", code);
       return json(502, {
         available: true,
         code: "upstream",
-        error: "Non riesco a rispondere in questo momento. Riprova tra poco oppure usa WhatsApp, Telegram o email."
+        error: outage.temporary
       });
   }
 }
@@ -11959,7 +12069,7 @@ async function postChatMessage(params) {
     });
   }
   if (!isGroqChatConfigured()) {
-    return chatFailureResponse("GROQ_CHAT_UNAVAILABLE");
+    return chatFailureResponse("GROQ_CHAT_UNAVAILABLE", lang);
   }
   const systemPrompt = buildNinaSystemPrompt({
     message,
@@ -11974,14 +12084,25 @@ async function postChatMessage(params) {
   ];
   try {
     const reply = await createGroqChatCompletion({ messages });
+    if (looksLikeNinaProviderLeak(reply)) {
+      console.error(
+        "Nina reply looked like provider/API leak \u2014 replaced with unclear rephrase (Maria logs only)"
+      );
+      return json(200, {
+        available: true,
+        mode,
+        code: "unclear",
+        reply: ninaUnclearIntentReply(lang)
+      });
+    }
     return json(200, { available: true, mode, reply });
   } catch (error) {
     const code = error instanceof Error ? error.message : "";
     if (code.startsWith("GROQ_CHAT_")) {
-      return chatFailureResponse(code);
+      return chatFailureResponse(code, lang);
     }
     console.error("postChatMessage failed:", code || error);
-    return chatFailureResponse("GROQ_CHAT_UPSTREAM");
+    return chatFailureResponse("GROQ_CHAT_UPSTREAM", lang);
   }
 }
 
