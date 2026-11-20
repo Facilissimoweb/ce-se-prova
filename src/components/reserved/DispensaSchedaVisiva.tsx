@@ -96,7 +96,7 @@ export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
     requestGoogleTranslateRefresh(220);
   }, [openSections]);
 
-  // ENN-155/156 — chrome + composizione map body follow GT (Sigillo Q/A stay protected elsewhere).
+  // ENN-155/156/157 — chrome + composizione map body + Sigillo Q/A follow GT.
   return (
     <section
       className="space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-4 md:p-6"
