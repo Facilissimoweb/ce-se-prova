@@ -24,8 +24,10 @@ import {
 } from './src/server/routes/comingSoon.ts';
 import {
   deleteUserNoteRoute,
+  getDispensaPdf,
   getReservedOverview,
   getUserNotes,
+  isDevDemoReservedAuth,
   postReservedConfirmStripe,
   postReservedEnroll,
   postUserNote,
@@ -214,6 +216,47 @@ async function startServer() {
         await postReservedConfirmStripe({
           user,
           body: bodyRecord(req),
+        })
+      );
+    }
+  );
+
+  app.get(
+    '/api/reserved/dispense/:dispensaId/pdf',
+    async (req: AuthRequest, res, next) => {
+      const authHeader =
+        typeof req.headers.authorization === 'string'
+          ? req.headers.authorization
+          : undefined;
+      if (isDevDemoReservedAuth(authHeader)) {
+        res.setHeader('Cache-Control', 'private, no-store');
+        return sendResult(
+          res,
+          await getDispensaPdf({
+            user: null,
+            dispensaId: Number(req.params.dispensaId),
+            lang: typeof req.query.lang === 'string' ? req.query.lang : null,
+            origin: expressOrigin(req, PORT),
+            demoBypass: true,
+          })
+        );
+      }
+      return requireAuth(req, res, next);
+    },
+    async (req: AuthRequest, res) => {
+      const user = toApiUserFromAuth(req);
+      if (!user) {
+        return res.status(401).json({ error: 'Autenticazione richiesta.' });
+      }
+      res.setHeader('Cache-Control', 'private, no-store');
+      sendResult(
+        res,
+        await getDispensaPdf({
+          user,
+          dispensaId: Number(req.params.dispensaId),
+          lang: typeof req.query.lang === 'string' ? req.query.lang : null,
+          origin: expressOrigin(req, PORT),
+          demoBypass: false,
         })
       );
     }

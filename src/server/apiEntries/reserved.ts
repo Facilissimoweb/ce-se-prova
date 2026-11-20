@@ -11,8 +11,10 @@
 import { ensureSchemaOnce } from '../../db/ensureBookingSchema.ts';
 import {
   deleteUserNoteRoute,
+  getDispensaPdf,
   getReservedOverview,
   getUserNotes,
+  isDevDemoReservedAuth,
   postReservedConfirmStripe,
   postReservedEnroll,
   postUserNote,
@@ -21,6 +23,7 @@ import {
 } from '../routes/reserved.ts';
 import { verifyBearerToken } from '../authToken.ts';
 import {
+  queryString,
   readBodyObject,
   requestOrigin,
   sendJson,
@@ -30,7 +33,8 @@ import {
 import type { ApiUser } from '../http.ts';
 import { groupSubpath } from '../vercelEntry.ts';
 
-export const config = { runtime: 'nodejs', maxDuration: 30 };
+/** PDF + Groq translate can exceed 30s on long Maggiori modules. */
+export const config = { runtime: 'nodejs', maxDuration: 60 };
 
 function methodNotAllowed(res: NodeLikeRes, allowed: string[]): void {
   res.setHeader('Allow', allowed.join(', '));
@@ -96,6 +100,35 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
       const result = await postReservedConfirmStripe({
         user,
         body: readBodyObject(req),
+      });
+      return sendJson(res, result.status, result.body);
+    }
+
+    const dispensaPdf = path.match(/^dispense\/([^/]+)\/pdf$/);
+    if (dispensaPdf) {
+      if (method !== 'GET') return methodNotAllowed(res, ['GET']);
+      const demoBypass = isDevDemoReservedAuth(
+        (() => {
+          for (const [key, value] of Object.entries(req.headers || {})) {
+            if (key.toLowerCase() !== 'authorization') continue;
+            return (Array.isArray(value) ? value[0] : value)?.trim() ?? '';
+          }
+          return '';
+        })()
+      );
+      let user = null as Awaited<ReturnType<typeof requireUser>>;
+      if (!demoBypass) {
+        user = await requireUser(req, res);
+        if (!user) return;
+      }
+      const langRaw = queryString(req.query?.lang) || null;
+      res.setHeader('Cache-Control', 'private, no-store');
+      const result = await getDispensaPdf({
+        user,
+        dispensaId: Number(dispensaPdf[1]),
+        lang: langRaw,
+        origin: requestOrigin(req),
+        demoBypass,
       });
       return sendJson(res, result.status, result.body);
     }

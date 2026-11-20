@@ -31,8 +31,7 @@ export function FormattedDispensaBody({
   const lines = markdown.split('\n');
   return (
     <div
-      className="notranslate space-y-3 text-sm md:text-[15px] leading-relaxed text-[#E8e1dd]"
-      translate="no"
+      className="space-y-3 text-sm md:text-[15px] leading-relaxed text-[#E8e1dd]"
     >
       {lines.map((rawLine, idx) => {
         const line = rawLine.trim();

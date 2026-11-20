@@ -1,6 +1,7 @@
 /**
- * Curated materials locale (ENN-140) — independent from Google Translate browsing.
- * Used only for course/dispensa download file selection.
+ * Legacy curated materials locale (ENN-140).
+ * ENN-145 Scarica PDF follows Google Translate (`readGoogTransLang`) instead;
+ * helpers remain for any leftover IT/EN static asset lookups.
  */
 import {
   DEFAULT_LANG,

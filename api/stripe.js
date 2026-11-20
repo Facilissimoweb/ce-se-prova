@@ -1383,8 +1383,8 @@ function haveSameKeys(left, right) {
   if (leftKeys.length !== rightKeys.length) {
     return false;
   }
-  for (const [index, key] of leftKeys.entries()) {
-    if (key !== rightKeys[index]) {
+  for (const [index2, key] of leftKeys.entries()) {
+    if (key !== rightKeys[index2]) {
       return false;
     }
   }
@@ -3477,6 +3477,9 @@ var Index = class {
     this.config = { ...config2, table };
   }
 };
+function index(name) {
+  return new IndexBuilderOn(false, name);
+}
 function uniqueIndex(name) {
   return new IndexBuilderOn(true, name);
 }
@@ -3698,8 +3701,8 @@ var PgDialect = class {
       return void 0;
     }
     const joinsArray = [];
-    for (const [index, joinMeta] of joins.entries()) {
-      if (index === 0) {
+    for (const [index2, joinMeta] of joins.entries()) {
+      if (index2 === 0) {
         joinsArray.push(sql` `);
       }
       const table = joinMeta.table;
@@ -3726,7 +3729,7 @@ var PgDialect = class {
           sql`${sql.raw(joinMeta.joinType)} join${lateralSql} ${table}${onSql}`
         );
       }
-      if (index < joins.length - 1) {
+      if (index2 < joins.length - 1) {
         joinsArray.push(sql` `);
       }
     }
@@ -7144,6 +7147,8 @@ __export(schema_exports, {
   dispensaProgressRelations: () => dispensaProgressRelations,
   dispense: () => dispense,
   dispenseRelations: () => dispenseRelations,
+  userNotes: () => userNotes,
+  userNotesRelations: () => userNotesRelations,
   users: () => users,
   usersRelations: () => usersRelations
 });
@@ -7284,12 +7289,27 @@ var dialoguePurchases = pgTable("dialogue_purchases", {
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
+var userNotes = pgTable(
+  "user_notes",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    title: text("title").default("").notNull(),
+    body: text("body").default("").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull()
+  },
+  (table) => [
+    index("user_notes_user_id_idx").on(table.userId)
+  ]
+);
 var usersRelations = relations(users, ({ many }) => ({
   purchases: many(coursePurchases),
   dispensaProgress: many(dispensaProgress),
   bookings: many(consultationBookings),
   dialogueSessions: many(dialogueSessions),
-  dialoguePurchases: many(dialoguePurchases)
+  dialoguePurchases: many(dialoguePurchases),
+  notes: many(userNotes)
 }));
 var coursesRelations = relations(courses, ({ many }) => ({
   dispense: many(dispense),
@@ -7342,6 +7362,12 @@ var dialoguePurchasesRelations = relations(dialoguePurchases, ({ one }) => ({
   }),
   user: one(users, {
     fields: [dialoguePurchases.userId],
+    references: [users.id]
+  })
+}));
+var userNotesRelations = relations(userNotes, ({ one }) => ({
+  user: one(users, {
+    fields: [userNotes.userId],
     references: [users.id]
   })
 }));
@@ -7469,123 +7495,332 @@ var db = new Proxy({}, {
   }
 });
 
+// src/data/courses/arcaniMaggioriDispense.ts
+var ARCANI_MAGGIORI_DISPENSE = [
+  {
+    moduleNumber: "01",
+    title: "Architettura e Primo Settenario (0 \u2013 VII)",
+    subtitle: "Mappa dei Tre Settenari \xB7 Dal Matto al Carro",
+    format: "Dispensa formativa + Esercizi",
+    readingMinutes: 40,
+    keyTakeaways: [
+      "I Tre Settenari come mappa evolutiva dalla materia allo spirito.",
+      "Il Matto (0) e la diade Bagatto (I) / Papessa (II).",
+      "Imperatrice\u2013Carro (III\u2013VII) con simbologia, senso profondo e chiave previsionale."
+    ],
+    contentMarkdown: `## Dispensa Formativa \xB7 Arcani Maggiori (Primo Step)
+
+Gli Arcani Maggiori non sono strumenti di divinazione meccanica, bens\xEC una **mappa strutturata** dell'esperienza umana, della psiche e dei cicli evolutivi. Questa dispensa apre il Primo Step di Tarot Italia: dall'architettura dei Tre Settenari al radicamento del Primo Settenario, dal Matto al Carro.
+
+## 1. Architettura Didattica e la Mappa dei Tre Settenari
+
+Il mazzo si articola in **ventidue lame** (dalla carta 0 alla XXI), organizzate in tre grandi cicli di crescita interiore e manifestazione esteriore. Ogni settenario risponde a una precisa fase dell'evoluzione individuale, scandendo il passaggio dalla materia allo spirito.
+
+### Mappa dei Tre Cicli
+
+- **Primo Settenario (0 \u2013 VII)** \u2014 Formazione dell'identit\xE0, radicamento nel mondo fisico, azione concreta e conquista della direzione.
+- **Secondo Settenario (VIII \u2013 XIV)** \u2014 Prova etica, maturazione morale, interiorizzazione, transizione e ricerca dell'equilibrio interiore.
+- **Terzo Settenario (XV \u2013 XXI)** \u2014 Padronanza spirituale, confronto con l'Ombra, liberazione dai vincoli e compiutezza nel mondo.
+
+## 2. Il Primo Settenario: La Formazione dell'Identit\xE0 (0 \u2013 VII)
+
+Il primo ciclo \xE8 la fase di radicamento e di costruzione della personalit\xE0 cosciente. Attraverso queste prime otto carte, l'individuo impara a gestire le risorse materiali, la creativit\xE0, l'autorit\xE0, la guida etica e la scelta, fino all'affermazione trionfante della propria volont\xE0 disciplinata.
+
+### 0. Il Matto \u2013 L'Inizio Non Condizionato
+
+- **Simbologia ed Essenza**: Il Matto (0) rappresenta la soglia fuori dalla numerazione sequenziale; passo sul precipizio; libert\xE0 assoluta. Precede ogni schema, regola o sovrastruttura mentale: energia pura prima di ogni cristallizzazione materiale.
+- **Significato Profondo**: slancio genuino, apertura incondizionata al nuovo, coraggio di slegarsi dai condizionamenti, fiducia nel cammino. Ogni inizio autentico richiede il rischio dell'ignoto e lo spogliamento dalle protezioni superflue.
+- **In Chiave Previsionale**: cambiamento improvviso di rotta, partenza imminente, salto di fiducia, novit\xE0 inattesa. Chiede audacia, spontaneit\xE0 e istinto pionieristico, senza garanzie logiche paralizzanti.
+
+{{scheda-visiva:il-matto}}
+
+{{sigillo:il-matto}}
+
+### La Diade Creativa: Il Bagatto (I) e La Papessa (II)
+
+La dinamica iniziale del manifestato divide il cammino tra azione visibile e gestazione interiore.
+
+### 1. Il Bagatto (I) \u2013 L'Iniziativa e il Talento all'Opera
+
+- **Simbologia ed Essenza**: Situato alla guida della numerazione, il Bagatto (o Giocoliere) dispone sul banco di tutti gli strumenti primari (bastoni, coppe, spade e denari). \xC8 il padrone delle risorse operative e delle potenzialit\xE0 materiali per cominciare subito.
+- **Significato Profondo**: iniziativa immediata, talento puro, destrezza, attivazione dei processi con ci\xF2 che \xE8 gi\xE0 disponibile, senza attendere condizioni ideali.
+- **In Chiave Previsionale**: azione pratica immediata; \xABmettere le mani in pasta\xBB, sfruttare le abilit\xE0 pratiche e concretizzare un progetto o un'azione nei primissimi giorni.
+
+{{scheda-visiva:il-bagatto}}
+
+{{sigillo:il-bagatto}}
+
+### 2. La Papessa (II) \u2013 La Gestazione e la Saggezza del Silenzio
+
+- **Simbologia ed Essenza**: Seduta immobile e velata tra i pilastri del tempio, con il sacro libro chiuso o socchiuso; custodisce la conoscenza sottile senza agire all'esterno.
+- **Significato Profondo**: gestazione silenziosa, verit\xE0 intuita prima di essere detta, sapienza del tempo, attesa fertile. Ogni vera creazione richiede raccoglimento e maturazione interiore.
+- **In Chiave Previsionale**: non \xE8 il momento di agire o esporre idee; custodire, studiare, riflettere, fare ricerca e lasciare maturare gli eventi in profondit\xE0.
+
+{{scheda-visiva:la-papessa}}
+
+{{sigillo:la-papessa}}
+
+### Dal Fiorire alla Conquista (III \u2013 VII)
+
+La progressione conduce dalla fioritura creativa fino all'accelerazione e alla vittoria della volont\xE0 disciplinata.
+
+### 3. L'Imperatrice (III) \u2013 La Fioritura Creativa e l'Abbondanza
+
+- **Simbologia ed Essenza**: fioritura sensibile, abbondanza generativa, capacit\xE0 di dare forma e vita alle idee con espressivit\xE0, comunicazione e cura fertile dei progetti.
+- **Significato Profondo**: vitalit\xE0 rigogliosa, espressione creativa senza vincoli, potere generativo della parola; armonia che trasforma l'impulso in manifestazione ricca.
+- **In Chiave Previsionale**: espansione prospera, intese riuscite, fioritura di nuove idee, fecondit\xE0 nei progetti, grande armonia relazionale.
+
+{{scheda-visiva:l-imperatrice}}
+
+{{sigillo:l-imperatrice}}
+
+### 4. L'Imperatore (IV) \u2013 La Stabilit\xE0 Strutturale e il Metodo
+
+- **Simbologia ed Essenza**: autorit\xE0 e concretezza; stabilit\xE0, metodo rigoroso, confini solidi, gestione organizzata del mondo materiale.
+- **Significato Profondo**: autorit\xE0 saggia, protezione, governo della realt\xE0 senza tentennamenti; forza strutturale per dare durata e confini certi a quanto creato.
+- **In Chiave Previsionale**: consolidamento di progetti lavorativi o finanziari, basi solide, referente autorevole o protettivo, gestione metodica ed efficace della materia.
+
+{{scheda-visiva:l-imperatore}}
+
+{{sigillo:l-imperatore}}
+
+### 5. Il Papa (V) \u2013 Il Patto Etico e la Guida Spettabile
+
+- **Simbologia ed Essenza**: guida spirituale o professionale; maestro che trasmette valori condivisi e facilita l'adesione a regole e principi codificati.
+- **Significato Profondo**: patto etico, trasmissione della sapienza, mediazione illuminata; alleanza tra aspirazioni individuali e tradizione o struttura sociale.
+- **In Chiave Previsionale**: contratti chiari e trasparenti, mediazioni riuscite, consulenze autorevoli, alleanze basate sulla fiducia, rispetto delle norme etiche.
+
+{{scheda-visiva:il-papa}}
+
+{{sigillo:il-papa}}
+
+### 6. Gli Innamorati (VI) \u2013 Il Bivio Fondamentale e la Scelta del Cuore
+
+- **Simbologia ed Essenza**: la figura umana al bivio, di fronte all'incontro, all'affetto e alla responsabilit\xE0 della decisione.
+- **Significato Profondo**: scelta consapevole del cuore e responsabilit\xE0 verso la propria direzione emotiva ed esistenziale; optare con convinzione per una strada escludendo le altre.
+- **In Chiave Previsionale**: decisioni sentimentali o professionali ineludibili; scelta d'amore o di valore chiara; allineamento autentico con i desideri profondi.
+
+{{scheda-visiva:gli-amanti}}
+
+{{sigillo:gli-amanti}}
+
+### 7. Il Carro (VII) \u2013 L'Azione Coordinata e la Vittoria Disciplinata
+
+- **Simbologia ed Essenza**: il condottiero guida il Carro trionfale e governa con maestria le forze opposte che muovono il veicolo.
+- **Significato Profondo**: azione coordinata, controllo sapiente delle polarit\xE0 energetiche, vittoria grazie a determinazione e rigore.
+- **In Chiave Previsionale**: sblocco rapido di trattative o situazioni stagnanti, viaggi, spostamenti materiali, accelerazione decisiva e trionfante verso gli obiettivi.
+
+{{scheda-visiva:il-carro}}
+
+{{sigillo:il-carro}}
+
+### Sintesi Didattica del Modulo 1
+
+1. Il Matto (0) garantisce la libert\xE0 originaria e l'apertura incondizionata al mutamento.
+2. La polarit\xE0 Bagatto (I) / Papessa (II) stabilisce l'alternanza tra azione visibile e gestazione intuitiva.
+3. Da Imperatrice (III) e Imperatore (IV) si giunge alla guida etica del Papa (V), alla scelta degli Innamorati (VI) e alla spinta del Carro (VII).
+
+### Esercizi Pratici del Primo Settenario
+
+- **Esercizio 1 (Il Matto e il foglio bianco)**: identifica un progetto rinviato e scrivi l'azione minima di coraggio da compiere oggi, senza pianificarla nei dettagli.
+- **Esercizio 2 (Bagatto vs Papessa)**: di fronte a un dubbio, estrai una carta. Bagatto \u2192 azione pratica entro 24 ore; Papessa \u2192 tre giorni di silenzio e ascolto prima di decidere.
+- **Esercizio 3 (Lettura a due lame)**: combina Il Carro con una lama precedente per interpretare uno sblocco inatteso in ambito lavorativo o personale.
+`
+  },
+  {
+    moduleNumber: "02",
+    title: "Secondo Settenario: Prova Etica (VIII \u2013 XIV)",
+    subtitle: "Giustizia, Eremita, Ruota, Forza, Appeso, Morte, Temperanza",
+    format: "Dispensa formativa + Schede Archetipo",
+    readingMinutes: 40,
+    keyTakeaways: [
+      "Dal mondo esterno all\u2019interiorizzazione: maturazione morale e limiti.",
+      "Ruota (X) e Forza (XI): mutamento e dominio gentile dell\u2019istinto.",
+      "Appeso, Morte e Temperanza come transizione verso il terzo ciclo."
+    ],
+    contentMarkdown: `## Il Secondo Settenario: La Prova Etica e l'Interiorizzazione (VIII \u2013 XIV)
+
+Se il primo settenario costruisce l'identit\xE0 esterna, il secondo sposta l'asse verso l'interno: maturazione morale, confronto con i limiti, equilibrio e trasformazione profonda.
+
+### 8. La Giustizia (VIII) \u2013 Ordine, Misura e Causa-Effetto
+
+- **Simbologia ed Essenza**: figura regale in trono, spada verticale e bilancia in equilibrio; ordine cosmico, imparzialit\xE0 e linearit\xE0 delle conseguenze.
+- **Significato Profondo**: responsabilit\xE0, onest\xE0 intellettuale, equilibrio, rigore etico. Ogni azione genera conseguenza; la chiarezza mentale guida l'emotivit\xE0.
+- **In Chiave Previsionale**: questioni legali o burocratiche, contratti equi, necessit\xE0 di fare ordine, risposta meritata e oggettiva.
+
+### 9. L'Eremita (IX) \u2013 Luce Interiore e Tempo della Ricerca
+
+- **Simbologia ed Essenza**: saggio nel mantello, lanterna nella notte; protegge e illumina il cammino.
+- **Significato Profondo**: raccoglimento, solitudine rigenerante, ricerca della verit\xE0 interiore, prudenza; distacco temporaneo dal frastuono per trovare risposte autentiche.
+- **In Chiave Previsionale**: rallentamento, studio, introspezione, cautela e riserbo, senza affrettare i tempi.
+
+### 10. La Ruota di Fortuna (X) \u2013 Ciclo, Mutamento e Imprevisto
+
+- **Simbologia ed Essenza**: ruota in movimento e figure in evoluzione; cicli vitali e mutevolezza delle circostanze.
+- **Significato Profondo**: accettazione del cambiamento, ciclicit\xE0, sblocco della stagnazione; adattarsi con flessibilit\xE0.
+- **In Chiave Previsionale**: svolta improvvisa, colpo di scena, nuovo ciclo, ribaltamento rapido di una situazione bloccata.
+
+### 11. La Forza (XI) \u2013 Dominio Istintivo e Coraggio Gentile
+
+- **Simbologia ed Essenza**: una donna apre o chiude con dolcezza le fauci di un leone, senza violenza.
+- **Significato Profondo**: dominio delle passioni tramite consapevolezza, coraggio interiore, pazienza, gestione saggia dell'energia; integrare gli impulsi anzich\xE9 reprimerli.
+- **In Chiave Previsionale**: superare una prova complessa con determinazione e autocontrollo; armonia nelle tensioni.
+
+### 12. L'Appeso (XII) \u2013 Sosta Volontaria e Cambio di Prospettiva
+
+- **Simbologia ed Essenza**: figura a testa in gi\xF9, serena; l'energia fluisce verso l'alto.
+- **Significato Profondo**: sosta necessaria, sacrificio come \xABrendere sacro\xBB, rinuncia al controllo rigido, capovolgimento di sguardo.
+- **In Chiave Previsionale**: blocco o attesa utile a riconsiderare le priorit\xE0, lasciando andare la fretta e accettando la pausa.
+
+### 13. L'Arcano Senza Nome / La Morte (XIII) \u2013 Trasmutazione e Taglio Netto
+
+- **Simbologia ed Essenza**: scheletro che falcia; dal terreno emergono germogli; potatura indispensabile alla vita.
+- **Significato Profondo**: fine radicale di un ciclo, distacco da ci\xF2 che \xE8 obsoleto, trasformazione e rinascita per fare spazio al nuovo.
+- **In Chiave Previsionale**: chiusura netta e cambiamento drastico; se accolto senza resistenza, apre a rinnovamento totale.
+
+### 14. La Temperanza (XIV) \u2013 Alchimia Quotidiana e Moderazione
+
+- **Simbologia ed Essenza**: figura alata che travasa liquido tra due vasi; flusso continuo di armonia.
+- **Significato Profondo**: misura, guarigione, pazienza alchemica, riconciliazione, compromesso e pace interiore.
+- **In Chiave Previsionale**: risoluzione pacifica, cure efficaci, tempi di recupero fluidi, fase di stabilizzazione in cui regna la cooperazione.
+
+### Sintesi Didattica del Modulo 2
+
+1. Dalla Giustizia (VIII) all'Eremita (IX): maturazione morale e ascolto della coscienza.
+2. Ruota (X) e Forza (XI): accettazione del mutamento e dominio saggio dell'energia.
+3. Appeso (XII), Morte (XIII) e Temperanza (XIV): transizione emotiva ed etica verso il terzo settenario.
+`
+  },
+  {
+    moduleNumber: "03",
+    title: "Terzo Settenario: Ombra e Compiutezza (XV \u2013 XXI)",
+    subtitle: "Dal Diavolo e la Torre fino a Sole, Giudizio e Mondo",
+    format: "Dispensa formativa + Atlante Simbolico",
+    readingMinutes: 40,
+    keyTakeaways: [
+      "Diavolo (XV) e Torre (XVI): Ombra, crollo e liberazione.",
+      "Stelle, Luna e Sole: speranza, inconscio e chiarezza visibile.",
+      "Giudizio (XX) e Mondo (XXI): risveglio e trionfo finale."
+    ],
+    contentMarkdown: `## Il Terzo Settenario: Padronanza Spirituale e Compiutezza (XV \u2013 XXI)
+
+Nel terzo settenario l'individuo si confronta con le grandi forze universali: supera le illusioni dell'Ombra, abbatte le false certezze e realizza il proprio potenziale interiore ed esteriore.
+
+### 15. Il Diavolo (XV) \u2013 Ombra, Materia e Fascino del Potere
+
+- **Simbologia ed Essenza**: creatura alata su due figure legate in modo blando ma consenziente.
+- **Significato Profondo**: confronto con l'Ombra, attaccamento alla materia, passioni, denaro, dipendenze, falsi poteri. Riconoscere i desideri inconsci per riprendere il controllo.
+- **In Chiave Previsionale**: passioni forti, dinamiche di potere o manipolazione, profitto materiale; necessit\xE0 di liberarsi da legami tossici.
+
+### 16. La Torre (XVI) \u2013 Folgore, Crollo e Liberazione
+
+- **Simbologia ed Essenza**: torre colpita dal fulmine; corona che salta; figure che precipitano tra scintille.
+- **Significato Profondo**: rottura delle false certezze, crollo di strutture non pi\xF9 aderenti alla verit\xE0, liberazione catartica attraverso la crisi.
+- **In Chiave Previsionale**: cambiamento drastico e inatteso che rompe la stagnazione e libera nuove energie.
+
+### 17. Le Stelle (XVII) \u2013 Speranza, Ispirazione e Guarigione
+
+- **Simbologia ed Essenza**: figura nuda che versa linfa su terra e acqua, sotto stelle radiose.
+- **Significato Profondo**: guida celeste, fiducia, chiarezza d'intenti, ispirazione, guarigione dopo la Torre.
+- **In Chiave Previsionale**: serenit\xE0 ritrovata, prospettive favorevoli, successo creativo, protezione, conferma del cammino.
+
+### 18. La Luna (XVIII) \u2013 Inconscio, Illusioni e Percorso Notturno
+
+- **Simbologia ed Essenza**: Luna piena, gambero dalle acque, lupi e torri lontane.
+- **Significato Profondo**: regno dell'inconscio, sogni, paure ancestrali, intuito viscerale, illusioni e nebbie da attraversare con la luce interiore.
+- **In Chiave Previsionale**: incertezza, segreti, malintesi; procedere ascoltando l'istinto senza paralisi ansiosa.
+
+### 19. Il Sole (XIX) \u2013 Chiarezza, Gioia e Realizzazione Visibile
+
+- **Simbologia ed Essenza**: Sole radioso; bambini festosi in un prato fiorito.
+- **Significato Profondo**: verit\xE0 svelata, gioia, trasparenza, calore umano, successo pubblico, vitalit\xE0 cosciente.
+- **In Chiave Previsionale**: successo, chiarezza nei rapporti, accordi fortunati, vitalit\xE0, trionfo di un progetto portato alla luce.
+
+### 20. Il Giudizio (XX) \u2013 Chiamata, Risveglio e Rinnovamento
+
+- **Simbologia ed Essenza**: angelo con tromba; figure che emergono dai sepolcri, braccia aperte.
+- **Significato Profondo**: chiamata alla consapevolezza, risveglio, perdono, liberazione dai giudizi limitanti.
+- **In Chiave Previsionale**: svolta decisiva, notizie importanti, riconciliazione che rinnova l'esistenza.
+
+### 21. Il Mondo (XXI) \u2013 Compiutezza e Cerchio Perfetto
+
+- **Simbologia ed Essenza**: figura danzante nella mandorla di foglie, circondata dai quattro viventi (Toro, Leone, Aquila, Angelo).
+- **Significato Profondo**: Compimento dell'Opera, integrazione dei settenari, realizzazione e armonia universale.
+- **In Chiave Previsionale**: successo totale, chiusura trionfante di un ciclo, viaggi internazionali, massima espansione.
+
+### Sintesi Didattica del Modulo 3
+
+1. Diavolo (XV) e Torre (XVI) spezzano i vincoli materiali.
+2. Dalle Stelle (XVII) e dalla Luna (XVIII) si giunge al Sole (XIX).
+3. La chiamata al risveglio del Giudizio (XX) conduce alla compiutezza e al trionfo finale del Mondo (XXI).
+`
+  },
+  {
+    moduleNumber: "04",
+    title: "Laboratorio Pratico Finale e Verifica",
+    subtitle: "Autovalutazione dei cicli \xB7 Stese integrative \xB7 Chiusura Primo Step",
+    format: "Quaderno esercizi + Verifica competenze",
+    readingMinutes: 25,
+    keyTakeaways: [
+      "Riconoscere quale settenario risuona nella situazione attuale.",
+      "Esercizi tris dei settenari e stesa delle tre fasi.",
+      "Chiusura del Primo Step con ripasso al Sigillo flashcard."
+    ],
+    contentMarkdown: `## Laboratorio Pratico Finale e Verifica delle Competenze
+
+Questa sezione trasforma l'inquadramento teorico dei Tre Settenari in **competenza attiva**, per verificare il livello di assimilazione e usare le carte nella consultazione pratica.
+
+## Test di Autovalutazione dei Cicli
+
+Rispondi ai quesiti guida per capire quale settenario risuona con maggiore frequenza nella tua situazione (o in quella del consultante).
+
+### 1. Fase di Avvio \u2014 Primo Settenario (0 \u2013 VII)
+
+Si sta vivendo un nuovo inizio, cercando la propria direzione o posando le basi di un progetto pratico? In tal caso, analizza l'energia del Matto, del Bagatto e del Carro.
+
+### 2. Fase di Scelta ed Elaborazione \u2014 Secondo Settenario (VIII \u2013 XIV)
+
+Si stanno affrontando blocchi, soste forzate, norme da rispettare o trasformazioni radicali? In tal caso, approfondisci la lezione dell'Eremita, dell'Appeso o della Morte.
+
+### 3. Fase di Svolta e Realizzazione \u2014 Terzo Settenario (XV \u2013 XXI)
+
+Si stanno recidendo schemi limitanti, affrontando lati d'Ombra o raccogliendo i frutti di un percorso completo? In tal caso, osserva l'impatto della Torre, del Sole o del Mondo.
+
+## Esercizi Pratici di Lettura
+
+### Esercizio A \u2014 Il tris dei settenari
+
+Estrai una carta a caso dal mazzo. Riconosci a quale dei tre settenari appartiene e articola a voce alta la lezione evolutiva che esprime per la situazione esaminata.
+
+### Esercizio B \u2014 La stesa delle tre fasi
+
+Esegui una stesa a tre carte, una per ciascun settenario:
+
+1. **Prima carta (1\xB0 Settenario)** \u2014 punto di partenza e azione pratica immediata.
+2. **Seconda carta (2\xB0 Settenario)** \u2014 nodo interiore o prova etica da superare.
+3. **Terza carta (3\xB0 Settenario)** \u2014 prospettiva di sblocco e direzione evolutiva finale.
+
+## Chiusura del Primo Step
+
+Dopo autovalutazione ed esercizi, ripassa i Trionfi 0\u2013XXI con il **Sigillo di apprendimento** (flashcard) e segna i moduli completati nella tua Area Riservata.
+`
+  }
+];
+
 // src/db/seedData.ts
 var COURSE_SEED_CATALOG = [
   {
     slug: "arcani-maggiori",
     title: "Arcani Maggiori",
-    subtitle: "Il Viaggio Archetipico da 0 a XXI \xB7 Presente e Previsione",
-    description: "Studio approfondito dei 22 Trionfi: iconografia tradizionale, struttura numerologica, lettura in luce e ombra e interpretazione previsionale delle grandi svolte.",
+    subtitle: "Primo Step \xB7 Tre Settenari da 0 a XXI \xB7 Presente e Previsione",
+    description: "Dispensa formativa completa del Primo Step: mappa dei Tre Settenari, studio dei 22 Trionfi dal Matto al Mondo, visioni multiple, schede visive, Sigillo flashcard ed esercizi di verifica.",
     priceEur: 190,
     stripePriceId: process.env.STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI || "STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI",
-    lessonsCount: 12,
-    totalHours: "8h 30m video",
+    lessonsCount: 4,
+    totalHours: "dispense + Sigillo",
     levelLabel: "Livello Base e Intermedio",
     sortOrder: 1,
-    dispense: [
-      {
-        moduleNumber: "01",
-        title: "Struttura del Mazzo e Primo Settenario (0 \u2013 VII)",
-        subtitle: "Dal potenziale originario del Matto alla direzione del Carro",
-        format: "Dispensa PDF + Scheda Archetipica",
-        readingMinutes: 22,
-        keyTakeaways: [
-          "Il Matto (0) come soglia fuori dal numero e principio di libert\xE0.",
-          "Polarit\xE0 attiva e ricettiva tra Il Bagatto (I) e La Papessa (II).",
-          "Lettura previsionale del Carro (VII): accelerazione, spostamenti e vittoria disciplinata."
-        ],
-        contentMarkdown: `## Il Primo Settenario: Identit\xE0 e Radicamento nel Mondo
-
-I primi sette Arcani Maggiori descrivono la formazione della coscienza individuale e la capacit\xE0 di agire nella realt\xE0 concreta.
-
-### 1. Il Matto (0) e l'inizio non condizionato
-Quando compare in lettura, segnala uno slancio genuino, una partenza imminente o un salto di fiducia ancora privo di schema rigido. In chiave previsionale anticipa un cambiamento improvviso di rotta o una novit\xE0 che richiede coraggio.
-
-### 2. La diade creativa: Bagatto (I) e Papessa (II)
-- **Il Bagatto**: strumenti sul tavolo, iniziativa immediata, talento da mettere all'opera nei prossimi giorni.
-- **La Papessa**: gestazione silenziosa, verit\xE0 intuita prima che detta, attesa fertile.
-
-### 3. Imperatrice (III), Imperatore (IV), Papa (V), Innamorati (VI) e Carro (VII)
-Dal fiorire creativo alla struttura, fino al patto etico (V), alla scelta del cuore (VI) e al movimento deciso del Carro (VII), che in previsione indica sblocco rapido di trattative o viaggi.`
-      },
-      {
-        moduleNumber: "02",
-        title: "Secondo Settenario: Prove Interiori e Destino (VIII \u2013 XIV)",
-        subtitle: "Giustizia, Eremita, Ruota della Fortuna e Temperanza",
-        format: "Dispensa PDF + Mappa Cicli",
-        readingMinutes: 25,
-        keyTakeaways: [
-          "La Giustizia (VIII/XI) e il bilancio oggettivo di accordi e contratti.",
-          "L\u2019Eremita (IX) come ricerca della lanterna interiore e maturit\xE0 dei tempi.",
-          "La Ruota della Fortuna (X) e la Temperanza (XIV): leggere il cambio di stagione."
-        ],
-        contentMarkdown: `## Il Secondo Settenario: Il Confronto con la Legge del Tempo
-
-In questa fascia centrale degli Arcani Maggiori il consultante impara a distinguere ci\xF2 che dipende dalla volont\xE0 da ci\xF2 che appartiene ai cicli pi\xF9 ampi.
-
-### La Giustizia e La Forza
-La Giustizia chiede chiarezza contrattuale e coerenza morale; sul piano futuro anticipa firme, verifiche o riequilibri meritati. La Forza sostituisce la durezza con la padronanza calma dell'istinto.
-
-### L'Eremita (IX) e La Ruota (X)
-- **L'Eremita**: invita a non forzare i tempi; mostra un periodo di discernimento che precede una decisione stabile.
-- **La Ruota della Fortuna**: segnala una svolta esterna imminente, un ritorno ciclico o un'opportunit\xE0 che chiede prontezza.
-
-### Appeso (XII), Arcano XIII e Temperanza (XIV)
-L'Appeso sospende l'azione per cambiare sguardo; l'Arcano XIII chiude ci\xF2 che ha esaurito la sua funzione; la Temperanza ricompone gli opposti con misura e guarigione graduale.`
-      },
-      {
-        moduleNumber: "03",
-        title: "Terzo Settenario: Ombra, Luce e Compimento (XV \u2013 XXI)",
-        subtitle: "Dal Diavolo e la Torre fino alle Stelle, Sole e Mondo",
-        format: "Dispensa PDF + Atlante Simbolico",
-        readingMinutes: 28,
-        keyTakeaways: [
-          "Leggere Il Diavolo (XV) e La Torre (XVI) senza fatalismo ma come verit\xE0 liberatorie.",
-          "Le Stelle (XVII) e La Luna (XVIII): discernere speranza autentica da proiezione.",
-          "Il Sole (XIX), Il Giudizio (XX) e Il Mondo (XXI) nelle previsioni di realizzazione."
-        ],
-        contentMarkdown: `## Il Terzo Settenario: La Trasformazione Profonda
-
-Gli ultimi sette Arcani conducono oltre i legami dell'ego verso una visione aperta e integrata.
-
-### Ombra e Rottura Costruttiva (XV \u2013 XVI)
-Il Diavolo porta alla luce attaccamenti, desideri intensi o accordi squilibrati. La Torre non punisce: abbatte costruzioni ormai fragili per liberare spazio autentico nel futuro prossimo.
-
-### Le Luci del Cielo (XVII \u2013 XIX)
-- **Le Stelle**: protezione, vocazione limpida, fidatezza dei progetti a medio termine.
-- **La Luna**: sogni, memorie familiari, zone non ancora chiarite dove muoversi con cautela.
-- **Il Sole**: chiarezza meridiana, riconoscimento pubblico, intesa affettiva e riuscita concreta.
-
-### Rinascita e Sintesi (XX \u2013 XXI)
-Il Giudizio annuncia una chiamata o notizia decisiva; Il Mondo sancisce il compimento di un ciclo e l'apertura di un nuovo orizzonte.`
-      },
-      {
-        moduleNumber: "04",
-        title: "Dialoghi tra Arcani e Formulazione Previsionale Etica",
-        subtitle: "Combinazioni binarie, libero arbitrio e codice deontologico",
-        format: "Quaderno Esercizi + Casi Studio",
-        readingMinutes: 20,
-        keyTakeaways: [
-          "Come il secondo Arcano orienta la direzione evolutiva del primo.",
-          "Linguaggio deontologico per esprimere scenari futuri senza togliere autonomia.",
-          "Protocollo di verifica su amore, lavoro e scelte personali."
-        ],
-        contentMarkdown: `## Combinare Due Arcani Maggiori in Chiave Previsionale
-
-Una carta isolata descrive un archetipo; due carte accostate mostrano un movimento nel tempo.
-
-### Regola della Direzione (Carta A \u2192 Carta B)
-1. **Carta A** fotografa la radice attiva nel presente.
-2. **Carta B** mostra dove converge l'energia nei mesi successivi se il consultante mantiene la rotta.
-
-### Esempio Pratico
-- **Eremita + Carro**: dopo una fase di studio riservato o attesa riflessiva, arriva una ripartenza veloce con obiettivi definiti.
-- **Torre + Stelle**: una ristrutturazione improvvisa libera risorse per un progetto pi\xF9 fedele alla propria vocazione.
-
-### Confine Etico (Legge 4/2013)
-La previsione olistica traccia tendenze reali e punti di snodo lasciando sempre al consultante la responsabilit\xE0 delle proprie scelte; restano escluse diagnosi mediche o pronostici sanitari.`
-      }
-    ]
+    dispense: ARCANI_MAGGIORI_DISPENSE
   },
   {
     slug: "arcani-minori",
@@ -8898,6 +9133,15 @@ var SCHEMA_BOOTSTRAP_STATEMENTS = [
     expires_at timestamp NOT NULL,
     created_at timestamp DEFAULT NOW() NOT NULL
   )`,
+  // ENN-98 — appunti liberi (tab Appunti), indipendenti dai corsi
+  `CREATE TABLE IF NOT EXISTS user_notes (
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title text DEFAULT '' NOT NULL,
+    body text DEFAULT '' NOT NULL,
+    created_at timestamp DEFAULT NOW() NOT NULL,
+    updated_at timestamp DEFAULT NOW() NOT NULL
+  )`,
   // --- Legacy ALTER (bases that predate booking Stripe/Calendar columns) ---
   `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS mode text NOT NULL DEFAULT 'remote'`,
   `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS stripe_session_id text`,
@@ -8917,7 +9161,9 @@ var SCHEMA_BOOTSTRAP_STATEMENTS = [
      WHERE stripe_session_id IS NOT NULL`,
   `CREATE UNIQUE INDEX IF NOT EXISTS consultation_bookings_active_slot_idx
      ON consultation_bookings (scheduled_date, scheduled_time)
-     WHERE status IN ('pending_payment', 'confirmed')`
+     WHERE status IN ('pending_payment', 'confirmed')`,
+  `CREATE INDEX IF NOT EXISTS user_notes_user_id_idx
+     ON user_notes (user_id)`
 ];
 async function ensureBookingSchema() {
   if (!hasDatabaseConfig()) {

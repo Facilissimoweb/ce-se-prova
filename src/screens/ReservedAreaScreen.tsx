@@ -520,8 +520,7 @@ export function ReservedAreaScreen({
               {activeDispensa && (
                 <article
                   id={SCROLL_LANDMARKS.reservedDispensaContent}
-                  className="notranslate lg:col-span-8 glass-tier-1 rounded-2xl p-6 md:p-8 space-y-6 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
-                  translate="no"
+                  className="lg:col-span-8 glass-tier-1 rounded-2xl p-6 md:p-8 space-y-6 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-[#D4AF37]/15 pb-5">
                     <div className="space-y-1.5">
