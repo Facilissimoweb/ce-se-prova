@@ -75,7 +75,9 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'home.bookmarksAria': 'Segnalibri laterali Consulti e Didattica',
     'nina.sectionAria': 'Parla con Maria Teresa',
     'nina.subtitleAvailable':
-      'Assistente virtuale di Maria Teresa. Per un consulto autentico, usa Parla con Maria Teresa qui sotto.',
+      'Accoglienza del sito: prezzi, WhatsApp, mappa. Per un consulto autentico usa Parla con Maria Teresa qui sotto.',
+    'nina.subtitleStudio':
+      'Nina Studio · compagnia di studio Maggiori (simbologia, senso, luce/ombra, previsione).',
     'nina.subtitleUnavailable':
       'Nina non è attiva. Usa Parla con Maria Teresa qui sotto.',
     'nina.errorOffline':
@@ -85,7 +87,18 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'nina.errorGeneric':
       'Non riesco a rispondere in questo momento. Riprova o usa i contatti.',
     'nina.welcome':
-      'Ciao, sono **Nina**, l’assistente virtuale di Tarot Italia.\n\nSono qui per **accoglierti** e orientarti con calma.\n\nQuando vorrai un consulto autentico, ti accompagno verso **Maria Teresa** — usa la sezione **Parla con Maria Teresa** qui sotto.',
+      'Ciao, sono **Nina**, l’assistente di **accoglienza** di Tarot Italia.\n\nTi oriento su **prezzi**, prenotazione **WhatsApp**, mappa del sito e **Chi sono**.\n\nLo studio profondo dei Maggiori è in **Nina Studio** (corso Arcani Maggiori). Per un consulto autentico usa **Parla con Maria Teresa** qui sotto.',
+    'nina.welcomeStudio':
+      'Ciao, sono **Nina Studio** — la compagnia di studio degli **Arcani Maggiori**.\n\nPossiamo esplorare simbologia, senso, luce/ombra e chiave previsionale (schede ufficiali del corso).\n\nIl Dialogo Tarot resta un percorso separato. Per un consulto con Maria Teresa usa la sezione qui sotto.',
+    'nina.modeWelcome': 'Accoglienza',
+    'nina.modeStudio': 'Nina Studio',
+    'nina.modeAria': 'Modalità chat Nina',
+    'nina.studioLockedHint':
+      'Nina Studio è inclusa nel corso Arcani Maggiori.',
+    'nina.studioCta': 'Apri Corsi Maggiori',
+    'nina.fabTitleWelcome': 'Chat Nina · Accoglienza',
+    'nina.fabTitleStudio': 'Nina Studio · Maggiori',
+    'nina.listening': 'Nina sta ascoltando…',
   },
   en: {
     'nav.home': 'Home',
@@ -161,7 +174,9 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'home.bookmarksAria': 'Side bookmarks for Readings and Courses',
     'nina.sectionAria': 'Talk to Maria Teresa',
     'nina.subtitleAvailable':
-      'Maria Teresa’s virtual assistant. For a live reading, use Talk to Maria Teresa below.',
+      'Site welcome: prices, WhatsApp, sitemap. For a live reading use Talk to Maria Teresa below.',
+    'nina.subtitleStudio':
+      'Nina Studio · Major Arcana study companion (symbolism, meaning, light/shadow, forecast).',
     'nina.subtitleUnavailable':
       'Nina is offline. Use Talk to Maria Teresa below.',
     'nina.errorOffline':
@@ -171,7 +186,18 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'nina.errorGeneric':
       'I cannot reply right now. Please try again or use the contacts.',
     'nina.welcome':
-      'Hello, I am **Nina**, Tarot Italia’s virtual assistant.\n\nI am here to **welcome** you and guide you calmly.\n\nWhen you want a live reading, I will accompany you to **Maria Teresa** — use the **Talk to Maria Teresa** section below.',
+      'Hello, I am **Nina**, Tarot Italia’s **welcome** assistant.\n\nI can help with **prices**, **WhatsApp** booking, the site map and **About**.\n\nDeep Major Arcana study lives in **Nina Studio** (Major Arcana course). For a live reading use **Talk to Maria Teresa** below.',
+    'nina.welcomeStudio':
+      'Hello, I am **Nina Studio** — your **Major Arcana** study companion.\n\nWe can explore symbolism, meaning, light/shadow and forecast keys (official course sheets).\n\nTarot Dialogue stays a separate path. For a reading with Maria Teresa use the section below.',
+    'nina.modeWelcome': 'Welcome',
+    'nina.modeStudio': 'Nina Studio',
+    'nina.modeAria': 'Nina chat mode',
+    'nina.studioLockedHint':
+      'Nina Studio is included with the Major Arcana course.',
+    'nina.studioCta': 'Open Major Arcana courses',
+    'nina.fabTitleWelcome': 'Nina chat · Welcome',
+    'nina.fabTitleStudio': 'Nina Studio · Majors',
+    'nina.listening': 'Nina is listening…',
   },
   es: {
     'nav.home': 'Inicio',
@@ -247,7 +273,9 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'home.bookmarksAria': 'Marcadores laterales Consultas y Didáctica',
     'nina.sectionAria': 'Habla con Maria Teresa',
     'nina.subtitleAvailable':
-      'Asistente virtual de Maria Teresa. Para una consulta auténtica, usa Habla con Maria Teresa abajo.',
+      'Acogida del sitio: precios, WhatsApp, mapa. Para una consulta auténtica usa Habla con Maria Teresa abajo.',
+    'nina.subtitleStudio':
+      'Nina Studio · compañera de estudio de Mayores (simbología, sentido, luz/sombra, previsión).',
     'nina.subtitleUnavailable':
       'Nina no está activa. Usa Habla con Maria Teresa abajo.',
     'nina.errorOffline':
@@ -257,7 +285,18 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'nina.errorGeneric':
       'No puedo responder ahora. Reintenta o usa los contactos.',
     'nina.welcome':
-      'Hola, soy **Nina**, la asistente virtual de Tarot Italia.\n\nEstoy aquí para **acogerte** y orientarte con calma.\n\nCuando quieras una consulta auténtica, te acompaño hacia **Maria Teresa** — usa la sección **Habla con Maria Teresa** aquí abajo.',
+      'Hola, soy **Nina**, la asistente de **acogida** de Tarot Italia.\n\nTe oriento sobre **precios**, reserva por **WhatsApp**, mapa del sitio y **Quién soy**.\n\nEl estudio profundo de los Mayores está en **Nina Studio** (curso Arcanos Mayores). Para una consulta auténtica usa **Habla con Maria Teresa** abajo.',
+    'nina.welcomeStudio':
+      'Hola, soy **Nina Studio** — tu compañera de estudio de los **Arcanos Mayores**.\n\nPodemos explorar simbología, sentido, luz/sombra y clave previsional (fichas oficiales del curso).\n\nEl Diálogo Tarot sigue siendo un camino aparte. Para una consulta con Maria Teresa usa la sección de abajo.',
+    'nina.modeWelcome': 'Acogida',
+    'nina.modeStudio': 'Nina Studio',
+    'nina.modeAria': 'Modo de chat Nina',
+    'nina.studioLockedHint':
+      'Nina Studio está incluido en el curso Arcanos Mayores.',
+    'nina.studioCta': 'Abrir Cursos Mayores',
+    'nina.fabTitleWelcome': 'Chat Nina · Acogida',
+    'nina.fabTitleStudio': 'Nina Studio · Mayores',
+    'nina.listening': 'Nina está escuchando…',
   },
   fr: {
     'nav.home': 'Accueil',
@@ -333,7 +372,9 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'home.bookmarksAria': 'Signets latéraux Consultations et Didactique',
     'nina.sectionAria': 'Parler à Maria Teresa',
     'nina.subtitleAvailable':
-      'Assistante virtuelle de Maria Teresa. Pour une vraie consultation, utilisez Parler à Maria Teresa ci-dessous.',
+      'Accueil du site : tarifs, WhatsApp, plan. Pour une vraie consultation, utilisez Parler à Maria Teresa ci-dessous.',
+    'nina.subtitleStudio':
+      'Nina Studio · compagnon d’étude des Majeurs (symbolique, sens, lumière/ombre, prévision).',
     'nina.subtitleUnavailable':
       'Nina n’est pas active. Utilisez Parler à Maria Teresa ci-dessous.',
     'nina.errorOffline':
@@ -343,7 +384,18 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'nina.errorGeneric':
       'Je ne peux pas répondre pour le moment. Réessayez ou utilisez les contacts.',
     'nina.welcome':
-      'Bonjour, je suis **Nina**, l’assistante virtuelle de Tarot Italia.\n\nJe suis ici pour vous **accueillir** et vous orienter avec calme.\n\nQuand vous voudrez une vraie consultation, je vous accompagne vers **Maria Teresa** — utilisez la section **Parler à Maria Teresa** ci-dessous.',
+      'Bonjour, je suis **Nina**, l’assistante d’**accueil** de Tarot Italia.\n\nJe vous oriente sur les **tarifs**, la réservation **WhatsApp**, le plan du site et **Qui suis-je**.\n\nL’étude approfondie des Majeurs est dans **Nina Studio** (cours Arcanes Majeurs). Pour une vraie consultation, utilisez **Parler à Maria Teresa** ci-dessous.',
+    'nina.welcomeStudio':
+      'Bonjour, je suis **Nina Studio** — votre compagnon d’étude des **Arcanes Majeurs**.\n\nNous pouvons explorer symbolique, sens, lumière/ombre et clé prévisionnelle (fiches officielles du cours).\n\nLe Dialogue Tarot reste un parcours distinct. Pour une consultation avec Maria Teresa, utilisez la section ci-dessous.',
+    'nina.modeWelcome': 'Accueil',
+    'nina.modeStudio': 'Nina Studio',
+    'nina.modeAria': 'Mode de chat Nina',
+    'nina.studioLockedHint':
+      'Nina Studio est inclus dans le cours Arcanes Majeurs.',
+    'nina.studioCta': 'Ouvrir Cours Majeurs',
+    'nina.fabTitleWelcome': 'Chat Nina · Accueil',
+    'nina.fabTitleStudio': 'Nina Studio · Majeurs',
+    'nina.listening': 'Nina écoute…',
   },
   de: {
     'nav.home': 'Start',
@@ -419,7 +471,9 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'home.bookmarksAria': 'Seitliche Lesezeichen Beratungen und Didaktik',
     'nina.sectionAria': 'Mit Maria Teresa sprechen',
     'nina.subtitleAvailable':
-      'Virtuelle Assistentin von Maria Teresa. Für eine echte Beratung nutzen Sie Mit Maria Teresa sprechen unten.',
+      'Willkommen: Preise, WhatsApp, Sitemap. Für eine echte Beratung nutzen Sie Mit Maria Teresa sprechen unten.',
+    'nina.subtitleStudio':
+      'Nina Studio · Lernbegleitung Große Arkana (Symbolik, Sinn, Licht/Schatten, Prognose).',
     'nina.subtitleUnavailable':
       'Nina ist nicht aktiv. Nutzen Sie Mit Maria Teresa sprechen unten.',
     'nina.errorOffline':
@@ -429,6 +483,17 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'nina.errorGeneric':
       'Ich kann gerade nicht antworten. Bitte erneut versuchen oder die Kontakte nutzen.',
     'nina.welcome':
-      'Hallo, ich bin **Nina**, die virtuelle Assistentin von Tarot Italia.\n\nIch bin hier, um Sie **willkommen** zu heißen und ruhig zu orientieren.\n\nWenn Sie eine echte Beratung möchten, begleite ich Sie zu **Maria Teresa** — nutzen Sie den Bereich **Mit Maria Teresa sprechen** unten.',
+      'Hallo, ich bin **Nina**, die **Willkommens**-Assistentin von Tarot Italia.\n\nIch helfe bei **Preisen**, **WhatsApp**-Buchung, Sitemap und **Über mich**.\n\nVertieftes Studium der Großen Arkana gibt es in **Nina Studio** (Kurs Große Arkana). Für eine echte Beratung nutzen Sie **Mit Maria Teresa sprechen** unten.',
+    'nina.welcomeStudio':
+      'Hallo, ich bin **Nina Studio** — Ihre Lernbegleitung für die **Großen Arkana**.\n\nWir können Symbolik, Sinn, Licht/Schatten und Prognoseschlüssel erkunden (offizielle Kursblätter).\n\nDer Tarot-Dialog bleibt ein eigener Weg. Für eine Beratung mit Maria Teresa nutzen Sie den Bereich unten.',
+    'nina.modeWelcome': 'Willkommen',
+    'nina.modeStudio': 'Nina Studio',
+    'nina.modeAria': 'Nina-Chat-Modus',
+    'nina.studioLockedHint':
+      'Nina Studio ist im Kurs Große Arkana enthalten.',
+    'nina.studioCta': 'Große-Arkana-Kurse öffnen',
+    'nina.fabTitleWelcome': 'Nina-Chat · Willkommen',
+    'nina.fabTitleStudio': 'Nina Studio · Arkana',
+    'nina.listening': 'Nina hört zu…',
   },
 };

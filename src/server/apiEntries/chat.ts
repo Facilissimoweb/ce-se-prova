@@ -1,7 +1,10 @@
 /**
  * Generic site chat (Groq) — GET status, POST message.
  * Bundled by scripts/bundle-api.mjs into api/chat.js.
- * Keep this free of firebase/pg imports (same pattern as news).
+ *
+ * ENN-137: welcome mode stays light; studio mode verifies Maggiori purchase
+ * via Bearer + course_purchases (firebase-admin / pg stay external).
+ * Auth is only exercised on studio POSTs — welcome path does not call Firebase.
  */
 import { getChatStatus, postChatMessage } from '../routes/chat.ts';
 import {
@@ -13,6 +16,16 @@ import {
 
 export const config = { runtime: 'nodejs', maxDuration: 30 };
 
+function readAuthorization(req: NodeLikeReq): string | undefined {
+  for (const [key, value] of Object.entries(req.headers || {})) {
+    if (key.toLowerCase() !== 'authorization') continue;
+    const raw = Array.isArray(value) ? value[0] : value;
+    const trimmed = raw?.trim();
+    return trimmed || undefined;
+  }
+  return undefined;
+}
+
 export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   try {
     const method = (req.method || 'GET').toUpperCase();
@@ -23,7 +36,10 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
     }
 
     if (method === 'POST') {
-      const result = await postChatMessage(readBodyObject(req));
+      const result = await postChatMessage({
+        body: readBodyObject(req),
+        authorization: readAuthorization(req),
+      });
       return sendJson(res, result.status, result.body);
     }
 
