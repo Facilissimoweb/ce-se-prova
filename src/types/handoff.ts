@@ -227,6 +227,8 @@ export interface CookieConsentPreferences {
   necessary: true;
   functional: boolean;
   analytics: boolean;
+  /** Third-party scripts (Google Website Translator, etc.) — ENN-140. */
+  marketing: boolean;
   updatedAtIso: string;
 }
 

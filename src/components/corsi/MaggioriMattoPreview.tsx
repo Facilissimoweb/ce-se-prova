@@ -7,6 +7,7 @@ import {
   Download,
   Lock,
 } from 'lucide-react';
+import { MaterialsLanguagePicker } from '../MaterialsLanguagePicker';
 import { DispensaFlashcards } from '../reserved/DispensaFlashcards';
 import { DispensaSchedaVisiva } from '../reserved/DispensaSchedaVisiva';
 import { FormattedDispensaBody } from '../reserved/FormattedDispensaBody';
@@ -58,7 +59,8 @@ export function MaggioriMattoPreview({
     <section
       id={SCROLL_LANDMARKS.corsiMaggioriPreview}
       aria-labelledby="maggiori-matto-preview-heading"
-      className="space-y-6 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
+      className="notranslate space-y-6 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
+      translate="no"
     >
       <h2 id="maggiori-matto-preview-heading" className="sr-only">
         Anteprima Dispensa 01 · Arcani Maggiori
@@ -169,25 +171,35 @@ export function MaggioriMattoPreview({
               <p className="text-sm text-[#A39B93]">{dispensa01.subtitle}</p>
             </div>
 
-            <div className="flex flex-wrap gap-2 shrink-0">
-              <button
-                type="button"
-                disabled
-                title="Disponibile dopo l’iscrizione"
-                className="px-3.5 py-2 min-h-[40px] rounded-lg border border-[#D4AF37]/30 text-xs font-medium text-[#F4F1EA]/55 inline-flex items-center gap-1.5 whitespace-nowrap cursor-not-allowed"
-              >
-                <Download className="w-3.5 h-3.5 text-[#D4AF37]/70" aria-hidden="true" />
-                Scarica Dispensa
-              </button>
-              <button
-                type="button"
-                disabled
-                title="Disponibile dopo l’iscrizione"
-                className="px-3.5 py-2 min-h-[40px] rounded-lg bg-[#D4AF37]/12 border border-[#D4AF37]/35 text-xs font-semibold text-[#F4F1EA]/55 inline-flex items-center gap-1.5 whitespace-nowrap cursor-not-allowed"
-              >
-                <Check className="w-3.5 h-3.5" aria-hidden="true" />
-                Segna Completato
-              </button>
+            <div className="flex flex-col items-stretch sm:items-end gap-2 shrink-0">
+              <MaterialsLanguagePicker />
+              <p className="text-[11px] text-[#A39B93] max-w-[16rem] sm:text-right">
+                Dopo l&apos;iscrizione scarichi la dispensa curata nella lingua
+                scelta (IT + EN).
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  disabled
+                  title="Disponibile dopo l’iscrizione in Area Riservata"
+                  className="px-3.5 py-2 min-h-[40px] rounded-lg border border-[#D4AF37]/30 text-xs font-medium text-[#F4F1EA]/55 inline-flex items-center gap-1.5 whitespace-nowrap cursor-not-allowed"
+                >
+                  <Download
+                    className="w-3.5 h-3.5 text-[#D4AF37]/70"
+                    aria-hidden="true"
+                  />
+                  Scarica Dispensa
+                </button>
+                <button
+                  type="button"
+                  disabled
+                  title="Disponibile dopo l’iscrizione"
+                  className="px-3.5 py-2 min-h-[40px] rounded-lg bg-[#D4AF37]/12 border border-[#D4AF37]/35 text-xs font-semibold text-[#F4F1EA]/55 inline-flex items-center gap-1.5 whitespace-nowrap cursor-not-allowed"
+                >
+                  <Check className="w-3.5 h-3.5" aria-hidden="true" />
+                  Segna Completato
+                </button>
+              </div>
             </div>
           </div>
 

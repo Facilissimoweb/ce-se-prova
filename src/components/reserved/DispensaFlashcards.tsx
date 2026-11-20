@@ -64,7 +64,8 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
 
   return (
     <section
-      className="space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-5 md:p-6"
+      className="notranslate space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-5 md:p-6"
+      translate="no"
       aria-label="Sigillo di apprendimento con flashcard"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">

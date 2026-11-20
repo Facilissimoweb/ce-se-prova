@@ -81,7 +81,8 @@ export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
 
   return (
     <section
-      className="space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-4 md:p-6"
+      className="notranslate space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-4 md:p-6"
+      translate="no"
       aria-label={`Scheda visiva: ${content.title}`}
     >
       <div className="space-y-1.5">
