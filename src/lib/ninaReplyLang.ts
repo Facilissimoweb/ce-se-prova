@@ -30,15 +30,12 @@ export const NINA_REPLY_LANG_LABELS: Record<string, string> = {
 
 /**
  * Normalize client `lang` (googtrans target) for prompts / copy lookup.
- * Preserves `zh-CN` as `zh-cn`; unknown tags keep their primary subtag.
+ * ENN-159: any Chinese variant → `zh-cn` (Simplified only; never zh-TW).
  */
 export function normalizeNinaLang(lang?: string | null): string {
   const raw = (lang || 'it').trim().toLowerCase().replace(/_/g, '-');
   if (!raw) return 'it';
   if (raw === 'zh' || raw.startsWith('zh-')) {
-    if (raw.startsWith('zh-tw') || raw.startsWith('zh-hk') || raw.startsWith('zh-hant')) {
-      return raw;
-    }
     return 'zh-cn';
   }
   if (NINA_REPLY_LANG_LABELS[raw]) return raw;

@@ -7,6 +7,10 @@ import {
 } from '../lib/cookieConsent';
 import { setSiteLanguage } from '../i18n';
 import {
+  applyGtDocumentChrome,
+  normalizeGoogTransLang,
+} from '../lib/gtLangCodes';
+import {
   GT_HOST_ID,
   GT_PAGE_LANG,
   clearGoogtransHash,
@@ -17,6 +21,7 @@ import {
   startGoogleTranslateSpaBridge,
   writeGoogtransCookie,
 } from '../lib/googleTranslateRuntime';
+
 
 const GT_SCRIPT_ID = 'tarot_italia_google_translate_script';
 export { GT_HOST_ID, readGoogTransLang } from '../lib/googleTranslateRuntime';
@@ -101,15 +106,16 @@ export function applyGoogTransLang(code: string) {
   // Keep react-i18next on Italian so GT does not double-translate overlays.
   void setSiteLanguage('it');
 
-  const target = (code || GT_PAGE_LANG).trim();
+  // ENN-159 — menu / cookie / hash always use canonical codes (zh-CN, ja, ar, hi…).
+  const target = normalizeGoogTransLang(code || GT_PAGE_LANG);
   const path = `${window.location.pathname}${window.location.search}`;
 
   document.documentElement.classList.remove('translated-ltr', 'translated-rtl');
   document.body?.style.removeProperty('top');
+  applyGtDocumentChrome(target);
 
   if (target === GT_PAGE_LANG) {
     expireGoogtransCookies();
-    document.documentElement.lang = GT_PAGE_LANG;
     // Strip hash first so reload cannot resurrect a foreign googtrans target.
     window.history.replaceState(null, '', path);
     window.location.reload();
@@ -312,7 +318,9 @@ function BrandedLanguageMenu({
   const active = langByCode(current);
 
   useEffect(() => {
-    setCurrent(readGoogTransLang());
+    const live = readGoogTransLang();
+    setCurrent(live);
+    applyGtDocumentChrome(live);
   }, []);
 
   useEffect(() => {

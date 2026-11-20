@@ -23,10 +23,13 @@ function assert(cond: boolean, label: string) {
 
 assert(normalizeNinaLang('zh-CN') === 'zh-cn', 'normalize zh-CN → zh-cn');
 assert(normalizeNinaLang('ZH_CN') === 'zh-cn', 'normalize ZH_CN → zh-cn');
+assert(normalizeNinaLang('zh-TW') === 'zh-cn', 'ENN-159 zh-TW → zh-cn (Simplified only)');
 assert(normalizeNinaLang('en') === 'en', 'normalize en');
+assert(normalizeNinaLang('hi') === 'hi', 'normalize hi');
 assert(normalizeNinaLang(undefined) === 'it', 'normalize default it');
 assert(ninaReplyLangLabel('zh-CN').includes('中文'), 'label zh-CN');
 assert(ninaReplyLangLabel('ja') === '日本語', 'label ja');
+assert(ninaReplyLangLabel('ar') === 'العربية', 'label ar');
 
 const itPrompt = buildNinaSystemPrompt({
   mode: 'welcome',
