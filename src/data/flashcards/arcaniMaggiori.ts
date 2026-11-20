@@ -2204,9 +2204,5 @@ export function getInlineFlashcardDeck(
 }
 
 /** Strip embed markers from plain-text downloads / exports. */
-export function stripFlashcardEmbedMarkers(markdown: string): string {
-  return markdown
-    .replace(/^\{\{(?:sigillo|scheda-visiva):[\w-]+\}\}\s*$/gm, '')
-    .replace(/\n{3,}/g, '\n\n');
-}
+export { stripDispensaEmbedMarkers as stripFlashcardEmbedMarkers } from '../../lib/stripDispensaEmbeds';
 

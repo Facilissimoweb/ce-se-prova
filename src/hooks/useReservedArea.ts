@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import { downloadMaggioriDispensaFile } from '../data/courses/maggioriDownloads';
-import { stripFlashcardEmbedMarkers } from '../data/flashcards/arcaniMaggiori';
-import { getMaterialsLang } from '../i18n/materialsLang';
+import {
+  downloadDispensaBrandedHtmlFallback,
+  downloadMaggioriDispensaPdf,
+} from '../data/courses/maggioriDownloads';
+import { readGoogTransLang } from '../components/GoogleTranslateWidget';
+import { stripDispensaEmbedMarkers } from '../lib/stripDispensaEmbeds';
 import { readJsonResponse } from '../lib/readJsonResponse';
 import {
   RESERVED_DEMO_UID,
@@ -230,30 +233,55 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
     dispensa: ReservedUnlockedDispensa,
     courseSlug?: string
   ) => {
-    // ENN-140 — Maggiori: curated IT/EN files; other courses keep generated IT markdown.
+    const gtLang =
+      typeof document !== 'undefined' ? readGoogTransLang() : 'it';
+
+    // ENN-145 — branded printable PDF HTML in googtrans language (server translate).
     if (courseSlug === 'arcani-maggiori') {
       try {
-        await downloadMaggioriDispensaFile(
-          dispensa.moduleNumber,
-          getMaterialsLang()
-        );
+        await downloadMaggioriDispensaPdf({
+          dispensaId: dispensa.id,
+          lang: gtLang,
+          getIdToken,
+        });
         return;
       } catch (err) {
-        console.warn('Curated Maggiori download failed, falling back:', err);
+        console.warn('Maggiori PDF download failed, falling back:', err);
+        // Demo / offline: Italian branded print from overview payload.
+        if (userUid === RESERVED_DEMO_UID) {
+          downloadDispensaBrandedHtmlFallback({
+            courseTitle,
+            dispensa,
+            lang: 'it',
+          });
+          return;
+        }
+        setNotesFeedback(
+          err instanceof Error
+            ? err.message
+            : 'Impossibile generare il PDF della dispensa.'
+        );
+        return;
       }
     }
 
-    const body = stripFlashcardEmbedMarkers(dispensa.contentMarkdown);
-    const fileContent = `# Tarot Italia · Maria Teresa Rogani\nPercorso: ${courseTitle}\nModulo ${dispensa.moduleNumber}: ${dispensa.title}\n${dispensa.subtitle}\n\nPunti Chiave:\n${dispensa.keyTakeaways.map((k) => `- ${k}`).join('\n')}\n\n${body}\n`;
-    const blob = new Blob([fileContent], { type: 'text/markdown;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `tarot-italia-modulo-${dispensa.moduleNumber}-${dispensa.id}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // Other courses: branded Italian print from unlocked markdown (no GT pipeline yet).
+    downloadDispensaBrandedHtmlFallback({
+      courseTitle,
+      dispensa: {
+        ...dispensa,
+        contentMarkdown: [
+          `# ${dispensa.title}`,
+          dispensa.subtitle,
+          '',
+          '## Punti Chiave',
+          ...dispensa.keyTakeaways.map((k) => `- ${k}`),
+          '',
+          stripDispensaEmbedMarkers(dispensa.contentMarkdown),
+        ].join('\n'),
+      },
+      lang: 'it',
+    });
   };
 
   const reloadOverview = useCallback(() => {

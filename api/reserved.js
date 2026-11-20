@@ -1427,8 +1427,8 @@ function haveSameKeys(left, right) {
   if (leftKeys.length !== rightKeys.length) {
     return false;
   }
-  for (const [index, key] of leftKeys.entries()) {
-    if (key !== rightKeys[index]) {
+  for (const [index2, key] of leftKeys.entries()) {
+    if (key !== rightKeys[index2]) {
       return false;
     }
   }
@@ -3025,6 +3025,9 @@ var Index = class {
     this.config = { ...config2, table };
   }
 };
+function index(name) {
+  return new IndexBuilderOn(false, name);
+}
 function uniqueIndex(name) {
   return new IndexBuilderOn(true, name);
 }
@@ -3698,8 +3701,8 @@ var PgDialect = class {
       return void 0;
     }
     const joinsArray = [];
-    for (const [index, joinMeta] of joins.entries()) {
-      if (index === 0) {
+    for (const [index2, joinMeta] of joins.entries()) {
+      if (index2 === 0) {
         joinsArray.push(sql` `);
       }
       const table = joinMeta.table;
@@ -3726,7 +3729,7 @@ var PgDialect = class {
           sql`${sql.raw(joinMeta.joinType)} join${lateralSql} ${table}${onSql}`
         );
       }
-      if (index < joins.length - 1) {
+      if (index2 < joins.length - 1) {
         joinsArray.push(sql` `);
       }
     }
@@ -6656,19 +6659,19 @@ var PgPreparedQuery = class {
   /** @internal */
   joinsNotNullableMap;
   /** @internal */
-  async queryWithCache(queryString, params, query) {
+  async queryWithCache(queryString2, params, query) {
     if (this.cache === void 0 || is(this.cache, NoopCache) || this.queryMetadata === void 0) {
       try {
         return await query();
       } catch (e) {
-        throw new DrizzleQueryError(queryString, params, e);
+        throw new DrizzleQueryError(queryString2, params, e);
       }
     }
     if (this.cacheConfig && !this.cacheConfig.enable) {
       try {
         return await query();
       } catch (e) {
-        throw new DrizzleQueryError(queryString, params, e);
+        throw new DrizzleQueryError(queryString2, params, e);
       }
     }
     if ((this.queryMetadata.type === "insert" || this.queryMetadata.type === "update" || this.queryMetadata.type === "delete") && this.queryMetadata.tables.length > 0) {
@@ -6679,19 +6682,19 @@ var PgPreparedQuery = class {
         ]);
         return res;
       } catch (e) {
-        throw new DrizzleQueryError(queryString, params, e);
+        throw new DrizzleQueryError(queryString2, params, e);
       }
     }
     if (!this.cacheConfig) {
       try {
         return await query();
       } catch (e) {
-        throw new DrizzleQueryError(queryString, params, e);
+        throw new DrizzleQueryError(queryString2, params, e);
       }
     }
     if (this.queryMetadata.type === "select") {
       const fromCache = await this.cache.get(
-        this.cacheConfig.tag ?? await hashQuery(queryString, params),
+        this.cacheConfig.tag ?? await hashQuery(queryString2, params),
         this.queryMetadata.tables,
         this.cacheConfig.tag !== void 0,
         this.cacheConfig.autoInvalidate
@@ -6701,10 +6704,10 @@ var PgPreparedQuery = class {
         try {
           result = await query();
         } catch (e) {
-          throw new DrizzleQueryError(queryString, params, e);
+          throw new DrizzleQueryError(queryString2, params, e);
         }
         await this.cache.put(
-          this.cacheConfig.tag ?? await hashQuery(queryString, params),
+          this.cacheConfig.tag ?? await hashQuery(queryString2, params),
           result,
           // make sure we send tables that were used in a query only if user wants to invalidate it on each write
           this.cacheConfig.autoInvalidate ? this.queryMetadata.tables : [],
@@ -6718,7 +6721,7 @@ var PgPreparedQuery = class {
     try {
       return await query();
     } catch (e) {
-      throw new DrizzleQueryError(queryString, params, e);
+      throw new DrizzleQueryError(queryString2, params, e);
     }
   }
 };
@@ -6789,10 +6792,10 @@ var PgTransaction = class extends PgDatabase {
 // node_modules/drizzle-orm/node-postgres/session.js
 var { Pool, types } = pg;
 var NodePgPreparedQuery = class extends PgPreparedQuery {
-  constructor(client, queryString, params, logger, cache, queryMetadata, cacheConfig, fields, name, _isResponseInArrayMode, customResultMapper) {
-    super({ sql: queryString, params }, cache, queryMetadata, cacheConfig);
+  constructor(client, queryString2, params, logger, cache, queryMetadata, cacheConfig, fields, name, _isResponseInArrayMode, customResultMapper) {
+    super({ sql: queryString2, params }, cache, queryMetadata, cacheConfig);
     this.client = client;
-    this.queryString = queryString;
+    this.queryString = queryString2;
     this.params = params;
     this.logger = logger;
     this.fields = fields;
@@ -6800,7 +6803,7 @@ var NodePgPreparedQuery = class extends PgPreparedQuery {
     this.customResultMapper = customResultMapper;
     this.rawQueryConfig = {
       name,
-      text: queryString,
+      text: queryString2,
       types: {
         // @ts-ignore
         getTypeParser: (typeId, format) => {
@@ -6837,7 +6840,7 @@ var NodePgPreparedQuery = class extends PgPreparedQuery {
     };
     this.queryConfig = {
       name,
-      text: queryString,
+      text: queryString2,
       rowMode: "array",
       types: {
         // @ts-ignore
@@ -7144,6 +7147,8 @@ __export(schema_exports, {
   dispensaProgressRelations: () => dispensaProgressRelations,
   dispense: () => dispense,
   dispenseRelations: () => dispenseRelations,
+  userNotes: () => userNotes,
+  userNotesRelations: () => userNotesRelations,
   users: () => users,
   usersRelations: () => usersRelations
 });
@@ -7284,12 +7289,27 @@ var dialoguePurchases = pgTable("dialogue_purchases", {
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
+var userNotes = pgTable(
+  "user_notes",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    title: text("title").default("").notNull(),
+    body: text("body").default("").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull()
+  },
+  (table) => [
+    index("user_notes_user_id_idx").on(table.userId)
+  ]
+);
 var usersRelations = relations(users, ({ many }) => ({
   purchases: many(coursePurchases),
   dispensaProgress: many(dispensaProgress),
   bookings: many(consultationBookings),
   dialogueSessions: many(dialogueSessions),
-  dialoguePurchases: many(dialoguePurchases)
+  dialoguePurchases: many(dialoguePurchases),
+  notes: many(userNotes)
 }));
 var coursesRelations = relations(courses, ({ many }) => ({
   dispense: many(dispense),
@@ -7342,6 +7362,12 @@ var dialoguePurchasesRelations = relations(dialoguePurchases, ({ one }) => ({
   }),
   user: one(users, {
     fields: [dialoguePurchases.userId],
+    references: [users.id]
+  })
+}));
+var userNotesRelations = relations(userNotes, ({ one }) => ({
+  user: one(users, {
+    fields: [userNotes.userId],
     references: [users.id]
   })
 }));
@@ -7582,6 +7608,15 @@ var SCHEMA_BOOTSTRAP_STATEMENTS = [
     expires_at timestamp NOT NULL,
     created_at timestamp DEFAULT NOW() NOT NULL
   )`,
+  // ENN-98 — appunti liberi (tab Appunti), indipendenti dai corsi
+  `CREATE TABLE IF NOT EXISTS user_notes (
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title text DEFAULT '' NOT NULL,
+    body text DEFAULT '' NOT NULL,
+    created_at timestamp DEFAULT NOW() NOT NULL,
+    updated_at timestamp DEFAULT NOW() NOT NULL
+  )`,
   // --- Legacy ALTER (bases that predate booking Stripe/Calendar columns) ---
   `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS mode text NOT NULL DEFAULT 'remote'`,
   `ALTER TABLE consultation_bookings ADD COLUMN IF NOT EXISTS stripe_session_id text`,
@@ -7601,7 +7636,9 @@ var SCHEMA_BOOTSTRAP_STATEMENTS = [
      WHERE stripe_session_id IS NOT NULL`,
   `CREATE UNIQUE INDEX IF NOT EXISTS consultation_bookings_active_slot_idx
      ON consultation_bookings (scheduled_date, scheduled_time)
-     WHERE status IN ('pending_payment', 'confirmed')`
+     WHERE status IN ('pending_payment', 'confirmed')`,
+  `CREATE INDEX IF NOT EXISTS user_notes_user_id_idx
+     ON user_notes (user_id)`
 ];
 async function ensureBookingSchema() {
   if (!hasDatabaseConfig()) {
@@ -7635,123 +7672,332 @@ async function ensureSchemaOnce() {
   await globalThis._ennamoSchemaReady;
 }
 
+// src/data/courses/arcaniMaggioriDispense.ts
+var ARCANI_MAGGIORI_DISPENSE = [
+  {
+    moduleNumber: "01",
+    title: "Architettura e Primo Settenario (0 \u2013 VII)",
+    subtitle: "Mappa dei Tre Settenari \xB7 Dal Matto al Carro",
+    format: "Dispensa formativa + Esercizi",
+    readingMinutes: 40,
+    keyTakeaways: [
+      "I Tre Settenari come mappa evolutiva dalla materia allo spirito.",
+      "Il Matto (0) e la diade Bagatto (I) / Papessa (II).",
+      "Imperatrice\u2013Carro (III\u2013VII) con simbologia, senso profondo e chiave previsionale."
+    ],
+    contentMarkdown: `## Dispensa Formativa \xB7 Arcani Maggiori (Primo Step)
+
+Gli Arcani Maggiori non sono strumenti di divinazione meccanica, bens\xEC una **mappa strutturata** dell'esperienza umana, della psiche e dei cicli evolutivi. Questa dispensa apre il Primo Step di Tarot Italia: dall'architettura dei Tre Settenari al radicamento del Primo Settenario, dal Matto al Carro.
+
+## 1. Architettura Didattica e la Mappa dei Tre Settenari
+
+Il mazzo si articola in **ventidue lame** (dalla carta 0 alla XXI), organizzate in tre grandi cicli di crescita interiore e manifestazione esteriore. Ogni settenario risponde a una precisa fase dell'evoluzione individuale, scandendo il passaggio dalla materia allo spirito.
+
+### Mappa dei Tre Cicli
+
+- **Primo Settenario (0 \u2013 VII)** \u2014 Formazione dell'identit\xE0, radicamento nel mondo fisico, azione concreta e conquista della direzione.
+- **Secondo Settenario (VIII \u2013 XIV)** \u2014 Prova etica, maturazione morale, interiorizzazione, transizione e ricerca dell'equilibrio interiore.
+- **Terzo Settenario (XV \u2013 XXI)** \u2014 Padronanza spirituale, confronto con l'Ombra, liberazione dai vincoli e compiutezza nel mondo.
+
+## 2. Il Primo Settenario: La Formazione dell'Identit\xE0 (0 \u2013 VII)
+
+Il primo ciclo \xE8 la fase di radicamento e di costruzione della personalit\xE0 cosciente. Attraverso queste prime otto carte, l'individuo impara a gestire le risorse materiali, la creativit\xE0, l'autorit\xE0, la guida etica e la scelta, fino all'affermazione trionfante della propria volont\xE0 disciplinata.
+
+### 0. Il Matto \u2013 L'Inizio Non Condizionato
+
+- **Simbologia ed Essenza**: Il Matto (0) rappresenta la soglia fuori dalla numerazione sequenziale; passo sul precipizio; libert\xE0 assoluta. Precede ogni schema, regola o sovrastruttura mentale: energia pura prima di ogni cristallizzazione materiale.
+- **Significato Profondo**: slancio genuino, apertura incondizionata al nuovo, coraggio di slegarsi dai condizionamenti, fiducia nel cammino. Ogni inizio autentico richiede il rischio dell'ignoto e lo spogliamento dalle protezioni superflue.
+- **In Chiave Previsionale**: cambiamento improvviso di rotta, partenza imminente, salto di fiducia, novit\xE0 inattesa. Chiede audacia, spontaneit\xE0 e istinto pionieristico, senza garanzie logiche paralizzanti.
+
+{{scheda-visiva:il-matto}}
+
+{{sigillo:il-matto}}
+
+### La Diade Creativa: Il Bagatto (I) e La Papessa (II)
+
+La dinamica iniziale del manifestato divide il cammino tra azione visibile e gestazione interiore.
+
+### 1. Il Bagatto (I) \u2013 L'Iniziativa e il Talento all'Opera
+
+- **Simbologia ed Essenza**: Situato alla guida della numerazione, il Bagatto (o Giocoliere) dispone sul banco di tutti gli strumenti primari (bastoni, coppe, spade e denari). \xC8 il padrone delle risorse operative e delle potenzialit\xE0 materiali per cominciare subito.
+- **Significato Profondo**: iniziativa immediata, talento puro, destrezza, attivazione dei processi con ci\xF2 che \xE8 gi\xE0 disponibile, senza attendere condizioni ideali.
+- **In Chiave Previsionale**: azione pratica immediata; \xABmettere le mani in pasta\xBB, sfruttare le abilit\xE0 pratiche e concretizzare un progetto o un'azione nei primissimi giorni.
+
+{{scheda-visiva:il-bagatto}}
+
+{{sigillo:il-bagatto}}
+
+### 2. La Papessa (II) \u2013 La Gestazione e la Saggezza del Silenzio
+
+- **Simbologia ed Essenza**: Seduta immobile e velata tra i pilastri del tempio, con il sacro libro chiuso o socchiuso; custodisce la conoscenza sottile senza agire all'esterno.
+- **Significato Profondo**: gestazione silenziosa, verit\xE0 intuita prima di essere detta, sapienza del tempo, attesa fertile. Ogni vera creazione richiede raccoglimento e maturazione interiore.
+- **In Chiave Previsionale**: non \xE8 il momento di agire o esporre idee; custodire, studiare, riflettere, fare ricerca e lasciare maturare gli eventi in profondit\xE0.
+
+{{scheda-visiva:la-papessa}}
+
+{{sigillo:la-papessa}}
+
+### Dal Fiorire alla Conquista (III \u2013 VII)
+
+La progressione conduce dalla fioritura creativa fino all'accelerazione e alla vittoria della volont\xE0 disciplinata.
+
+### 3. L'Imperatrice (III) \u2013 La Fioritura Creativa e l'Abbondanza
+
+- **Simbologia ed Essenza**: fioritura sensibile, abbondanza generativa, capacit\xE0 di dare forma e vita alle idee con espressivit\xE0, comunicazione e cura fertile dei progetti.
+- **Significato Profondo**: vitalit\xE0 rigogliosa, espressione creativa senza vincoli, potere generativo della parola; armonia che trasforma l'impulso in manifestazione ricca.
+- **In Chiave Previsionale**: espansione prospera, intese riuscite, fioritura di nuove idee, fecondit\xE0 nei progetti, grande armonia relazionale.
+
+{{scheda-visiva:l-imperatrice}}
+
+{{sigillo:l-imperatrice}}
+
+### 4. L'Imperatore (IV) \u2013 La Stabilit\xE0 Strutturale e il Metodo
+
+- **Simbologia ed Essenza**: autorit\xE0 e concretezza; stabilit\xE0, metodo rigoroso, confini solidi, gestione organizzata del mondo materiale.
+- **Significato Profondo**: autorit\xE0 saggia, protezione, governo della realt\xE0 senza tentennamenti; forza strutturale per dare durata e confini certi a quanto creato.
+- **In Chiave Previsionale**: consolidamento di progetti lavorativi o finanziari, basi solide, referente autorevole o protettivo, gestione metodica ed efficace della materia.
+
+{{scheda-visiva:l-imperatore}}
+
+{{sigillo:l-imperatore}}
+
+### 5. Il Papa (V) \u2013 Il Patto Etico e la Guida Spettabile
+
+- **Simbologia ed Essenza**: guida spirituale o professionale; maestro che trasmette valori condivisi e facilita l'adesione a regole e principi codificati.
+- **Significato Profondo**: patto etico, trasmissione della sapienza, mediazione illuminata; alleanza tra aspirazioni individuali e tradizione o struttura sociale.
+- **In Chiave Previsionale**: contratti chiari e trasparenti, mediazioni riuscite, consulenze autorevoli, alleanze basate sulla fiducia, rispetto delle norme etiche.
+
+{{scheda-visiva:il-papa}}
+
+{{sigillo:il-papa}}
+
+### 6. Gli Innamorati (VI) \u2013 Il Bivio Fondamentale e la Scelta del Cuore
+
+- **Simbologia ed Essenza**: la figura umana al bivio, di fronte all'incontro, all'affetto e alla responsabilit\xE0 della decisione.
+- **Significato Profondo**: scelta consapevole del cuore e responsabilit\xE0 verso la propria direzione emotiva ed esistenziale; optare con convinzione per una strada escludendo le altre.
+- **In Chiave Previsionale**: decisioni sentimentali o professionali ineludibili; scelta d'amore o di valore chiara; allineamento autentico con i desideri profondi.
+
+{{scheda-visiva:gli-amanti}}
+
+{{sigillo:gli-amanti}}
+
+### 7. Il Carro (VII) \u2013 L'Azione Coordinata e la Vittoria Disciplinata
+
+- **Simbologia ed Essenza**: il condottiero guida il Carro trionfale e governa con maestria le forze opposte che muovono il veicolo.
+- **Significato Profondo**: azione coordinata, controllo sapiente delle polarit\xE0 energetiche, vittoria grazie a determinazione e rigore.
+- **In Chiave Previsionale**: sblocco rapido di trattative o situazioni stagnanti, viaggi, spostamenti materiali, accelerazione decisiva e trionfante verso gli obiettivi.
+
+{{scheda-visiva:il-carro}}
+
+{{sigillo:il-carro}}
+
+### Sintesi Didattica del Modulo 1
+
+1. Il Matto (0) garantisce la libert\xE0 originaria e l'apertura incondizionata al mutamento.
+2. La polarit\xE0 Bagatto (I) / Papessa (II) stabilisce l'alternanza tra azione visibile e gestazione intuitiva.
+3. Da Imperatrice (III) e Imperatore (IV) si giunge alla guida etica del Papa (V), alla scelta degli Innamorati (VI) e alla spinta del Carro (VII).
+
+### Esercizi Pratici del Primo Settenario
+
+- **Esercizio 1 (Il Matto e il foglio bianco)**: identifica un progetto rinviato e scrivi l'azione minima di coraggio da compiere oggi, senza pianificarla nei dettagli.
+- **Esercizio 2 (Bagatto vs Papessa)**: di fronte a un dubbio, estrai una carta. Bagatto \u2192 azione pratica entro 24 ore; Papessa \u2192 tre giorni di silenzio e ascolto prima di decidere.
+- **Esercizio 3 (Lettura a due lame)**: combina Il Carro con una lama precedente per interpretare uno sblocco inatteso in ambito lavorativo o personale.
+`
+  },
+  {
+    moduleNumber: "02",
+    title: "Secondo Settenario: Prova Etica (VIII \u2013 XIV)",
+    subtitle: "Giustizia, Eremita, Ruota, Forza, Appeso, Morte, Temperanza",
+    format: "Dispensa formativa + Schede Archetipo",
+    readingMinutes: 40,
+    keyTakeaways: [
+      "Dal mondo esterno all\u2019interiorizzazione: maturazione morale e limiti.",
+      "Ruota (X) e Forza (XI): mutamento e dominio gentile dell\u2019istinto.",
+      "Appeso, Morte e Temperanza come transizione verso il terzo ciclo."
+    ],
+    contentMarkdown: `## Il Secondo Settenario: La Prova Etica e l'Interiorizzazione (VIII \u2013 XIV)
+
+Se il primo settenario costruisce l'identit\xE0 esterna, il secondo sposta l'asse verso l'interno: maturazione morale, confronto con i limiti, equilibrio e trasformazione profonda.
+
+### 8. La Giustizia (VIII) \u2013 Ordine, Misura e Causa-Effetto
+
+- **Simbologia ed Essenza**: figura regale in trono, spada verticale e bilancia in equilibrio; ordine cosmico, imparzialit\xE0 e linearit\xE0 delle conseguenze.
+- **Significato Profondo**: responsabilit\xE0, onest\xE0 intellettuale, equilibrio, rigore etico. Ogni azione genera conseguenza; la chiarezza mentale guida l'emotivit\xE0.
+- **In Chiave Previsionale**: questioni legali o burocratiche, contratti equi, necessit\xE0 di fare ordine, risposta meritata e oggettiva.
+
+### 9. L'Eremita (IX) \u2013 Luce Interiore e Tempo della Ricerca
+
+- **Simbologia ed Essenza**: saggio nel mantello, lanterna nella notte; protegge e illumina il cammino.
+- **Significato Profondo**: raccoglimento, solitudine rigenerante, ricerca della verit\xE0 interiore, prudenza; distacco temporaneo dal frastuono per trovare risposte autentiche.
+- **In Chiave Previsionale**: rallentamento, studio, introspezione, cautela e riserbo, senza affrettare i tempi.
+
+### 10. La Ruota di Fortuna (X) \u2013 Ciclo, Mutamento e Imprevisto
+
+- **Simbologia ed Essenza**: ruota in movimento e figure in evoluzione; cicli vitali e mutevolezza delle circostanze.
+- **Significato Profondo**: accettazione del cambiamento, ciclicit\xE0, sblocco della stagnazione; adattarsi con flessibilit\xE0.
+- **In Chiave Previsionale**: svolta improvvisa, colpo di scena, nuovo ciclo, ribaltamento rapido di una situazione bloccata.
+
+### 11. La Forza (XI) \u2013 Dominio Istintivo e Coraggio Gentile
+
+- **Simbologia ed Essenza**: una donna apre o chiude con dolcezza le fauci di un leone, senza violenza.
+- **Significato Profondo**: dominio delle passioni tramite consapevolezza, coraggio interiore, pazienza, gestione saggia dell'energia; integrare gli impulsi anzich\xE9 reprimerli.
+- **In Chiave Previsionale**: superare una prova complessa con determinazione e autocontrollo; armonia nelle tensioni.
+
+### 12. L'Appeso (XII) \u2013 Sosta Volontaria e Cambio di Prospettiva
+
+- **Simbologia ed Essenza**: figura a testa in gi\xF9, serena; l'energia fluisce verso l'alto.
+- **Significato Profondo**: sosta necessaria, sacrificio come \xABrendere sacro\xBB, rinuncia al controllo rigido, capovolgimento di sguardo.
+- **In Chiave Previsionale**: blocco o attesa utile a riconsiderare le priorit\xE0, lasciando andare la fretta e accettando la pausa.
+
+### 13. L'Arcano Senza Nome / La Morte (XIII) \u2013 Trasmutazione e Taglio Netto
+
+- **Simbologia ed Essenza**: scheletro che falcia; dal terreno emergono germogli; potatura indispensabile alla vita.
+- **Significato Profondo**: fine radicale di un ciclo, distacco da ci\xF2 che \xE8 obsoleto, trasformazione e rinascita per fare spazio al nuovo.
+- **In Chiave Previsionale**: chiusura netta e cambiamento drastico; se accolto senza resistenza, apre a rinnovamento totale.
+
+### 14. La Temperanza (XIV) \u2013 Alchimia Quotidiana e Moderazione
+
+- **Simbologia ed Essenza**: figura alata che travasa liquido tra due vasi; flusso continuo di armonia.
+- **Significato Profondo**: misura, guarigione, pazienza alchemica, riconciliazione, compromesso e pace interiore.
+- **In Chiave Previsionale**: risoluzione pacifica, cure efficaci, tempi di recupero fluidi, fase di stabilizzazione in cui regna la cooperazione.
+
+### Sintesi Didattica del Modulo 2
+
+1. Dalla Giustizia (VIII) all'Eremita (IX): maturazione morale e ascolto della coscienza.
+2. Ruota (X) e Forza (XI): accettazione del mutamento e dominio saggio dell'energia.
+3. Appeso (XII), Morte (XIII) e Temperanza (XIV): transizione emotiva ed etica verso il terzo settenario.
+`
+  },
+  {
+    moduleNumber: "03",
+    title: "Terzo Settenario: Ombra e Compiutezza (XV \u2013 XXI)",
+    subtitle: "Dal Diavolo e la Torre fino a Sole, Giudizio e Mondo",
+    format: "Dispensa formativa + Atlante Simbolico",
+    readingMinutes: 40,
+    keyTakeaways: [
+      "Diavolo (XV) e Torre (XVI): Ombra, crollo e liberazione.",
+      "Stelle, Luna e Sole: speranza, inconscio e chiarezza visibile.",
+      "Giudizio (XX) e Mondo (XXI): risveglio e trionfo finale."
+    ],
+    contentMarkdown: `## Il Terzo Settenario: Padronanza Spirituale e Compiutezza (XV \u2013 XXI)
+
+Nel terzo settenario l'individuo si confronta con le grandi forze universali: supera le illusioni dell'Ombra, abbatte le false certezze e realizza il proprio potenziale interiore ed esteriore.
+
+### 15. Il Diavolo (XV) \u2013 Ombra, Materia e Fascino del Potere
+
+- **Simbologia ed Essenza**: creatura alata su due figure legate in modo blando ma consenziente.
+- **Significato Profondo**: confronto con l'Ombra, attaccamento alla materia, passioni, denaro, dipendenze, falsi poteri. Riconoscere i desideri inconsci per riprendere il controllo.
+- **In Chiave Previsionale**: passioni forti, dinamiche di potere o manipolazione, profitto materiale; necessit\xE0 di liberarsi da legami tossici.
+
+### 16. La Torre (XVI) \u2013 Folgore, Crollo e Liberazione
+
+- **Simbologia ed Essenza**: torre colpita dal fulmine; corona che salta; figure che precipitano tra scintille.
+- **Significato Profondo**: rottura delle false certezze, crollo di strutture non pi\xF9 aderenti alla verit\xE0, liberazione catartica attraverso la crisi.
+- **In Chiave Previsionale**: cambiamento drastico e inatteso che rompe la stagnazione e libera nuove energie.
+
+### 17. Le Stelle (XVII) \u2013 Speranza, Ispirazione e Guarigione
+
+- **Simbologia ed Essenza**: figura nuda che versa linfa su terra e acqua, sotto stelle radiose.
+- **Significato Profondo**: guida celeste, fiducia, chiarezza d'intenti, ispirazione, guarigione dopo la Torre.
+- **In Chiave Previsionale**: serenit\xE0 ritrovata, prospettive favorevoli, successo creativo, protezione, conferma del cammino.
+
+### 18. La Luna (XVIII) \u2013 Inconscio, Illusioni e Percorso Notturno
+
+- **Simbologia ed Essenza**: Luna piena, gambero dalle acque, lupi e torri lontane.
+- **Significato Profondo**: regno dell'inconscio, sogni, paure ancestrali, intuito viscerale, illusioni e nebbie da attraversare con la luce interiore.
+- **In Chiave Previsionale**: incertezza, segreti, malintesi; procedere ascoltando l'istinto senza paralisi ansiosa.
+
+### 19. Il Sole (XIX) \u2013 Chiarezza, Gioia e Realizzazione Visibile
+
+- **Simbologia ed Essenza**: Sole radioso; bambini festosi in un prato fiorito.
+- **Significato Profondo**: verit\xE0 svelata, gioia, trasparenza, calore umano, successo pubblico, vitalit\xE0 cosciente.
+- **In Chiave Previsionale**: successo, chiarezza nei rapporti, accordi fortunati, vitalit\xE0, trionfo di un progetto portato alla luce.
+
+### 20. Il Giudizio (XX) \u2013 Chiamata, Risveglio e Rinnovamento
+
+- **Simbologia ed Essenza**: angelo con tromba; figure che emergono dai sepolcri, braccia aperte.
+- **Significato Profondo**: chiamata alla consapevolezza, risveglio, perdono, liberazione dai giudizi limitanti.
+- **In Chiave Previsionale**: svolta decisiva, notizie importanti, riconciliazione che rinnova l'esistenza.
+
+### 21. Il Mondo (XXI) \u2013 Compiutezza e Cerchio Perfetto
+
+- **Simbologia ed Essenza**: figura danzante nella mandorla di foglie, circondata dai quattro viventi (Toro, Leone, Aquila, Angelo).
+- **Significato Profondo**: Compimento dell'Opera, integrazione dei settenari, realizzazione e armonia universale.
+- **In Chiave Previsionale**: successo totale, chiusura trionfante di un ciclo, viaggi internazionali, massima espansione.
+
+### Sintesi Didattica del Modulo 3
+
+1. Diavolo (XV) e Torre (XVI) spezzano i vincoli materiali.
+2. Dalle Stelle (XVII) e dalla Luna (XVIII) si giunge al Sole (XIX).
+3. La chiamata al risveglio del Giudizio (XX) conduce alla compiutezza e al trionfo finale del Mondo (XXI).
+`
+  },
+  {
+    moduleNumber: "04",
+    title: "Laboratorio Pratico Finale e Verifica",
+    subtitle: "Autovalutazione dei cicli \xB7 Stese integrative \xB7 Chiusura Primo Step",
+    format: "Quaderno esercizi + Verifica competenze",
+    readingMinutes: 25,
+    keyTakeaways: [
+      "Riconoscere quale settenario risuona nella situazione attuale.",
+      "Esercizi tris dei settenari e stesa delle tre fasi.",
+      "Chiusura del Primo Step con ripasso al Sigillo flashcard."
+    ],
+    contentMarkdown: `## Laboratorio Pratico Finale e Verifica delle Competenze
+
+Questa sezione trasforma l'inquadramento teorico dei Tre Settenari in **competenza attiva**, per verificare il livello di assimilazione e usare le carte nella consultazione pratica.
+
+## Test di Autovalutazione dei Cicli
+
+Rispondi ai quesiti guida per capire quale settenario risuona con maggiore frequenza nella tua situazione (o in quella del consultante).
+
+### 1. Fase di Avvio \u2014 Primo Settenario (0 \u2013 VII)
+
+Si sta vivendo un nuovo inizio, cercando la propria direzione o posando le basi di un progetto pratico? In tal caso, analizza l'energia del Matto, del Bagatto e del Carro.
+
+### 2. Fase di Scelta ed Elaborazione \u2014 Secondo Settenario (VIII \u2013 XIV)
+
+Si stanno affrontando blocchi, soste forzate, norme da rispettare o trasformazioni radicali? In tal caso, approfondisci la lezione dell'Eremita, dell'Appeso o della Morte.
+
+### 3. Fase di Svolta e Realizzazione \u2014 Terzo Settenario (XV \u2013 XXI)
+
+Si stanno recidendo schemi limitanti, affrontando lati d'Ombra o raccogliendo i frutti di un percorso completo? In tal caso, osserva l'impatto della Torre, del Sole o del Mondo.
+
+## Esercizi Pratici di Lettura
+
+### Esercizio A \u2014 Il tris dei settenari
+
+Estrai una carta a caso dal mazzo. Riconosci a quale dei tre settenari appartiene e articola a voce alta la lezione evolutiva che esprime per la situazione esaminata.
+
+### Esercizio B \u2014 La stesa delle tre fasi
+
+Esegui una stesa a tre carte, una per ciascun settenario:
+
+1. **Prima carta (1\xB0 Settenario)** \u2014 punto di partenza e azione pratica immediata.
+2. **Seconda carta (2\xB0 Settenario)** \u2014 nodo interiore o prova etica da superare.
+3. **Terza carta (3\xB0 Settenario)** \u2014 prospettiva di sblocco e direzione evolutiva finale.
+
+## Chiusura del Primo Step
+
+Dopo autovalutazione ed esercizi, ripassa i Trionfi 0\u2013XXI con il **Sigillo di apprendimento** (flashcard) e segna i moduli completati nella tua Area Riservata.
+`
+  }
+];
+
 // src/db/seedData.ts
 var COURSE_SEED_CATALOG = [
   {
     slug: "arcani-maggiori",
     title: "Arcani Maggiori",
-    subtitle: "Il Viaggio Archetipico da 0 a XXI \xB7 Presente e Previsione",
-    description: "Studio approfondito dei 22 Trionfi: iconografia tradizionale, struttura numerologica, lettura in luce e ombra e interpretazione previsionale delle grandi svolte.",
+    subtitle: "Primo Step \xB7 Tre Settenari da 0 a XXI \xB7 Presente e Previsione",
+    description: "Dispensa formativa completa del Primo Step: mappa dei Tre Settenari, studio dei 22 Trionfi dal Matto al Mondo, visioni multiple, schede visive, Sigillo flashcard ed esercizi di verifica.",
     priceEur: 190,
     stripePriceId: process.env.STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI || "STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI",
-    lessonsCount: 12,
-    totalHours: "8h 30m video",
+    lessonsCount: 4,
+    totalHours: "dispense + Sigillo",
     levelLabel: "Livello Base e Intermedio",
     sortOrder: 1,
-    dispense: [
-      {
-        moduleNumber: "01",
-        title: "Struttura del Mazzo e Primo Settenario (0 \u2013 VII)",
-        subtitle: "Dal potenziale originario del Matto alla direzione del Carro",
-        format: "Dispensa PDF + Scheda Archetipica",
-        readingMinutes: 22,
-        keyTakeaways: [
-          "Il Matto (0) come soglia fuori dal numero e principio di libert\xE0.",
-          "Polarit\xE0 attiva e ricettiva tra Il Bagatto (I) e La Papessa (II).",
-          "Lettura previsionale del Carro (VII): accelerazione, spostamenti e vittoria disciplinata."
-        ],
-        contentMarkdown: `## Il Primo Settenario: Identit\xE0 e Radicamento nel Mondo
-
-I primi sette Arcani Maggiori descrivono la formazione della coscienza individuale e la capacit\xE0 di agire nella realt\xE0 concreta.
-
-### 1. Il Matto (0) e l'inizio non condizionato
-Quando compare in lettura, segnala uno slancio genuino, una partenza imminente o un salto di fiducia ancora privo di schema rigido. In chiave previsionale anticipa un cambiamento improvviso di rotta o una novit\xE0 che richiede coraggio.
-
-### 2. La diade creativa: Bagatto (I) e Papessa (II)
-- **Il Bagatto**: strumenti sul tavolo, iniziativa immediata, talento da mettere all'opera nei prossimi giorni.
-- **La Papessa**: gestazione silenziosa, verit\xE0 intuita prima che detta, attesa fertile.
-
-### 3. Imperatrice (III), Imperatore (IV), Papa (V), Innamorati (VI) e Carro (VII)
-Dal fiorire creativo alla struttura, fino al patto etico (V), alla scelta del cuore (VI) e al movimento deciso del Carro (VII), che in previsione indica sblocco rapido di trattative o viaggi.`
-      },
-      {
-        moduleNumber: "02",
-        title: "Secondo Settenario: Prove Interiori e Destino (VIII \u2013 XIV)",
-        subtitle: "Giustizia, Eremita, Ruota della Fortuna e Temperanza",
-        format: "Dispensa PDF + Mappa Cicli",
-        readingMinutes: 25,
-        keyTakeaways: [
-          "La Giustizia (VIII/XI) e il bilancio oggettivo di accordi e contratti.",
-          "L\u2019Eremita (IX) come ricerca della lanterna interiore e maturit\xE0 dei tempi.",
-          "La Ruota della Fortuna (X) e la Temperanza (XIV): leggere il cambio di stagione."
-        ],
-        contentMarkdown: `## Il Secondo Settenario: Il Confronto con la Legge del Tempo
-
-In questa fascia centrale degli Arcani Maggiori il consultante impara a distinguere ci\xF2 che dipende dalla volont\xE0 da ci\xF2 che appartiene ai cicli pi\xF9 ampi.
-
-### La Giustizia e La Forza
-La Giustizia chiede chiarezza contrattuale e coerenza morale; sul piano futuro anticipa firme, verifiche o riequilibri meritati. La Forza sostituisce la durezza con la padronanza calma dell'istinto.
-
-### L'Eremita (IX) e La Ruota (X)
-- **L'Eremita**: invita a non forzare i tempi; mostra un periodo di discernimento che precede una decisione stabile.
-- **La Ruota della Fortuna**: segnala una svolta esterna imminente, un ritorno ciclico o un'opportunit\xE0 che chiede prontezza.
-
-### Appeso (XII), Arcano XIII e Temperanza (XIV)
-L'Appeso sospende l'azione per cambiare sguardo; l'Arcano XIII chiude ci\xF2 che ha esaurito la sua funzione; la Temperanza ricompone gli opposti con misura e guarigione graduale.`
-      },
-      {
-        moduleNumber: "03",
-        title: "Terzo Settenario: Ombra, Luce e Compimento (XV \u2013 XXI)",
-        subtitle: "Dal Diavolo e la Torre fino alle Stelle, Sole e Mondo",
-        format: "Dispensa PDF + Atlante Simbolico",
-        readingMinutes: 28,
-        keyTakeaways: [
-          "Leggere Il Diavolo (XV) e La Torre (XVI) senza fatalismo ma come verit\xE0 liberatorie.",
-          "Le Stelle (XVII) e La Luna (XVIII): discernere speranza autentica da proiezione.",
-          "Il Sole (XIX), Il Giudizio (XX) e Il Mondo (XXI) nelle previsioni di realizzazione."
-        ],
-        contentMarkdown: `## Il Terzo Settenario: La Trasformazione Profonda
-
-Gli ultimi sette Arcani conducono oltre i legami dell'ego verso una visione aperta e integrata.
-
-### Ombra e Rottura Costruttiva (XV \u2013 XVI)
-Il Diavolo porta alla luce attaccamenti, desideri intensi o accordi squilibrati. La Torre non punisce: abbatte costruzioni ormai fragili per liberare spazio autentico nel futuro prossimo.
-
-### Le Luci del Cielo (XVII \u2013 XIX)
-- **Le Stelle**: protezione, vocazione limpida, fidatezza dei progetti a medio termine.
-- **La Luna**: sogni, memorie familiari, zone non ancora chiarite dove muoversi con cautela.
-- **Il Sole**: chiarezza meridiana, riconoscimento pubblico, intesa affettiva e riuscita concreta.
-
-### Rinascita e Sintesi (XX \u2013 XXI)
-Il Giudizio annuncia una chiamata o notizia decisiva; Il Mondo sancisce il compimento di un ciclo e l'apertura di un nuovo orizzonte.`
-      },
-      {
-        moduleNumber: "04",
-        title: "Dialoghi tra Arcani e Formulazione Previsionale Etica",
-        subtitle: "Combinazioni binarie, libero arbitrio e codice deontologico",
-        format: "Quaderno Esercizi + Casi Studio",
-        readingMinutes: 20,
-        keyTakeaways: [
-          "Come il secondo Arcano orienta la direzione evolutiva del primo.",
-          "Linguaggio deontologico per esprimere scenari futuri senza togliere autonomia.",
-          "Protocollo di verifica su amore, lavoro e scelte personali."
-        ],
-        contentMarkdown: `## Combinare Due Arcani Maggiori in Chiave Previsionale
-
-Una carta isolata descrive un archetipo; due carte accostate mostrano un movimento nel tempo.
-
-### Regola della Direzione (Carta A \u2192 Carta B)
-1. **Carta A** fotografa la radice attiva nel presente.
-2. **Carta B** mostra dove converge l'energia nei mesi successivi se il consultante mantiene la rotta.
-
-### Esempio Pratico
-- **Eremita + Carro**: dopo una fase di studio riservato o attesa riflessiva, arriva una ripartenza veloce con obiettivi definiti.
-- **Torre + Stelle**: una ristrutturazione improvvisa libera risorse per un progetto pi\xF9 fedele alla propria vocazione.
-
-### Confine Etico (Legge 4/2013)
-La previsione olistica traccia tendenze reali e punti di snodo lasciando sempre al consultante la responsabilit\xE0 delle proprie scelte; restano escluse diagnosi mediche o pronostici sanitari.`
-      }
-    ]
+    dispense: ARCANI_MAGGIORI_DISPENSE
   },
   {
     slug: "arcani-minori",
@@ -8246,6 +8492,117 @@ async function enrollUserInCourse(params) {
     );
   }
 }
+function serializeUserNote(row) {
+  return {
+    id: row.id,
+    title: row.title,
+    body: row.body,
+    createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : String(row.createdAt),
+    updatedAt: row.updatedAt instanceof Date ? row.updatedAt.toISOString() : String(row.updatedAt)
+  };
+}
+async function listUserNotes(params) {
+  try {
+    const dbUser = await getOrCreateUser(
+      params.uid,
+      params.email,
+      params.displayName
+    );
+    const rows = await db.select().from(userNotes).where(eq(userNotes.userId, dbUser.id)).orderBy(desc(userNotes.updatedAt));
+    return rows.map(serializeUserNote);
+  } catch (error) {
+    if (isDbConnectionFailure(error)) {
+      resetDbPool();
+    }
+    console.error("Failed to list user notes:", error);
+    throw new Error("Errore durante il caricamento degli appunti.", {
+      cause: error
+    });
+  }
+}
+async function createUserNote(params) {
+  try {
+    const dbUser = await getOrCreateUser(
+      params.uid,
+      params.email,
+      params.displayName
+    );
+    const title = typeof params.title === "string" ? params.title.trim().slice(0, 200) : "";
+    const body = typeof params.body === "string" ? params.body.slice(0, 5e4) : "";
+    const now = /* @__PURE__ */ new Date();
+    const saved = await db.insert(userNotes).values({
+      userId: dbUser.id,
+      title: title || "Nuovo appunto",
+      body,
+      createdAt: now,
+      updatedAt: now
+    }).returning();
+    return serializeUserNote(saved[0]);
+  } catch (error) {
+    if (isDbConnectionFailure(error)) {
+      resetDbPool();
+    }
+    console.error("Failed to create user note:", error);
+    throw new Error("Errore durante la creazione dell\u2019appunto.", {
+      cause: error
+    });
+  }
+}
+async function updateUserNote(params) {
+  try {
+    const dbUser = await getOrCreateUser(params.uid, params.email);
+    const existing = await db.select().from(userNotes).where(
+      and(eq(userNotes.id, params.noteId), eq(userNotes.userId, dbUser.id))
+    ).limit(1);
+    if (!existing[0]) {
+      throw new Error("Appunto non trovato.");
+    }
+    const nextTitle = typeof params.title === "string" ? params.title.trim().slice(0, 200) : existing[0].title;
+    const nextBody = typeof params.body === "string" ? params.body.slice(0, 5e4) : existing[0].body;
+    const saved = await db.update(userNotes).set({
+      title: nextTitle || "Senza titolo",
+      body: nextBody,
+      updatedAt: /* @__PURE__ */ new Date()
+    }).where(
+      and(eq(userNotes.id, params.noteId), eq(userNotes.userId, dbUser.id))
+    ).returning();
+    return serializeUserNote(saved[0]);
+  } catch (error) {
+    if (error instanceof Error && error.message === "Appunto non trovato.") {
+      throw error;
+    }
+    if (isDbConnectionFailure(error)) {
+      resetDbPool();
+    }
+    console.error("Failed to update user note:", error);
+    throw new Error("Errore durante il salvataggio dell\u2019appunto.", {
+      cause: error
+    });
+  }
+}
+async function deleteUserNote(params) {
+  try {
+    const dbUser = await getOrCreateUser(params.uid, params.email);
+    const deleted = await db.delete(userNotes).where(
+      and(eq(userNotes.id, params.noteId), eq(userNotes.userId, dbUser.id))
+    ).returning();
+    if (!deleted[0]) {
+      throw new Error("Appunto non trovato.");
+    }
+    return { ok: true, id: deleted[0].id };
+  } catch (error) {
+    if (error instanceof Error && error.message === "Appunto non trovato.") {
+      throw error;
+    }
+    if (isDbConnectionFailure(error)) {
+      resetDbPool();
+    }
+    console.error("Failed to delete user note:", error);
+    throw new Error("Errore durante l\u2019eliminazione dell\u2019appunto.", {
+      cause: error
+    });
+  }
+}
 async function updateDispensaProgress(params) {
   await ensureCatalogSeeded();
   try {
@@ -8322,6 +8679,395 @@ var DIALOGUE_PACK_CATALOG = {
     stripePriceId: process.env.STRIPE_PRICE_ID_DIALOGO_15M || "STRIPE_PRICE_ID_DIALOGO_15M"
   }
 };
+
+// src/lib/siteContacts.ts
+var SITE_EMAIL = "info@tarotitalia.com";
+var SITE_PHONE_DISPLAY = "379 103 82 53";
+var SITE_PHONE_E164 = "393791038253";
+var SITE_ADDRESS = "Via Crispi 37, 62100 Macerata";
+var SITE_PIVA = "02136780430";
+var SITE_WHATSAPP_HREF = `https://wa.me/${SITE_PHONE_E164}`;
+var SITE_MAPS_QUERY = "Via Francesco Crispi 37, 62100 Macerata, Italia";
+var SITE_BUSINESS_QUERY = "Tarot Italia Via Crispi 37 Macerata";
+var SITE_MAPS_OPEN_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SITE_MAPS_QUERY)}`;
+var SITE_MAPS_DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(SITE_MAPS_QUERY)}`;
+var SITE_BUSINESS_PROFILE_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SITE_BUSINESS_QUERY)}`;
+var SITE_PARKING_SEARCH_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`parcheggio near ${SITE_MAPS_QUERY}`)}`;
+var NEARBY_PARKING = [
+  {
+    name: "Parcheggio Direzionale",
+    address: "Via Giosu\xE8 Carducci 33, 62100 Macerata",
+    note: "Il pi\xF9 vicino a Via Crispi \xB7 coperto, H24 \xB7 Impresa Servizi Generali",
+    href: "https://parcheggimacerata.it/parcheggio-direzionale",
+    latLng: { lat: 43.2972841, lng: 13.4546689 }
+  },
+  {
+    name: "Parcheggio Centro Storico",
+    address: "Via Antonio Mugnoz, 62100 Macerata",
+    note: "Struttura APM \xB7 collegamento con ascensore al centro storico",
+    href: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Parcheggio Centro Storico Via Antonio Mugnoz Macerata")
+  },
+  {
+    name: "Parcheggio Garibaldi",
+    address: "Via Augusto Murri, 62100 Macerata",
+    note: "Struttura APM \xB7 accessibile da nord, ascensore / scale verso il centro",
+    href: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Parcheggio Garibaldi Via Murri Macerata")
+  },
+  {
+    name: "Parcheggio Centrale",
+    address: "Via Leopoldo Armaroli 1, 62100 Macerata",
+    note: "A pochi minuti a piedi dal centro \xB7 utile se arrivi in auto",
+    href: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Parcheggio Centrale Via Leopoldo Armaroli Macerata")
+  }
+];
+
+// src/lib/dispensaBrandedHtml.ts
+function escapeHtml2(value) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function inlineBold(text2) {
+  return escapeHtml2(text2).replace(
+    /\*\*([^*]+)\*\*/g,
+    "<strong>$1</strong>"
+  );
+}
+function markdownToBrandedBodyHtml(markdown) {
+  const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+  const out = [];
+  let inUl = false;
+  const closeUl = () => {
+    if (inUl) {
+      out.push("</ul>");
+      inUl = false;
+    }
+  };
+  for (const raw of lines) {
+    const line2 = raw.trimEnd();
+    const trimmed = line2.trim();
+    if (!trimmed) {
+      closeUl();
+      continue;
+    }
+    if (/^#{1,4}\s+/.test(trimmed)) {
+      closeUl();
+      const level = Math.min(trimmed.match(/^#+/)?.[0].length ?? 2, 4);
+      const text2 = trimmed.replace(/^#{1,4}\s+/, "");
+      out.push(`<h${level}>${inlineBold(text2)}</h${level}>`);
+      continue;
+    }
+    if (/^[-*]\s+/.test(trimmed)) {
+      if (!inUl) {
+        out.push("<ul>");
+        inUl = true;
+      }
+      out.push(`<li>${inlineBold(trimmed.replace(/^[-*]\s+/, ""))}</li>`);
+      continue;
+    }
+    closeUl();
+    out.push(`<p>${inlineBold(trimmed)}</p>`);
+  }
+  closeUl();
+  return out.join("\n");
+}
+function buildBrandedDispensaHtml(params) {
+  const lang = (params.lang || "it").trim() || "it";
+  const moduleNumber = params.moduleNumber.padStart(2, "0");
+  const courseTitle = params.courseTitle || "Arcani Maggiori";
+  const logoSrc = `${params.origin.replace(/\/$/, "")}/brand/tarot-italia-nav.png`;
+  const bodyHtml = markdownToBrandedBodyHtml(params.markdown);
+  const docTitle = `Tarot Italia \xB7 Modulo ${moduleNumber} \xB7 ${params.title}`;
+  const autoPrint = params.autoPrint !== false;
+  return `<!DOCTYPE html>
+<html lang="${escapeHtml2(lang)}">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml2(docTitle)}</title>
+  <style>
+    :root {
+      --gold: #D4AF37;
+      --ink: #1a1612;
+      --muted: #5c534c;
+      --paper: #faf7f2;
+    }
+    * { box-sizing: border-box; }
+    @page {
+      size: A4;
+      margin: 18mm 14mm 20mm;
+    }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Source Serif 4", "Noto Serif SC", "Noto Serif", Georgia, "Times New Roman", serif;
+      font-size: 11.5pt;
+      line-height: 1.55;
+    }
+    .sheet {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 2.5rem;
+    }
+    .tip {
+      margin: 0 0 1rem;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      border-radius: 8px;
+      background: #fff8e7;
+      color: var(--muted);
+      font-family: system-ui, sans-serif;
+      font-size: 0.85rem;
+    }
+    header.brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 2px solid var(--gold);
+      margin-bottom: 1.25rem;
+    }
+    header.brand img {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+    }
+    header.brand .titles { min-width: 0; }
+    header.brand .brand-name {
+      margin: 0;
+      font-size: 1.15rem;
+      letter-spacing: 0.04em;
+      color: #3a2f1c;
+      font-weight: 700;
+    }
+    header.brand .doc-line {
+      margin: 0.2rem 0 0;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+    h1, h2, h3, h4 {
+      color: #2a2218;
+      line-height: 1.25;
+      page-break-after: avoid;
+    }
+    h1 { font-size: 1.45rem; margin: 0 0 0.4rem; }
+    h2 { font-size: 1.2rem; margin: 1.35rem 0 0.5rem; border-bottom: 1px solid rgba(212,175,55,0.35); padding-bottom: 0.25rem; }
+    h3 { font-size: 1.05rem; margin: 1.1rem 0 0.4rem; }
+    h4 { font-size: 1rem; margin: 0.9rem 0 0.35rem; }
+    p { margin: 0.55rem 0; }
+    ul { margin: 0.45rem 0 0.7rem 1.2rem; padding: 0; }
+    li { margin: 0.25rem 0; }
+    strong { font-weight: 700; }
+    footer.brand {
+      margin-top: 2rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid rgba(212, 175, 55, 0.55);
+      font-family: system-ui, sans-serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    footer.brand a { color: #6b5520; text-decoration: none; }
+    @media print {
+      body { background: white; }
+      .tip { display: none !important; }
+      .sheet { max-width: none; padding: 0; }
+      a[href]::after { content: ""; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <p class="tip">Usa <strong>Salva come PDF</strong> / <strong>Save as PDF</strong> nella finestra di stampa. Lingua: <strong>${escapeHtml2(lang)}</strong>.</p>
+    <header class="brand">
+      <img src="${escapeHtml2(logoSrc)}" alt="Tarot Italia" width="56" height="56" />
+      <div class="titles">
+        <p class="brand-name">Tarot Italia \xB7 Maria Teresa Rogani</p>
+        <p class="doc-line">${escapeHtml2(courseTitle)} \xB7 Modulo ${escapeHtml2(moduleNumber)}</p>
+      </div>
+    </header>
+    <main>
+      <h1>${escapeHtml2(params.title)}</h1>
+      ${params.subtitle ? `<p style="color:var(--muted);margin-top:0">${escapeHtml2(params.subtitle)}</p>` : ""}
+      ${bodyHtml}
+    </main>
+    <footer class="brand">
+      <div><strong>Tarot Italia</strong> \xB7 ${escapeHtml2(SITE_ADDRESS)}</div>
+      <div>
+        <a href="mailto:${escapeHtml2(SITE_EMAIL)}">${escapeHtml2(SITE_EMAIL)}</a>
+        \xB7 Tel. ${escapeHtml2(SITE_PHONE_DISPLAY)}
+        \xB7 P.IVA ${escapeHtml2(SITE_PIVA)}
+      </div>
+      <div>tarotitalia.com \xB7 Dispensa formativa (traduzione automatica da italiano quando la lingua \u2260 IT)</div>
+    </footer>
+  </div>
+  ${autoPrint ? `<script>
+  window.addEventListener('load', function () {
+    setTimeout(function () { window.print(); }, 350);
+  });
+</script>` : ""}
+</body>
+</html>`;
+}
+function dispensaPdfFilename(moduleNumber, lang) {
+  const nn = moduleNumber.padStart(2, "0");
+  const safeLang = (lang || "it").toLowerCase().replace(/[^a-z0-9-]/g, "");
+  return `tarot-italia-arcani-maggiori-modulo-${nn}-${safeLang}.pdf`;
+}
+
+// src/lib/ninaReplyLang.ts
+var NINA_REPLY_LANG_LABELS = {
+  it: "italiano",
+  en: "English",
+  es: "espa\xF1ol",
+  fr: "fran\xE7ais",
+  de: "Deutsch",
+  pt: "portugu\xEAs",
+  "zh-cn": "\u4E2D\u6587\uFF08\u7B80\u4F53\uFF09",
+  zh: "\u4E2D\u6587\uFF08\u7B80\u4F53\uFF09",
+  ja: "\u65E5\u672C\u8A9E",
+  ar: "\u0627\u0644\u0639\u0631\u0628\u064A\u0629",
+  ru: "\u0440\u0443\u0441\u0441\u043A\u0438\u0439",
+  uk: "\u0443\u043A\u0440\u0430\u0457\u043D\u0441\u044C\u043A\u0430",
+  pl: "polski",
+  nl: "Nederlands",
+  ro: "rom\xE2n\u0103",
+  sv: "svenska",
+  tr: "T\xFCrk\xE7e",
+  el: "\u0395\u03BB\u03BB\u03B7\u03BD\u03B9\u03BA\u03AC",
+  ko: "\uD55C\uAD6D\uC5B4",
+  hi: "\u0939\u093F\u0928\u094D\u0926\u0940"
+};
+function normalizeNinaLang(lang) {
+  const raw = (lang || "it").trim().toLowerCase().replace(/_/g, "-");
+  if (!raw) return "it";
+  if (raw === "zh" || raw.startsWith("zh-")) {
+    if (raw.startsWith("zh-tw") || raw.startsWith("zh-hk") || raw.startsWith("zh-hant")) {
+      return raw;
+    }
+    return "zh-cn";
+  }
+  if (NINA_REPLY_LANG_LABELS[raw]) return raw;
+  const primary = raw.split("-")[0] || "it";
+  return primary;
+}
+function ninaReplyLangLabel(lang) {
+  const code = normalizeNinaLang(lang);
+  return NINA_REPLY_LANG_LABELS[code] || NINA_REPLY_LANG_LABELS[code.split("-")[0]] || code;
+}
+function isNinaDefaultLang(lang) {
+  return normalizeNinaLang(lang) === "it";
+}
+
+// src/lib/dispensaTranslate.ts
+var GROQ_CHAT_ENV_KEY = "TAROTITALIACHATGENERICAGROQ_API_KEY";
+var GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions";
+var GROQ_CHAT_DEFAULT_MODEL = "openai/gpt-oss-20b";
+var MAX_CHUNK_CHARS = 6e3;
+function readGroqApiKey() {
+  const raw = process.env[GROQ_CHAT_ENV_KEY];
+  if (typeof raw !== "string") return null;
+  const key = raw.trim();
+  return key.length > 0 ? key : null;
+}
+function resolveGroqModel() {
+  return process.env.GROQ_CHAT_MODEL?.trim() || GROQ_CHAT_DEFAULT_MODEL;
+}
+function isDispensaTranslateConfigured() {
+  return readGroqApiKey() !== null;
+}
+function splitMarkdownChunks(markdown) {
+  const text2 = markdown.trim();
+  if (text2.length <= MAX_CHUNK_CHARS) return [text2];
+  const parts = [];
+  let rest = text2;
+  while (rest.length > MAX_CHUNK_CHARS) {
+    const window = rest.slice(0, MAX_CHUNK_CHARS);
+    const breakAt = Math.max(
+      window.lastIndexOf("\n\n"),
+      window.lastIndexOf("\n## "),
+      window.lastIndexOf("\n### ")
+    );
+    const cut = breakAt > MAX_CHUNK_CHARS * 0.4 ? breakAt : MAX_CHUNK_CHARS;
+    parts.push(rest.slice(0, cut).trim());
+    rest = rest.slice(cut).trim();
+  }
+  if (rest) parts.push(rest);
+  return parts;
+}
+async function groqTranslateChunk(chunk, lang, label) {
+  const apiKey = readGroqApiKey();
+  if (!apiKey) {
+    throw new Error("GROQ_CHAT_UNAVAILABLE");
+  }
+  const response = await fetch(GROQ_CHAT_COMPLETIONS_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: resolveGroqModel(),
+      temperature: 0.15,
+      max_tokens: 8192,
+      stream: false,
+      messages: [
+        {
+          role: "system",
+          content: `You are a professional translator for Tarot Italia course handouts.
+Translate Italian Markdown into ${label} (\`${lang}\`).
+Rules:
+- Preserve Markdown structure (# ## ### headings, lists, **bold**, blank lines).
+- Keep proper names unchanged: Tarot Italia, Maria Teresa Rogani, Arcani Maggiori, Waite-Smith, Nina, Dialogo Tarot.
+- Keep Roman numerals and module numbers (0\u2013XXI, Modulo 01, etc.).
+- Do not add commentary, prefaces, or wrap the result in code fences.
+- Output ONLY the translated Markdown.`
+        },
+        { role: "user", content: chunk }
+      ]
+    })
+  });
+  let payload = null;
+  try {
+    payload = await response.json();
+  } catch {
+    payload = null;
+  }
+  if (!response.ok) {
+    console.error(
+      "Dispensa Groq translate failed:",
+      response.status,
+      payload?.error?.message || ""
+    );
+    throw new Error("GROQ_CHAT_UPSTREAM");
+  }
+  const reply = payload?.choices?.[0]?.message?.content?.trim();
+  if (!reply) {
+    throw new Error("GROQ_CHAT_EMPTY");
+  }
+  return reply;
+}
+async function translateDispensaMarkdown(italianMarkdown, targetLang) {
+  const lang = normalizeNinaLang(targetLang);
+  if (isNinaDefaultLang(lang)) {
+    return { markdown: italianMarkdown, lang: "it", translated: false };
+  }
+  const label = ninaReplyLangLabel(lang);
+  const chunks = splitMarkdownChunks(italianMarkdown);
+  const translatedChunks = [];
+  for (const chunk of chunks) {
+    translatedChunks.push(await groqTranslateChunk(chunk, lang, label));
+  }
+  return {
+    markdown: translatedChunks.join("\n\n"),
+    lang,
+    translated: true
+  };
+}
+
+// src/lib/stripDispensaEmbeds.ts
+function stripDispensaEmbedMarkers(markdown) {
+  return markdown.replace(/^\{\{(?:sigillo|scheda-visiva):[\w-]+\}\}\s*$/gm, "").replace(/\n{3,}/g, "\n\n");
+}
 
 // src/lib/stripe.ts
 function stripeSecretKey() {
@@ -8479,7 +9225,8 @@ var SAFE_CLIENT_ERRORS = /* @__PURE__ */ new Set([
   "Pagamento Stripe richiesto per attivare il pass.",
   "SLOT_TAKEN",
   "Prenotazione non trovata.",
-  "Prenotazione annullata."
+  "Prenotazione annullata.",
+  "Appunto non trovato."
 ]);
 function json2(status, body) {
   return { status, body };
@@ -8504,6 +9251,34 @@ function mapSafeError(error, fallback, statusHints) {
 }
 
 // src/server/routes/reserved.ts
+var MAGGIORI_SLUG = "arcani-maggiori";
+var MAGGIORI_MODULES = /* @__PURE__ */ new Set(["01", "02", "03", "04"]);
+var DEMO_RESERVED_UID = "demo-reserved-enn103";
+var DEMO_RESERVED_TOKEN = "demo-reserved-token";
+function isDevDemoReservedAuth(authorization) {
+  if (!authorization || !authorization.startsWith("Bearer ")) return false;
+  const token = authorization.slice("Bearer ".length).trim();
+  if (token !== DEMO_RESERVED_TOKEN) return false;
+  return process.env.NODE_ENV !== "production" || process.env.ALLOW_DIRECT_UNLOCK === "true";
+}
+async function loadItalianMaggioriMarkdown(params) {
+  const nn = params.moduleNumber.padStart(2, "0");
+  if (MAGGIORI_MODULES.has(nn)) {
+    const url = `${params.origin.replace(/\/$/, "")}/dispense/arcani-maggiori/it/modulo-${nn}.md`;
+    try {
+      const res = await fetch(url);
+      if (res.ok) {
+        const text2 = (await res.text()).trim();
+        if (text2) return text2;
+      }
+    } catch (error) {
+      console.warn("Maggiori IT markdown fetch failed:", nn, error);
+    }
+  }
+  const fallback = (params.fallbackMarkdown || "").trim();
+  if (fallback) return stripDispensaEmbedMarkers(fallback);
+  throw new Error("Dispensa non trovata.");
+}
 var OVERVIEW_DEGRADED_NOTICE = "Area Riservata in modalit\xE0 ridotta: non riusciamo a sincronizzare corsi e prenotazioni con il database in questo momento. Puoi restare autenticata; riprova tra poco.";
 function degradedOverviewFromSeed(user) {
   return {
@@ -8514,8 +9289,8 @@ function degradedOverviewFromSeed(user) {
       displayName: user.name ?? null,
       phoneWhatsapp: null
     },
-    courses: COURSE_SEED_CATALOG.map((course, index) => ({
-      id: -(index + 1),
+    courses: COURSE_SEED_CATALOG.map((course, index2) => ({
+      id: -(index2 + 1),
       slug: course.slug,
       title: course.title,
       subtitle: course.subtitle,
@@ -8531,8 +9306,8 @@ function degradedOverviewFromSeed(user) {
       amountPaidEur: null,
       dispenseCount: course.dispense.length,
       dispenseOutline: course.dispense.map((d, i) => ({
-        id: -(index * 100 + i + 1),
-        courseId: -(index + 1),
+        id: -(index2 * 100 + i + 1),
+        courseId: -(index2 + 1),
         moduleNumber: d.moduleNumber,
         title: d.title,
         subtitle: d.subtitle,
@@ -8714,6 +9489,191 @@ async function putDispensaProgress(params) {
     });
   }
 }
+async function getDispensaPdf(params) {
+  try {
+    const { dispensaId, origin } = params;
+    if (!Number.isInteger(dispensaId) || dispensaId <= 0) {
+      return json2(400, { error: "Identificativo dispensa non valido." });
+    }
+    const rows = await db.select({
+      id: dispense.id,
+      courseId: dispense.courseId,
+      moduleNumber: dispense.moduleNumber,
+      title: dispense.title,
+      subtitle: dispense.subtitle,
+      contentMarkdown: dispense.contentMarkdown,
+      courseSlug: courses.slug,
+      courseTitle: courses.title
+    }).from(dispense).innerJoin(courses, eq(courses.id, dispense.courseId)).where(eq(dispense.id, dispensaId)).limit(1);
+    const row = rows[0];
+    if (!row) {
+      return json2(404, { error: "Dispensa non trovata." });
+    }
+    if (!params.demoBypass) {
+      const user = params.user;
+      if (!user?.uid) {
+        return json2(401, { error: "Autenticazione richiesta." });
+      }
+      if (user.uid === DEMO_RESERVED_UID) {
+        return json2(403, {
+          error: "Acquisto richiesto per accedere a questa dispensa."
+        });
+      }
+      const dbUser = await getOrCreateUser(
+        user.uid,
+        user.email || "",
+        user.name ?? null
+      );
+      const purchaseRows = await db.select({ id: coursePurchases.id }).from(coursePurchases).where(
+        and(
+          eq(coursePurchases.userId, dbUser.id),
+          eq(coursePurchases.courseId, row.courseId),
+          eq(coursePurchases.status, "active")
+        )
+      ).limit(1);
+      if (!purchaseRows[0]) {
+        return json2(403, {
+          error: "Acquisto richiesto per accedere a questa dispensa."
+        });
+      }
+    }
+    const lang = normalizeNinaLang(params.lang);
+    if (!isNinaDefaultLang(lang) && !isDispensaTranslateConfigured()) {
+      return json2(503, {
+        error: "Traduzione PDF non disponibile: manca TAROTITALIACHATGENERICAGROQ_API_KEY.",
+        code: "DISPENSA_PDF_TRANSLATE_UNAVAILABLE"
+      });
+    }
+    let italianMarkdown;
+    if (row.courseSlug === MAGGIORI_SLUG) {
+      italianMarkdown = await loadItalianMaggioriMarkdown({
+        moduleNumber: row.moduleNumber,
+        origin,
+        fallbackMarkdown: row.contentMarkdown
+      });
+    } else {
+      italianMarkdown = stripDispensaEmbedMarkers(row.contentMarkdown);
+    }
+    let markdown = italianMarkdown;
+    let outLang = "it";
+    let translated = false;
+    try {
+      const result = await translateDispensaMarkdown(italianMarkdown, lang);
+      markdown = result.markdown;
+      outLang = result.lang;
+      translated = result.translated;
+    } catch (error) {
+      const code = error instanceof Error ? error.message : "GROQ_CHAT_UPSTREAM";
+      console.error("Dispensa PDF translate failed:", code);
+      return json2(503, {
+        error: "Traduzione della dispensa non riuscita. Riprova tra poco.",
+        code: "DISPENSA_PDF_TRANSLATE_FAILED",
+        detail: code
+      });
+    }
+    const html = buildBrandedDispensaHtml({
+      markdown,
+      lang: outLang,
+      moduleNumber: row.moduleNumber,
+      title: row.title,
+      subtitle: row.subtitle,
+      courseTitle: row.courseTitle,
+      origin,
+      autoPrint: true
+    });
+    return json2(200, {
+      html,
+      lang: outLang,
+      translated,
+      filename: dispensaPdfFilename(row.moduleNumber, outLang),
+      moduleNumber: row.moduleNumber,
+      title: row.title,
+      courseSlug: row.courseSlug
+    });
+  } catch (error) {
+    return mapSafeError(error, "Impossibile generare il PDF della dispensa.", {
+      notFound: "non trovata",
+      forbidden: "Acquisto richiesto"
+    });
+  }
+}
+async function getUserNotes(user) {
+  try {
+    if (!user.uid) {
+      return json2(401, { error: "Autenticazione richiesta." });
+    }
+    const notes = await listUserNotes({
+      uid: user.uid,
+      email: user.email || "",
+      displayName: user.name ?? null
+    });
+    return json2(200, { notes });
+  } catch (error) {
+    return mapSafeError(error, "Impossibile caricare gli appunti.");
+  }
+}
+async function postUserNote(params) {
+  try {
+    const { user, body } = params;
+    if (!user.uid) {
+      return json2(401, { error: "Autenticazione richiesta." });
+    }
+    const note = await createUserNote({
+      uid: user.uid,
+      email: user.email || "",
+      displayName: user.name ?? null,
+      title: typeof body.title === "string" ? body.title : void 0,
+      body: typeof body.body === "string" ? body.body : void 0
+    });
+    return json2(201, { note });
+  } catch (error) {
+    return mapSafeError(error, "Impossibile creare l\u2019appunto.");
+  }
+}
+async function putUserNote(params) {
+  try {
+    const { user, noteId, body } = params;
+    if (!user.uid) {
+      return json2(401, { error: "Autenticazione richiesta." });
+    }
+    if (!Number.isInteger(noteId) || noteId <= 0) {
+      return json2(400, { error: "Identificativo appunto non valido." });
+    }
+    const note = await updateUserNote({
+      uid: user.uid,
+      email: user.email || "",
+      noteId,
+      title: typeof body.title === "string" ? body.title : void 0,
+      body: typeof body.body === "string" ? body.body : void 0
+    });
+    return json2(200, { note });
+  } catch (error) {
+    return mapSafeError(error, "Impossibile salvare l\u2019appunto.", {
+      notFound: "non trovato"
+    });
+  }
+}
+async function deleteUserNoteRoute(params) {
+  try {
+    const { user, noteId } = params;
+    if (!user.uid) {
+      return json2(401, { error: "Autenticazione richiesta." });
+    }
+    if (!Number.isInteger(noteId) || noteId <= 0) {
+      return json2(400, { error: "Identificativo appunto non valido." });
+    }
+    const result = await deleteUserNote({
+      uid: user.uid,
+      email: user.email || "",
+      noteId
+    });
+    return json2(200, result);
+  } catch (error) {
+    return mapSafeError(error, "Impossibile eliminare l\u2019appunto.", {
+      notFound: "non trovato"
+    });
+  }
+}
 
 // firebase-applet-config.json
 var firebase_applet_config_default = {
@@ -8852,6 +9812,10 @@ function readBodyObject(req) {
   }
   return {};
 }
+function queryString(value) {
+  if (Array.isArray(value)) return String(value[0] || "");
+  return String(value || "");
+}
 function requestOrigin(req) {
   const proto = readHeader(req, "x-forwarded-proto") || "https";
   const host = readHeader(req, "x-forwarded-host") || readHeader(req, "host");
@@ -8884,7 +9848,7 @@ function groupSubpath(req, prefix) {
 }
 
 // src/server/apiEntries/reserved.ts
-var config = { runtime: "nodejs", maxDuration: 30 };
+var config = { runtime: "nodejs", maxDuration: 60 };
 function methodNotAllowed(res, allowed) {
   res.setHeader("Allow", allowed.join(", "));
   sendJson(res, 405, { error: "Metodo non consentito.", allow: allowed });
@@ -8941,6 +9905,34 @@ async function handler(req, res) {
       });
       return sendJson(res, result.status, result.body);
     }
+    const dispensaPdf = path.match(/^dispense\/([^/]+)\/pdf$/);
+    if (dispensaPdf) {
+      if (method !== "GET") return methodNotAllowed(res, ["GET"]);
+      const demoBypass = isDevDemoReservedAuth(
+        (() => {
+          for (const [key, value] of Object.entries(req.headers || {})) {
+            if (key.toLowerCase() !== "authorization") continue;
+            return (Array.isArray(value) ? value[0] : value)?.trim() ?? "";
+          }
+          return "";
+        })()
+      );
+      let user = null;
+      if (!demoBypass) {
+        user = await requireUser(req, res);
+        if (!user) return;
+      }
+      const langRaw = queryString(req.query?.lang) || null;
+      res.setHeader("Cache-Control", "private, no-store");
+      const result = await getDispensaPdf({
+        user,
+        dispensaId: Number(dispensaPdf[1]),
+        lang: langRaw,
+        origin: requestOrigin(req),
+        demoBypass
+      });
+      return sendJson(res, result.status, result.body);
+    }
     const dispensaProgress2 = path.match(/^dispense\/([^/]+)\/progress$/);
     if (dispensaProgress2) {
       if (method !== "PUT") return methodNotAllowed(res, ["PUT"]);
@@ -8952,6 +9944,46 @@ async function handler(req, res) {
         body: readBodyObject(req)
       });
       return sendJson(res, result.status, result.body);
+    }
+    if (path === "notes") {
+      if (method === "GET") {
+        const user = await requireUser(req, res);
+        if (!user) return;
+        res.setHeader("Cache-Control", "private, no-store");
+        const result = await getUserNotes(user);
+        return sendJson(res, result.status, result.body);
+      }
+      if (method === "POST") {
+        const user = await requireUser(req, res);
+        if (!user) return;
+        const result = await postUserNote({
+          user,
+          body: readBodyObject(req)
+        });
+        return sendJson(res, result.status, result.body);
+      }
+      return methodNotAllowed(res, ["GET", "POST"]);
+    }
+    const noteById = path.match(/^notes\/([^/]+)$/);
+    if (noteById) {
+      const noteId = Number(noteById[1]);
+      if (method === "PUT") {
+        const user = await requireUser(req, res);
+        if (!user) return;
+        const result = await putUserNote({
+          user,
+          noteId,
+          body: readBodyObject(req)
+        });
+        return sendJson(res, result.status, result.body);
+      }
+      if (method === "DELETE") {
+        const user = await requireUser(req, res);
+        if (!user) return;
+        const result = await deleteUserNoteRoute({ user, noteId });
+        return sendJson(res, result.status, result.body);
+      }
+      return methodNotAllowed(res, ["PUT", "DELETE"]);
     }
     return sendJson(res, 404, { error: "Not found", path, method });
   } catch (error) {

@@ -20,7 +20,7 @@ type Props = {
  * Curated react-i18next locale switcher (ENN-136).
  * ENN-140: not mounted in site chrome — Google Translate is the primary
  * browsing control. Kept for `?lang=` / programmatic use and possible
- * materials tooling. Prefer `MaterialsLanguagePicker` for course downloads.
+ * materials tooling. Course PDF language follows Google Translate (ENN-145).
  */
 export function LanguageSwitcher({
   variant = 'header',

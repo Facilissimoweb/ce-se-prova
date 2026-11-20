@@ -59,8 +59,7 @@ export function MaggioriMattoPreview({
     <section
       id={SCROLL_LANDMARKS.corsiMaggioriPreview}
       aria-labelledby="maggiori-matto-preview-heading"
-      className="notranslate space-y-6 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
-      translate="no"
+      className="space-y-6 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
     >
       <h2 id="maggiori-matto-preview-heading" className="sr-only">
         Anteprima Dispensa 01 · Arcani Maggiori
@@ -174,8 +173,8 @@ export function MaggioriMattoPreview({
             <div className="flex flex-col items-stretch sm:items-end gap-2 shrink-0">
               <MaterialsLanguagePicker />
               <p className="text-[11px] text-[#A39B93] max-w-[16rem] sm:text-right">
-                Dopo l&apos;iscrizione scarichi la dispensa curata nella lingua
-                scelta (IT + EN).
+                Dopo l&apos;iscrizione: PDF brandizzato nella lingua di Traduci
+                (auto da italiano).
               </p>
               <div className="flex flex-wrap gap-2">
                 <button
