@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import type { CourseModuleFlashcardDeck } from '../../data/flashcards/arcaniMaggiori';
 import { requestGoogleTranslateRefresh } from '../../lib/googleTranslateRuntime';
+import { GtSafeBoundary } from '../GtSafeBoundary';
 
 interface DispensaFlashcardsProps {
   deck: CourseModuleFlashcardDeck;
@@ -27,17 +28,15 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
   const [order, setOrder] = useState<number[]>(baseOrder);
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
+  /** Discard GT `<font>` wrappers when face remount fails (ENN-162). */
+  const [faceEpoch, setFaceEpoch] = useState(0);
 
   useEffect(() => {
     setOrder(baseOrder);
     setIndex(0);
     setFlipped(false);
+    setFaceEpoch((n) => n + 1);
   }, [baseOrder, deck.courseSlug, deck.moduleNumber]);
-
-  // ENN-156/157 — flip/nav remounts Q/A + chrome; re-apply googtrans after DOM change.
-  useEffect(() => {
-    requestGoogleTranslateRefresh(160);
-  }, [deck.courseSlug, deck.moduleNumber, index, flipped]);
 
   const cardById = useMemo(() => {
     const map = new Map(deck.cards.map((c) => [c.id, c]));
@@ -47,6 +46,25 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
   const current = cardById.get(order[index] ?? -1) ?? null;
   const total = order.length;
   const position = total === 0 ? 0 : index + 1;
+
+  /**
+   * ENN-162 — remount Q and A as separate faces so GT never reconciles against
+   * a previous side’s `<font>` wrappers (partial IT/EN mix). Include card id so
+   * shuffle at the same index still refreshes.
+   */
+  const faceKey = current
+    ? `sigillo-${deck.moduleNumber}-${current.id}-${flipped ? 'a' : 'q'}-${faceEpoch}`
+    : `sigillo-empty-${faceEpoch}`;
+
+  // Flip / prev-next / shuffle / deck change — dual refresh like SchedaVisiva.
+  useEffect(() => {
+    requestGoogleTranslateRefresh(140);
+    const later = window.setTimeout(
+      () => requestGoogleTranslateRefresh(380),
+      300
+    );
+    return () => window.clearTimeout(later);
+  }, [deck.courseSlug, deck.moduleNumber, faceKey]);
 
   const go = (delta: number) => {
     if (total === 0) return;
@@ -68,7 +86,7 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
 
   if (!current || total === 0) return null;
 
-  // ENN-157 — whole Sigillo (chrome + Q/A) follows selected Google Translate language.
+  // ENN-157/162 — whole Sigillo (chrome + Q/A) follows selected Google Translate.
   return (
     <section
       className="space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-5 md:p-6"
@@ -92,26 +110,48 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
         </p>
       </div>
 
-      <button
-        type="button"
-        onClick={() => setFlipped((v) => !v)}
-        aria-pressed={flipped}
-        className="group relative w-full min-h-[200px] md:min-h-[240px] rounded-2xl border border-[#D4AF37]/35 bg-gradient-to-br from-[#1A1615] to-[#0E0C0B] px-5 py-6 text-left transition-all hover:border-[#D4AF37] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+      <GtSafeBoundary
+        resetKey={faceKey}
+        onError={() => setFaceEpoch((n) => n + 1)}
+        fallback={
+          <button
+            type="button"
+            onClick={() => setFaceEpoch((n) => n + 1)}
+            className="w-full min-h-[200px] md:min-h-[240px] rounded-2xl border border-[#D4AF37]/35 bg-[#1A1615] px-5 py-6 text-sm text-[#E8e1dd]"
+          >
+            Ricarica la carta
+          </button>
+        }
       >
-        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]/90 mb-3">
-          {flipped ? 'Risposta' : 'Domanda'}
-        </p>
-        <h2
-          className={`flashcard-body-text normal-case ${
-            flipped ? 'flashcard-body-answer' : 'flashcard-body-question'
-          }`}
+        <button
+          type="button"
+          onClick={() => setFlipped((v) => !v)}
+          aria-pressed={flipped}
+          className="group relative w-full min-h-[200px] md:min-h-[240px] rounded-2xl border border-[#D4AF37]/35 bg-gradient-to-br from-[#1A1615] to-[#0E0C0B] px-5 py-6 text-left transition-all hover:border-[#D4AF37] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
         >
-          {flipped ? current.answer : current.question}
-        </h2>
-        <p className="mt-5 text-[11px] text-[#A39B93] group-hover:text-[#E6C65C] transition-colors">
-          {flipped ? 'Tocca per tornare alla domanda' : 'Tocca per rivelare la risposta'}
-        </p>
-      </button>
+          {/*
+            Keyed face remount: Domanda and Risposta are separate DOM trees so
+            GT re-scans each side from Italian source (ENN-162).
+          */}
+          <div key={faceKey}>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]/90 mb-3">
+              {flipped ? 'Risposta' : 'Domanda'}
+            </p>
+            <h2
+              className={`flashcard-body-text normal-case ${
+                flipped ? 'flashcard-body-answer' : 'flashcard-body-question'
+              }`}
+            >
+              {flipped ? current.answer : current.question}
+            </h2>
+            <p className="mt-5 text-[11px] text-[#A39B93] group-hover:text-[#E6C65C] transition-colors">
+              {flipped
+                ? 'Tocca per tornare alla domanda'
+                : 'Tocca per rivelare la risposta'}
+            </p>
+          </div>
+        </button>
+      </GtSafeBoundary>
 
       {/* Mobile-first toolbar: 2×2 grid (template for other courses’ flashcard UI) */}
       <div

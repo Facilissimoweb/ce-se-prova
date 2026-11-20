@@ -140,6 +140,21 @@ assert(
   flash.includes('requestGoogleTranslateRefresh'),
   'Sigillo requests GT refresh on card flip/nav (ENN-156/157)'
 );
+assert(
+  flash.includes('faceKey') &&
+    /key=\{faceKey\}/.test(flash) &&
+    flash.includes("flipped ? 'a' : 'q'"),
+  'Sigillo remounts Domanda/Risposta faces separately (ENN-162 — full GT both sides)'
+);
+assert(
+  flash.includes('GtSafeBoundary'),
+  'Sigillo face wrapped in GtSafeBoundary (ENN-162)'
+);
+assert(
+  /requestGoogleTranslateRefresh\(380\)/.test(flash) ||
+    flash.includes('requestGoogleTranslateRefresh(380)'),
+  'Sigillo dual GT refresh after face remount (ENN-162)'
+);
 
 const catalog = readFileSync(
   path.join(root, 'src/i18n/useLocalizedCatalog.ts'),

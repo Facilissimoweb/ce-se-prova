@@ -26,13 +26,14 @@ import {
 import { looksLikeNinaProviderLeak } from '../lib/ninaReplyLang';
 import { NinaMessageBody } from './chat/NinaMessageBody';
 import { GtCriticalLabel } from './GtCriticalLabel';
+import { GtSafeBoundary } from './GtSafeBoundary';
 import { readGoogTransLang } from './GoogleTranslateWidget';
 import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
 
 /**
  * Thread turns. `skipGt` marks copy already localized for googtrans
  * (API /api/chat replies, user input). Seed chrome stays Italian DOM
- * source so GT can translate (ENN-158) — never English default for JA.
+ * source so GT can translate (ENN-158/161) — never English i18n fallback.
  */
 type ChatTurn = {
   role: 'user' | 'assistant';
@@ -96,21 +97,26 @@ const linkClass =
  * Live chat via server `/api/chat` (Groq / Nina) when
  * `TAROTITALIACHATGENERICAGROQ_API_KEY` is set on Vercel; otherwise contacts only.
  * ENN-137: welcome (free) vs Nina Studio (Maggiori entitlement).
+ * ENN-161: all visible chrome = Italian getFixedT / GtCriticalLabel (GT-able);
+ * panel remount + GtSafeBoundary so Studio tab cannot blank the site under GT.
  * On mobile, only visible when «Strumenti» is open.
  */
 export function ChatFab() {
-  const { t, i18n } = useTranslation('common');
+  const { i18n } = useTranslation('common');
+  /** Italian DOM source for every visible Nina string (ENN-158/161). */
+  const tIt = i18n.getFixedT('it', 'common');
   const panelId = useId();
   const composerId = useId();
   const threadRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<NinaMode>('welcome');
+  /** Bumps on mode / lock-CTA / recover so GT-mutated nodes are discarded. */
+  const [panelEpoch, setPanelEpoch] = useState(0);
   const [statusLoading, setStatusLoading] = useState(false);
   const [chatAvailable, setChatAvailable] = useState(false);
   const [turns, setTurns] = useState<ChatTurn[]>(() => [
     {
       role: 'assistant',
-      // Always Italian DOM source — GT translates (ENN-158).
       content: i18n.getFixedT('it', 'common')('nina.welcome'),
     },
   ]);
@@ -123,6 +129,10 @@ export function ChatFab() {
   const entitlement = useCourseEntitlement('arcani-maggiori');
   const { getIdToken } = useAuth();
   const canUseStudio = entitlement.owns;
+
+  function bumpPanel() {
+    setPanelEpoch((n) => n + 1);
+  }
 
   /** Italian seed only — never EN fallback for JA/other GT langs (ENN-158). */
   function greetingFor(nextMode: NinaMode): string {
@@ -144,6 +154,7 @@ export function ChatFab() {
   function switchMode(nextMode: NinaMode) {
     if (nextMode === 'studio' && !canUseStudio) {
       setShowStudioCta(true);
+      bumpPanel();
       return;
     }
     setMode(nextMode);
@@ -151,6 +162,16 @@ export function ChatFab() {
     setSendError(null);
     setShowStudioCta(false);
     setDraft('');
+    bumpPanel();
+  }
+
+  function recoverPanel() {
+    setMode('welcome');
+    setTurns([seedTurn('welcome')]);
+    setShowStudioCta(false);
+    setSendError(null);
+    setDraft('');
+    bumpPanel();
   }
 
   // Keep seed greeting on Italian source when i18n/mode changes (still GT-able).
@@ -172,13 +193,16 @@ export function ChatFab() {
   useEffect(() => {
     if (!open) return;
     requestGoogleTranslateRefresh(160);
-  }, [open, mode, turns.length, showStudioCta, sending]);
+    const later = window.setTimeout(() => requestGoogleTranslateRefresh(360), 280);
+    return () => window.clearTimeout(later);
+  }, [open, mode, turns.length, showStudioCta, sending, panelEpoch]);
 
   // If Studio entitlement is lost, fall back to welcome.
   useEffect(() => {
     if (!canUseStudio && mode === 'studio') {
       setMode('welcome');
       setTurns([seedTurn('welcome')]);
+      bumpPanel();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canUseStudio, mode]);
@@ -203,12 +227,14 @@ export function ChatFab() {
         setMode('welcome');
         setTurns([seedTurn('welcome')]);
         setShowStudioCta(true);
+        bumpPanel();
         return;
       }
       setMode(requested);
       setTurns([seedTurn(requested)]);
       setShowStudioCta(false);
       setSendError(null);
+      bumpPanel();
     };
     window.addEventListener(NINA_CHAT_OPEN_EVENT, onOpen);
     return () => window.removeEventListener(NINA_CHAT_OPEN_EVENT, onOpen);
@@ -310,12 +336,13 @@ export function ChatFab() {
 
       if (data.available === false) {
         setChatAvailable(false);
-        setSendError(safeUserError(t('nina.errorUnavailable')));
+        setSendError(safeUserError(tIt('nina.errorUnavailable')));
         return;
       }
 
       if (data.code === 'studio_locked' || data.locked) {
         setShowStudioCta(true);
+        bumpPanel();
         if (data.reply) {
           setTurns((prev) => [
             ...prev,
@@ -326,14 +353,15 @@ export function ChatFab() {
             },
           ]);
         } else {
-          setSendError(safeUserError(t('nina.studioLockedHint')));
+          setSendError(safeUserError(tIt('nina.studioLockedHint')));
         }
         return;
       }
 
       if (data.code === 'studio_auth') {
-        setSendError(safeUserError(t('nina.errorGeneric')));
+        setSendError(safeUserError(tIt('nina.errorGeneric')));
         setShowStudioCta(true);
+        bumpPanel();
         return;
       }
 
@@ -349,7 +377,6 @@ export function ChatFab() {
             ? { role: 'assistant', content: apiReply, skipGt: true }
             : {
                 role: 'assistant',
-                // Italian DOM source — GT translates (no EN hardcode).
                 content: i18n.getFixedT('it', 'common')('nina.errorRephrase'),
               },
         ]);
@@ -357,12 +384,12 @@ export function ChatFab() {
       }
 
       if (data.code === 'payload') {
-        setSendError(safeUserError(t('nina.errorRephrase')));
+        setSendError(safeUserError(tIt('nina.errorRephrase')));
         return;
       }
 
       if (!res.ok) {
-        setSendError(safeUserError(t('nina.errorGeneric')));
+        setSendError(safeUserError(tIt('nina.errorGeneric')));
         return;
       }
 
@@ -382,7 +409,7 @@ export function ChatFab() {
         { role: 'assistant', content: data.reply as string, skipGt: true },
       ]);
     } catch {
-      setSendError(t('nina.errorOffline'));
+      setSendError(tIt('nina.errorOffline'));
     } finally {
       setSending(false);
     }
@@ -390,15 +417,17 @@ export function ChatFab() {
 
   const titleLabel =
     mode === 'studio' && canUseStudio
-      ? t('nina.fabTitleStudio')
-      : t('nina.fabTitleWelcome');
+      ? tIt('nina.fabTitleStudio')
+      : tIt('nina.fabTitleWelcome');
   const subtitle = statusLoading
     ? '…'
     : !chatAvailable
-      ? t('nina.subtitleUnavailable')
+      ? tIt('nina.subtitleUnavailable')
       : mode === 'studio' && canUseStudio
-        ? t('nina.subtitleStudio')
-        : t('nina.subtitleAvailable');
+        ? tIt('nina.subtitleStudio')
+        : tIt('nina.subtitleAvailable');
+
+  const panelKey = `nina-${mode}-${canUseStudio ? 'u' : 'g'}-${showStudioCta ? 'cta' : 'ok'}-${panelEpoch}`;
 
   return (
     <>
@@ -427,229 +456,273 @@ export function ChatFab() {
           aria-label={titleLabel}
           className="fixed inset-0 z-50 flex flex-col overflow-hidden border-0 bg-[#151311] pt-[env(safe-area-inset-top,0px)] pr-[env(safe-area-inset-right,0px)] pb-[env(safe-area-inset-bottom,0px)] pl-[env(safe-area-inset-left,0px)] shadow-[0_16px_40px_rgba(0,0,0,0.5)] md:inset-[max(0.75rem,env(safe-area-inset-top,0px))_max(0.75rem,env(safe-area-inset-right,0px))_max(0.75rem,env(safe-area-inset-bottom,0px))_max(0.75rem,env(safe-area-inset-left,0px))] md:rounded-2xl md:border md:border-[#D4AF37]/30 md:bg-[#151311]/98 md:pt-0 md:pr-0 md:pb-0 md:pl-0 md:backdrop-blur-md"
         >
-          <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-2.5 md:px-4 md:pb-4 md:pt-3">
-            <div className="mb-2 flex shrink-0 items-start justify-between gap-2">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0">
-                  <p className="font-display text-[10px] tracking-[0.1em] text-[#D4AF37] uppercase sm:text-[11px]">
-                    Tarot Italia
-                  </p>
-                  <h2 className="font-display text-base leading-none text-[#F4F1EA] sm:text-lg">
-                    {mode === 'studio' && canUseStudio
-                      ? 'Nina Studio'
-                      : 'Nina'}
-                  </h2>
-                </div>
-                <p className="mt-1 text-[11px] leading-snug text-[#A39B93] sm:text-xs">
-                  {subtitle}
+          <GtSafeBoundary
+            resetKey={panelKey}
+            onError={recoverPanel}
+            fallback={
+              <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-4 text-center">
+                <p className="text-sm text-[#E8e1dd]">
+                  La chat si è riavviata. Puoi continuare con Nina.
                 </p>
+                <button
+                  type="button"
+                  onClick={recoverPanel}
+                  className="rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/15 px-3 py-2 text-xs font-semibold text-[#E6C65C]"
+                >
+                  Riapri Accoglienza
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="text-xs text-[#A39B93] underline"
+                >
+                  Chiudi
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                aria-label="Chiudi chat con Nina"
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/25 text-[#A39B93] transition-colors hover:bg-[#D4AF37]/10 hover:text-[#F4F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
-              >
-                <X className="h-3.5 w-3.5" aria-hidden="true" />
-              </button>
-            </div>
-
-            {/* Mode switch — Accoglienza vs Studio */}
+            }
+          >
             <div
-              className="mb-2 flex shrink-0 flex-wrap items-center gap-1.5"
-              role="group"
-              aria-label={t('nina.modeAria')}
+              key={panelKey}
+              className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-2.5 md:px-4 md:pb-4 md:pt-3"
             >
-              <button
-                type="button"
-                aria-pressed={mode === 'welcome'}
-                onClick={() => switchMode('welcome')}
-                className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:text-xs ${
-                  mode === 'welcome'
-                    ? 'border-[#D4AF37]/45 bg-[#D4AF37]/15 text-[#E6C65C]'
-                    : 'border-[#D4AF37]/15 text-[#A39B93] hover:border-[#D4AF37]/30 hover:text-[#F4F1EA]'
-                }`}
-              >
-                <MessageCircle className="h-3 w-3" aria-hidden />
-                <GtCriticalLabel uiKey="welcomeMode" />
-              </button>
-              <button
-                type="button"
-                aria-pressed={mode === 'studio' && canUseStudio}
-                onClick={() => switchMode('studio')}
-                className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:text-xs ${
-                  mode === 'studio' && canUseStudio
-                    ? 'border-[#D4AF37]/45 bg-[#D4AF37]/15 text-[#E6C65C]'
-                    : 'border-[#D4AF37]/15 text-[#A39B93] hover:border-[#D4AF37]/30 hover:text-[#F4F1EA]'
-                }`}
-              >
-                {canUseStudio ? (
-                  <Sparkles className="h-3 w-3" aria-hidden />
-                ) : (
-                  <Lock className="h-3 w-3" aria-hidden />
-                )}
-                {t('nina.modeStudio')}
-              </button>
-            </div>
-
-            {showStudioCta && (
-              <div
-                className="mb-2 shrink-0 rounded-xl border border-[#D4AF37]/25 bg-[#D4AF37]/08 px-3 py-2.5"
-                role="status"
-              >
-                <p className="text-xs leading-relaxed text-[#E8e1dd]">
-                  {t('nina.studioLockedHint')}
-                </p>
-                <a
-                  href={`/corsi#${SCROLL_LANDMARKS.corsiCheckout}`}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/15 px-2.5 py-1.5 text-[11px] font-semibold text-[#E6C65C] transition-colors hover:bg-[#D4AF37]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+              <div className="mb-2 flex shrink-0 items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0">
+                    <p className="font-display text-[10px] tracking-[0.1em] text-[#D4AF37] uppercase sm:text-[11px]">
+                      Tarot Italia
+                    </p>
+                    <h2 className="font-display text-base leading-none text-[#F4F1EA] sm:text-lg">
+                      {mode === 'studio' && canUseStudio
+                        ? 'Nina Studio'
+                        : 'Nina'}
+                    </h2>
+                  </div>
+                  <p className="mt-1 text-[11px] leading-snug text-[#A39B93] sm:text-xs">
+                    {subtitle}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label="Chiudi chat con Nina"
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/25 text-[#A39B93] transition-colors hover:bg-[#D4AF37]/10 hover:text-[#F4F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
                 >
-                  <Sparkles className="h-3 w-3" aria-hidden />
-                  {t('nina.studioCta')}
-                </a>
+                  <X className="h-3.5 w-3.5" aria-hidden="true" />
+                </button>
               </div>
-            )}
 
-            {chatAvailable && (
-              <div className="mb-2 flex min-h-0 min-w-0 flex-1 flex-col">
-                {/*
-                  ENN-158: chrome + seed welcome stay GT-able (Italian DOM source).
-                  Only API/user bubbles use notranslate — replies already follow
-                  googtrans via /api/chat (ENN-143). Never default seed to English.
-                */}
-                <div
-                  ref={threadRef}
-                  className="mb-2 min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain rounded-xl border border-[#D4AF37]/12 bg-[#0F0D0B]/70 p-2.5"
-                  aria-live="polite"
+              {/* Mode switch — Accoglienza vs Studio */}
+              <div
+                className="mb-2 flex shrink-0 flex-wrap items-center gap-1.5"
+                role="group"
+                aria-label={tIt('nina.modeAria')}
+              >
+                <button
+                  type="button"
+                  aria-pressed={mode === 'welcome'}
+                  onClick={() => switchMode('welcome')}
+                  className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:text-xs ${
+                    mode === 'welcome'
+                      ? 'border-[#D4AF37]/45 bg-[#D4AF37]/15 text-[#E6C65C]'
+                      : 'border-[#D4AF37]/15 text-[#A39B93] hover:border-[#D4AF37]/30 hover:text-[#F4F1EA]'
+                  }`}
                 >
-                  {turns.map((turn, index) => {
-                    const baseClass =
-                      turn.role === 'user'
-                        ? 'ml-6 break-words rounded-lg bg-[#D4AF37]/15 px-2.5 py-2 text-sm text-[#F4F1EA] whitespace-pre-wrap'
-                        : 'mr-2 break-words rounded-lg bg-[#1C1916] px-2.5 py-2.5';
-                    return (
-                      <div
-                        key={`${turn.role}-${index}`}
-                        className={
-                          turn.skipGt ? `${baseClass} notranslate` : baseClass
-                        }
-                        {...(turn.skipGt ? { translate: 'no' as const } : {})}
-                      >
-                        {turn.role === 'assistant' ? (
-                          <NinaMessageBody content={turn.content} />
-                        ) : (
-                          turn.content
-                        )}
+                  <MessageCircle className="h-3 w-3" aria-hidden />
+                  <GtCriticalLabel uiKey="welcomeMode" />
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={mode === 'studio' && canUseStudio}
+                  onClick={() => switchMode('studio')}
+                  className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:text-xs ${
+                    mode === 'studio' && canUseStudio
+                      ? 'border-[#D4AF37]/45 bg-[#D4AF37]/15 text-[#E6C65C]'
+                      : 'border-[#D4AF37]/15 text-[#A39B93] hover:border-[#D4AF37]/30 hover:text-[#F4F1EA]'
+                  }`}
+                >
+                  {canUseStudio ? (
+                    <Sparkles className="h-3 w-3" aria-hidden />
+                  ) : (
+                    <Lock className="h-3 w-3" aria-hidden />
+                  )}
+                  {tIt('nina.modeStudio')}
+                </button>
+              </div>
+
+              {showStudioCta && (
+                <div
+                  className="mb-2 shrink-0 rounded-xl border border-[#D4AF37]/25 bg-[#D4AF37]/08 px-3 py-2.5"
+                  role="status"
+                >
+                  <p className="text-xs leading-relaxed text-[#E8e1dd]">
+                    {tIt('nina.studioLockedHint')}
+                  </p>
+                  <a
+                    href={`/corsi#${SCROLL_LANDMARKS.corsiCheckout}`}
+                    className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/15 px-2.5 py-1.5 text-[11px] font-semibold text-[#E6C65C] transition-colors hover:bg-[#D4AF37]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                  >
+                    <Sparkles className="h-3 w-3" aria-hidden />
+                    {tIt('nina.studioCta')}
+                  </a>
+                </div>
+              )}
+
+              {chatAvailable && (
+                <div className="mb-2 flex min-h-0 min-w-0 flex-1 flex-col">
+                  {/*
+                    ENN-158/161: chrome + seed welcome stay GT-able (Italian DOM).
+                    Only API/user bubbles use notranslate — replies already follow
+                    googtrans via /api/chat (ENN-143). Never default seed to English.
+                  */}
+                  <div
+                    ref={threadRef}
+                    className="mb-2 min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain rounded-xl border border-[#D4AF37]/12 bg-[#0F0D0B]/70 p-2.5"
+                    aria-live="polite"
+                  >
+                    {turns.map((turn, index) => {
+                      const baseClass =
+                        turn.role === 'user'
+                          ? 'ml-6 break-words rounded-lg bg-[#D4AF37]/15 px-2.5 py-2 text-sm text-[#F4F1EA] whitespace-pre-wrap'
+                          : 'mr-2 break-words rounded-lg bg-[#1C1916] px-2.5 py-2.5';
+                      return (
+                        <div
+                          key={`${turn.role}-${index}-${turn.skipGt ? 'api' : 'seed'}`}
+                          className={
+                            turn.skipGt ? `${baseClass} notranslate` : baseClass
+                          }
+                          {...(turn.skipGt ? { translate: 'no' as const } : {})}
+                        >
+                          {turn.role === 'assistant' ? (
+                            <NinaMessageBody content={turn.content} />
+                          ) : (
+                            turn.content
+                          )}
+                        </div>
+                      );
+                    })}
+                    {sending && (
+                      <div className="mr-4 flex items-center gap-2 rounded-lg bg-[#1C1916] px-2.5 py-2 text-sm text-[#A39B93]">
+                        <Loader2
+                          className="h-3.5 w-3.5 animate-spin"
+                          aria-hidden
+                        />
+                        {tIt('nina.listening')}
                       </div>
-                    );
-                  })}
-                  {sending && (
-                    <div className="mr-4 flex items-center gap-2 rounded-lg bg-[#1C1916] px-2.5 py-2 text-sm text-[#A39B93]">
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
-                      {t('nina.listening')}
+                    )}
+                  </div>
+
+                  <form
+                    onSubmit={sendMessage}
+                    className="flex min-w-0 shrink-0 items-end gap-2"
+                  >
+                    <label htmlFor={composerId} className="sr-only">
+                      Messaggio per Nina
+                    </label>
+                    {/*
+                      GT does not translate HTML placeholder attrs — use a visible
+                      Italian text node so googtrans can localize «Scrivi qui…».
+                    */}
+                    <div className="relative min-h-[2.5rem] min-w-0 flex-1">
+                      {!draft.trim() && (
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute top-2 left-3 right-3 text-sm leading-snug text-[#6F675F]"
+                        >
+                          Scrivi qui…
+                        </span>
+                      )}
+                      <textarea
+                        id={composerId}
+                        rows={1}
+                        value={draft}
+                        onChange={(e) => setDraft(e.target.value)}
+                        disabled={sending}
+                        placeholder=""
+                        className="min-h-[2.5rem] w-full resize-none rounded-xl border border-[#D4AF37]/20 bg-[#12100E] px-3 py-2 text-sm text-[#F4F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:opacity-60"
+                      />
                     </div>
+                    <button
+                      type="submit"
+                      disabled={sending || !draft.trim()}
+                      aria-label="Invia messaggio"
+                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/35 bg-[#D4AF37]/15 text-[#D4AF37] transition-colors hover:bg-[#D4AF37]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <Send className="h-3.5 w-3.5" aria-hidden="true" />
+                    </button>
+                  </form>
+
+                  {sendError && (
+                    <p
+                      className="mt-1.5 shrink-0 text-xs leading-relaxed text-[#C9A27A]"
+                      role="alert"
+                    >
+                      {sendError}
+                    </p>
                   )}
                 </div>
+              )}
 
-                <form onSubmit={sendMessage} className="flex min-w-0 shrink-0 items-end gap-2">
-                  <label htmlFor={composerId} className="sr-only">
-                    Messaggio per Nina
-                  </label>
-                  {/*
-                    GT does not translate HTML placeholder attrs — use a visible
-                    Italian text node so googtrans can localize «Scrivi qui…».
-                  */}
-                  <div className="relative min-h-[2.5rem] min-w-0 flex-1">
-                    {!draft.trim() && (
-                      <span
+              <div
+                className={`rounded-lg border border-[#D4AF37]/20 bg-[#0F0D0B]/55 px-2 py-1.5 sm:px-2.5 sm:py-2 ${
+                  chatAvailable ? 'shrink-0' : 'mt-auto shrink-0'
+                }`}
+                role="group"
+                aria-label={tIt('nina.sectionAria')}
+              >
+                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                  {tIt('cta.talkMaria')}
+                </p>
+                <ul className="grid grid-cols-2 gap-1.5 md:grid-cols-4">
+                  <li>
+                    <a href="/prenota" className={linkClass}>
+                      <CalendarDays
+                        className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]"
                         aria-hidden="true"
-                        className="pointer-events-none absolute top-2 left-3 right-3 text-sm leading-snug text-[#6F675F]"
-                      >
-                        Scrivi qui…
-                      </span>
-                    )}
-                    <textarea
-                      id={composerId}
-                      rows={1}
-                      value={draft}
-                      onChange={(e) => setDraft(e.target.value)}
-                      disabled={sending}
-                      placeholder=""
-                      className="min-h-[2.5rem] w-full resize-none rounded-xl border border-[#D4AF37]/20 bg-[#12100E] px-3 py-2 text-sm text-[#F4F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:opacity-60"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={sending || !draft.trim()}
-                    aria-label="Invia messaggio"
-                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/35 bg-[#D4AF37]/15 text-[#D4AF37] transition-colors hover:bg-[#D4AF37]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    <Send className="h-3.5 w-3.5" aria-hidden="true" />
-                  </button>
-                </form>
-
-                {sendError && (
-                  <p className="mt-1.5 shrink-0 text-xs leading-relaxed text-[#C9A27A]" role="alert">
-                    {sendError}
-                  </p>
-                )}
+                      />
+                      <GtCriticalLabel uiKey="bookConsult" />
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href={whatsappHref(
+                        'Buongiorno Maria Teresa, vorrei scrivere in chat.'
+                      )}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={linkClass}
+                    >
+                      <WhatsAppLogo className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />
+                      <GtCriticalLabel uiKey="whatsappContact" />
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href={telegramHref()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={linkClass}
+                    >
+                      <TelegramLogo className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />
+                      Telegram
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href={`mailto:${SITE_EMAIL}`}
+                      className={linkClass}
+                      title={`Email · ${SITE_EMAIL}`}
+                    >
+                      <Mail
+                        className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]"
+                        aria-hidden="true"
+                      />
+                      <span className="min-w-0 truncate">Email</span>
+                    </a>
+                  </li>
+                </ul>
               </div>
-            )}
-
-            <div
-              className={`rounded-lg border border-[#D4AF37]/20 bg-[#0F0D0B]/55 px-2 py-1.5 sm:px-2.5 sm:py-2 ${
-                chatAvailable ? 'shrink-0' : 'mt-auto shrink-0'
-              }`}
-              role="group"
-              aria-label={t('nina.sectionAria')}
-            >
-              <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                {t('cta.talkMaria')}
-              </p>
-              <ul className="grid grid-cols-2 gap-1.5 md:grid-cols-4">
-                <li>
-                  <a href="/prenota" className={linkClass}>
-                    <CalendarDays className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" aria-hidden="true" />
-                    <GtCriticalLabel uiKey="bookConsult" />
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href={whatsappHref(
-                      'Buongiorno Maria Teresa, vorrei scrivere in chat.'
-                    )}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={linkClass}
-                  >
-                    <WhatsAppLogo className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />
-                    <GtCriticalLabel uiKey="whatsappContact" />
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href={telegramHref()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={linkClass}
-                  >
-                    <TelegramLogo className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />
-                    Telegram
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href={`mailto:${SITE_EMAIL}`}
-                    className={linkClass}
-                    title={`Email · ${SITE_EMAIL}`}
-                  >
-                    <Mail className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" aria-hidden="true" />
-                    <span className="min-w-0 truncate">Email</span>
-                  </a>
-                </li>
-              </ul>
             </div>
-          </div>
+          </GtSafeBoundary>
         </div>
       )}
     </>

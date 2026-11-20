@@ -35,6 +35,21 @@ assert(
   'getFixedT is not driven by GT→EN fallback'
 );
 assert(
+  chatFab.includes("getFixedT('it', 'common')") &&
+    /tIt\(['"]cta\.talkMaria['"]\)/.test(chatFab) &&
+    /tIt\(['"]nina\.subtitleAvailable['"]\)/.test(chatFab) &&
+    /tIt\(['"]nina\.modeStudio['"]\)/.test(chatFab),
+  'visible Nina chrome uses Italian tIt / getFixedT (ENN-161 — no EN i18n fallback)'
+);
+assert(
+  !/\bt\(\s*['"]nina\./.test(chatFab) && !/\bt\(\s*['"]cta\.talkMaria/.test(chatFab),
+  'ChatFab does not call live-locale t() for Nina chrome keys'
+);
+assert(
+  chatFab.includes('GtSafeBoundary') && chatFab.includes('panelEpoch'),
+  'Studio mode remount + GtSafeBoundary prevent GT blank screen (ENN-161)'
+);
+assert(
   chatFab.includes('requestGoogleTranslateRefresh'),
   'opens panel with GT refresh'
 );
