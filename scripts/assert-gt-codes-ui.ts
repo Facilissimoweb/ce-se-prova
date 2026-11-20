@@ -96,7 +96,16 @@ const nav = readFileSync(
   'utf8'
 );
 assert(nav.includes('GtCriticalLabel'), 'nav uses GtCriticalLabel');
-assert(nav.includes('bookSession'), 'nav mobile bookSession');
+assert(nav.includes('bookConsult'), 'nav desktop bookConsult');
+assert(nav.includes('hidden md:inline-flex'), 'nav Prenota hidden below md (ENN-160)');
+
+const bookFab = readFileSync(
+  path.join(root, 'src/components/BookSessionFab.tsx'),
+  'utf8'
+);
+assert(bookFab.includes('bookSession'), 'mobile shopper FAB uses bookSession (ENN-160)');
+assert(bookFab.includes('ShoppingBag'), 'mobile shopper FAB is icon-only bag');
+assert(bookFab.includes('md:hidden'), 'shopper FAB is mobile-only');
 
 const chat = readFileSync(path.join(root, 'src/components/ChatFab.tsx'), 'utf8');
 assert(chat.includes('welcomeMode'), 'Nina Accoglienza uses critical label');

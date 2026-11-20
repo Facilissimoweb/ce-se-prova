@@ -242,18 +242,14 @@ export function TopBar({
               variant="header"
               onRequestConsent={onOpenPrivacy}
             />
+            {/* ENN-160: text Prenota only from md+; mobile uses BookSessionFab */}
             <button
               type="button"
               data-nowrap-keep
               onClick={() => handleMobileSelect('booking')}
-              className="px-3 md:px-4 py-2 min-h-[40px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs md:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+              className="hidden md:inline-flex px-4 py-2 min-h-[40px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold whitespace-nowrap shrink-0 items-center transition-all duration-150 hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
             >
-              <span className="sm:hidden">
-                <GtCriticalLabel uiKey="bookSession" />
-              </span>
-              <span className="hidden sm:inline">
-                <GtCriticalLabel uiKey="bookConsult" />
-              </span>
+              <GtCriticalLabel uiKey="bookConsult" />
             </button>
 
             <button
