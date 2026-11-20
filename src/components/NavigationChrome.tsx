@@ -17,10 +17,10 @@ import {
   X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { LanguageSwitcher } from '../i18n/LanguageSwitcher';
 import type { ScreenId } from '../types/handoff';
 import { afterNextPaint, scrollWindowTo } from '../lib/scrollNavigation';
 import { whatsappHref } from '../lib/siteContacts';
+import { GoogleTranslateWidget } from './GoogleTranslateWidget';
 import { TarotNavLogo } from './TarotEmblem';
 
 interface TopBarProps {
@@ -235,9 +235,12 @@ export function TopBar({
             })}
           </nav>
 
-          {/* Zone 3: Language + Primary CTA + Hamburger Toggle (Mobile) */}
+          {/* Zone 3: Google Translate (ENN-140) + Primary CTA + Hamburger */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <LanguageSwitcher variant="header" className="hidden sm:block" />
+            <GoogleTranslateWidget
+              variant="header"
+              onRequestConsent={onOpenPrivacy}
+            />
             <button
               type="button"
               data-nowrap-keep
@@ -295,7 +298,13 @@ export function TopBar({
                 </span>
               </div>
 
-              <LanguageSwitcher variant="drawer" />
+              <GoogleTranslateWidget
+                variant="drawer"
+                onRequestConsent={() => {
+                  setMobileMenuOpen(false);
+                  onOpenPrivacy();
+                }}
+              />
 
               <nav aria-label={t('nav.pagesAria')} className="space-y-2.5">
                 {navItems.map((item) => {

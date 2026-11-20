@@ -13,6 +13,7 @@ import {
 import type { CourseId, ScreenId } from '../types/handoff';
 import { useAuth } from '../context/AuthContext';
 import { CheckoutReturnBanner } from '../components/CheckoutReturnBanner';
+import { MaterialsLanguagePicker } from '../components/MaterialsLanguagePicker';
 import { FormattedDispensaBody } from '../components/reserved/FormattedDispensaBody';
 import { DispensaFlashcards } from '../components/reserved/DispensaFlashcards';
 import { DispensaSchedaVisiva } from '../components/reserved/DispensaSchedaVisiva';
@@ -503,7 +504,8 @@ export function ReservedAreaScreen({
               {activeDispensa && (
                 <article
                   id={SCROLL_LANDMARKS.reservedDispensaContent}
-                  className="lg:col-span-8 glass-tier-1 rounded-2xl p-6 md:p-8 space-y-6 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
+                  className="notranslate lg:col-span-8 glass-tier-1 rounded-2xl p-6 md:p-8 space-y-6 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
+                  translate="no"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-[#D4AF37]/15 pb-5">
                     <div className="space-y-1.5">
@@ -559,11 +561,19 @@ export function ReservedAreaScreen({
                         )}
                     </div>
 
-                    <div className="flex flex-wrap gap-2 shrink-0">
+                    <div className="flex flex-col items-stretch sm:items-end gap-2 shrink-0">
+                      {activeCourse.slug === 'arcani-maggiori' && (
+                        <MaterialsLanguagePicker />
+                      )}
+                      <div className="flex flex-wrap gap-2">
                       <button
                         type="button"
                         onClick={() =>
-                          handleDownloadDispensa(activeCourse.title, activeDispensa)
+                          void handleDownloadDispensa(
+                            activeCourse.title,
+                            activeDispensa,
+                            activeCourse.slug
+                          )
                         }
                         className="px-3.5 py-2 min-h-[40px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs font-medium text-[#F4F1EA] inline-flex items-center gap-1.5 whitespace-nowrap"
                       >
@@ -591,6 +601,7 @@ export function ReservedAreaScreen({
                           ? 'Modulo Completato'
                           : 'Segna Completato'}
                       </button>
+                      </div>
                     </div>
                   </div>
 

@@ -17,8 +17,10 @@ type Props = {
 };
 
 /**
- * Site language switcher — IT default + EN/ES/FR/DE.
- * Persists to localStorage and mirrors preference in `?lang=` (paths stay Italian).
+ * Curated react-i18next locale switcher (ENN-136).
+ * ENN-140: not mounted in site chrome — Google Translate is the primary
+ * browsing control. Kept for `?lang=` / programmatic use and possible
+ * materials tooling. Prefer `MaterialsLanguagePicker` for course downloads.
  */
 export function LanguageSwitcher({
   variant = 'header',

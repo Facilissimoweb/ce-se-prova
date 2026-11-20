@@ -30,7 +30,10 @@ export function FormattedDispensaBody({
 }) {
   const lines = markdown.split('\n');
   return (
-    <div className="space-y-3 text-sm md:text-[15px] leading-relaxed text-[#E8e1dd]">
+    <div
+      className="notranslate space-y-3 text-sm md:text-[15px] leading-relaxed text-[#E8e1dd]"
+      translate="no"
+    >
       {lines.map((rawLine, idx) => {
         const line = rawLine.trim();
         if (!line) return <div key={idx} className="h-1" aria-hidden="true" />;

@@ -248,7 +248,7 @@ export const siteContent = {
     bannerBody: {
       cmsKey: '[COPY: siteContent.privacy.bannerBody]',
       liveText:
-        'Utilizziamo cookie tecnici indispensabili per il funzionamento del sito e, solo previo consenso, preferenze funzionali e statistiche anonime.',
+        'Utilizziamo cookie tecnici indispensabili per il funzionamento del sito e, solo previo consenso, preferenze funzionali, statistiche anonime e script di terze parti (es. Google Traduttore).',
     },
     modalTitle: {
       cmsKey: '[COPY: siteContent.privacy.modalTitle]',

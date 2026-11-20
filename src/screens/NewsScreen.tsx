@@ -399,7 +399,10 @@ function ArticleDetail({
           }
         />
         {showGatedBody && gatedMarkdown && (
-          <div className="mt-8 space-y-4 border-t border-[#D4AF37]/15 pt-8">
+          <div
+            className="notranslate mt-8 space-y-4 border-t border-[#D4AF37]/15 pt-8"
+            translate="no"
+          >
             <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]">
               Approfondimento sbloccato · corso Maggiori
             </p>

@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { downloadMaggioriDispensaFile } from '../data/courses/maggioriDownloads';
 import { stripFlashcardEmbedMarkers } from '../data/flashcards/arcaniMaggiori';
+import { getMaterialsLang } from '../i18n/materialsLang';
 import { readJsonResponse } from '../lib/readJsonResponse';
 import {
   RESERVED_DEMO_UID,
@@ -223,10 +225,24 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
     }
   };
 
-  const handleDownloadDispensa = (
+  const handleDownloadDispensa = async (
     courseTitle: string,
-    dispensa: ReservedUnlockedDispensa
+    dispensa: ReservedUnlockedDispensa,
+    courseSlug?: string
   ) => {
+    // ENN-140 — Maggiori: curated IT/EN files; other courses keep generated IT markdown.
+    if (courseSlug === 'arcani-maggiori') {
+      try {
+        await downloadMaggioriDispensaFile(
+          dispensa.moduleNumber,
+          getMaterialsLang()
+        );
+        return;
+      } catch (err) {
+        console.warn('Curated Maggiori download failed, falling back:', err);
+      }
+    }
+
     const body = stripFlashcardEmbedMarkers(dispensa.contentMarkdown);
     const fileContent = `# Tarot Italia · Maria Teresa Rogani\nPercorso: ${courseTitle}\nModulo ${dispensa.moduleNumber}: ${dispensa.title}\n${dispensa.subtitle}\n\nPunti Chiave:\n${dispensa.keyTakeaways.map((k) => `- ${k}`).join('\n')}\n\n${body}\n`;
     const blob = new Blob([fileContent], { type: 'text/markdown;charset=utf-8' });
