@@ -433,18 +433,22 @@ export function HomeScreen({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 items-stretch">
-          {educationalCourses.map((course, idx) => {
+          {educationalCourses.map((course) => {
             const courseImage = COURSE_SECTION_IMAGES[course.id];
+            const lessonsMeta =
+              course.id === 'arcani-maggiori'
+                ? `${course.lessonsCount} moduli · ${course.totalHours}`
+                : `${course.lessonsCount} lezioni · ${course.totalHours}`;
             return (
               <article
                 key={course.id}
-                className={`rounded-2xl p-5 md:p-6 flex flex-col justify-between gap-6 transition-colors duration-150 ${
+                className={`rounded-2xl p-6 md:p-7 flex flex-col justify-between gap-6 transition-all duration-200 ${
                   course.recommended
-                    ? 'glass-tier-2 border-[#D4AF37]/40 hover:border-[#D4AF37]/60'
-                    : 'glass-tier-1 hover:border-[#D4AF37]/40'
+                    ? 'glass-tier-2 border-[#D4AF37]/45 shadow-[0_0_28px_rgba(212,175,55,0.12)]'
+                    : 'glass-tier-1 hover:border-[#D4AF37]/35'
                 }`}
               >
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <div className="rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#12100E]">
                     <ResilientImage
                       src={courseImage.src}
@@ -454,33 +458,92 @@ export function HomeScreen({
                     />
                   </div>
 
-                  <div className="flex items-center justify-between gap-2 text-xs text-[#A39B93]">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                     <span className="font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                      {idx + 1}) {course.title}
+                      {course.orderLabel}
                     </span>
-                    <span className="tabular-nums">{course.lessonsCount} lezioni</span>
+                    <span className="text-[#A39B93]">
+                      {course.recommended ? 'Percorso Consigliato' : lessonsMeta}
+                    </span>
                   </div>
 
-                  <h3 className="font-display text-lg md:text-xl text-[#F4F1EA]">
-                    {course.subtitle}
-                  </h3>
+                  <div className="space-y-2">
+                    <h3 className="font-display text-xl md:text-2xl text-[#F4F1EA]">
+                      {showCmsKeys ? (
+                        <CopyText
+                          entry={{ cmsKey: course.cmsKeyTitle, liveText: course.title }}
+                          showKeys={true}
+                        />
+                      ) : (
+                        course.title
+                      )}
+                    </h3>
+                    <p className="text-xs font-medium text-[#D4AF37]/90">
+                      {showCmsKeys ? (
+                        <CopyText
+                          entry={{ cmsKey: course.cmsKeySubtitle, liveText: course.subtitle }}
+                          showKeys={true}
+                        />
+                      ) : (
+                        course.subtitle
+                      )}
+                    </p>
+                    {course.recommended ? (
+                      <p className="text-[11px] text-[#A39B93] tabular-nums">{lessonsMeta}</p>
+                    ) : null}
+                  </div>
+
+                  <div className="py-3 border-y border-[#D4AF37]/15 flex items-baseline justify-between gap-2">
+                    <span className="font-display text-3xl text-[#F4F1EA] tabular-nums">
+                      € {course.priceEur}
+                    </span>
+                    <span className="text-xs text-[#A39B93] text-right">
+                      Accesso perpetuo · IVA incl.
+                    </span>
+                  </div>
 
                   <p className="text-sm leading-relaxed text-[#A39B93]">
-                    {course.description}
+                    {showCmsKeys ? (
+                      <CopyText
+                        entry={{ cmsKey: course.cmsKeyDesc, liveText: course.description }}
+                        showKeys={true}
+                      />
+                    ) : (
+                      course.description
+                    )}
                   </p>
+
+                  <ul className="space-y-2.5 pt-1">
+                    {course.includes.map((item) => (
+                      <li
+                        key={item}
+                        className="flex items-start gap-2.5 text-xs md:text-sm text-[#E8e1dd]"
+                      >
+                        <Check
+                          className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5"
+                          aria-hidden="true"
+                        />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-              <div className="pt-4 border-t border-[#D4AF37]/15 flex items-center justify-end">
-                <button
-                  type="button"
-                  onClick={() => onSelectCourse(course.id)}
-                  className="text-xs md:text-sm font-medium text-[#F4F1EA] hover:text-[#D4AF37] inline-flex items-center gap-1.5 transition-colors whitespace-nowrap"
-                >
-                  Scopri il percorso
-                  <ArrowRight className="w-3.5 h-3.5 text-[#D4AF37]" />
-                </button>
-              </div>
-            </article>
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => onSelectCourse(course.id)}
+                    className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] ${
+                      course.recommended
+                        ? 'bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)]'
+                        : 'bg-[#D4AF37]/10 border border-[#D4AF37]/35 hover:bg-[#D4AF37] hover:text-[#12100E] text-[#F4F1EA]'
+                    }`}
+                  >
+                    Scopri il percorso
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </article>
             );
           })}
         </div>
