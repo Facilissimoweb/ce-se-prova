@@ -34,8 +34,7 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
     setFlipped(false);
   }, [baseOrder, deck.courseSlug, deck.moduleNumber]);
 
-  // ENN-156 — chrome (Domanda/Risposta/hints) remounts on flip/nav; re-apply GT.
-  // Q/A <h2> stays notranslate — refresh must not strip that protection.
+  // ENN-156/157 — flip/nav remounts Q/A + chrome; re-apply googtrans after DOM change.
   useEffect(() => {
     requestGoogleTranslateRefresh(160);
   }, [deck.courseSlug, deck.moduleNumber, index, flipped]);
@@ -69,7 +68,7 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
 
   if (!current || total === 0) return null;
 
-  // ENN-155 — chrome / titles follow GT; only Q/A study text stays notranslate.
+  // ENN-157 — whole Sigillo (chrome + Q/A) follows selected Google Translate language.
   return (
     <section
       className="space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-5 md:p-6"
@@ -102,12 +101,10 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
         <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]/90 mb-3">
           {flipped ? 'Risposta' : 'Domanda'}
         </p>
-        {/* Precision: keep Italian Q/A body for study (ENN-155). */}
         <h2
-          className={`notranslate flashcard-body-text normal-case ${
+          className={`flashcard-body-text normal-case ${
             flipped ? 'flashcard-body-answer' : 'flashcard-body-question'
           }`}
-          translate="no"
         >
           {flipped ? current.answer : current.question}
         </h2>

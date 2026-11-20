@@ -108,8 +108,8 @@ const scheda = readFileSync(
   'utf8'
 );
 assert(
-  flash.includes('notranslate') && flash.includes('translate="no"'),
-  'Sigillo keeps intentional notranslate on flashcard Q/A only'
+  !flash.includes('notranslate') && !flash.includes('translate="no"'),
+  'Sigillo flashcards fully GT-able — no notranslate on Q/A (ENN-157)'
 );
 assert(
   !/className="[^"]*notranslate/.test(scheda) &&
@@ -122,11 +122,8 @@ assert(
   'Sigillo shell section is GT-able (ENN-155)'
 );
 assert(
-  /Layers[\s\S]{0,120}Sigillo di apprendimento/.test(flash) &&
-    !/className="[^"]*notranslate[^"]*"[\s\S]{0,80}Sigillo di apprendimento/.test(
-      flash
-    ),
-  'Sigillo eyebrow label is outside notranslate'
+  /Layers[\s\S]{0,120}Sigillo di apprendimento/.test(flash),
+  'Sigillo eyebrow label present'
 );
 assert(
   /SECTION_LABELS[\s\S]*mappa:\s*'Mappa della composizione'/.test(scheda) &&
@@ -135,15 +132,13 @@ assert(
   'Mappa titles present + scheda requests GT refresh after mount (ENN-156)'
 );
 assert(
-  /flashcard-body-text[\s\S]{0,120}translate="no"/.test(flash) ||
-    /translate="no"[\s\S]{0,120}flashcard-body-text/.test(flash) ||
-    (/notranslate flashcard-body-text/.test(flash) &&
-      flash.includes('translate="no"')),
-  'Flashcard Q/A h2 keeps notranslate (ENN-156 intentional)'
+  /className=\{`flashcard-body-text/.test(flash) &&
+    !/notranslate flashcard-body-text/.test(flash),
+  'Flashcard Q/A h2 has no notranslate (ENN-157 — whole-site GT)'
 );
 assert(
   flash.includes('requestGoogleTranslateRefresh'),
-  'Sigillo requests GT refresh on card flip/nav (chrome only)'
+  'Sigillo requests GT refresh on card flip/nav (ENN-156/157)'
 );
 
 const catalog = readFileSync(
