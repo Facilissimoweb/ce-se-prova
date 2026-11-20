@@ -21,6 +21,7 @@ import type { ScreenId } from '../types/handoff';
 import { afterNextPaint, scrollWindowTo } from '../lib/scrollNavigation';
 import { whatsappHref } from '../lib/siteContacts';
 import { GoogleTranslateWidget } from './GoogleTranslateWidget';
+import { GtCriticalLabel } from './GtCriticalLabel';
 import { TarotNavLogo } from './TarotEmblem';
 
 interface TopBarProps {
@@ -247,8 +248,12 @@ export function TopBar({
               onClick={() => handleMobileSelect('booking')}
               className="px-3 md:px-4 py-2 min-h-[40px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs md:text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
             >
-              <span className="sm:hidden">{t('nav.bookShort')}</span>
-              <span className="hidden sm:inline">{t('nav.bookLong')}</span>
+              <span className="sm:hidden">
+                <GtCriticalLabel uiKey="bookSession" />
+              </span>
+              <span className="hidden sm:inline">
+                <GtCriticalLabel uiKey="bookConsult" />
+              </span>
             </button>
 
             <button
@@ -429,7 +434,7 @@ export function FloatingSideRail({
   const { t } = useTranslation('common');
   return (
     <aside
-      className="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 p-2 rounded-full glass-tier-2"
+      className="ti-rail-side hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 p-2 rounded-full glass-tier-2"
       aria-label={t('rail.aria')}
     >
       <button

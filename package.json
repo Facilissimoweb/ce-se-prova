@@ -12,6 +12,7 @@
     "build:blog": "node scripts/build-blog.mjs",
     "test:nina-studio": "npx tsx scripts/assert-nina-studio-split.ts && npx tsx scripts/assert-nina-maggiori-source.ts",
     "test:nina-chat-gt": "npx tsx scripts/assert-nina-chat-gt.ts",
+    "test:gt-codes-ui": "npx tsx scripts/assert-gt-codes-ui.ts",
     "seo:generate": "node scripts/generate-seo-assets.mjs",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js api/courses.js api/bookings.js api/booking-availability.js api/stripe.js api/reserved.js api/dialogue.js api/news.js api/chat.js api/coming-soon.js",

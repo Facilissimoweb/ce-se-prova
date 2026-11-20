@@ -30,6 +30,7 @@ import {
   buildBookingWhatsAppMessage,
   CONSULTATION_STRIPE_ENABLED,
 } from '../lib/bookingCheckoutMode';
+import { GtCriticalLabel } from '../components/GtCriticalLabel';
 import {
   isEveningSlot,
   isSlotAllowedForMode,
@@ -957,7 +958,9 @@ export function BookingScreen({
                           : 'Apertura WhatsApp…'
                         : CONSULTATION_STRIPE_ENABLED
                           ? `Paga e conferma (€ ${activeTariff.priceEur})`
-                          : 'Invia prenotazione'}
+                          : (
+                              <GtCriticalLabel uiKey="sendBooking" />
+                            )}
                     </button>
                   </div>
 

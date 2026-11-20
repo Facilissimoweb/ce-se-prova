@@ -832,3 +832,10 @@ body {
 .tarot-gt-host .goog-te-combo {
   display: none !important;
 }
+
+/* ENN-159 — Arabic (and any RTL googtrans): document dir is set in JS;
+   mirror fixed side rail that uses physical `right`. */
+html.ti-gt-rtl .ti-rail-side {
+  right: auto;
+  left: 1.5rem;
+}

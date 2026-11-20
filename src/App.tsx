@@ -38,6 +38,7 @@ import { NewsScreen } from './screens/NewsScreen';
 import { ContattiScreen } from './screens/ContattiScreen';
 import { SocialShareButtons } from './components/SocialShareButtons';
 import { DocumentSeo } from './components/DocumentSeo';
+import { GtCriticalLabel } from './components/GtCriticalLabel';
 import {
   MAGGIORI_BAGATTO_BLOG_SLUG,
   MAGGIORI_MODULO_01_BLOG_SLUG,
@@ -602,7 +603,11 @@ export function App() {
                             onClick={() => handleNavigate(item.id)}
                             className={FOOTER_LINK_CLASS}
                           >
-                            {item.label}
+                            {item.id === 'booking' ? (
+                              <GtCriticalLabel uiKey="bookConsult" />
+                            ) : (
+                              item.label
+                            )}
                           </button>
                         );
                       }

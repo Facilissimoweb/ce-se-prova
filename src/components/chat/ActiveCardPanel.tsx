@@ -4,6 +4,7 @@ import { getSiteLanguage, maggioriNameFor } from '../../i18n';
 import type { ArcanaCard } from '../../types/handoff';
 import type { SpreadDrawItem } from '../../data/majorArcana';
 import { MajorArcanaArtwork } from '../MajorArcanaArtwork';
+import { GtCriticalLabel } from '../GtCriticalLabel';
 
 interface ActiveCardPanelProps {
   activeCard: ArcanaCard;
@@ -210,7 +211,10 @@ export function ActiveCardPanel({
           onClick={onBookConsult}
           className="text-xs font-semibold text-[#D4AF37] hover:text-[#E6C65C] inline-flex items-center gap-1 whitespace-nowrap"
         >
-          Prenota ora <ArrowRight className="w-3.5 h-3.5" />
+          <GtCriticalLabel uiKey="bookNow">
+            {' '}
+            <ArrowRight className="w-3.5 h-3.5" />
+          </GtCriticalLabel>
         </button>
       </div>
     </section>

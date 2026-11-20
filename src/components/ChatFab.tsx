@@ -25,6 +25,7 @@ import {
 } from '../lib/siteContacts';
 import { looksLikeNinaProviderLeak } from '../lib/ninaReplyLang';
 import { NinaMessageBody } from './chat/NinaMessageBody';
+import { GtCriticalLabel } from './GtCriticalLabel';
 import { readGoogTransLang } from './GoogleTranslateWidget';
 import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
 
@@ -470,7 +471,7 @@ export function ChatFab() {
                 }`}
               >
                 <MessageCircle className="h-3 w-3" aria-hidden />
-                {t('nina.modeWelcome')}
+                <GtCriticalLabel uiKey="welcomeMode" />
               </button>
               <button
                 type="button"
@@ -609,7 +610,7 @@ export function ChatFab() {
                 <li>
                   <a href="/prenota" className={linkClass}>
                     <CalendarDays className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" aria-hidden="true" />
-                    {t('cta.book')}
+                    <GtCriticalLabel uiKey="bookConsult" />
                   </a>
                 </li>
                 <li>
@@ -622,7 +623,7 @@ export function ChatFab() {
                     className={linkClass}
                   >
                     <WhatsAppLogo className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />
-                    {t('cta.whatsapp')}
+                    <GtCriticalLabel uiKey="whatsappContact" />
                   </a>
                 </li>
                 <li>

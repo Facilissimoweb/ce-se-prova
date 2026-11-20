@@ -5,11 +5,20 @@
  * (route changes, auth login, dynamic course UI) leave fresh Italian source
  * until we re-trigger. Cookie `googtrans` is the durable language signal;
  * `#googtrans(it|xx)` is restored across SPA pushState when present/needed.
+ *
+ * ENN-159 — cookie/hash targets are normalized via `normalizeGoogTransLang`
+ * (zh-CN only; ar drives document RTL).
  */
+
+import {
+  applyGtDocumentChrome,
+  normalizeGoogTransLang,
+} from './gtLangCodes';
 
 export const GT_PAGE_LANG = 'it';
 export const GT_HOST_ID = 'tarot_italia_google_translate_host';
 export const GT_REFRESH_EVENT = 'tarot:gt-refresh';
+
 
 /** Fired so scroll helpers can wait/retry after GT mutates layout (ENN-149). */
 export const GT_LAYOUT_EVENT = 'tarot:gt-layout';
@@ -92,18 +101,19 @@ export function readGoogTransLang(): string {
   const cookie = document.cookie.match(/(?:^|;\s*)googtrans=([^;]*)/);
   if (cookie?.[1]) {
     const fromCookie = parseGoogtransTarget(cookie[1]);
-    if (fromCookie) return fromCookie;
+    if (fromCookie) return normalizeGoogTransLang(fromCookie);
   }
   const hash = window.location.hash.match(
     /googtrans\(([^|)]+)\|([^)]+)\)/i
   );
-  if (hash?.[2]) return hash[2];
+  if (hash?.[2]) return normalizeGoogTransLang(hash[2]);
   return GT_PAGE_LANG;
 }
 
 export function writeGoogtransCookie(target: string): void {
   expireGoogtransCookies();
-  const value = `/${GT_PAGE_LANG}/${target}`;
+  const canonical = normalizeGoogTransLang(target);
+  const value = `/${GT_PAGE_LANG}/${canonical}`;
   document.cookie = `googtrans=${value}; path=/`;
   const host = window.location.hostname;
   if (host && !/^\d{1,3}(\.\d{1,3}){3}$/.test(host) && host !== 'localhost') {
@@ -139,10 +149,18 @@ export function preservedGoogtransHash(): string {
 /** Ensure cookie + hash still advertise the active non-IT language. */
 export function ensureGoogtransPersisted(): string {
   const lang = readGoogTransLang();
+  applyGtDocumentChrome(lang);
   if (lang === GT_PAGE_LANG) return lang;
   writeGoogtransCookie(lang);
   const want = `#googtrans(${GT_PAGE_LANG}|${lang})`;
-  if (!isGoogtransHash(window.location.hash)) {
+  // Rewrite hash when a legacy target (e.g. zh-TW) was normalized to zh-CN.
+  const hashMatch = window.location.hash.match(
+    /googtrans\(([^|)]+)\|([^)]+)\)/i
+  );
+  const hashTarget = hashMatch?.[2]
+    ? normalizeGoogTransLang(hashMatch[2])
+    : null;
+  if (!isGoogtransHash(window.location.hash) || hashTarget !== lang) {
     const url = `${window.location.pathname}${window.location.search}${want}`;
     window.history.replaceState(null, '', url);
   }
@@ -277,7 +295,8 @@ export function startGoogleTranslateSpaBridge(): () => void {
 
   observer.observe(root, { childList: true, subtree: true });
 
-  // First paint after inject — cookie may already request EN.
+  // First paint after inject — cookie may already request EN / ar RTL.
+  applyGtDocumentChrome(readGoogTransLang());
   requestGoogleTranslateRefresh(200);
 
   return () => {
