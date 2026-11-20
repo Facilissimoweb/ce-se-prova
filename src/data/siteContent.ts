@@ -224,6 +224,18 @@ export const siteContent = {
       liveText:
         'Per ora il pagamento online è in pausa. Invia la prenotazione su WhatsApp: riceverai da Maria Teresa le modalità di pagamento e la conferma dello slot.',
     },
+    /** ENN-166 — soft IT note (booking on site · consult on WhatsApp). */
+    waConsultNoteIt: {
+      cmsKey: '[COPY: siteContent.booking.waConsultNoteIt]',
+      liveText:
+        'Prenotazione e pagamento sul sito; il consulto si svolge su WhatsApp. Se usi la traduzione automatica, è consigliata la chat scritta (puoi usare la traduzione integrata di WhatsApp).',
+    },
+    /** ENN-166 — prominent when googtrans ≠ it: written WhatsApp only. */
+    waConsultNoticeNonIt: {
+      cmsKey: '[COPY: siteContent.booking.waConsultNoticeNonIt]',
+      liveText:
+        'Con una lingua diversa dall’italiano, il consulto avviene esclusivamente via chat scritta su WhatsApp. Puoi usare la traduzione integrata di WhatsApp durante la conversazione.',
+    },
   },
   chat: {
     title: {
