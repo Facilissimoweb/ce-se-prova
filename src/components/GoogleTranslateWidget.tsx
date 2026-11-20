@@ -1,4 +1,5 @@
-import React, { useEffect, useId, useRef, useState } from 'react';
+import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Check, ChevronDown, Globe } from 'lucide-react';
 import {
   loadSavedCookiePreferences,
@@ -71,14 +72,32 @@ function googleTranslateApi(): GoogleTranslateNs | undefined {
   return (window as Window & { google?: GoogleTranslateNs }).google;
 }
 
-function expireGoogtransCookies() {
-  const expire = 'expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+/** Host-only + Domain= variants GT / we may have written (ENN-142 stuck switches). */
+function googtransDomainCandidates(): string[] {
   const host = window.location.hostname;
-  document.cookie = `googtrans=; ${expire}`;
-  document.cookie = `googtrans=; domain=${host}; ${expire}`;
-  const parts = host.split('.');
-  if (parts.length >= 2) {
-    document.cookie = `googtrans=; domain=.${parts.slice(-2).join('.')}; ${expire}`;
+  const domains: string[] = [''];
+  if (
+    host &&
+    host !== 'localhost' &&
+    !/^\d{1,3}(\.\d{1,3}){3}$/.test(host)
+  ) {
+    domains.push(host);
+    const parts = host.split('.');
+    for (let i = 0; i <= parts.length - 2; i++) {
+      domains.push(`.${parts.slice(i).join('.')}`);
+    }
+  }
+  return [...new Set(domains)];
+}
+
+function expireGoogtransCookies() {
+  const expire = 'expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  const paths = ['/', window.location.pathname || '/'];
+  for (const domain of googtransDomainCandidates()) {
+    const domainPart = domain ? `domain=${domain}; ` : '';
+    for (const path of paths) {
+      document.cookie = `googtrans=; ${domainPart}path=${path}; ${expire}`;
+    }
   }
 }
 
@@ -88,19 +107,25 @@ function clearGoogtransHash() {
   window.history.replaceState(null, '', url);
 }
 
+function parseGoogtransTarget(raw: string): string | null {
+  try {
+    const value = decodeURIComponent(raw.trim());
+    // Forms: /it/en, /auto/en, en
+    const parts = value.split('/').filter(Boolean);
+    if (parts.length >= 2) return parts[parts.length - 1];
+    if (parts.length === 1 && parts[0] !== GT_PAGE_LANG) return parts[0];
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
 /** Read active GT target from cookie or hash; default Italian source. */
 export function readGoogTransLang(): string {
   const cookie = document.cookie.match(/(?:^|;\s*)googtrans=([^;]*)/);
   if (cookie?.[1]) {
-    try {
-      const value = decodeURIComponent(cookie[1].trim());
-      // Forms: /it/en  or  /auto/en
-      const parts = value.split('/').filter(Boolean);
-      if (parts.length >= 2) return parts[parts.length - 1];
-      if (parts.length === 1 && parts[0] !== GT_PAGE_LANG) return parts[0];
-    } catch {
-      /* ignore */
-    }
+    const fromCookie = parseGoogtransTarget(cookie[1]);
+    if (fromCookie) return fromCookie;
   }
   const hash = window.location.hash.match(
     /googtrans\(([^|)]+)\|([^)]+)\)/i
@@ -110,35 +135,67 @@ export function readGoogTransLang(): string {
 }
 
 function writeGoogtransCookie(target: string) {
+  // Always wipe every domain/path variant first — stale /it/en next to /it/es freezes GT.
+  expireGoogtransCookies();
   const value = `/${GT_PAGE_LANG}/${target}`;
   document.cookie = `googtrans=${value}; path=/`;
   const host = window.location.hostname;
   // Browsers reject Domain= for raw IPs (localhost / 127.0.0.1).
   if (host && !/^\d{1,3}(\.\d{1,3}){3}$/.test(host) && host !== 'localhost') {
     document.cookie = `googtrans=${value}; domain=${host}; path=/`;
+    const parts = host.split('.');
+    if (parts.length >= 2) {
+      document.cookie = `googtrans=${value}; domain=.${parts.slice(-2).join('.')}; path=/`;
+    }
   }
 }
+
+/** Prevent double-clicks / overlapping reloads while a switch is in flight. */
+let gtLangSwitchLock = false;
 
 /**
  * Apply a browsing language via googtrans.
- * IT clears cookie/hash, restores page.lang, and reloads to Italian source.
+ * IT clears cookie/hash and reloads to Italian source.
+ * Other langs clear stale cookies, write /it/<code> + #googtrans, then reload.
+ *
+ * Important (ENN-142): never rely on location.replace/assign when only the
+ * `#googtrans(...)` hash changes — browsers treat that as in-page navigation
+ * (no reload), which left the menu stuck busy/disabled (EN→ES→DE freeze).
  */
 export function applyGoogTransLang(code: string) {
+  if (gtLangSwitchLock) return;
+  gtLangSwitchLock = true;
+
+  // Keep react-i18next on Italian so GT does not double-translate overlays.
   void setSiteLanguage('it');
-  if (code === GT_PAGE_LANG || code === '') {
+
+  const target = (code || GT_PAGE_LANG).trim();
+  const path = `${window.location.pathname}${window.location.search}`;
+
+  document.documentElement.classList.remove('translated-ltr', 'translated-rtl');
+  document.body?.style.removeProperty('top');
+
+  if (target === GT_PAGE_LANG) {
     expireGoogtransCookies();
-    clearGoogtransHash();
     document.documentElement.lang = GT_PAGE_LANG;
-    document.documentElement.classList.remove('translated-ltr', 'translated-rtl');
+    // Strip hash first so reload cannot resurrect a foreign googtrans target.
+    window.history.replaceState(null, '', path);
     window.location.reload();
     return;
   }
-  writeGoogtransCookie(code);
-  clearGoogtransHash();
+
+  writeGoogtransCookie(target);
+  // Cookie + hash; replaceState then reload forces a full document load even
+  // when the previous URL already had a different #googtrans(...).
+  window.history.replaceState(
+    null,
+    '',
+    `${path}#googtrans(${GT_PAGE_LANG}|${target})`
+  );
   window.location.reload();
 }
 
-function clearGoogleTranslateArtifacts() {
+function clearGoogleTranslateArtifacts(clearCookies: boolean) {
   document
     .querySelectorAll(
       'iframe.goog-te-banner-frame, .skiptranslate, #goog-gt-tt, .goog-te-spinner-pos'
@@ -146,55 +203,74 @@ function clearGoogleTranslateArtifacts() {
     .forEach((el) => el.remove());
   document.documentElement.classList.remove('translated-ltr', 'translated-rtl');
   document.body?.style.removeProperty('top');
-  expireGoogtransCookies();
-  clearGoogtransHash();
+  if (clearCookies) {
+    expireGoogtransCookies();
+    clearGoogtransHash();
+  }
+}
+
+let gtInjected = false;
+
+function mountTranslateElement() {
+  const host = document.getElementById(GT_HOST_ID);
+  const TranslateElement = googleTranslateApi()?.translate?.TranslateElement;
+  if (!host || !TranslateElement) return false;
+  host.innerHTML = '';
+  new TranslateElement(
+    {
+      pageLanguage: GT_PAGE_LANG,
+      includedLanguages: GT_INCLUDED,
+      layout: TranslateElement.InlineLayout?.SIMPLE ?? 0,
+      autoDisplay: false,
+    },
+    GT_HOST_ID
+  );
+  return true;
 }
 
 function unloadGoogleTranslate() {
+  gtInjected = false;
   document.getElementById(GT_SCRIPT_ID)?.remove();
   const host = document.getElementById(GT_HOST_ID);
   if (host) host.innerHTML = '';
   delete window.googleTranslateElementInit;
-  clearGoogleTranslateArtifacts();
+  // Consent revoked — drop googtrans so the next grant starts clean.
+  clearGoogleTranslateArtifacts(true);
 }
 
 function injectGoogleTranslate() {
-  if (document.getElementById(GT_SCRIPT_ID)) {
-    const host = document.getElementById(GT_HOST_ID);
-    if (
-      host &&
-      !host.childElementCount &&
-      googleTranslateApi()?.translate?.TranslateElement
-    ) {
-      window.googleTranslateElementInit?.();
-    }
-    return;
-  }
-
   // Keep react-i18next DOM source Italian so GT does not double-translate overlays.
   void setSiteLanguage('it');
 
   window.googleTranslateElementInit = () => {
-    const host = document.getElementById(GT_HOST_ID);
-    const TranslateElement = googleTranslateApi()?.translate?.TranslateElement;
-    if (!host || !TranslateElement) return;
-    host.innerHTML = '';
-    new TranslateElement(
-      {
-        pageLanguage: GT_PAGE_LANG,
-        includedLanguages: GT_INCLUDED,
-        layout: TranslateElement.InlineLayout?.SIMPLE ?? 0,
-        autoDisplay: false,
-      },
-      GT_HOST_ID
-    );
+    mountTranslateElement();
   };
+
+  const existing = document.getElementById(GT_SCRIPT_ID);
+  if (existing) {
+    // Script already present (Strict remount / prior inject): remount gadget if needed.
+    if (
+      googleTranslateApi()?.translate?.TranslateElement &&
+      !document.querySelector(`#${GT_HOST_ID} .goog-te-gadget`)
+    ) {
+      mountTranslateElement();
+    }
+    gtInjected = true;
+    return;
+  }
+
+  if (gtInjected) return;
+  gtInjected = true;
 
   const script = document.createElement('script');
   script.id = GT_SCRIPT_ID;
   script.src =
     'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
   script.async = true;
+  script.onerror = () => {
+    gtInjected = false;
+    script.remove();
+  };
   document.body.appendChild(script);
 }
 
@@ -212,6 +288,66 @@ type Props = {
   onRequestConsent?: () => void;
 };
 
+/** Preferred menu size; clamped so the panel never leaves the viewport (ENN-142). */
+const GT_MENU_WIDTH_PX = 288; // 18rem — room for ZH / JA / AR labels
+const GT_MENU_VIEWPORT_PAD_PX = 12;
+const GT_MENU_MAX_HEIGHT_PX = 352; // 22rem
+const GT_MENU_MIN_HEIGHT_PX = 48; // at least one row
+
+type HeaderMenuPos = {
+  top: number;
+  left: number;
+  width: number;
+  maxHeight: number;
+};
+
+function readSafeAreaInsetTop(): number {
+  // CSS env() is not readable via getPropertyValue on :root in all engines.
+  const probe = document.createElement('div');
+  probe.style.cssText =
+    'position:fixed;top:0;left:0;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top,0px)';
+  document.body.appendChild(probe);
+  const value = Number.parseFloat(getComputedStyle(probe).paddingTop) || 0;
+  probe.remove();
+  return value;
+}
+
+function clampHeaderMenuPos(trigger: DOMRect): HeaderMenuPos {
+  const pad = GT_MENU_VIEWPORT_PAD_PX;
+  const vv = window.visualViewport;
+  const viewLeft = vv?.offsetLeft ?? 0;
+  const viewTop = vv?.offsetTop ?? 0;
+  const viewWidth = vv?.width ?? window.innerWidth;
+  const viewHeight = vv?.height ?? window.innerHeight;
+  const safeTop = readSafeAreaInsetTop();
+
+  const width = Math.min(GT_MENU_WIDTH_PX, viewWidth - pad * 2);
+  // Prefer right-align under the trigger; slide in if that would clip.
+  let left = trigger.right - width;
+  left = Math.max(
+    viewLeft + pad,
+    Math.min(left, viewLeft + viewWidth - pad - width)
+  );
+
+  // Prefer below the trigger; never above safe-area / viewport pad (first row visible).
+  const minTop = viewTop + Math.max(pad, safeTop + pad);
+  const maxBottom = viewTop + viewHeight - pad;
+  let top = Math.max(minTop, trigger.bottom + 6);
+  let maxHeight = Math.min(GT_MENU_MAX_HEIGHT_PX, viewHeight * 0.7);
+
+  if (top + GT_MENU_MIN_HEIGHT_PX > maxBottom) {
+    // Not enough room below — open upward, still clamped under safe-area.
+    const upwardBottom = Math.max(minTop + GT_MENU_MIN_HEIGHT_PX, trigger.top - 6);
+    maxHeight = Math.min(maxHeight, upwardBottom - minTop);
+    top = Math.max(minTop, upwardBottom - maxHeight);
+  } else {
+    maxHeight = Math.min(maxHeight, maxBottom - top);
+  }
+  maxHeight = Math.max(GT_MENU_MIN_HEIGHT_PX, maxHeight);
+
+  return { top, left, width, maxHeight };
+}
+
 function BrandedLanguageMenu({
   variant,
   className = '',
@@ -221,7 +357,13 @@ function BrandedLanguageMenu({
 }) {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState(GT_PAGE_LANG);
+  const [switching, setSwitching] = useState(false);
+  const [headerMenuPos, setHeaderMenuPos] = useState<HeaderMenuPos | null>(
+    null
+  );
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const listId = useId();
   const active = langByCode(current);
 
@@ -232,9 +374,15 @@ function BrandedLanguageMenu({
   useEffect(() => {
     if (!open) return;
     const onPointer = (event: MouseEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false);
+      const target = event.target as Node;
+      // Portaled list lives outside rootRef — treat both as "inside".
+      if (
+        rootRef.current?.contains(target) ||
+        listRef.current?.contains(target)
+      ) {
+        return;
       }
+      setOpen(false);
     };
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setOpen(false);
@@ -247,9 +395,41 @@ function BrandedLanguageMenu({
     };
   }, [open]);
 
+  // Header dropdown: portal + clamp so it never clips under header blur/safe-area (ENN-142).
+  useLayoutEffect(() => {
+    if (variant !== 'header' || !open) {
+      setHeaderMenuPos(null);
+      return;
+    }
+    const update = () => {
+      const el = triggerRef.current;
+      if (!el) return;
+      setHeaderMenuPos(clampHeaderMenuPos(el.getBoundingClientRect()));
+    };
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('scroll', update, true);
+    window.visualViewport?.addEventListener('resize', update);
+    window.visualViewport?.addEventListener('scroll', update);
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', update, true);
+      window.visualViewport?.removeEventListener('resize', update);
+      window.visualViewport?.removeEventListener('scroll', update);
+    };
+  }, [open, variant]);
+
   const pick = (code: string) => {
+    if (switching || gtLangSwitchLock) return;
     setOpen(false);
-    if (code === current) return;
+    const live = readGoogTransLang();
+    if (code === live) {
+      // Cookie/hash already match — sync UI if it drifted, skip reload.
+      if (code !== current) setCurrent(code);
+      return;
+    }
+    setSwitching(true);
+    setCurrent(code);
     applyGoogTransLang(code);
   };
 
@@ -279,7 +459,8 @@ function BrandedLanguageMenu({
                 <button
                   type="button"
                   onClick={() => pick(lang.code)}
-                  className={`flex w-full min-h-[44px] items-center justify-between gap-3 px-3 py-2 text-left text-xs transition-colors focus-visible:outline-none focus-visible:bg-[#D4AF37]/12 ${
+                  disabled={switching}
+                  className={`flex w-full min-h-[44px] items-center justify-between gap-3 px-3 py-2 text-left text-xs transition-colors focus-visible:outline-none focus-visible:bg-[#D4AF37]/12 disabled:opacity-60 ${
                     selected
                       ? 'bg-[#D4AF37]/12 text-[#D4AF37]'
                       : 'text-[#F4F1EA] hover:bg-[#D4AF37]/08'
@@ -313,14 +494,17 @@ function BrandedLanguageMenu({
       translate="no"
     >
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
+        disabled={switching}
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-controls={listId}
+        aria-busy={switching || undefined}
         aria-label={`Lingua del sito: ${active.label}`}
         title="Traduci il sito"
-        className="inline-flex min-h-[40px] max-w-[11.5rem] items-center gap-1.5 rounded-lg border border-[#D4AF37]/25 bg-[#151311]/70 px-2 py-1.5 text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/55 hover:text-[#D4AF37] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+        className="inline-flex min-h-[40px] max-w-[11.5rem] items-center gap-1.5 rounded-lg border border-[#D4AF37]/25 bg-[#151311]/70 px-2 py-1.5 text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/55 hover:text-[#D4AF37] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:opacity-60"
       >
         <span className="text-sm leading-none" aria-hidden>
           {active.flag}
@@ -337,44 +521,58 @@ function BrandedLanguageMenu({
         />
       </button>
 
-      {open && (
-        <ul
-          id={listId}
-          role="listbox"
-          aria-label="Lingua del sito"
-          className="absolute right-0 top-[calc(100%+0.35rem)] z-[70] max-h-[min(70vh,22rem)] min-w-[14rem] overflow-y-auto rounded-xl border border-[#D4AF37]/25 bg-[#12100E]/98 py-1 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md"
-        >
-          {GT_LANGUAGES.map((lang) => {
-            const selected = lang.code === current;
-            return (
-              <li key={lang.code} role="option" aria-selected={selected}>
-                <button
-                  type="button"
-                  onClick={() => pick(lang.code)}
-                  className={`flex w-full min-h-[44px] items-center justify-between gap-3 px-3 py-2 text-left text-xs transition-colors focus-visible:outline-none focus-visible:bg-[#D4AF37]/12 ${
-                    selected
-                      ? 'bg-[#D4AF37]/12 text-[#D4AF37]'
-                      : 'text-[#F4F1EA] hover:bg-[#D4AF37]/08'
-                  }`}
-                >
-                  <span className="flex min-w-0 items-center gap-2.5">
-                    <span className="text-base leading-none" aria-hidden>
-                      {lang.flag}
+      {open &&
+        headerMenuPos &&
+        createPortal(
+          <ul
+            ref={listRef}
+            id={listId}
+            role="listbox"
+            aria-label="Lingua del sito"
+            style={{
+              top: headerMenuPos.top,
+              left: headerMenuPos.left,
+              width: headerMenuPos.width,
+              maxHeight: headerMenuPos.maxHeight,
+            }}
+            className="fixed z-[70] overflow-y-auto rounded-xl border border-[#D4AF37]/25 bg-[#12100E]/98 py-1 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md notranslate"
+            translate="no"
+          >
+            {GT_LANGUAGES.map((lang) => {
+              const selected = lang.code === current;
+              return (
+                <li key={lang.code} role="option" aria-selected={selected}>
+                  <button
+                    type="button"
+                    onClick={() => pick(lang.code)}
+                    disabled={switching}
+                    className={`flex w-full min-h-[44px] items-center justify-between gap-3 px-3 py-2 text-left text-xs transition-colors focus-visible:outline-none focus-visible:bg-[#D4AF37]/12 disabled:opacity-60 ${
+                      selected
+                        ? 'bg-[#D4AF37]/12 text-[#D4AF37]'
+                        : 'text-[#F4F1EA] hover:bg-[#D4AF37]/08'
+                    }`}
+                  >
+                    <span className="flex min-w-0 items-center gap-2.5">
+                      <span className="text-base leading-none" aria-hidden>
+                        {lang.flag}
+                      </span>
+                      <span className="font-semibold tracking-[0.06em]">
+                        {lang.short}
+                      </span>
+                      <span className="truncate text-[#A39B93]">
+                        {lang.label}
+                      </span>
                     </span>
-                    <span className="font-semibold tracking-[0.06em]">
-                      {lang.short}
-                    </span>
-                    <span className="truncate text-[#A39B93]">{lang.label}</span>
-                  </span>
-                  {selected && (
-                    <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                  )}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+                    {selected && (
+                      <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>,
+          document.body
+        )}
     </div>
   );
 }
@@ -404,13 +602,15 @@ export function GoogleTranslateWidget({
   }, []);
 
   useEffect(() => {
+    // Only the header instance owns the GT script lifecycle (drawer is UI-only).
     if (variant !== 'header') return;
+    // null = consent not read yet — never unload/clear googtrans during this gap.
     if (marketingAllowed === null) return;
     if (marketingAllowed) {
       injectGoogleTranslate();
-    } else {
-      unloadGoogleTranslate();
+      return;
     }
+    unloadGoogleTranslate();
   }, [marketingAllowed, variant]);
 
   if (marketingAllowed === null) {
