@@ -1,4 +1,5 @@
 import type { ScreenId } from '../types/handoff';
+import { preservedGoogtransHash } from './googleTranslateRuntime';
 
 /** Path pubblici allineati a v2tarotitalia dove possibile (`/privacy`, `/termini-di-servizio`, `/disclaimer`). */
 export const SCREEN_PATHS: Record<ScreenId, string> = {
@@ -200,7 +201,12 @@ function preservedSearch(extraSearch = ''): string {
 }
 
 export function navigateBlogPost(slug: string): void {
-  window.history.pushState({}, '', `${pathForBlogPost(slug)}${preservedSearch()}`);
+  // Keep `#googtrans(it|xx)` (or restore from cookie) so GT survives SPA jumps (ENN-148).
+  window.history.pushState(
+    {},
+    '',
+    `${pathForBlogPost(slug)}${preservedSearch()}${preservedGoogtransHash()}`
+  );
   notifyPathChange();
 }
 
@@ -245,7 +251,7 @@ export function bootstrapScreenFromLocation(
 
 export function navigatePath(screen: ScreenId, search = ''): void {
   const path = pathForScreen(screen);
-  const url = `${path}${preservedSearch(search)}`;
+  const url = `${path}${preservedSearch(search)}${preservedGoogtransHash()}`;
   window.history.pushState({}, '', url);
   notifyPathChange();
 }

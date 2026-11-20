@@ -3,6 +3,8 @@
  * Sticky header is ~4.75rem (+ safe-area); section targets must clear it.
  */
 
+import { isGoogtransHash } from './googleTranslateRuntime';
+
 export const SITE_HEADER_OFFSET_PX = 76; // 4.75rem — matches NavigationChrome mobile header
 export const SITE_HEADER_OFFSET_MD_PX = 80; // 5rem desktop
 
@@ -59,14 +61,14 @@ export function normalizeHash(hash: string): string {
 /** Map `#corsi` / `#dialogo` / `#didattica` → screen (or null if unknown). */
 export function screenFromHash(hash: string): 'corsi' | 'chat' | 'home' | null {
   const key = normalizeHash(hash);
-  if (!key) return null;
+  if (!key || isGoogtransHash(key)) return null;
   return HASH_SCREEN_ALIASES[key] ?? null;
 }
 
 /** Section id to scroll to for a hash, once the right screen is mounted. */
 export function sectionIdFromHash(hash: string): string | null {
   const key = normalizeHash(hash);
-  if (!key) return null;
+  if (!key || isGoogtransHash(key)) return null;
   return HASH_SECTION_ALIASES[key] ?? null;
 }
 

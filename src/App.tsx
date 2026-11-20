@@ -62,6 +62,10 @@ import {
   scrollWindowTo,
   sectionIdFromHash,
 } from './lib/scrollNavigation';
+import {
+  notifyGoogleTranslateRefresh,
+  preservedGoogtransHash,
+} from './lib/googleTranslateRuntime';
 import { SITE_PIVA, SITE_PIVA_VERIFY_URL } from './lib/siteContacts';
 
 const AUX_SCREENS: ScreenId[] = [
@@ -228,6 +232,8 @@ export function App() {
     const kind = navigationKindRef.current;
     navigationKindRef.current = 'push';
     lastPathnameRef.current = window.location.pathname;
+    // New screen mount → GT must re-scan Italian source nodes (ENN-148).
+    notifyGoogleTranslateRefresh();
 
     if (kind === 'boot') {
       const sectionFromHash = sectionIdFromHash(window.location.hash);
@@ -294,7 +300,7 @@ export function App() {
         window.history.replaceState(
           {},
           '',
-          `${expected}${window.location.search}`
+          `${expected}${window.location.search}${preservedGoogtransHash()}`
         );
       }
 
@@ -323,7 +329,11 @@ export function App() {
         pathname !== expected
       ) {
         const search = window.location.search;
-        window.history.replaceState({}, '', `${expected}${search}`);
+        window.history.replaceState(
+          {},
+          '',
+          `${expected}${search}${preservedGoogtransHash()}`
+        );
       }
     };
 
@@ -343,8 +353,10 @@ export function App() {
       }
     };
     const onHashChange = () => {
+      // `#googtrans(it|en)` is not a site landmark — ignore (ENN-148).
       const hashScreen = screenFromHash(window.location.hash);
       const sectionFromHash = sectionIdFromHash(window.location.hash);
+      if (!hashScreen && !sectionFromHash) return;
       if (hashScreen === 'corsi' || hashScreen === 'chat') {
         handleNavigate(
           hashScreen,
