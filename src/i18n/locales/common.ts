@@ -86,6 +86,8 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
       'Nina non è ancora attiva. Usa i contatti qui sotto per parlare con Maria Teresa.',
     'nina.errorGeneric':
       'Non riesco a rispondere in questo momento. Riprova o usa i contatti.',
+    'nina.errorRephrase':
+      'Non sono sicura di aver colto bene la tua domanda. Puoi **riformularla** o **specificare l’Arcano** / il tema? Così ti rispondo con più precisione.',
     'nina.welcome':
       'Ciao, sono **Nina**, l’assistente di **accoglienza** di Tarot Italia.\n\nTi oriento su **prezzi**, prenotazione **WhatsApp**, mappa del sito e **Chi sono**.\n\nLo studio profondo dei Maggiori è in **Nina Studio** (corso Arcani Maggiori). Per un consulto autentico usa **Parla con Maria Teresa** qui sotto.',
     'nina.welcomeStudio':
@@ -185,6 +187,8 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
       'Nina is not active yet. Use the contacts below to reach Maria Teresa.',
     'nina.errorGeneric':
       'I cannot reply right now. Please try again or use the contacts.',
+    'nina.errorRephrase':
+      'I’m not sure I’ve understood your question. Could you **rephrase** it, or **name the Arcana** / topic? That helps me answer more precisely.',
     'nina.welcome':
       'Hello, I am **Nina**, Tarot Italia’s **welcome** assistant.\n\nI can help with **prices**, **WhatsApp** booking, the site map and **About**.\n\nDeep Major Arcana study lives in **Nina Studio** (Major Arcana course). For a live reading use **Talk to Maria Teresa** below.',
     'nina.welcomeStudio':
@@ -284,6 +288,8 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
       'Nina aún no está activa. Usa los contactos de abajo para hablar con Maria Teresa.',
     'nina.errorGeneric':
       'No puedo responder ahora. Reintenta o usa los contactos.',
+    'nina.errorRephrase':
+      'No estoy segura de haber entendido bien tu pregunta. ¿Puedes **reformularla** o **indicar el Arcano** / tema? Así te respondo con más precisión.',
     'nina.welcome':
       'Hola, soy **Nina**, la asistente de **acogida** de Tarot Italia.\n\nTe oriento sobre **precios**, reserva por **WhatsApp**, mapa del sitio y **Quién soy**.\n\nEl estudio profundo de los Mayores está en **Nina Studio** (curso Arcanos Mayores). Para una consulta auténtica usa **Habla con Maria Teresa** abajo.',
     'nina.welcomeStudio':
@@ -383,6 +389,8 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
       'Nina n’est pas encore active. Utilisez les contacts ci-dessous pour joindre Maria Teresa.',
     'nina.errorGeneric':
       'Je ne peux pas répondre pour le moment. Réessayez ou utilisez les contacts.',
+    'nina.errorRephrase':
+      'Je ne suis pas sûre d’avoir bien compris ta question. Peux-tu la **reformuler** ou **préciser l’Arcane** / le sujet ? Ainsi je répondrai avec plus de précision.',
     'nina.welcome':
       'Bonjour, je suis **Nina**, l’assistante d’**accueil** de Tarot Italia.\n\nJe vous oriente sur les **tarifs**, la réservation **WhatsApp**, le plan du site et **Qui suis-je**.\n\nL’étude approfondie des Majeurs est dans **Nina Studio** (cours Arcanes Majeurs). Pour une vraie consultation, utilisez **Parler à Maria Teresa** ci-dessous.',
     'nina.welcomeStudio':
@@ -482,6 +490,8 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
       'Nina ist noch nicht aktiv. Nutzen Sie die Kontakte unten, um Maria Teresa zu erreichen.',
     'nina.errorGeneric':
       'Ich kann gerade nicht antworten. Bitte erneut versuchen oder die Kontakte nutzen.',
+    'nina.errorRephrase':
+      'Ich bin mir nicht sicher, ob ich deine Frage richtig verstanden habe. Kannst du sie **umformulieren** oder das **Arkana** / Thema nennen? Dann antworte ich präziser.',
     'nina.welcome':
       'Hallo, ich bin **Nina**, die **Willkommens**-Assistentin von Tarot Italia.\n\nIch helfe bei **Preisen**, **WhatsApp**-Buchung, Sitemap und **Über mich**.\n\nVertieftes Studium der Großen Arkana gibt es in **Nina Studio** (Kurs Große Arkana). Für eine echte Beratung nutzen Sie **Mit Maria Teresa sprechen** unten.',
     'nina.welcomeStudio':

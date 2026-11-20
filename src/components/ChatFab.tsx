@@ -23,6 +23,7 @@ import {
   telegramHref,
   whatsappHref,
 } from '../lib/siteContacts';
+import { looksLikeNinaProviderLeak } from '../lib/ninaReplyLang';
 import { NinaMessageBody } from './chat/NinaMessageBody';
 import { readGoogTransLang } from './GoogleTranslateWidget';
 import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
@@ -276,9 +277,16 @@ export function ChatFab() {
       });
       const data = (await res.json().catch(() => ({}))) as ChatPostResponse;
 
+      /** Never surface Groq/Grok/API strings from the API to the user (ENN-152). */
+      function safeUserError(fallback: string): string {
+        const raw = typeof data.error === 'string' ? data.error.trim() : '';
+        if (!raw || looksLikeNinaProviderLeak(raw)) return fallback;
+        return raw;
+      }
+
       if (data.available === false) {
         setChatAvailable(false);
-        setSendError(data.error || t('nina.errorUnavailable'));
+        setSendError(safeUserError(t('nina.errorUnavailable')));
         return;
       }
 
@@ -290,19 +298,44 @@ export function ChatFab() {
             { role: 'assistant', content: data.reply as string },
           ]);
         } else {
-          setSendError(data.error || t('nina.studioLockedHint'));
+          setSendError(safeUserError(t('nina.studioLockedHint')));
         }
         return;
       }
 
       if (data.code === 'studio_auth') {
-        setSendError(data.error || t('nina.errorGeneric'));
+        setSendError(safeUserError(t('nina.errorGeneric')));
         setShowStudioCta(true);
         return;
       }
 
-      if (!res.ok || !data.reply) {
-        setSendError(data.error || t('nina.errorGeneric'));
+      // Unclear intent / empty-confused → Nina asks to rephrase in-thread.
+      if (data.code === 'unclear' || data.code === 'empty') {
+        const rephrase =
+          (typeof data.reply === 'string' && data.reply.trim()) ||
+          t('nina.errorRephrase');
+        setTurns((prev) => [
+          ...prev,
+          { role: 'assistant', content: rephrase },
+        ]);
+        return;
+      }
+
+      if (data.code === 'payload') {
+        setSendError(safeUserError(t('nina.errorRephrase')));
+        return;
+      }
+
+      if (!res.ok) {
+        setSendError(safeUserError(t('nina.errorGeneric')));
+        return;
+      }
+
+      if (!data.reply || looksLikeNinaProviderLeak(data.reply)) {
+        setTurns((prev) => [
+          ...prev,
+          { role: 'assistant', content: t('nina.errorRephrase') },
+        ]);
         return;
       }
 

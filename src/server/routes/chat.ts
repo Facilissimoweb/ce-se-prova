@@ -12,8 +12,11 @@ import {
   ninaStudioSoftLockReply,
 } from '../../lib/ninaChatKnowledge.ts';
 import {
+  looksLikeNinaProviderLeak,
   normalizeNinaLang,
+  ninaSoftOutageCopy,
   ninaStudioGateCopy,
+  ninaUnclearIntentReply,
 } from '../../lib/ninaReplyLang.ts';
 import { verifyBearerToken } from '../authToken.ts';
 import { json, type ApiResult } from '../http.ts';
@@ -162,49 +165,67 @@ async function assertNinaStudioAccess(
   }
 }
 
-function chatFailureResponse(code: GroqChatFailureCode | string): ApiResult {
+/**
+ * ENN-152 — user-facing failure copy never names Groq/Grok or env keys.
+ * Provider detail stays in console.error for Maria’s logs only.
+ *
+ * - empty/confused → 200 reply asking to rephrase (unclear intent)
+ * - payload too large → soft “riformula / specifica un Arcano”
+ * - real outage (key/auth/model/upstream) → short soft message
+ */
+function chatFailureResponse(
+  code: GroqChatFailureCode | string,
+  lang?: string
+): ApiResult {
+  const outage = ninaSoftOutageCopy(lang);
+
   switch (code) {
     case 'GROQ_CHAT_UNAVAILABLE':
+      console.error(
+        'Nina chat unavailable: missing TAROTITALIACHATGENERICAGROQ_API_KEY (Maria logs only)'
+      );
       return json(503, {
         available: false,
         code: 'missing_key',
-        error:
-          'Nina non è ancora attiva: manca la chiave Groq su Vercel (TAROTITALIACHATGENERICAGROQ_API_KEY). Puoi scrivere a Maria Teresa su WhatsApp, Telegram o email.',
+        error: outage.unavailable,
       });
     case 'GROQ_CHAT_AUTH':
+      console.error(
+        'Nina chat auth failure vs Groq (Maria logs only) — check TAROTITALIACHATGENERICAGROQ_API_KEY'
+      );
       return json(502, {
         available: true,
         code: 'auth',
-        error:
-          'Nina non riesce ad autenticarsi con Groq. Verifica la chiave TAROTITALIACHATGENERICAGROQ_API_KEY su Vercel (Production e Preview), poi ridistribuisci. Nel frattempo usa WhatsApp, Telegram o email.',
+        error: outage.temporary,
       });
     case 'GROQ_CHAT_MODEL':
+      console.error(
+        'Nina chat model failure (Maria logs only) — check GROQ_CHAT_MODEL / default'
+      );
       return json(502, {
         available: true,
         code: 'model',
-        error:
-          'Il modello Groq non è disponibile. Controlla GROQ_CHAT_MODEL oppure il default del sito, poi riprova. Nel frattempo usa WhatsApp, Telegram o email.',
+        error: outage.temporary,
       });
     case 'GROQ_CHAT_PAYLOAD':
       return json(502, {
         available: true,
         code: 'payload',
-        error:
-          'La richiesta a Nina è troppo ampia per il modello. Prova una domanda più breve o specifica un solo Arcano, poi riprova. Nel frattempo usa WhatsApp, Telegram o email.',
+        error: outage.tooBroad,
       });
     case 'GROQ_CHAT_EMPTY':
-      return json(502, {
+      // Treat empty/confused model output as unclear intent — Nina voice, not an outage banner.
+      return json(200, {
         available: true,
-        code: 'empty',
-        error:
-          'Nina non ha ricevuto una risposta utile. Riprova tra poco oppure usa WhatsApp, Telegram o email.',
+        code: 'unclear',
+        reply: ninaUnclearIntentReply(lang),
       });
     default:
+      console.error('Nina chat upstream failure (Maria logs only):', code);
       return json(502, {
         available: true,
         code: 'upstream',
-        error:
-          'Non riesco a rispondere in questo momento. Riprova tra poco oppure usa WhatsApp, Telegram o email.',
+        error: outage.temporary,
       });
   }
 }
@@ -249,7 +270,7 @@ export async function postChatMessage(params: {
   }
 
   if (!isGroqChatConfigured()) {
-    return chatFailureResponse('GROQ_CHAT_UNAVAILABLE');
+    return chatFailureResponse('GROQ_CHAT_UNAVAILABLE', lang);
   }
 
   const systemPrompt = buildNinaSystemPrompt({
@@ -266,13 +287,24 @@ export async function postChatMessage(params: {
 
   try {
     const reply = await createGroqChatCompletion({ messages });
+    if (looksLikeNinaProviderLeak(reply)) {
+      console.error(
+        'Nina reply looked like provider/API leak — replaced with unclear rephrase (Maria logs only)'
+      );
+      return json(200, {
+        available: true,
+        mode,
+        code: 'unclear',
+        reply: ninaUnclearIntentReply(lang),
+      });
+    }
     return json(200, { available: true, mode, reply });
   } catch (error) {
     const code = error instanceof Error ? error.message : '';
     if (code.startsWith('GROQ_CHAT_')) {
-      return chatFailureResponse(code);
+      return chatFailureResponse(code, lang);
     }
     console.error('postChatMessage failed:', code || error);
-    return chatFailureResponse('GROQ_CHAT_UPSTREAM');
+    return chatFailureResponse('GROQ_CHAT_UPSTREAM', lang);
   }
 }

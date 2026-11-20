@@ -279,3 +279,160 @@ export function ninaStudioGateCopy(lang?: string | null): GateCopy {
   const code = normalizeNinaLang(lang);
   return GATE_BY_LANG[code] || GATE_BY_LANG[code.split('-')[0]] || GATE_EN;
 }
+
+/**
+ * ENN-152 — when intent is unclear / model empty-confused:
+ * ask to rephrase in Tarot Italia tone (never name Groq/Grok).
+ */
+const UNCLEAR_IT = `Non sono sicura di aver colto bene la tua domanda.
+
+Puoi **riformularla** in modo più chiaro, oppure **specificare l’Arcano** o il tema (prezzi, prenotazione, Chi sono)? Così ti rispondo con più precisione.
+
+Per un consulto personale resta **Parla con Maria Teresa** qui sotto.`;
+
+const UNCLEAR_EN = `I’m not sure I’ve understood your question.
+
+Could you **rephrase** it a little more clearly, or **name the Arcana** / topic (prices, booking, About)? That helps me answer more precisely.
+
+For a personal reading, use **Talk to Maria Teresa** below.`;
+
+const UNCLEAR_ES = `No estoy segura de haber entendido bien tu pregunta.
+
+¿Puedes **reformularla** con más claridad, o **indicar el Arcano** o el tema (precios, reserva, Quién soy)? Así te respondo con más precisión.
+
+Para una consulta personal, usa **Habla con Maria Teresa** abajo.`;
+
+const UNCLEAR_FR = `Je ne suis pas sûre d’avoir bien compris ta question.
+
+Peux-tu la **reformuler** plus clairement, ou **préciser l’Arcane** / le sujet (tarifs, réservation, Qui suis-je) ? Ainsi je répondrai avec plus de précision.
+
+Pour une consultation personnelle, utilise **Parler à Maria Teresa** ci-dessous.`;
+
+const UNCLEAR_DE = `Ich bin mir nicht sicher, ob ich deine Frage richtig verstanden habe.
+
+Kannst du sie etwas **klarer umformulieren**, oder das **Arkana** / Thema nennen (Preise, Buchung, Über mich)? Dann antworte ich präziser.
+
+Für eine persönliche Beratung nutze unten **Mit Maria Teresa sprechen**.`;
+
+const UNCLEAR_PT = `Não tenho a certeza de ter compreendido bem a tua pergunta.
+
+Podes **reformulá-la** com mais clareza, ou **indicar o Arcano** / tema (preços, reserva, Chi sono)? Assim respondo com mais precisão.
+
+Para uma consulta pessoal, usa **Parla con Maria Teresa** abaixo.`;
+
+const UNCLEAR_ZH = `我不太确定是否理解了你的问题。
+
+能否**换个说法**说得更清楚，或**指明具体阿尔卡纳**/主题（价格、预约、Chi sono）？这样我能答得更准。
+
+个人咨询请使用下方的 **Parla con Maria Teresa**。`;
+
+const UNCLEAR_JA = `ご質問の意図を十分に捉えきれていないかもしれません。
+
+もう少し**わかりやすく言い換える**か、**アルカナやテーマ**（料金・予約・Chi sono）を指定してもらえますか？より的確にお答えできます。
+
+個人鑑定は下の **Parla con Maria Teresa** をご利用ください。`;
+
+const UNCLEAR_BY_LANG: Record<string, string> = {
+  it: UNCLEAR_IT,
+  en: UNCLEAR_EN,
+  es: UNCLEAR_ES,
+  fr: UNCLEAR_FR,
+  de: UNCLEAR_DE,
+  pt: UNCLEAR_PT,
+  'zh-cn': UNCLEAR_ZH,
+  zh: UNCLEAR_ZH,
+  ja: UNCLEAR_JA,
+};
+
+/** User-facing Nina reply when intent is unclear or the model returned empty/confused. */
+export function ninaUnclearIntentReply(lang?: string | null): string {
+  const code = normalizeNinaLang(lang);
+  return (
+    UNCLEAR_BY_LANG[code] ||
+    UNCLEAR_BY_LANG[code.split('-')[0]] ||
+    UNCLEAR_EN
+  );
+}
+
+/** Soft outage copy — no provider/env names (those stay in Maria’s server logs). */
+type SoftOutageCopy = {
+  unavailable: string;
+  temporary: string;
+  tooBroad: string;
+};
+
+const OUTAGE_IT: SoftOutageCopy = {
+  unavailable:
+    'Nina non è attiva in questo momento. Puoi scrivere a Maria Teresa su WhatsApp, Telegram o email.',
+  temporary:
+    'In questo momento non riesco a risponderti con serenità. Riprova tra poco oppure usa WhatsApp, Telegram o email.',
+  tooBroad:
+    'La domanda è un po’ troppo ampia per questa chat. Prova a **riformularla** in modo più breve, o **specifica un solo Arcano** / un tema, poi riprova. Nel frattempo puoi usare WhatsApp, Telegram o email.',
+};
+
+const OUTAGE_EN: SoftOutageCopy = {
+  unavailable:
+    'Nina is not available right now. You can reach Maria Teresa on WhatsApp, Telegram or email.',
+  temporary:
+    'I cannot reply calmly right now. Please try again shortly, or use WhatsApp, Telegram or email.',
+  tooBroad:
+    'That question is a bit too broad for this chat. Please **rephrase** it more briefly, or **name one Arcana** / topic, then try again. Meanwhile you can use WhatsApp, Telegram or email.',
+};
+
+const OUTAGE_ES: SoftOutageCopy = {
+  unavailable:
+    'Nina no está activa ahora. Puedes escribir a Maria Teresa por WhatsApp, Telegram o email.',
+  temporary:
+    'Ahora mismo no puedo responderte con calma. Reintenta en breve o usa WhatsApp, Telegram o email.',
+  tooBroad:
+    'La pregunta es un poco amplia para este chat. **Reformúlala** más breve, o **indica un solo Arcano** / tema, y vuelve a intentarlo. Mientras, WhatsApp, Telegram o email.',
+};
+
+const OUTAGE_FR: SoftOutageCopy = {
+  unavailable:
+    'Nina n’est pas active pour le moment. Tu peux écrire à Maria Teresa sur WhatsApp, Telegram ou email.',
+  temporary:
+    'Je ne peux pas te répondre sereinement pour l’instant. Réessaie bientôt, ou utilise WhatsApp, Telegram ou email.',
+  tooBroad:
+    'La question est un peu trop large pour ce chat. **Reformule**-la plus brièvement, ou **précise un seul Arcane** / sujet, puis réessaie. En attendant : WhatsApp, Telegram ou email.',
+};
+
+const OUTAGE_DE: SoftOutageCopy = {
+  unavailable:
+    'Nina ist gerade nicht aktiv. Du kannst Maria Teresa per WhatsApp, Telegram oder E-Mail erreichen.',
+  temporary:
+    'Ich kann gerade nicht ruhig antworten. Bitte gleich erneut versuchen oder WhatsApp, Telegram oder E-Mail nutzen.',
+  tooBroad:
+    'Die Frage ist für diesen Chat etwas zu weit. Bitte **kürzer umformulieren** oder **ein Arkana** / Thema nennen, dann erneut versuchen. Zwischenzeitlich: WhatsApp, Telegram oder E-Mail.',
+};
+
+const OUTAGE_BY_LANG: Record<string, SoftOutageCopy> = {
+  it: OUTAGE_IT,
+  en: OUTAGE_EN,
+  es: OUTAGE_ES,
+  fr: OUTAGE_FR,
+  de: OUTAGE_DE,
+};
+
+export function ninaSoftOutageCopy(lang?: string | null): SoftOutageCopy {
+  const code = normalizeNinaLang(lang);
+  return OUTAGE_BY_LANG[code] || OUTAGE_BY_LANG[code.split('-')[0]] || OUTAGE_EN;
+}
+
+/**
+ * True when a model reply looks like a provider/API leak or empty confusion
+ * that must never reach the user as-is (ENN-152).
+ */
+export function looksLikeNinaProviderLeak(text: string): boolean {
+  const raw = text.trim();
+  if (!raw) return true;
+  const lower = raw.toLowerCase();
+  return (
+    /\bgroq\b/.test(lower) ||
+    /\bgrok\b/.test(lower) ||
+    /tarotitaliachatgenericagroq/.test(lower) ||
+    /api[_ -]?key/.test(lower) ||
+    /openai\/gpt/.test(lower) ||
+    /problema con (groq|grok)/.test(lower)
+  );
+}
