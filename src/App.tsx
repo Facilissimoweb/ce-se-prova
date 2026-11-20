@@ -10,6 +10,7 @@ import {
 import { HandoffDrawer } from './components/HandoffDrawer';
 import { AccessibilityFab } from './components/AccessibilityFab';
 import { BackToTopFab } from './components/BackToTopFab';
+import { BookSessionFab } from './components/BookSessionFab';
 import { ChatFab } from './components/ChatFab';
 import {
   LEFT_TOOLS_MENU_ID,
@@ -689,6 +690,9 @@ export function App() {
         />
 
         <StickyContactBar />
+
+        {/* ENN-160: mobile shopper FAB (right) — booking; clear of Strumenti + dock */}
+        <BookSessionFab onBook={() => handleNavigate('booking')} />
 
         {/* Mobile: single «Strumenti» FAB; desktop: full vertical stack */}
         <ToolsFab />
