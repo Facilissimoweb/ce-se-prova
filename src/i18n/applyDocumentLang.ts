@@ -1,9 +1,11 @@
 import {
+  DEFAULT_LANG,
   LANG_HTML,
   LANG_OG,
   SUPPORTED_LANGS,
   type SiteLang,
 } from './types';
+import { GT_ENABLED } from '../lib/googleTranslateEnabled';
 
 const HREFLANG_ATTR = 'data-ti-hreflang';
 
@@ -50,24 +52,28 @@ function upsertMeta(
 /**
  * Update `<html lang>`, og:locale, and hreflang alternates for the current path.
  * Pathnames stay Italian (SPA); language is expressed via `?lang=` + document lang.
+ * When GT is frozen (launch), only emit Italian / x-default — no multi-lang advertise.
  */
 export function applyDocumentLang(lang: SiteLang, pathname?: string): void {
   if (typeof document === 'undefined') return;
 
-  document.documentElement.lang = LANG_HTML[lang];
-  upsertMeta({ attr: 'property', key: 'og:locale' }, LANG_OG[lang]);
+  const effectiveLang = GT_ENABLED ? lang : DEFAULT_LANG;
+  document.documentElement.lang = LANG_HTML[effectiveLang];
+  upsertMeta({ attr: 'property', key: 'og:locale' }, LANG_OG[effectiveLang]);
 
-  // Alternate og:locale tags for other languages
+  // Alternate og:locale tags for other languages (skip while Traduci is frozen)
   document
     .querySelectorAll(`meta[${HREFLANG_ATTR}="og-alt"]`)
     .forEach((n) => n.remove());
-  for (const other of SUPPORTED_LANGS) {
-    if (other === lang) continue;
-    const el = document.createElement('meta');
-    el.setAttribute('property', 'og:locale:alternate');
-    el.setAttribute('content', LANG_OG[other]);
-    el.setAttribute(HREFLANG_ATTR, 'og-alt');
-    document.head.appendChild(el);
+  if (GT_ENABLED) {
+    for (const other of SUPPORTED_LANGS) {
+      if (other === effectiveLang) continue;
+      const el = document.createElement('meta');
+      el.setAttribute('property', 'og:locale:alternate');
+      el.setAttribute('content', LANG_OG[other]);
+      el.setAttribute(HREFLANG_ATTR, 'og-alt');
+      document.head.appendChild(el);
+    }
   }
 
   const path =
@@ -84,7 +90,11 @@ export function applyDocumentLang(lang: SiteLang, pathname?: string): void {
     return absoluteHref(`${path}${q}`, origin);
   };
 
-  for (const code of SUPPORTED_LANGS) {
+  const hreflangLangs: SiteLang[] = GT_ENABLED
+    ? [...SUPPORTED_LANGS]
+    : [DEFAULT_LANG];
+
+  for (const code of hreflangLangs) {
     const link = document.createElement('link');
     link.rel = 'alternate';
     link.hreflang = code;

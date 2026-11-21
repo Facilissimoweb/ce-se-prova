@@ -1,0 +1,55 @@
+# Tarot Italia
+> Consulenze simboliche, evolutive e previsionali dei Tarocchi con Maria Teresa Rogani, Operatore Olistico (L. 4/2013). Studio a Macerata e sessioni online in chiamata vocale WhatsApp.
+
+Tarot Italia is the public Italian site of Maria Teresa Rogani. The practice combines cartomanzia and tarologia evolutiva with all 78 Arcani (Maggiori e Minori) in every consultation. Consultations respect free will and do not replace medical, psychological, or legal advice.
+
+## Key facts
+- Practitioner: Maria Teresa Rogani · Operatore Olistico (L. 4/2013)
+- Brand: Tarot Italia
+- Language: Italian only at launch (no English edition; do not treat other locales as official site content)
+- Email: info@tarotitalia.com
+- Phone / WhatsApp / Telegram: +39 379 103 82 53
+- Studio: Via Crispi 37, 62100 Macerata, Italia
+- P.IVA: 02136780430
+- Booking: Stripe Checkout (+ confirmation email) on /prenota; WhatsApp voice call for the live reading
+- Online sessions: WhatsApp voice only (no video)
+- In person: Macerata by appointment (until 18:00); from 19:00 online only
+- Typical public slots: 09:00–20:00 Europe/Rome
+- Prices: EUR, IVA inclusa
+
+## Consultation prices (EUR, IVA inclusa)
+- Consulto Breve · 20 min · €19 · online only (WhatsApp voice)
+- Consulto Essenziale · 45 min · €50 · online or in person (Macerata)
+- Consulto Evolutivo Completo · 60 min · €75 · online or in person (recommended)
+- Sessione Integrata · 90 min · €90 · online or in person
+Every session includes Maggiori and Minori.
+
+## Courses (public offer)
+- Arcani Maggiori · €69 (list price €149 struck) · dispense, schede, Sigillo · includes Nina Studio for life
+- Page: /corsi
+- Arcani Minori and Metodi di Stesura are NOT on public sale (hidden / in preparation) — do not advertise them as available
+
+## Nina
+- Accoglienza: public site assistant (prices, booking, orientation)
+- Nina Studio: reserved study chat for Maggiori students (included with the Maggiori course)
+
+## Public pages
+- Home: /
+- Chi sono: /chi-sono
+- Consulti: /consulti
+- Dialogo Tarot: /dialogo
+- Corsi (Maggiori): /corsi
+- Blog / News: /news
+- Contatti: /contatti
+- Prenota: /prenota
+- Privacy: /privacy
+- Termini: /termini-di-servizio
+- Disclaimer: /disclaimer
+- Sitemap: /sitemap
+- Full LLM summary: /llms-full.txt
+- Mirror: /.well-known/llms.txt
+
+## Optional
+- Brand domain after cutover (ENN-43): https://www.tarotitalia.com
+- Do not treat private /area-riservata as public content
+- Coming Soon may gate visitors on some deployments; this file describes the real public offer when the site is open/indexed
