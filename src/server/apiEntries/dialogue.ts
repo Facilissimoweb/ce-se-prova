@@ -36,11 +36,24 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
   try {
     const method = (req.method || 'GET').toUpperCase();
     const path = groupSubpath(req, 'dialogue');
-    // Non-fatal if Postgres is down — routes return JSON 5xx instead of hanging.
-    await ensureSchemaOnce();
 
     // Guest sessionKey path — no firebase-admin on this function.
     const user = null;
+
+    // ENN-186 — Checkout Session needs Stripe only (no DB write until paid).
+    // Skip ensureSchemaOnce so cold start + DDL cannot delay the payment page.
+    if (path === 'checkout') {
+      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
+      const result = await postDialogueCheckout({
+        user,
+        body: readBodyObject(req),
+        origin: requestOrigin(req),
+      });
+      return sendJson(res, result.status, result.body);
+    }
+
+    // Non-fatal if Postgres is down — routes return JSON 5xx instead of hanging.
+    await ensureSchemaOnce();
 
     if (path === 'status') {
       if (method !== 'GET') return methodNotAllowed(res, ['GET']);
@@ -65,16 +78,6 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
       const result = await postDialogueUnlock({
         user,
         body: readBodyObject(req),
-      });
-      return sendJson(res, result.status, result.body);
-    }
-
-    if (path === 'checkout') {
-      if (method !== 'POST') return methodNotAllowed(res, ['POST']);
-      const result = await postDialogueCheckout({
-        user,
-        body: readBodyObject(req),
-        origin: requestOrigin(req),
       });
       return sendJson(res, result.status, result.body);
     }

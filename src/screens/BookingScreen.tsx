@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -139,6 +139,8 @@ export function BookingScreen({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [confirmingStripe, setConfirmingStripe] = useState(false);
+  /** ENN-186 — sync guard: disabled={submitting} alone allows double-submit before re-render. */
+  const checkoutInFlightRef = useRef(false);
 
   const activeTariff =
     consultationTariffs.find((t) => t.id === draft.tariffId) ??
@@ -252,6 +254,8 @@ export function BookingScreen({
 
     setFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
+    if (checkoutInFlightRef.current) return;
+    checkoutInFlightRef.current = true;
 
     setSubmitting(true);
     setSubmitError(null);
@@ -320,6 +324,7 @@ export function BookingScreen({
         err instanceof Error ? err.message : 'Errore durante la prenotazione.'
       );
     } finally {
+      checkoutInFlightRef.current = false;
       setSubmitting(false);
     }
   };

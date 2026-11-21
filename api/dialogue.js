@@ -7648,6 +7648,18 @@ async function ensureBookingSchema() {
     return;
   }
   const pool = createPool();
+  try {
+    await pool.query("SELECT 1 FROM consultation_bookings LIMIT 1");
+    return;
+  } catch (error) {
+    if (isDbConnectionFailure(error)) {
+      console.error(
+        "ensureBookingSchema: probe failed (DB unreachable), skipping DDL"
+      );
+      resetDbPool();
+      return;
+    }
+  }
   for (const sql2 of SCHEMA_BOOTSTRAP_STATEMENTS) {
     try {
       await pool.query(sql2);
@@ -8939,8 +8951,17 @@ async function handler(req, res) {
   try {
     const method = (req.method || "GET").toUpperCase();
     const path = groupSubpath(req, "dialogue");
-    await ensureSchemaOnce();
     const user = null;
+    if (path === "checkout") {
+      if (method !== "POST") return methodNotAllowed(res, ["POST"]);
+      const result = await postDialogueCheckout({
+        user,
+        body: readBodyObject(req),
+        origin: requestOrigin(req)
+      });
+      return sendJson(res, result.status, result.body);
+    }
+    await ensureSchemaOnce();
     if (path === "status") {
       if (method !== "GET") return methodNotAllowed(res, ["GET"]);
       const result = await getDialogueStatus({
@@ -8962,15 +8983,6 @@ async function handler(req, res) {
       const result = await postDialogueUnlock({
         user,
         body: readBodyObject(req)
-      });
-      return sendJson(res, result.status, result.body);
-    }
-    if (path === "checkout") {
-      if (method !== "POST") return methodNotAllowed(res, ["POST"]);
-      const result = await postDialogueCheckout({
-        user,
-        body: readBodyObject(req),
-        origin: requestOrigin(req)
       });
       return sendJson(res, result.status, result.body);
     }

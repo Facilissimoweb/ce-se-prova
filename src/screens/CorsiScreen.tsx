@@ -89,6 +89,8 @@ export function CorsiScreen({
 
   const checkoutSectionRef = useRef<HTMLElement | null>(null);
   const workbenchSectionRef = useRef<HTMLElement | null>(null);
+  /** ENN-186 — sync guard against double Checkout Session on rapid re-submit. */
+  const checkoutInFlightRef = useRef(false);
 
   useEffect(() => {
     if (user) {
@@ -144,6 +146,7 @@ export function CorsiScreen({
     setFormErrors(errors);
     setEnrollError(null);
     if (Object.keys(errors).length > 0) return;
+    if (checkoutInFlightRef.current) return;
 
     const payload: StripeCheckoutHandoffPayload = {
       provider: 'stripe_checkout',
@@ -174,6 +177,7 @@ export function CorsiScreen({
       return;
     }
 
+    checkoutInFlightRef.current = true;
     setEnrolling(true);
     try {
       const token = await getIdToken();
@@ -210,6 +214,7 @@ export function CorsiScreen({
         err instanceof Error ? err.message : 'Errore durante la registrazione.'
       );
     } finally {
+      checkoutInFlightRef.current = false;
       setEnrolling(false);
     }
   };

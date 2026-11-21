@@ -74,6 +74,8 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
   const getIdTokenRef = useRef(getIdToken);
   getIdTokenRef.current = getIdToken;
   const overviewRequestIdRef = useRef(0);
+  /** ENN-186 — sync guard against double Checkout Session on rapid re-submit. */
+  const checkoutInFlightRef = useRef(false);
 
   const loadOverview = useCallback(async (signal?: AbortSignal) => {
     const currentUser = userRef.current;
@@ -356,6 +358,8 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
   const handleUnlockCourse = async (e: FormEvent) => {
     e.preventDefault();
     if (!activeCourse || !user) return;
+    if (checkoutInFlightRef.current) return;
+    checkoutInFlightRef.current = true;
     setEnrolling(true);
     setEnrollMessage(null);
     try {
@@ -397,6 +401,7 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
         err instanceof Error ? err.message : 'Errore durante la registrazione.'
       );
     } finally {
+      checkoutInFlightRef.current = false;
       setEnrolling(false);
     }
   };
