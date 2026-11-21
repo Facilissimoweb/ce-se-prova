@@ -234,193 +234,229 @@ export function CorsiScreen({
         </p>
       </header>
 
-      {/* 3 Paid Courses Catalog Grid */}
-      <section aria-label="Catalogo percorsi didattici a pagamento" className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+      {/* Catalog — ENN-176: solo Maggiori → full-width horizontal on desktop */}
+      <section
+        aria-label="Catalogo percorsi didattici a pagamento"
+        className={`grid gap-6 items-stretch ${
+          educationalCourses.length === 1
+            ? 'grid-cols-1'
+            : 'grid-cols-1 lg:grid-cols-3'
+        }`}
+      >
         {educationalCourses.map((course) => {
           const isSelected = course.id === activeCourse.id;
           const courseImage = COURSE_SECTION_IMAGES[course.id];
           const soonOpen = soonRevealedId === course.id;
+          const soloWide = educationalCourses.length === 1;
+          // Live Maggiori has no “in arrivo” overlay; keep for future multi-catalog soon cards
+          const showSoonChrome = !soloWide && course.id !== 'arcani-maggiori';
           return (
             <article
               key={course.id}
-              onMouseEnter={() => setSoonRevealedId(course.id)}
-              onMouseLeave={() => setSoonRevealedId(null)}
-              className={`rounded-2xl p-6 md:p-7 flex flex-col justify-between gap-6 transition-all duration-200 ${
+              onMouseEnter={() => showSoonChrome && setSoonRevealedId(course.id)}
+              onMouseLeave={() => showSoonChrome && setSoonRevealedId(null)}
+              className={`rounded-2xl p-6 md:p-7 flex transition-all duration-200 ${
+                soloWide
+                  ? 'flex-col md:flex-row md:items-stretch gap-6 md:gap-8'
+                  : 'flex-col justify-between gap-6'
+              } ${
                 isSelected
                   ? 'glass-tier-2 border-[#D4AF37]/55 shadow-[0_0_28px_rgba(212,175,55,0.14)]'
                   : 'glass-tier-1 hover:border-[#D4AF37]/35'
               }`}
             >
-              <div className="space-y-5">
-                {/* 4:3 Bespoke Course Visual — hover/tap reveals “didattica in arrivo” */}
-                <div className="relative rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#12100E]">
-                  <ResilientImage
-                    src={courseImage.src}
-                    alt={courseImage.alt}
-                    className={`w-full aspect-[4/3] object-cover transition-transform duration-500 ease-out ${
-                      soonOpen ? 'scale-[1.03]' : ''
-                    }`}
-                    fallbackLabel={course.title}
-                  />
-                  <div
-                    className={`pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#12100E]/95 via-[#12100E]/55 to-transparent p-4 transition-opacity duration-300 ease-out ${
-                      soonOpen ? 'opacity-100' : 'opacity-0'
-                    }`}
-                    aria-hidden={!soonOpen}
-                  >
-                    <p className="font-display text-sm tracking-[0.06em] text-[#D4AF37]">
-                      <CopyText
-                        entry={siteContent.corsi.soonHoverTitle}
-                        showKeys={showCmsKeys}
-                      />
-                    </p>
-                    <p className="mt-1 text-xs leading-relaxed text-[#E8e1dd]">
-                      <CopyText
-                        entry={siteContent.corsi.soonHoverBody}
-                        showKeys={showCmsKeys}
-                      />
-                    </p>
-                  </div>
-                  {/* Always-visible badge; tap toggles reveal on touch devices */}
-                  <button
-                    type="button"
-                    aria-expanded={soonOpen}
-                    onClick={() =>
-                      setSoonRevealedId((prev) =>
-                        prev === course.id ? null : course.id
-                      )
-                    }
-                    className="absolute left-3 top-3 z-10 max-w-[calc(100%-1.5rem)] rounded-md border border-[#D4AF37]/45 bg-[#12100E]/85 px-2.5 py-1.5 text-left shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-sm transition-colors hover:border-[#D4AF37]/75 hover:bg-[#12100E]/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
-                    aria-label={`${siteContent.corsi.soonBadge.liveText}. ${siteContent.corsi.soonHoverBody.liveText}`}
-                  >
-                    <span className="block text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]">
-                      <CopyText
-                        entry={siteContent.corsi.soonBadge}
-                        showKeys={showCmsKeys}
-                      />
-                    </span>
-                  </button>
-                </div>
-
-                {/* Quiet unboxed metadata */}
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                  <span className="font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                    {course.orderLabel}
-                  </span>
-                  <span className="text-[#A39B93] tabular-nums">
-                    {course.id === 'arcani-maggiori'
-                      ? `${course.lessonsCount} moduli · ${course.totalHours}`
-                      : `${course.lessonsCount} lezioni · ${course.totalHours}`}
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  <h2 className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]">
-                    {showCmsKeys ? (
-                      <CopyText
-                        entry={{ cmsKey: course.cmsKeyTitle, liveText: course.title }}
-                        showKeys={true}
-                      />
-                    ) : (
-                      course.title
-                    )}
-                  </h2>
-                  <p className="text-xs font-medium text-[#D4AF37]/90">
-                    {showCmsKeys ? (
-                      <CopyText
-                        entry={{ cmsKey: course.cmsKeySubtitle, liveText: course.subtitle }}
-                        showKeys={true}
-                      />
-                    ) : (
-                      course.subtitle
-                    )}
-                  </p>
-                </div>
-
-                {/* Price row */}
-                <div className="py-3 border-y border-[#D4AF37]/15 flex items-baseline justify-between gap-2">
-                  <CourseOfferPrice
-                    priceEur={course.priceEur}
-                    compareAtPriceEur={course.compareAtPriceEur}
-                    size="lg"
-                  />
-                  <span className="text-xs text-[#A39B93] text-right">
-                    Accesso perpetuo · IVA incl.
-                  </span>
-                </div>
-
-                <p className="text-sm leading-relaxed text-[#A39B93]">
-                  {showCmsKeys ? (
-                    <CopyText
-                      entry={{ cmsKey: course.cmsKeyDesc, liveText: course.description }}
-                      showKeys={true}
-                    />
-                  ) : (
-                    course.description
-                  )}
-                </p>
-
-                <ul className="space-y-2.5 pt-1">
-                  {course.includes.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-2.5 text-xs md:text-sm text-[#E8e1dd]"
+              <div
+                className={`relative rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#12100E] ${
+                  soloWide ? 'md:w-[min(42%,22rem)] md:shrink-0' : ''
+                }`}
+              >
+                <ResilientImage
+                  src={courseImage.src}
+                  alt={courseImage.alt}
+                  className={`w-full object-cover transition-transform duration-500 ease-out ${
+                    soloWide
+                      ? 'aspect-[4/3] md:aspect-auto md:h-full md:min-h-[16rem]'
+                      : 'aspect-[4/3]'
+                  } ${soonOpen ? 'scale-[1.03]' : ''}`}
+                  fallbackLabel={course.title}
+                />
+                {showSoonChrome ? (
+                  <>
+                    <div
+                      className={`pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#12100E]/95 via-[#12100E]/55 to-transparent p-4 transition-opacity duration-300 ease-out ${
+                        soonOpen ? 'opacity-100' : 'opacity-0'
+                      }`}
+                      aria-hidden={!soonOpen}
                     >
-                      <Check
-                        className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5"
-                        aria-hidden="true"
-                      />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                      <p className="font-display text-sm tracking-[0.06em] text-[#D4AF37]">
+                        <CopyText
+                          entry={siteContent.corsi.soonHoverTitle}
+                          showKeys={showCmsKeys}
+                        />
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-[#E8e1dd]">
+                        <CopyText
+                          entry={siteContent.corsi.soonHoverBody}
+                          showKeys={showCmsKeys}
+                        />
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      aria-expanded={soonOpen}
+                      onClick={() =>
+                        setSoonRevealedId((prev) =>
+                          prev === course.id ? null : course.id
+                        )
+                      }
+                      className="absolute left-3 top-3 z-10 max-w-[calc(100%-1.5rem)] rounded-md border border-[#D4AF37]/45 bg-[#12100E]/85 px-2.5 py-1.5 text-left shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-sm transition-colors hover:border-[#D4AF37]/75 hover:bg-[#12100E]/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+                      aria-label={`${siteContent.corsi.soonBadge.liveText}. ${siteContent.corsi.soonHoverBody.liveText}`}
+                    >
+                      <span className="block text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]">
+                        <CopyText
+                          entry={siteContent.corsi.soonBadge}
+                          showKeys={showCmsKeys}
+                        />
+                      </span>
+                    </button>
+                  </>
+                ) : null}
               </div>
 
-              <div className="space-y-2.5 pt-2">
-                <button
-                  type="button"
-                  onClick={() => handleEnrollCourse(course.id)}
-                  className={`cta-label cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] ${
-                    isSelected || course.recommended
-                      ? 'bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)]'
-                      : 'bg-[#D4AF37]/10 border border-[#D4AF37]/35 hover:bg-[#D4AF37] hover:text-[#12100E] text-[#F4F1EA]'
-                  }`}
-                >
-                  Iscriviti al Percorso (€ {course.priceEur})
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+              <div
+                className={`flex flex-col justify-between gap-6 ${
+                  soloWide ? 'flex-1 min-w-0' : ''
+                }`}
+              >
+                <div className="space-y-5">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <span className="font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                      {course.orderLabel}
+                    </span>
+                    <span className="text-[#A39B93] tabular-nums">
+                      {course.id === 'arcani-maggiori'
+                        ? `${course.lessonsCount} moduli · ${course.totalHours}`
+                        : `${course.lessonsCount} lezioni · ${course.totalHours}`}
+                    </span>
+                  </div>
 
-                {course.id === 'arcani-maggiori' ? (
-                  <PaymentTrustCues compact prominent />
-                ) : null}
+                  <div className="space-y-2">
+                    <h2 className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]">
+                      {showCmsKeys ? (
+                        <CopyText
+                          entry={{ cmsKey: course.cmsKeyTitle, liveText: course.title }}
+                          showKeys={true}
+                        />
+                      ) : (
+                        course.title
+                      )}
+                    </h2>
+                    <p className="text-xs font-medium text-[#D4AF37]/90">
+                      {showCmsKeys ? (
+                        <CopyText
+                          entry={{ cmsKey: course.cmsKeySubtitle, liveText: course.subtitle }}
+                          showKeys={true}
+                        />
+                      ) : (
+                        course.subtitle
+                      )}
+                    </p>
+                  </div>
 
-                {course.id === 'arcani-maggiori' && (
+                  <div className="py-3 border-y border-[#D4AF37]/15 flex items-baseline justify-between gap-2">
+                    <CourseOfferPrice
+                      priceEur={course.priceEur}
+                      compareAtPriceEur={course.compareAtPriceEur}
+                      size="lg"
+                    />
+                    <span className="text-xs text-[#A39B93] text-right">
+                      Accesso perpetuo · IVA incl.
+                    </span>
+                  </div>
+
+                  <p className="text-sm leading-relaxed text-[#A39B93]">
+                    {showCmsKeys ? (
+                      <CopyText
+                        entry={{ cmsKey: course.cmsKeyDesc, liveText: course.description }}
+                        showKeys={true}
+                      />
+                    ) : (
+                      course.description
+                    )}
+                  </p>
+
+                  <ul className="space-y-2.5 pt-1">
+                    {course.includes.map((item) => (
+                      <li
+                        key={item}
+                        className="flex items-start gap-2.5 text-xs md:text-sm text-[#E8e1dd]"
+                      >
+                        <Check
+                          className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5"
+                          aria-hidden="true"
+                        />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="space-y-2.5 pt-2">
                   <button
                     type="button"
-                    onClick={handleMaggioriMattoPreview}
-                    className="w-full min-h-[42px] px-4 py-2 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-2 border border-[#D4AF37]/40 text-[#E6C65C] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/18 hover:border-[#D4AF37]/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                    onClick={() => handleEnrollCourse(course.id)}
+                    className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] ${
+                      isSelected || course.recommended
+                        ? 'bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)]'
+                        : 'bg-[#D4AF37]/10 border border-[#D4AF37]/35 hover:bg-[#D4AF37] hover:text-[#12100E] text-[#F4F1EA]'
+                    } ${soloWide ? 'md:max-w-sm' : ''}`}
                   >
-                    <Eye className="w-3.5 h-3.5" aria-hidden="true" />
-                    Anteprima gratuita · Modulo 01
+                    Iscriviti al Percorso (€ {course.priceEur})
+                    <ArrowRight className="w-4 h-4" />
                   </button>
-                )}
 
-                <button
-                  type="button"
-                  onClick={() => handleExploreCourse(course.id)}
-                  className={`w-full min-h-[42px] px-4 py-2 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-2 border transition-colors ${
-                    isSelected
-                      ? 'border-[#D4AF37]/45 text-[#E6C65C] bg-[#D4AF37]/8'
-                      : 'border-[#D4AF37]/20 text-[#A39B93] hover:text-[#F4F1EA] hover:border-[#D4AF37]/40'
-                  }`}
-                >
-                  <BookOpen className="w-3.5 h-3.5" />
-                  {isSelected ? 'Programma selezionato sotto' : 'Esplora Programma e Anteprima'}
-                </button>
+                  {course.id === 'arcani-maggiori' ? (
+                    <PaymentTrustCues
+                      compact
+                      prominent
+                      className={soloWide ? 'md:justify-start' : ''}
+                    />
+                  ) : null}
 
-                <p className="text-[11px] font-mono text-[#A39B93]/80 text-center truncate">
-                  Stripe Price Key: {course.stripePriceIdAnnotation}
-                </p>
+                  {course.id === 'arcani-maggiori' && (
+                    <button
+                      type="button"
+                      onClick={handleMaggioriMattoPreview}
+                      className={`w-full min-h-[42px] px-4 py-2 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-2 border border-[#D4AF37]/40 text-[#E6C65C] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/18 hover:border-[#D4AF37]/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
+                        soloWide ? 'md:max-w-sm' : ''
+                      }`}
+                    >
+                      <Eye className="w-3.5 h-3.5" aria-hidden="true" />
+                      Anteprima gratuita · Modulo 01
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => handleExploreCourse(course.id)}
+                    className={`w-full min-h-[42px] px-4 py-2 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-2 border transition-colors ${
+                      isSelected
+                        ? 'border-[#D4AF37]/45 text-[#E6C65C] bg-[#D4AF37]/8'
+                        : 'border-[#D4AF37]/20 text-[#A39B93] hover:text-[#F4F1EA] hover:border-[#D4AF37]/40'
+                    } ${soloWide ? 'md:max-w-sm' : ''}`}
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    {isSelected ? 'Programma selezionato sotto' : 'Esplora Programma e Anteprima'}
+                  </button>
+
+                  <p
+                    className={`text-[11px] font-mono text-[#A39B93]/80 truncate ${
+                      soloWide ? 'md:text-left' : 'text-center'
+                    }`}
+                  >
+                    Stripe Price Key: {course.stripePriceIdAnnotation}
+                  </p>
+                </div>
               </div>
             </article>
           );
