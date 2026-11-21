@@ -152,13 +152,31 @@ assert(
   'Sigillo keys the card <button> (ENN-164 — not an inner div under GT-touched parent)'
 );
 assert(
+  flash.includes('GtSafeBoundary') &&
+    /<GtSafeBoundary[\s\S]{0,120}\bkey=\{faceKey\}/.test(flash),
+  'Sigillo keys GtSafeBoundary with faceKey (ENN-181 — remount whole face tree)'
+);
+assert(
   flash.includes('GtSafeBoundary'),
   'Sigillo face wrapped in GtSafeBoundary (ENN-162)'
 );
 assert(
-  /requestGoogleTranslateRefresh\(380\)/.test(flash) ||
-    flash.includes('requestGoogleTranslateRefresh(380)'),
-  'Sigillo dual GT refresh after face remount (ENN-162)'
+  (/requestGoogleTranslateRefresh\(380\)/.test(flash) ||
+    flash.includes('requestGoogleTranslateRefresh(380)')) &&
+    (/requestGoogleTranslateRefresh\(900\)/.test(flash) ||
+      flash.includes('requestGoogleTranslateRefresh(900)')),
+  'Sigillo dual+late GT refresh after face remount (ENN-162/181)'
+);
+
+const gtBoundary = readFileSync(
+  path.join(root, 'src/components/GtSafeBoundary.tsx'),
+  'utf8'
+);
+assert(
+  gtBoundary.includes('data-gt-remount') &&
+    /display:\s*['"]contents['"]/.test(gtBoundary) &&
+    !/<React\.Fragment\s+key=/.test(gtBoundary),
+  'GtSafeBoundary remounts via DOM shell not Fragment (ENN-181)'
 );
 
 const reserved = readFileSync(
