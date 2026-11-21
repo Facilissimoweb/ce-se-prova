@@ -5,8 +5,8 @@ type PaymentTrustCuesProps = {
   /** Tighter typography under tariff / catalog CTAs. */
   compact?: boolean;
   /**
-   * Maggiori buy CTAs — Klarna pink badge + Stripe secure, more visible
-   * than the default microcopy.
+   * Buy / Prenota CTAs (Maggiori + consulti) — Klarna pink badge + Stripe
+   * secure, more visible than the default microcopy.
    */
   prominent?: boolean;
   className?: string;
@@ -28,7 +28,7 @@ function KlarnaMark({ className = '' }: { className?: string }) {
 }
 
 /**
- * ENN-172 / ENN-170 — Stripe + Klarna trust cues next to checkout CTAs.
+ * ENN-172 / ENN-170 / ENN-177 — Stripe + Klarna trust cues next to checkout CTAs.
  * Short trusted copy + brand marks; no fake seals or promo cards.
  */
 export function PaymentTrustCues({
@@ -47,7 +47,7 @@ export function PaymentTrustCues({
         <span className="inline-flex items-center gap-2 text-sm text-[#F4F1EA]">
           <KlarnaMark className="text-[13px] leading-none" />
           <span className="font-medium leading-snug">
-            Paga a rate con Klarna
+            Paga in 3 rate con Klarna
           </span>
         </span>
         <span

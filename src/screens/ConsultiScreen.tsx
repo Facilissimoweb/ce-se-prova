@@ -243,7 +243,7 @@ export function ConsultiScreen({
                 </button>
 
                 {CONSULTATION_STRIPE_ENABLED ? (
-                  <PaymentTrustCues compact />
+                  <PaymentTrustCues compact prominent />
                 ) : null}
 
                 {CONSULTATION_STRIPE_ENABLED ? (
@@ -368,7 +368,7 @@ export function ConsultiScreen({
                 : 'Dopo aver scelto la tariffa, invii la richiesta su WhatsApp: Maria Teresa ti risponde con le indicazioni per il pagamento. Il checkout Stripe resta disponibile per ripartire quando sarà il momento.'}
             </p>
             {CONSULTATION_STRIPE_ENABLED ? (
-              <PaymentTrustCues className="pt-2" />
+              <PaymentTrustCues prominent className="pt-2" />
             ) : null}
           </div>
         </div>

@@ -25,6 +25,7 @@ import {
   PaymentTrustCues,
 } from '../components/PaymentTrustCues';
 import { COURSE_SECTION_IMAGES, TARIFF_SECTION_IMAGES } from '../data/sectionImages';
+import { CONSULTATION_STRIPE_ENABLED } from '../lib/bookingCheckoutMode';
 import {
   SITE_ADDRESS,
   SITE_EMAIL,
@@ -391,7 +392,7 @@ export function HomeScreen({
                   </ul>
                 </div>
 
-                <div className="pt-2">
+                <div className="space-y-3 pt-2">
                   <button
                     type="button"
                     onClick={() => onSelectTariffAndBook(tariff.id)}
@@ -404,6 +405,9 @@ export function HomeScreen({
                     {t('home.bookTariff', { minutes: tariff.durationMinutes })}
                     <ArrowRight className="w-4 h-4" />
                   </button>
+                  {CONSULTATION_STRIPE_ENABLED ? (
+                    <PaymentTrustCues compact prominent />
+                  ) : null}
                 </div>
               </article>
             );
