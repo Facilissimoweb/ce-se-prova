@@ -19,6 +19,7 @@ import { ResilientImage } from '../components/ResilientImage';
 import { COURSE_SECTION_IMAGES } from '../data/sectionImages';
 import { MaggioriMattoPreview } from '../components/corsi/MaggioriMattoPreview';
 import { MinorArcanaSuitsPlate, SpreadGeometryExplorer } from '../components/CourseVisuals';
+import { PaymentTrustCues } from '../components/PaymentTrustCues';
 import { useAuth } from '../context/AuthContext';
 import {
   isValidEmail,
@@ -373,6 +374,10 @@ export function CorsiScreen({
                   Iscriviti al Percorso (€ {course.priceEur})
                   <ArrowRight className="w-4 h-4" />
                 </button>
+
+                {course.id === 'arcani-maggiori' ? (
+                  <PaymentTrustCues compact />
+                ) : null}
 
                 {course.id === 'arcani-maggiori' && (
                   <button
@@ -752,6 +757,8 @@ export function CorsiScreen({
             </button>
           </div>
 
+          <PaymentTrustCues />
+
           {checkoutPayload && (
             <div className="mt-4 rounded-xl bg-[#12100E]/90 border border-[#D4AF37]/45 p-5 space-y-4">
               <div>
@@ -860,6 +867,8 @@ export function CorsiScreen({
               Accesso illimitato nel tempo ai materiali didattici e attestato di partecipazione olistica rilasciato da Tarot Italia.
             </p>
           </div>
+
+          <PaymentTrustCues />
         </aside>
       </section>
       </div>
