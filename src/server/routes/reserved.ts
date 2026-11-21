@@ -35,7 +35,10 @@ import {
   allowDirectUnlock,
   checkoutLineItemFromCatalog,
   createCheckoutSession,
+  diagnoseStripeSecretKey,
   isStripeConfigured,
+  stripeCheckoutClientError,
+  STRIPE_SECRET_KEY_CLIENT_ERROR,
 } from '../../lib/stripe.ts';
 import { courseStripePriceAnnotation } from '../../lib/paymentCatalog.ts';
 import { activateCourseFromPaidSession } from '../activations.ts';
@@ -187,6 +190,11 @@ export async function postReservedEnroll(params: {
       return json(201, { mode: 'enrolled', ...result });
     }
 
+    const keyIssue = diagnoseStripeSecretKey();
+    if (keyIssue === 'publishable' || keyIssue === 'invalid') {
+      return json(400, { error: STRIPE_SECRET_KEY_CLIENT_ERROR });
+    }
+
     if (isStripeConfigured()) {
       const priceAnnotation =
         course.stripePriceId || courseStripePriceAnnotation(course.slug);
@@ -244,6 +252,10 @@ export async function postReservedEnroll(params: {
       msg === 'STRIPE_WRONG_ITEM_TYPE'
     ) {
       return json(400, { error: 'Metadati pagamento incompleti.' });
+    }
+    const stripeClient = stripeCheckoutClientError(error);
+    if (stripeClient) {
+      return json(stripeClient.status, { error: stripeClient.error });
     }
     return mapSafeError(error, 'Errore nella registrazione del percorso.', {
       notFound: 'non trovato',

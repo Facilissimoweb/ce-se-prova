@@ -8,7 +8,10 @@ import {
   allowDirectUnlock,
   checkoutLineItemFromCatalog,
   createCheckoutSession,
+  diagnoseStripeSecretKey,
   isStripeConfigured,
+  stripeCheckoutClientError,
+  STRIPE_SECRET_KEY_CLIENT_ERROR,
 } from '../../lib/stripe.ts';
 import type { DialoguePackId } from '../../types/handoff.ts';
 import { activateDialogueFromPaidSession } from '../activations.ts';
@@ -174,6 +177,11 @@ export async function postDialogueCheckout(params: {
 
     const pack = DIALOGUE_PACK_CATALOG[packId];
 
+    const keyIssue = diagnoseStripeSecretKey();
+    if (keyIssue === 'publishable' || keyIssue === 'invalid') {
+      return json(400, { error: STRIPE_SECRET_KEY_CLIENT_ERROR });
+    }
+
     if (isStripeConfigured()) {
       const checkout = await createCheckoutSession({
         customerEmail,
@@ -225,6 +233,10 @@ export async function postDialogueCheckout(params: {
         'Pagamenti Stripe non configurati. Imposta STRIPE_SECRET_KEY oppure, solo in sviluppo, ALLOW_DIRECT_UNLOCK=true.',
     });
   } catch (error) {
+    const stripeClient = stripeCheckoutClientError(error);
+    if (stripeClient) {
+      return json(stripeClient.status, { error: stripeClient.error });
+    }
     return mapSafeError(error, 'Impossibile avviare il pagamento del pass.');
   }
 }

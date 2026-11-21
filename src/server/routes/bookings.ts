@@ -24,7 +24,10 @@ import {
   assertCheckoutPaid,
   checkoutLineItemFromCatalog,
   createCheckoutSession,
+  diagnoseStripeSecretKey,
   isStripeConfigured,
+  stripeCheckoutClientError,
+  STRIPE_SECRET_KEY_CLIENT_ERROR,
 } from '../../lib/stripe.ts';
 import {
   isValidEmail,
@@ -185,6 +188,11 @@ export async function postBooking(params: {
       });
     }
 
+    const keyIssue = diagnoseStripeSecretKey();
+    if (keyIssue === 'publishable' || keyIssue === 'invalid') {
+      return json(400, { error: STRIPE_SECRET_KEY_CLIENT_ERROR });
+    }
+
     if (isStripeConfigured()) {
       const booking = await createConsultationBooking({
         uid: user?.uid ?? null,
@@ -283,6 +291,10 @@ export async function postBooking(params: {
     }
     if (msg === 'STRIPE_PAYMENT_NOT_PAID') {
       return json(402, { error: 'Pagamento Stripe non ancora confermato.' });
+    }
+    const stripeClient = stripeCheckoutClientError(error);
+    if (stripeClient) {
+      return json(stripeClient.status, { error: stripeClient.error });
     }
     return mapSafeError(
       error,
