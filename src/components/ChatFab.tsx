@@ -12,7 +12,12 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useCourseEntitlement } from '../hooks/useCourseEntitlement';
 import { useAuth } from '../context/AuthContext';
-import { requestGoogleTranslateRefresh } from '../lib/googleTranslateRuntime';
+import {
+  GT_PAGE_LANG,
+  GT_REFRESH_EVENT,
+  requestGoogleTranslateRefresh,
+  readGoogTransLang,
+} from '../lib/googleTranslateRuntime';
 import {
   NINA_CHAT_OPEN_EVENT,
   type NinaChatOpenDetail,
@@ -27,7 +32,6 @@ import { looksLikeNinaProviderLeak } from '../lib/ninaReplyLang';
 import { NinaMessageBody } from './chat/NinaMessageBody';
 import { GtCriticalLabel } from './GtCriticalLabel';
 import { GtSafeBoundary } from './GtSafeBoundary';
-import { readGoogTransLang } from './GoogleTranslateWidget';
 import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
 
 /**
@@ -99,6 +103,8 @@ const linkClass =
  * ENN-137: welcome (free) vs Nina Studio (Maggiori entitlement).
  * ENN-161: all visible chrome = Italian getFixedT / GtCriticalLabel (GT-able);
  * panel remount + GtSafeBoundary so Studio tab cannot blank the site under GT.
+ * ENN-165: panelKey includes googtrans lang; Groq history omits Italian seed;
+ * seed never gets stale notranslate; lang re-read on send.
  * On mobile, only visible when «Strumenti» is open.
  */
 export function ChatFab() {
@@ -110,8 +116,12 @@ export function ChatFab() {
   const threadRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<NinaMode>('welcome');
-  /** Bumps on mode / lock-CTA / recover so GT-mutated nodes are discarded. */
+  /** Bumps on mode / lock-CTA / recover / open so GT-mutated nodes are discarded. */
   const [panelEpoch, setPanelEpoch] = useState(0);
+  /** Active googtrans target — keys chrome remount + Groq `lang` (ENN-165). */
+  const [gtLang, setGtLang] = useState(() =>
+    typeof document !== 'undefined' ? readGoogTransLang() : GT_PAGE_LANG
+  );
   const [statusLoading, setStatusLoading] = useState(false);
   const [chatAvailable, setChatAvailable] = useState(false);
   const [turns, setTurns] = useState<ChatTurn[]>(() => [
@@ -134,6 +144,13 @@ export function ChatFab() {
     setPanelEpoch((n) => n + 1);
   }
 
+  function syncGtLang(): string {
+    const live =
+      typeof document !== 'undefined' ? readGoogTransLang() : GT_PAGE_LANG;
+    setGtLang(live);
+    return live;
+  }
+
   /** Italian seed only — never EN fallback for JA/other GT langs (ENN-158). */
   function greetingFor(nextMode: NinaMode): string {
     const tf = i18n.getFixedT('it', 'common');
@@ -143,12 +160,13 @@ export function ChatFab() {
   }
 
   function seedTurn(nextMode: NinaMode): ChatTurn {
+    // Never skipGt — seed must stay GT-able Italian DOM (no stale notranslate).
     return { role: 'assistant', content: greetingFor(nextMode) };
   }
 
   /** Active Google Translate browsing language (`/it/<lang>` cookie/hash). */
   function activeChatLang(): string {
-    return typeof document !== 'undefined' ? readGoogTransLang() : 'it';
+    return typeof document !== 'undefined' ? readGoogTransLang() : gtLang;
   }
 
   function switchMode(nextMode: NinaMode) {
@@ -189,13 +207,37 @@ export function ChatFab() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- seedTurn binds i18n/mode
   }, [i18n.language, mode]);
 
+  // Track googtrans so chrome remounts when Traduci changes (ENN-165).
+  useEffect(() => {
+    const sync = () => {
+      syncGtLang();
+    };
+    sync();
+    window.addEventListener('hashchange', sync);
+    window.addEventListener(GT_REFRESH_EVENT, sync);
+    const id = window.setInterval(sync, 1500);
+    return () => {
+      window.removeEventListener('hashchange', sync);
+      window.removeEventListener(GT_REFRESH_EVENT, sync);
+      window.clearInterval(id);
+    };
+  }, []);
+
+  // Fresh remount on open so GT scans clean Italian chrome (not stale fonts).
+  useEffect(() => {
+    if (!open) return;
+    syncGtLang();
+    bumpPanel();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- open edge only
+  }, [open]);
+
   // Panel remounts chrome + seed — re-apply googtrans (same as Sigillo ENN-157).
   useEffect(() => {
     if (!open) return;
     requestGoogleTranslateRefresh(160);
     const later = window.setTimeout(() => requestGoogleTranslateRefresh(360), 280);
     return () => window.clearTimeout(later);
-  }, [open, mode, turns.length, showStudioCta, sending, panelEpoch]);
+  }, [open, mode, turns.length, showStudioCta, sending, panelEpoch, gtLang]);
 
   // If Studio entitlement is lost, fall back to welcome.
   useEffect(() => {
@@ -297,9 +339,16 @@ export function ChatFab() {
     setSendError(null);
     setShowStudioCta(false);
     setDraft('');
+    // ENN-165: Groq history = user/API only. Italian seed must not bias reply lang.
     const history = turns
-      .filter((turn) => turn.role === 'user' || turn.role === 'assistant')
+      .filter(
+        (turn) =>
+          turn.skipGt === true &&
+          (turn.role === 'user' || turn.role === 'assistant')
+      )
+      .map(({ role, content }) => ({ role, content }))
       .slice(-12);
+    const replyLang = syncGtLang();
     setTurns((prev) => [
       ...prev,
       { role: 'user', content: message, skipGt: true },
@@ -321,7 +370,7 @@ export function ChatFab() {
         body: JSON.stringify({
           message,
           history,
-          lang: activeChatLang(),
+          lang: replyLang || activeChatLang(),
           mode: effectiveMode,
         }),
       });
@@ -427,7 +476,7 @@ export function ChatFab() {
         ? tIt('nina.subtitleStudio')
         : tIt('nina.subtitleAvailable');
 
-  const panelKey = `nina-${mode}-${canUseStudio ? 'u' : 'g'}-${showStudioCta ? 'cta' : 'ok'}-${panelEpoch}`;
+  const panelKey = `nina-${gtLang}-${mode}-${canUseStudio ? 'u' : 'g'}-${showStudioCta ? 'cta' : 'ok'}-${panelEpoch}`;
 
   return (
     <>
@@ -584,13 +633,15 @@ export function ChatFab() {
                         turn.role === 'user'
                           ? 'ml-6 break-words rounded-lg bg-[#D4AF37]/15 px-2.5 py-2 text-sm text-[#F4F1EA] whitespace-pre-wrap'
                           : 'mr-2 break-words rounded-lg bg-[#1C1916] px-2.5 py-2.5';
+                      // skipGt only for API/user — never seed (stale notranslate left IT).
+                      const localized = turn.skipGt === true;
                       return (
                         <div
-                          key={`${turn.role}-${index}-${turn.skipGt ? 'api' : 'seed'}`}
+                          key={`${turn.role}-${index}-${localized ? 'api' : `seed-${gtLang}`}`}
                           className={
-                            turn.skipGt ? `${baseClass} notranslate` : baseClass
+                            localized ? `${baseClass} notranslate` : baseClass
                           }
-                          {...(turn.skipGt ? { translate: 'no' as const } : {})}
+                          {...(localized ? { translate: 'no' as const } : {})}
                         >
                           {turn.role === 'assistant' ? (
                             <NinaMessageBody content={turn.content} />
