@@ -17,6 +17,7 @@ import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
 import { TARIFF_SECTION_IMAGES } from '../data/sectionImages';
 import consultiDeskImg from '../assets/images/consulti_desk_linen_1794651607906.jpg';
+import { PaymentTrustCues } from '../components/PaymentTrustCues';
 import { CONSULTATION_STRIPE_ENABLED } from '../lib/bookingCheckoutMode';
 
 interface ConsultiScreenProps {
@@ -242,6 +243,10 @@ export function ConsultiScreen({
                 </button>
 
                 {CONSULTATION_STRIPE_ENABLED ? (
+                  <PaymentTrustCues compact />
+                ) : null}
+
+                {CONSULTATION_STRIPE_ENABLED ? (
                   <p className="text-[11px] font-mono text-[#A39B93]/80 text-center truncate">
                     Stripe Price Key: {tariff.stripePriceIdAnnotation}
                   </p>
@@ -359,9 +364,12 @@ export function ConsultiScreen({
             </h3>
             <p className="text-xs md:text-sm leading-relaxed text-[#A39B93]">
               {CONSULTATION_STRIPE_ENABLED
-                ? 'Le tariffe selezionate pre-compilano la sessione Stripe Checkout e il record di prenotazione protetto da Firebase Auth e persistito su Postgres.'
+                ? 'Le tariffe selezionate aprono Stripe Checkout: pagamento sicuro, con rate Klarna se disponibili sul totale.'
                 : 'Dopo aver scelto la tariffa, invii la richiesta su WhatsApp: Maria Teresa ti risponde con le indicazioni per il pagamento. Il checkout Stripe resta disponibile per ripartire quando sarà il momento.'}
             </p>
+            {CONSULTATION_STRIPE_ENABLED ? (
+              <PaymentTrustCues className="pt-2" />
+            ) : null}
           </div>
         </div>
       </section>

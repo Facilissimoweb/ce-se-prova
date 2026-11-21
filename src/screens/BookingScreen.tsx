@@ -17,6 +17,7 @@ import { CopyText } from '../components/CopyText';
 import { BookingCalendar } from '../components/booking/BookingCalendar';
 import { BookingLangNotice } from '../components/booking/BookingLangNotice';
 import { CheckoutReturnBanner } from '../components/CheckoutReturnBanner';
+import { PaymentTrustCues } from '../components/PaymentTrustCues';
 import { useAuth } from '../context/AuthContext';
 import { useBookingAvailability } from '../hooks/useBookingAvailability';
 import {
@@ -969,6 +970,10 @@ export function BookingScreen({
                   </div>
 
                   {CONSULTATION_STRIPE_ENABLED ? (
+                    <PaymentTrustCues className="pt-1" />
+                  ) : null}
+
+                  {CONSULTATION_STRIPE_ENABLED ? (
                     <a
                       href={whatsappHref(
                         `Buongiorno Maria Teresa, vorrei conferma per ${activeTariff.title} (${activeTariff.durationMinutes}m) il ${draft.selectedDateIso} alle ${draft.selectedTimeSlot}. Nome: ${draft.fullName}.`
@@ -1043,11 +1048,15 @@ export function BookingScreen({
 
           <BookingLangNotice showCmsKeys={showCmsKeys} compact />
 
-          <p className="text-xs leading-relaxed text-[#A39B93]">
-            {CONSULTATION_STRIPE_ENABLED
-              ? 'Pagamento Stripe · conferma email Zoho · evento Google Calendar. Firebase Auth + Postgres.'
-              : 'Richiesta via WhatsApp · Maria Teresa invia le indicazioni di pagamento · conferma slot a mano. Il checkout Stripe resta pronto per ripartire.'}
-          </p>
+          {CONSULTATION_STRIPE_ENABLED ? (
+            <PaymentTrustCues />
+          ) : (
+            <p className="text-xs leading-relaxed text-[#A39B93]">
+              Richiesta via WhatsApp · Maria Teresa invia le indicazioni di
+              pagamento · conferma slot a mano. Il checkout Stripe resta pronto
+              per ripartire.
+            </p>
+          )}
         </aside>
       </div>
     </div>

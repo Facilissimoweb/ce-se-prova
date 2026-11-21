@@ -16,6 +16,7 @@ import type { CourseId, ScreenId } from '../types/handoff';
 import { useAuth } from '../context/AuthContext';
 import { CheckoutReturnBanner } from '../components/CheckoutReturnBanner';
 import { MaterialsLanguagePicker } from '../components/MaterialsLanguagePicker';
+import { PaymentTrustCues } from '../components/PaymentTrustCues';
 import { FormattedDispensaBody } from '../components/reserved/FormattedDispensaBody';
 import { DispensaFlashcards } from '../components/reserved/DispensaFlashcards';
 import { DispensaSchedaVisiva } from '../components/reserved/DispensaSchedaVisiva';
@@ -828,6 +829,8 @@ export function ReservedAreaScreen({
                       ? 'Preparazione checkout...'
                       : `Paga e sblocca (€ ${activeCourse.priceEur})`}
                   </button>
+
+                  <PaymentTrustCues compact />
 
                   <button
                     type="button"

@@ -8,6 +8,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { MaterialsLanguagePicker } from '../MaterialsLanguagePicker';
+import { PaymentTrustCues } from '../PaymentTrustCues';
 import { DispensaFlashcards } from '../reserved/DispensaFlashcards';
 import { DispensaSchedaVisiva } from '../reserved/DispensaSchedaVisiva';
 import { FormattedDispensaBody } from '../reserved/FormattedDispensaBody';
@@ -274,14 +275,17 @@ export function MaggioriMattoPreview({
                 sbloccano con l&apos;iscrizione al percorso Arcani Maggiori.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={onEnroll}
-              className="cta-label shrink-0 w-full sm:w-auto min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] transition-all duration-150 hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
-            >
-              Iscriviti al Percorso (€ {priceEur})
-              <ArrowRight className="w-4 h-4" aria-hidden="true" />
-            </button>
+            <div className="shrink-0 w-full sm:w-auto space-y-2">
+              <button
+                type="button"
+                onClick={onEnroll}
+                className="cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] transition-all duration-150 hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+              >
+                Iscriviti al Percorso (€ {priceEur})
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </button>
+              <PaymentTrustCues compact />
+            </div>
           </div>
         </article>
       </div>
