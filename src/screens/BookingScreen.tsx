@@ -16,7 +16,6 @@ import { useLocalizedTariffs } from '../i18n/useLocalizedCatalog';
 import { CopyText } from '../components/CopyText';
 import { TariffDescriptionBlurbs } from '../components/TariffDescriptionBlurbs';
 import { BookingCalendar } from '../components/booking/BookingCalendar';
-import { BookingLangNotice } from '../components/booking/BookingLangNotice';
 import { CheckoutReturnBanner } from '../components/CheckoutReturnBanner';
 import { PaymentTrustCues } from '../components/PaymentTrustCues';
 import { useAuth } from '../context/AuthContext';
@@ -400,9 +399,6 @@ export function BookingScreen({
             Conferma del pagamento in corso…
           </p>
         ) : null}
-        <div className="pt-2">
-          <BookingLangNotice showCmsKeys={showCmsKeys} />
-        </div>
       </header>
 
       <nav
@@ -1107,8 +1103,6 @@ export function BookingScreen({
               € {activeTariff.priceEur}
             </span>
           </div>
-
-          <BookingLangNotice showCmsKeys={showCmsKeys} compact />
 
           {CONSULTATION_STRIPE_ENABLED ? (
             <PaymentTrustCues prominent />
