@@ -169,18 +169,47 @@ assert(
   reserved.includes('GtSafeBoundary') &&
     reserved.includes('dispensaEpoch') &&
     reserved.includes('dispensaRemountKey') &&
-    /dispensa-\$\{activeDispensa\.id\}-\$\{dispensaEpoch\}/.test(reserved),
-  'Area Personale dispensa wrapped in GtSafeBoundary + remount key (ENN-178)'
+    /dispensa-\$\{activeDispensa\?\.id \?\? 'none'\}-\$\{gtLang\}-\$\{dispensaEpoch\}/.test(
+      reserved
+    ),
+  'Area Personale workspace remount key includes id+gtLang+epoch (ENN-178/182)'
+);
+assert(
+  reserved.includes('GT_REFRESH_EVENT') &&
+    reserved.includes('gtLangPrevRef') &&
+    reserved.includes('setDispensaEpoch'),
+  'SPA Traduci bumps dispensaEpoch so Maggiori module nav needs no reload (ENN-182)'
 );
 assert(
   reserved.includes('requestGoogleTranslateRefresh(160)') &&
-    reserved.includes('requestGoogleTranslateRefresh(360)'),
-  'Dispensa switch dual GT refresh (ENN-178)'
+    reserved.includes('requestGoogleTranslateRefresh(360)') &&
+    reserved.includes('requestGoogleTranslateRefresh(900)'),
+  'Dispensa/workspace GT refresh dual + late nudge (ENN-178/182)'
 );
 assert(
   reserved.includes('Ricarica la dispensa') &&
     !/notranslate/.test(reserved),
   'Dispensa recovery CTA; didactic text stays GT-able (ENN-178)'
+);
+
+const widget = readFileSync(
+  path.join(root, 'src/components/GoogleTranslateWidget.tsx'),
+  'utf8'
+);
+assert(
+  /return 'spa'/.test(widget) &&
+    widget.includes('requestGoogleTranslateRefresh(900)'),
+  'SPA Traduci late GT refresh for Maggiori remount (ENN-182)'
+);
+
+const boundary = readFileSync(
+  path.join(root, 'src/components/GtSafeBoundary.tsx'),
+  'utf8'
+);
+assert(
+  boundary.includes('ENN-182') ||
+    /prevProps\.resetKey === this\.props\.resetKey/.test(boundary),
+  'GtSafeBoundary clears error on resetKey for SPA Maggiori recovery (ENN-182)'
 );
 
 const catalog = readFileSync(

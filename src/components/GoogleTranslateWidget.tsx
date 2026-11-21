@@ -133,10 +133,12 @@ export function applyGoogTransLang(code: string): 'reload' | 'spa' | 'noop' {
     '',
     `${path}#googtrans(${GT_PAGE_LANG}|${target})`
   );
-  // Nina + booking notices listen for this; hashchange does not fire on replaceState.
+  // Nina + Maggiori + booking listen for this; hashchange does not fire on replaceState.
+  // Late nudge (900ms): Area Personale remounts on GT_REFRESH before combo is ready.
   notifyGoogleTranslateRefresh();
   requestGoogleTranslateRefresh(40);
   window.setTimeout(() => requestGoogleTranslateRefresh(220), 160);
+  window.setTimeout(() => requestGoogleTranslateRefresh(900), 700);
   window.setTimeout(() => {
     gtLangSwitchLock = false;
   }, 450);

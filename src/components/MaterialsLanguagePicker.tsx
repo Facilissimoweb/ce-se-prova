@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { readGoogTransLang } from './GoogleTranslateWidget';
+import {
+  GT_REFRESH_EVENT,
+  readGoogTransLang,
+} from '../lib/googleTranslateRuntime';
 
 type Props = {
   className?: string;
@@ -10,6 +13,7 @@ type Props = {
 /**
  * ENN-145 — Dispensa PDF follows Google Translate (`googtrans`), not a separate
  * curated materials switcher. Shows the active GT language for Scarica.
+ * ENN-182 — also listens `GT_REFRESH` (SPA Traduci uses replaceState).
  */
 export function MaterialsLanguagePicker({
   className = '',
@@ -20,9 +24,11 @@ export function MaterialsLanguagePicker({
     const sync = () => setLang(readGoogTransLang());
     sync();
     window.addEventListener('hashchange', sync);
+    window.addEventListener(GT_REFRESH_EVENT, sync);
     const id = window.setInterval(sync, 1200);
     return () => {
       window.removeEventListener('hashchange', sync);
+      window.removeEventListener(GT_REFRESH_EVENT, sync);
       window.clearInterval(id);
     };
   }, []);

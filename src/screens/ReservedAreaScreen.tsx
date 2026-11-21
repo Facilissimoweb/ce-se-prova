@@ -41,7 +41,12 @@ import {
   MAGGIORI_MODULO_01_BLOG_SLUG,
 } from '../data/maggioriGatedBlog';
 import { openNinaChat } from '../lib/ninaChatOpen';
-import { requestGoogleTranslateRefresh } from '../lib/googleTranslateRuntime';
+import {
+  GT_PAGE_LANG,
+  GT_REFRESH_EVENT,
+  readGoogTransLang,
+  requestGoogleTranslateRefresh,
+} from '../lib/googleTranslateRuntime';
 import {
   SCROLL_LANDMARKS,
   scrollToIdAfterPaint,
@@ -117,29 +122,60 @@ export function ReservedAreaScreen({
     totalDispenseCount,
   } = area;
 
-  // ENN-178 — remount whole dispensa article under GT so 01→02 cannot
-  // removeChild against Translate `<font>` wrappers (same class as ENN-161).
+  // ENN-178 / ENN-182 — remount Maggiori workspace (list + dispensa) under GT
+  // so SPA Traduci + module switch cannot removeChild against `<font>` wrappers.
   const [dispensaEpoch, setDispensaEpoch] = useState(0);
+  const [gtLang, setGtLang] = useState(() =>
+    typeof document !== 'undefined' ? readGoogTransLang() : GT_PAGE_LANG
+  );
+
+  // Prefer GT_REFRESH: applyGoogTransLang uses replaceState (no hashchange).
+  useEffect(() => {
+    const sync = () => setGtLang(readGoogTransLang());
+    sync();
+    window.addEventListener('hashchange', sync);
+    window.addEventListener(GT_REFRESH_EVENT, sync);
+    const id = window.setInterval(sync, 1500);
+    return () => {
+      window.removeEventListener('hashchange', sync);
+      window.removeEventListener(GT_REFRESH_EVENT, sync);
+      window.clearInterval(id);
+    };
+  }, []);
+
+  // SPA Traduci: discard GT-mutated list/article so module nav works without reload.
+  const gtLangPrevRef = useRef(gtLang);
+  useEffect(() => {
+    if (gtLangPrevRef.current === gtLang) return;
+    gtLangPrevRef.current = gtLang;
+    setDispensaEpoch((n) => n + 1);
+  }, [gtLang]);
 
   const activeFlashcardDeck = useMemo(() => {
     if (!activeCourse || !activeDispensa) return null;
     return getFlashcardDeck(activeCourse.slug, activeDispensa.moduleNumber);
   }, [activeCourse, activeDispensa]);
 
-  const dispensaRemountKey = activeDispensa
-    ? `dispensa-${activeDispensa.id}-${dispensaEpoch}`
-    : `dispensa-none-${dispensaEpoch}`;
+  const dispensaRemountKey = `dispensa-${activeDispensa?.id ?? 'none'}-${gtLang}-${dispensaEpoch}`;
 
-  // Fresh Italian DOM after id/epoch change — dual refresh like Sigillo / Nina.
+  // Fresh Italian DOM after id/lang/epoch change — dual + late refresh like Nina.
   useEffect(() => {
-    if (!activeDispensa) return;
+    if (!activeCourse?.isUnlocked) return;
+    if (gtLang === GT_PAGE_LANG) return;
     requestGoogleTranslateRefresh(160);
-    const later = window.setTimeout(
+    const mid = window.setTimeout(
       () => requestGoogleTranslateRefresh(360),
       280
     );
-    return () => window.clearTimeout(later);
-  }, [activeDispensa?.id, dispensaEpoch]);
+    const late = window.setTimeout(
+      () => requestGoogleTranslateRefresh(900),
+      700
+    );
+    return () => {
+      window.clearTimeout(mid);
+      window.clearTimeout(late);
+    };
+  }, [activeCourse?.isUnlocked, activeDispensa?.id, dispensaEpoch, gtLang]);
 
   /**
    * ENN-113–122 — mid-dispensa embeds for Maggiori Dispensa 01.
@@ -483,7 +519,35 @@ export function ReservedAreaScreen({
 
           {/* Selected Course Workspace: Unlocked Dispense Reader OR Enrollment Activation */}
           {activeCourse.isUnlocked ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <GtSafeBoundary
+              resetKey={dispensaRemountKey}
+              onError={() => setDispensaEpoch((n) => n + 1)}
+              fallback={
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                  <div className="lg:col-span-8 lg:col-start-5 min-w-0">
+                    <article
+                      id={SCROLL_LANDMARKS.reservedDispensaContent}
+                      className="glass-tier-1 rounded-2xl p-6 md:p-8 space-y-4 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
+                    >
+                      <p className="text-sm text-[#E8e1dd]">
+                        La dispensa si è riavviata. Puoi ricaricarla e continuare.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setDispensaEpoch((n) => n + 1)}
+                        className="min-h-[44px] px-4 py-2.5 rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/15 text-xs font-semibold text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                      >
+                        Ricarica la dispensa
+                      </button>
+                    </article>
+                  </div>
+                </div>
+              }
+            >
+            <div
+              key={dispensaRemountKey}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
+            >
               {/* Left Column: 4 Dispense Navigation */}
               <aside
                 id={SCROLL_LANDMARKS.reservedDispenseList}
@@ -563,29 +627,7 @@ export function ReservedAreaScreen({
               {/* Right Column: Dispensa Content + Study Notes */}
               {activeDispensa && (
                 <div className="lg:col-span-8 min-w-0">
-                <GtSafeBoundary
-                  resetKey={dispensaRemountKey}
-                  onError={() => setDispensaEpoch((n) => n + 1)}
-                  fallback={
-                    <article
-                      id={SCROLL_LANDMARKS.reservedDispensaContent}
-                      className="glass-tier-1 rounded-2xl p-6 md:p-8 space-y-4 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
-                    >
-                      <p className="text-sm text-[#E8e1dd]">
-                        La dispensa si è riavviata. Puoi ricaricarla e continuare.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setDispensaEpoch((n) => n + 1)}
-                        className="min-h-[44px] px-4 py-2.5 rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/15 text-xs font-semibold text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
-                      >
-                        Ricarica la dispensa
-                      </button>
-                    </article>
-                  }
-                >
                   <article
-                    key={dispensaRemountKey}
                     id={SCROLL_LANDMARKS.reservedDispensaContent}
                     className="glass-tier-1 rounded-2xl p-6 md:p-8 space-y-6 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
                   >
@@ -787,10 +829,10 @@ export function ReservedAreaScreen({
                       )}
                     </div>
                   </article>
-                </GtSafeBoundary>
                 </div>
               )}
             </div>
+            </GtSafeBoundary>
           ) : (
             /* Locked Course Preview + Activation Form */
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
