@@ -224,18 +224,6 @@ export const siteContent = {
       liveText:
         'Pagamento sicuro con Stripe Checkout. Dopo il pagamento ricevi la conferma via email; Maria Teresa riceve un avviso dello slot. Il consulto si svolge su WhatsApp.',
     },
-    /** ENN-166 — soft IT note (booking on site · consult on WhatsApp). */
-    waConsultNoteIt: {
-      cmsKey: '[COPY: siteContent.booking.waConsultNoteIt]',
-      liveText:
-        'Prenotazione e pagamento sul sito; il consulto si svolge su WhatsApp. Se usi la traduzione automatica, è consigliata la chat scritta (puoi usare la traduzione integrata di WhatsApp).',
-    },
-    /** ENN-166 — prominent when googtrans ≠ it: written WhatsApp only. */
-    waConsultNoticeNonIt: {
-      cmsKey: '[COPY: siteContent.booking.waConsultNoticeNonIt]',
-      liveText:
-        'Con una lingua diversa dall’italiano, il consulto avviene esclusivamente via chat scritta su WhatsApp. Puoi usare la traduzione integrata di WhatsApp durante la conversazione.',
-    },
   },
   chat: {
     title: {

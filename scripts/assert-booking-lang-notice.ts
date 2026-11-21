@@ -1,8 +1,9 @@
 /**
- * ENN-166 — booking WhatsApp language notice wiring (no browser GT).
+ * ENN-199 — WhatsApp consult / GT translation advice banner must stay removed.
+ * Stripe consult checkout must remain enabled.
  * Run: npx tsx scripts/assert-booking-lang-notice.ts
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -18,9 +19,9 @@ function assert(cond: boolean, label: string) {
   }
 }
 
-const notice = readFileSync(
-  path.join(root, 'src/components/booking/BookingLangNotice.tsx'),
-  'utf8'
+const noticePath = path.join(
+  root,
+  'src/components/booking/BookingLangNotice.tsx'
 );
 const booking = readFileSync(
   path.join(root, 'src/screens/BookingScreen.tsx'),
@@ -35,34 +36,28 @@ const checkout = readFileSync(
   'utf8'
 );
 
-assert(notice.includes('readGoogTransLang'), 'notice reads googtrans lang');
-assert(notice.includes('GT_PAGE_LANG'), 'notice uses GT_PAGE_LANG');
-assert(notice.includes('GT_REFRESH_EVENT'), 'notice listens for GT refresh');
+assert(!existsSync(noticePath), 'BookingLangNotice.tsx deleted');
 assert(
-  notice.includes('waConsultNoticeNonIt') && notice.includes('waConsultNoteIt'),
-  'notice branches IT vs non-IT copy keys'
+  !booking.includes('BookingLangNotice'),
+  'BookingScreen does not mount BookingLangNotice'
 );
 assert(
-  booking.includes('BookingLangNotice'),
-  'BookingScreen mounts BookingLangNotice'
+  !content.includes('waConsultNoteIt') &&
+    !content.includes('waConsultNoticeNonIt'),
+  'siteContent has no ENN-166 WA consult notice copy keys'
 );
 assert(
-  content.includes('waConsultNoteIt') &&
-    content.includes('waConsultNoticeNonIt'),
-  'siteContent has ENN-166 booking copy keys'
+  !content.includes('traduzione automatica') &&
+    !content.includes('traduzione integrata di WhatsApp'),
+  'siteContent has no GT/translation-advice banner copy'
 );
 assert(
   /CONSULTATION_STRIPE_ENABLED\s*=\s*true/.test(checkout),
-  'Stripe consult checkout enabled (ENN-167)'
-);
-assert(
-  !notice.toLowerCase().includes('whatsapp cloud') &&
-    !notice.includes('/api/webhooks/whatsapp'),
-  'notice has no WA Business API / webhook wiring'
+  'Stripe consult checkout enabled (do not regress)'
 );
 
 if (failed > 0) {
   console.error(`\n${failed} assertion(s) failed`);
   process.exit(1);
 }
-console.log('\nAll ENN-166 booking lang notice asserts passed.');
+console.log('\nAll ENN-199 booking lang notice removal asserts passed.');
