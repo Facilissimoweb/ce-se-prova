@@ -529,14 +529,15 @@ export function BookingScreen({
                 </div>
               </div>
 
-              <div className="flex justify-end pt-2">
+              <div className="flex flex-col sm:flex-row sm:justify-end pt-2">
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 transition-colors"
+                  data-nowrap-keep
+                  className="cta-label w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors"
                 >
                   Prosegui a Data e Ora
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 shrink-0" />
                 </button>
               </div>
             </div>
@@ -624,11 +625,12 @@ export function BookingScreen({
                 </p>
               </div>
 
-              <div className="flex items-center justify-between gap-4 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="cta-label px-5 py-3 min-h-[44px] rounded-lg border border-[#D4AF37]/30 text-sm font-medium text-[#F4F1EA] hover:border-[#D4AF37] inline-flex items-center justify-center gap-2"
+                  data-nowrap-keep
+                  className="cta-label w-full sm:w-auto px-5 py-3 min-h-[44px] rounded-lg border border-[#D4AF37]/30 text-sm font-medium text-[#F4F1EA] hover:border-[#D4AF37] inline-flex items-center justify-center gap-2 whitespace-nowrap"
                 >
                   <ArrowLeft className="w-4 h-4 shrink-0" />
                   Indietro
@@ -637,7 +639,8 @@ export function BookingScreen({
                   type="button"
                   disabled={openHours.length === 0}
                   onClick={() => setStep(3)}
-                  className="cta-label px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-50 text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2"
+                  data-nowrap-keep
+                  className="cta-label w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-50 text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap"
                 >
                   Prosegui ai Dati
                   <ArrowRight className="w-4 h-4 shrink-0" />
@@ -946,24 +949,26 @@ export function BookingScreen({
                     </p>
                   ) : null}
 
-                  <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+                  <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
                     <button
                       type="button"
                       onClick={() => setStep(2)}
-                      className="px-5 py-3 min-h-[44px] rounded-lg border border-[#D4AF37]/30 text-sm font-medium text-[#F4F1EA] hover:border-[#D4AF37] inline-flex items-center gap-2"
+                      data-nowrap-keep
+                      className="cta-label w-full sm:w-auto px-5 py-3 min-h-[44px] rounded-lg border border-[#D4AF37]/30 text-sm font-medium text-[#F4F1EA] hover:border-[#D4AF37] inline-flex items-center justify-center gap-2 whitespace-nowrap"
                     >
-                      <ArrowLeft className="w-4 h-4" />
+                      <ArrowLeft className="w-4 h-4 shrink-0" />
                       Modifica Data
                     </button>
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="px-6 py-3 min-h-[46px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                      data-nowrap-keep
+                      className="cta-label w-full sm:w-auto px-6 py-3 min-h-[46px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
                     >
                       {CONSULTATION_STRIPE_ENABLED ? (
-                        <CreditCard className="w-4 h-4" />
+                        <CreditCard className="w-4 h-4 shrink-0" />
                       ) : (
-                        <Send className="w-4 h-4" />
+                        <Send className="w-4 h-4 shrink-0" />
                       )}
                       {submitting
                         ? CONSULTATION_STRIPE_ENABLED
