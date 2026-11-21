@@ -63,6 +63,43 @@ assert(
   'syncs googtrans lang for chrome remount + Groq'
 );
 assert(
+  chatFab.includes('gtLangPrevRef') &&
+    chatFab.includes('setTurns([seedTurn(mode)])'),
+  'resets seed/history when googtrans lang changes (SPA Traduci)'
+);
+assert(
+  chatFab.includes('requestGoogleTranslateRefresh(900)'),
+  'late GT refresh nudge when combo may still be mounting'
+);
+
+const widget = readFileSync(
+  path.join(root, 'src/components/GoogleTranslateWidget.tsx'),
+  'utf8'
+);
+assert(
+  widget.includes('notifyGoogleTranslateRefresh'),
+  'Traduci SPA switch notifies Nina via GT_REFRESH'
+);
+assert(
+  /return 'spa'/.test(widget) && widget.includes("return 'reload'"),
+  'non-IT Traduci uses SPA path; IT still reloads'
+);
+assert(
+  !/writeGoogtransCookie\(target\);[\s\S]{0,220}window\.location\.reload\(\)/.test(
+    widget
+  ),
+  'non-IT applyGoogTransLang no longer ends in location.reload'
+);
+
+const critical = readFileSync(
+  path.join(root, 'src/components/GtCriticalLabel.tsx'),
+  'utf8'
+);
+assert(
+  critical.includes('GT_REFRESH_EVENT'),
+  'GtCriticalLabel follows SPA Traduci (Accoglienza / Prenota)'
+);
+assert(
   chatFab.includes('turn.skipGt === true') &&
     chatFab.includes('.map(({ role, content })'),
   'Groq history omits Italian seed (skipGt-only) so replies track lang'
