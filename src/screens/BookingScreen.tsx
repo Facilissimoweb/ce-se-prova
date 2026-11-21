@@ -46,6 +46,7 @@ import {
 } from '../lib/formValidation';
 import { SCREEN_PATHS } from '../lib/appPaths';
 import { readJsonResponse } from '../lib/readJsonResponse';
+import { scrollToTopAfterPaint } from '../lib/scrollNavigation';
 import { whatsappHref } from '../lib/siteContacts';
 
 interface BookingScreenProps {
@@ -64,6 +65,7 @@ export function BookingScreen({
   const { user, getIdToken } = useAuth();
   const consultationTariffs = useLocalizedTariffs();
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const wizardRootRef = useRef<HTMLDivElement>(null);
   const [calendarMonth, setCalendarMonth] = useState<Date>(() => {
     const d = getNextAvailableDate();
     return new Date(d.getFullYear(), d.getMonth(), 1);
@@ -87,6 +89,17 @@ export function BookingScreen({
     deontologyAccepted: false,
     privacyTermsAccepted: false,
   });
+
+  // ENN-194 — land at page top on every step change (Prosegui / Indietro / step tabs).
+  useEffect(() => {
+    const cancel = scrollToTopAfterPaint('auto');
+    let el: HTMLElement | null = wizardRootRef.current;
+    while (el) {
+      if (el.scrollTop) el.scrollTop = 0;
+      el = el.parentElement;
+    }
+    return cancel;
+  }, [step]);
 
   useEffect(() => {
     const tariff =
@@ -341,7 +354,7 @@ export function BookingScreen({
   ];
 
   return (
-    <div className="space-y-10 pt-6 md:pt-10 pb-8">
+    <div ref={wizardRootRef} className="space-y-10 pt-6 md:pt-10 pb-8">
       {CONSULTATION_STRIPE_ENABLED ? (
         <CheckoutReturnBanner variant="booking" />
       ) : null}
