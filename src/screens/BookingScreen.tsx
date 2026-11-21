@@ -46,7 +46,7 @@ import {
 } from '../lib/formValidation';
 import { SCREEN_PATHS } from '../lib/appPaths';
 import { readJsonResponse } from '../lib/readJsonResponse';
-import { scrollToTopAfterPaint } from '../lib/scrollNavigation';
+import { scrollStepToTopAfterPaint } from '../lib/scrollNavigation';
 import { whatsappHref } from '../lib/siteContacts';
 
 interface BookingScreenProps {
@@ -90,15 +90,37 @@ export function BookingScreen({
     privacyTermsAccepted: false,
   });
 
-  // ENN-194 — land at page top on every step change (Prosegui / Indietro / step tabs).
-  useEffect(() => {
-    const cancel = scrollToTopAfterPaint('auto');
-    let el: HTMLElement | null = wizardRootRef.current;
-    while (el) {
-      if (el.scrollTop) el.scrollTop = 0;
-      el = el.parentElement;
+  const cancelStepScrollRef = useRef<(() => void) | null>(null);
+
+  const scrollWizardStepToTop = () => {
+    cancelStepScrollRef.current?.();
+    cancelStepScrollRef.current = scrollStepToTopAfterPaint(
+      () =>
+        // Prefer step pills so they stay under the sticky header; heading
+        // sits immediately below and stays in view (ENN-196).
+        document.querySelector<HTMLElement>(
+          '[aria-label="Passaggi prenotazione"]'
+        ) ?? document.getElementById('booking-step-heading'),
+      { from: wizardRootRef.current, behavior: 'auto' }
+    );
+  };
+
+  /** Step pills stay mounted + focused; same-step taps still need a top landing. */
+  const goToStep = (next: 1 | 2 | 3) => {
+    if (next === step) {
+      scrollWizardStepToTop();
+      return;
     }
-    return cancel;
+    setStep(next);
+  };
+
+  // ENN-196 — every step index change (pills, Prosegui, Indietro) lands at top.
+  useEffect(() => {
+    scrollWizardStepToTop();
+    return () => {
+      cancelStepScrollRef.current?.();
+      cancelStepScrollRef.current = null;
+    };
   }, [step]);
 
   useEffect(() => {
@@ -393,7 +415,7 @@ export function BookingScreen({
             <button
               key={s.num}
               type="button"
-              onClick={() => setStep(s.num)}
+              onClick={() => goToStep(s.num)}
               className={`cta-label min-h-[44px] px-2.5 sm:px-3 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
                 isActive
                   ? 'bg-[#D4AF37] text-[#12100E] font-semibold'
@@ -413,7 +435,10 @@ export function BookingScreen({
           {step === 1 && (
             <div className="space-y-6">
               <div className="space-y-1">
-                <h2 className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]">
+                <h2
+                  id="booking-step-heading"
+                  className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]"
+                >
                   Durata e modalità del consulto
                 </h2>
                 <p className="text-sm text-[#A39B93]">
@@ -545,7 +570,7 @@ export function BookingScreen({
               <div className="flex flex-col sm:flex-row sm:justify-end pt-2">
                 <button
                   type="button"
-                  onClick={() => setStep(2)}
+                  onClick={() => goToStep(2)}
                   data-nowrap-keep
                   className="cta-label w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors"
                 >
@@ -559,7 +584,10 @@ export function BookingScreen({
           {step === 2 && (
             <div className="space-y-8">
               <div className="space-y-1">
-                <h2 className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]">
+                <h2
+                  id="booking-step-heading"
+                  className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]"
+                >
                   Scegli giorno e fascia oraria
                 </h2>
                 <p className="text-sm text-[#A39B93]">
@@ -641,7 +669,7 @@ export function BookingScreen({
               <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => setStep(1)}
+                  onClick={() => goToStep(1)}
                   data-nowrap-keep
                   className="cta-label w-full sm:w-auto px-5 py-3 min-h-[44px] rounded-lg border border-[#D4AF37]/30 text-sm font-medium text-[#F4F1EA] hover:border-[#D4AF37] inline-flex items-center justify-center gap-2 whitespace-nowrap"
                 >
@@ -651,7 +679,7 @@ export function BookingScreen({
                 <button
                   type="button"
                   disabled={openHours.length === 0}
-                  onClick={() => setStep(3)}
+                  onClick={() => goToStep(3)}
                   data-nowrap-keep
                   className="cta-label w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-50 text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap"
                 >
@@ -669,7 +697,10 @@ export function BookingScreen({
               noValidate
             >
               <div className="space-y-1">
-                <h2 className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]">
+                <h2
+                  id="booking-step-heading"
+                  className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]"
+                >
                   {CONSULTATION_STRIPE_ENABLED
                     ? 'Dati di contatto e checkout'
                     : 'Dati di contatto e invio'}
@@ -965,7 +996,7 @@ export function BookingScreen({
                   <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
                     <button
                       type="button"
-                      onClick={() => setStep(2)}
+                      onClick={() => goToStep(2)}
                       data-nowrap-keep
                       className="cta-label w-full sm:w-auto px-5 py-3 min-h-[44px] rounded-lg border border-[#D4AF37]/30 text-sm font-medium text-[#F4F1EA] hover:border-[#D4AF37] inline-flex items-center justify-center gap-2 whitespace-nowrap"
                     >
