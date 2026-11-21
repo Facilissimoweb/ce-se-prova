@@ -1,7 +1,8 @@
 /**
- * ENN-200 — Compile compact Nina Studio Minori cards FROM Maria’s luce/ombra pack.
- * Source: content/nina/arcani-minori-luce-ombra.md (Italian SoT for Studio companion).
- * Not the public Minori course (catalog stays hidden). Not Maggiori Area Personale.
+ * ENN-200 / ENN-201 — Compile compact Nina Studio Minori cards FROM Maria’s packs:
+ * - content/nina/arcani-minori-luce-ombra.md (luce/ombra, ENN-200)
+ * - content/nina/arcani-minori-domande.md (domande di pratica / consulto, ENN-201)
+ * Italian SoT for Studio companion. Not the public Minori course (catalog hidden).
  *
  * Run: npx tsx scripts/build-nina-minori-cards.ts
  * Also invoked from scripts/bundle-api.mjs before chat bundle.
@@ -12,11 +13,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const sourceFile = path.join(root, 'content/nina/arcani-minori-luce-ombra.md');
+const luceOmbraFile = path.join(
+  root,
+  'content/nina/arcani-minori-luce-ombra.md'
+);
+const domandeFile = path.join(root, 'content/nina/arcani-minori-domande.md');
 const outFile = path.join(root, 'src/data/ninaMinoriCards.generated.ts');
 
 /** Soft cap — keep max-3 inject under Groq 413 (same discipline as Maggiori). */
-const MAX_BODY_CHARS = 700;
+const MAX_BODY_CHARS = 900;
 
 export type NinaMinoriSuitId = 'bastoni' | 'coppe' | 'spade' | 'denari';
 export type NinaMinoriRankId =
@@ -148,7 +153,10 @@ function parseRankHeading(heading: string): NinaMinoriRankId | null {
   return null;
 }
 
-function extractField(block: string, field: 'Luce' | 'Ombra'): string {
+function extractField(
+  block: string,
+  field: 'Luce' | 'Ombra' | 'Domanda'
+): string {
   const re = new RegExp(
     `\\*\\*${field}\\*\\*\\s*:\\s*([^\\n]+(?:\\n(?!\\*\\*)[^\\n]+)*)`,
     'i'
@@ -197,14 +205,93 @@ type ParsedSuit = {
   meta: SuitMeta;
   elemento: string;
   senso: string;
+  focus?: string;
   cards: Array<{
     rank: NinaMinoriRankId;
     luce: string;
     ombra: string;
+    domanda?: string;
   }>;
 };
 
-function parseSource(md: string): {
+function parseSuitBlocks(
+  md: string,
+  mode: 'luce' | 'domande'
+): Map<
+  NinaMinoriSuitId,
+  {
+    elemento: string;
+    senso: string;
+    focus: string;
+    cards: Map<NinaMinoriRankId, { luce: string; ombra: string; domanda: string }>;
+  }
+> {
+  const out = new Map<
+    NinaMinoriSuitId,
+    {
+      elemento: string;
+      senso: string;
+      focus: string;
+      cards: Map<
+        NinaMinoriRankId,
+        { luce: string; ombra: string; domanda: string }
+      >;
+    }
+  >();
+
+  for (let i = 0; i < SUITS.length; i += 1) {
+    const suit = SUITS[i];
+    const next = SUITS[i + 1];
+    const re = new RegExp(
+      `## ${suit.heading}\\s+([\\s\\S]*?)(?=${next ? `\\n## ${next.heading}\\b` : '$'})`
+    );
+    const blockMatch = md.match(re);
+    if (!blockMatch) {
+      throw new Error(`Missing ${mode} suit section: ${suit.heading}`);
+    }
+    const block = blockMatch[1];
+    const { elemento, senso } = extractSuitMeta(block);
+    const focusMatch = block.match(/\*\*Focus\*\*\s*:\s*([^\n]+)/i);
+    const focus = focusMatch
+      ? focusMatch[1].replace(/\s+/g, ' ').trim()
+      : '';
+    const cards = new Map<
+      NinaMinoriRankId,
+      { luce: string; ombra: string; domanda: string }
+    >();
+    const cardParts = block.split(/\n### /).slice(1);
+    for (const part of cardParts) {
+      const nl = part.indexOf('\n');
+      const heading = nl === -1 ? part : part.slice(0, nl);
+      const body = nl === -1 ? '' : part.slice(nl + 1);
+      const rank = parseRankHeading(heading);
+      if (!rank) continue;
+      if (mode === 'luce') {
+        const luce = extractField(body, 'Luce');
+        const ombra = extractField(body, 'Ombra');
+        if (!luce || !ombra) {
+          throw new Error(`Missing luce/ombra for ${rank} di ${suit.id}`);
+        }
+        cards.set(rank, { luce, ombra, domanda: '' });
+      } else {
+        const domanda = extractField(body, 'Domanda');
+        if (!domanda) {
+          throw new Error(`Missing domanda for ${rank} di ${suit.id}`);
+        }
+        cards.set(rank, { luce: '', ombra: '', domanda });
+      }
+    }
+    if (cards.size !== 14) {
+      throw new Error(
+        `Expected 14 ${mode} cards for ${suit.id}, got ${cards.size}`
+      );
+    }
+    out.set(suit.id, { elemento, senso, focus, cards });
+  }
+  return out;
+}
+
+function parseLuceOmbraSource(md: string): {
   intro: string;
   pratica: string;
   suits: ParsedSuit[];
@@ -224,46 +311,49 @@ function parseSource(md: string): {
     .trim()
     .slice(0, 500);
 
-  const suits: ParsedSuit[] = [];
-  for (let i = 0; i < SUITS.length; i += 1) {
-    const suit = SUITS[i];
-    const next = SUITS[i + 1];
-    const re = new RegExp(
-      `## ${suit.heading}\\s+([\\s\\S]*?)(?=${next ? `\\n## ${next.heading}\\b` : '$'})`
-    );
-    const blockMatch = md.match(re);
-    if (!blockMatch) {
-      throw new Error(`Missing suit section: ${suit.heading}`);
-    }
-    const block = blockMatch[1];
-    const { elemento, senso } = extractSuitMeta(block);
-    const cards: ParsedSuit['cards'] = [];
-    const cardParts = block.split(/\n### /).slice(1);
-    for (const part of cardParts) {
-      const nl = part.indexOf('\n');
-      const heading = nl === -1 ? part : part.slice(0, nl);
-      const body = nl === -1 ? '' : part.slice(nl + 1);
-      const rank = parseRankHeading(heading);
-      if (!rank) continue;
-      const luce = extractField(body, 'Luce');
-      const ombra = extractField(body, 'Ombra');
-      if (!luce || !ombra) {
-        throw new Error(`Missing luce/ombra for ${rank} di ${suit.id}`);
-      }
-      cards.push({ rank, luce, ombra });
-    }
-    if (cards.length !== 14) {
-      throw new Error(
-        `Expected 14 cards for ${suit.id}, got ${cards.length}`
-      );
-    }
-    // Stable rank order
-    cards.sort(
-      (a, b) => RANK_ORDER.indexOf(a.rank) - RANK_ORDER.indexOf(b.rank)
-    );
-    suits.push({ meta: suit, elemento, senso, cards });
-  }
+  const parsed = parseSuitBlocks(md, 'luce');
+  const suits: ParsedSuit[] = SUITS.map((meta) => {
+    const block = parsed.get(meta.id);
+    if (!block) throw new Error(`Missing luce block for ${meta.id}`);
+    const cards = RANK_ORDER.map((rank) => {
+      const c = block.cards.get(rank);
+      if (!c) throw new Error(`Missing luce card ${meta.id}-${rank}`);
+      return { rank, luce: c.luce, ombra: c.ombra };
+    });
+    return {
+      meta,
+      elemento: block.elemento,
+      senso: block.senso,
+      cards,
+    };
+  });
   return { intro, pratica, suits };
+}
+
+function parseDomandeSource(md: string): {
+  intro: string;
+  byId: Map<string, string>;
+  suitFocus: Map<NinaMinoriSuitId, string>;
+} {
+  const introMatch = md.match(
+    /## Come usare queste domande\s+([\s\S]*?)(?=\n## Bastoni\b)/
+  );
+  const intro = (introMatch?.[1] ?? '').replace(/\s+/g, ' ').trim().slice(0, 700);
+  const parsed = parseSuitBlocks(md, 'domande');
+  const byId = new Map<string, string>();
+  const suitFocus = new Map<NinaMinoriSuitId, string>();
+  for (const suit of SUITS) {
+    const block = parsed.get(suit.id);
+    if (!block) throw new Error(`Missing domande block for ${suit.id}`);
+    if (block.focus) suitFocus.set(suit.id, block.focus);
+    for (const [rank, c] of block.cards) {
+      byId.set(`${suit.id}-${rank}`, c.domanda);
+    }
+  }
+  if (byId.size !== 56) {
+    throw new Error(`Expected 56 domande, got ${byId.size}`);
+  }
+  return { intro, byId, suitFocus };
 }
 
 function joinSense(elemento: string, senso: string): string {
@@ -281,54 +371,74 @@ function formatCardBody(params: {
   senso: string;
   luce: string;
   ombra: string;
+  domanda: string;
 }): string {
   const title = `${RANK_TITLES[params.rank]} di ${params.suit.title}`;
-  const body = [
+  const lines = [
     `### ${title}`,
     `- **Senso**: ${params.suit.title} — ${joinSense(params.elemento, params.senso)}`,
     `- **Luce/ombra**: Luce — ${params.luce} Ombra — ${params.ombra}`,
-  ].join('\n');
-  return clipBody(body);
+  ];
+  if (params.domanda) {
+    lines.push(`- **Domanda**: ${params.domanda}`);
+  }
+  return clipBody(lines.join('\n'));
 }
 
 function main() {
-  const md = readFileSync(sourceFile, 'utf8');
-  const { intro, pratica, suits } = parseSource(md);
+  const luceMd = readFileSync(luceOmbraFile, 'utf8');
+  const domandeMd = readFileSync(domandeFile, 'utf8');
+  const { intro, pratica, suits } = parseLuceOmbraSource(luceMd);
+  const domande = parseDomandeSource(domandeMd);
 
   const cards = suits.flatMap((s) =>
-    s.cards.map((c) => ({
-      id: `${s.meta.id}-${c.rank}`,
-      suit: s.meta.id,
-      rank: c.rank,
-      title: `${RANK_TITLES[c.rank]} di ${s.meta.title}`,
-      aliases: buildAliases(s.meta, c.rank),
-      body: formatCardBody({
-        suit: s.meta,
+    s.cards.map((c) => {
+      const id = `${s.meta.id}-${c.rank}`;
+      const domanda = domande.byId.get(id);
+      if (!domanda) {
+        throw new Error(`Missing domanda merge for ${id}`);
+      }
+      return {
+        id,
+        suit: s.meta.id,
         rank: c.rank,
-        elemento: s.elemento,
-        senso: s.senso,
-        luce: c.luce,
-        ombra: c.ombra,
-      }),
-    }))
+        title: `${RANK_TITLES[c.rank]} di ${s.meta.title}`,
+        aliases: buildAliases(s.meta, c.rank),
+        body: formatCardBody({
+          suit: s.meta,
+          rank: c.rank,
+          elemento: s.elemento,
+          senso: s.senso,
+          luce: c.luce,
+          ombra: c.ombra,
+          domanda,
+        }),
+      };
+    })
   );
 
   if (cards.length !== 56) {
     throw new Error(`Expected 56 Minori cards, got ${cards.length}`);
   }
 
-  const suitFrames = suits.map((s) => ({
-    id: s.meta.id,
-    title: s.meta.title,
-    aliases: s.meta.aliases,
-    body: clipBody(
-      `### Seme: ${s.meta.title}\n- **Senso**: ${joinSense(s.elemento, s.senso)}`
-    ),
-  }));
+  const suitFrames = suits.map((s) => {
+    const focus = domande.suitFocus.get(s.meta.id);
+    const focusLine = focus ? `\n- **Focus domande**: ${focus}` : '';
+    return {
+      id: s.meta.id,
+      title: s.meta.title,
+      aliases: s.meta.aliases,
+      body: clipBody(
+        `### Seme: ${s.meta.title}\n- **Senso**: ${joinSense(s.elemento, s.senso)}${focusLine}`
+      ),
+    };
+  });
 
   const file = `/**
  * GENERATED by scripts/build-nina-minori-cards.ts — do not edit by hand.
- * ENN-200: compact Nina Studio Minori (luce/ombra) from content/nina/arcani-minori-luce-ombra.md.
+ * ENN-200: compact Nina Studio Minori from:
+ * - content/nina/arcani-minori-luce-ombra.md (luce/ombra)
+ * - content/nina/arcani-minori-domande.md (domande di pratica)
  * Companion knowledge for Studio (Maggiori entitlement). Public Minori catalog stays hidden.
  * Rebuild: npx tsx scripts/build-nina-minori-cards.ts  (also via npm run build:api)
  */
@@ -370,6 +480,8 @@ export const NINA_MINORI_INTRO = ${JSON.stringify(intro)};
 
 export const NINA_MINORI_PRATICA = ${JSON.stringify(pratica)};
 
+export const NINA_MINORI_DOMANDE_INTRO = ${JSON.stringify(domande.intro)};
+
 export const NINA_MINORI_SUIT_FRAMES: readonly NinaMinoriSuitFrameGenerated[] = ${JSON.stringify(
     suitFrames,
     null,
@@ -385,7 +497,7 @@ export const NINA_MINORI_CARDS_GENERATED: readonly NinaMinoriCardGenerated[] = $
 
   writeFileSync(outFile, file, 'utf8');
   console.log(
-    `Wrote ${cards.length} Minori cards + ${suitFrames.length} suit frames → ${path.relative(root, outFile)}`
+    `Wrote ${cards.length} Minori cards (luce/ombra + domanda) + ${suitFrames.length} suit frames → ${path.relative(root, outFile)}`
   );
 }
 

@@ -3,9 +3,10 @@
  * Mirror of public copy from siteContent / booking / corsi — do not invent FAQ or prices.
  * Maggiori cards: compiled FROM Area Personale didactic sources (ENN-147) —
  * dispensa + schede visive + approfondimenti — not a hand KB, not Dialogo Tarot.
- * Minori cards: compiled FROM Maria’s luce/ombra pack (ENN-200) —
- * content/nina/arcani-minori-luce-ombra.md — Studio companion only; public Minori catalog stays hidden.
- * Inject only matched cards per request (ENN-138 / ENN-200). When knowledge changes:
+ * Minori cards: compiled FROM Maria’s packs (ENN-200 luce/ombra + ENN-201 domande) —
+ * content/nina/arcani-minori-luce-ombra.md + arcani-minori-domande.md —
+ * Studio companion only; public Minori catalog stays hidden.
+ * Inject only matched cards per request (ENN-138 / ENN-200 / ENN-201). When knowledge changes:
  * `npx tsx scripts/build-nina-maggiori-cards.ts` / `build-nina-minori-cards.ts` then `npm run build:api`.
  */
 
@@ -17,6 +18,7 @@ import {
 import { NINA_MAGGIORI_CARDS_GENERATED } from '../data/ninaMaggioriCards.generated.ts';
 import {
   NINA_MINORI_CARDS_GENERATED,
+  NINA_MINORI_DOMANDE_INTRO,
   NINA_MINORI_INTRO,
   NINA_MINORI_PRATICA,
   NINA_MINORI_SUIT_FRAMES,
@@ -293,16 +295,19 @@ export const NINA_MINORI_CARDS: readonly NinaMinoriCard[] =
   NINA_MINORI_CARDS_GENERATED;
 
 /** Always-on Minori framing (no per-card bodies) — keeps payload small. */
-export const NINA_CHAT_MINORI_FRAME = `## Arcani Minori — schede luce/ombra (Studio)
+export const NINA_CHAT_MINORI_FRAME = `## Arcani Minori — schede luce/ombra + domande (Studio)
 
-Fonte: pack didattico italiano Tarot Italia (ENN-200). Usa SOLO le schede Minori iniettate sotto (se presenti). Non inventare simbologia Waite assente dal pack. Il corso pubblico **Arcani Minori** non è in vendita: questa è conoscenza companion in Nina Studio per chi ha Maggiori.
+Fonte: pack didattico italiano Tarot Italia (ENN-200 luce/ombra + ENN-201 domande di pratica). Usa SOLO le schede Minori iniettate sotto (se presenti). Non inventare simbologia Waite assente dal pack. Il corso pubblico **Arcani Minori** non è in vendita: questa è conoscenza companion in Nina Studio per chi ha Maggiori.
 
-${NINA_MINORI_INTRO.slice(0, 420)}…
+${NINA_MINORI_INTRO.slice(0, 360)}…
 
-Struttura risposta (quando chiedono un Minore — senso del seme, luce/ombra):
+Domande di pratica (come usarle): ${NINA_MINORI_DOMANDE_INTRO.slice(0, 280)}…
+
+Struttura risposta (quando chiedono un Minore — senso, luce/ombra, domanda di pratica):
 1. **Senso** (seme / energia quotidiana)
 2. **Luce / ombra**
-3. Se utile, un cenno di pratica: ${NINA_MINORI_PRATICA.slice(0, 220)}…
+3. **Domanda** di pratica/consulto (se in scheda) — apri consapevolezza, non chiudere in sentenza
+4. Se utile: ${NINA_MINORI_PRATICA.slice(0, 180)}…
 Tono: caldo, rigoroso, Tarot Italia. Semi: Bastoni · Coppe · Spade · Denari (Pentacoli). Ranks: Asso–10 + Fante, Cavallo, Regina, Re.
 Se manca la scheda nel contesto, chiedi quale carta (es. «Asso di Bastoni») e non inventare dettagli.`;
 
@@ -348,7 +353,9 @@ export function selectMinoriSuitFramesForText(
   // Avoid injecting from Maggiori tool lists («bastoni, coppe, spade e denari» on Bagatto)
   // unless the ask is clearly about a Minori suit / luce-ombra / seme.
   const suitStudyCue =
-    /\b(arcani?\s+minori|minori|seme|semi|luce|ombra|pentacol)\b/.test(hay) ||
+    /\b(arcani?\s+minori|minori|seme|semi|luce|ombra|domanda|domande|pentacol)\b/.test(
+      hay
+    ) ||
     /\b(?:parla(?:mi)?|spiega(?:mi)?|racconta(?:mi)?|cosa\s+(?:sono|significano)|approfond)\b/.test(
       hay
     );
@@ -407,7 +414,7 @@ export function buildMinoriKnowledgeForMessages(params: {
 }
 
 const DEEP_MINORI_CUES =
-  /\b(arcani?\s+minori|minori\s+didatt|luce\s*\/?\s*ombra|asso\s+di\s+(bastoni|coppe|spade|denari|pentacol)|(?:fante|cavallo|regina|re|\d{1,2}|due|tre|quattro|cinque|sei|sette|otto|nove|dieci)\s+di\s+(bastoni|coppe|spade|denari|pentacol))/;
+  /\b(arcani?\s+minori|minori\s+didatt|luce\s*\/?\s*ombra|domande?\s+(sui\s+)?minori|domanda\s+di\s+pratica|asso\s+di\s+(bastoni|coppe|spade|denari|pentacol)|(?:fante|cavallo|regina|re|\d{1,2}|due|tre|quattro|cinque|sei|sette|otto|nove|dieci)\s+di\s+(bastoni|coppe|spade|denari|pentacol))/;
 
 /**
  * Welcome soft-lock: named Minore and/or deep Minori study cues (ENN-200).
