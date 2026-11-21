@@ -77,6 +77,12 @@ assert(
   'omits prior-lang history when gtLang state lags live googtrans'
 );
 assert(
+  /lang:\s*'it'/.test(chatFab) &&
+    chatFab.includes('Italian-only') &&
+    !/lang:\s*replyLang/.test(chatFab),
+  'POST /api/chat always sends lang: it (ENN-188)'
+);
+assert(
   chatFab.includes('requestGoogleTranslateRefresh(900)'),
   'late GT refresh nudge when combo may still be mounting'
 );

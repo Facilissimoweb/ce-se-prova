@@ -41,10 +41,10 @@ async function main() {
 
   const unclearEn = ninaUnclearIntentReply('en');
   assert(
-    /rephrase/i.test(unclearEn) && /Arcana/i.test(unclearEn),
-    'unclear EN asks to rephrase + Arcana'
+    /riformul/i.test(unclearEn) && /Arcano/i.test(unclearEn),
+    'unclear EN client still Italian (ENN-188)'
   );
-  assertNoProviderLeak(unclearEn, 'unclear EN');
+  assertNoProviderLeak(unclearEn, 'unclear EN→IT');
 
   const outage = ninaSoftOutageCopy('it');
   assertNoProviderLeak(outage.unavailable, 'outage.unavailable');

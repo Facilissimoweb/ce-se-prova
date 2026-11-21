@@ -103,8 +103,8 @@ const welcomeZh = buildNinaSystemPrompt({
   lang: 'zh-CN',
 });
 assert(
-  welcomeZh.includes('中文') && welcomeZh.includes('zh-cn'),
-  'welcome prompt instructs Chinese reply for zh-CN'
+  /Rispondi sempre in italiano/i.test(welcomeZh),
+  'welcome zh-CN still forces Italian (ENN-188)'
 );
 assert(
   !welcomeZh.includes('### 0. Il Matto'),
@@ -118,8 +118,14 @@ const studioEn = buildNinaSystemPrompt({
   lang: 'en',
 });
 assert(
-  studioEn.includes('English') && studioEn.includes('### 0. Il Matto'),
-  'studio EN still injects Maggiori + reply-lang suffix'
+  /Rispondi sempre in italiano/i.test(studioEn) &&
+    studioEn.includes('### 0. Il Matto'),
+  'studio EN injects Maggiori + Italian-only (ENN-188)'
+);
+assert(
+  welcomePrices.includes('una voce per riga') ||
+    welcomePrices.includes('elenco markdown'),
+  'welcome instructs markdown bullet lists for prices'
 );
 
 assert(

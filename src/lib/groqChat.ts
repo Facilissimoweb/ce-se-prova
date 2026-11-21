@@ -9,11 +9,7 @@ import {
   buildMaggioriKnowledgeForMessages,
   NINA_CHAT_SITE_KNOWLEDGE,
 } from './ninaChatKnowledge.ts';
-import {
-  isNinaDefaultLang,
-  normalizeNinaLang,
-  ninaReplyLangLabel,
-} from './ninaReplyLang.ts';
+// ENN-188: Nina is Italian-only — no googtrans / reply-lang suffix.
 
 export const GROQ_CHAT_ENV_KEY = 'TAROTITALIACHATGENERICAGROQ_API_KEY';
 export const GROQ_CHAT_DEFAULT_MODEL = 'openai/gpt-oss-20b'; // was llama-3.1-8b-instant (retired 2026-08-16)
@@ -51,7 +47,12 @@ Limiti (obbligatori) — Nina Studio è un altro prodotto:
 
 Formato messaggio (obbligatorio — mobile-friendly):
 - Paragrafi brevi (1–3 frasi), riga vuota tra paragrafi. **Grassetto** con moderazione. Niente HTML.
-- Quando inviti al contatto, rimanda a **Parla con Maria Teresa** sotto la chat (niente elenchi di bottoni nel messaggio).`;
+- Prezzi e opzioni: elenco markdown con **una voce per riga** (\`- **Consulto Breve** · …\`), mai un unico paragrafo con trattini.
+- Quando inviti al contatto, rimanda a **Parla con Maria Teresa** sotto la chat (niente elenchi di bottoni nel messaggio).
+
+## Lingua (obbligatoria — ENN-188)
+**Rispondi sempre in italiano.** Ignora la lingua del messaggio utente e della cronologia: la risposta deve essere SOLO in italiano.
+I nomi «Tarot Italia», «Maria Teresa Rogani», «Nina», «Nina Studio», «Arcani Maggiori», «Dialogo Tarot», «Parla con Maria Teresa» e i prezzi in EUR restano invariati.`;
 
 const NINA_STUDIO_PERSONA = `Sei **Nina Studio**, la compagnia di studio degli Arcani Maggiori di Tarot Italia — riservata a chi ha acquistato il corso **Arcani Maggiori**.
 
@@ -77,25 +78,18 @@ Limiti (obbligatori):
 
 Formato messaggio (obbligatorio — mobile-friendly):
 - Paragrafi brevi; per Maggiori puoi usare i quattro campi didattici in forma breve.
-- **Grassetto** con moderazione. Niente HTML. CTA contatto → sezione **Parla con Maria Teresa** sotto la chat.`;
+- Prezzi e opzioni: elenco markdown con **una voce per riga** (\`- **…** · …\`).
+- **Grassetto** con moderazione. Niente HTML. CTA contatto → sezione **Parla con Maria Teresa** sotto la chat.
 
-function ninaReplyLanguageSuffix(lang?: string): string {
-  if (isNinaDefaultLang(lang)) return '';
-  const code = normalizeNinaLang(lang);
-  const label = ninaReplyLangLabel(code);
-  return `
-
-## Lingua di risposta (ENN-143 · Google Translate)
-L’utente sta navigando il sito nella lingua di Google Traduttore: **${label}** (\`${code}\`).
-Rispondi SEMPRE e SOLO in ${label}. Se la cronologia ha messaggi in un’altra lingua, ignorane la lingua: la navigazione googtrans ha priorità assoluta sulla lingua di risposta.
-La conoscenza ufficiale sopra resta in italiano come fonte (prezzi, FAQ, Maggiori): traducila fedelmente nella risposta senza inventare e senza riscrivere/ripetere l’intero blocco conoscenza in un’altra lingua nel system prompt.
-I nomi «Tarot Italia», «Maria Teresa Rogani», «Nina», «Nina Studio», «Arcani Maggiori», «Dialogo Tarot» e i prezzi in EUR restano invariati.`;
-}
+## Lingua (obbligatoria — ENN-188)
+**Rispondi sempre in italiano.** Ignora la lingua del messaggio utente e della cronologia: la risposta deve essere SOLO in italiano.
+I nomi «Tarot Italia», «Maria Teresa Rogani», «Nina», «Nina Studio», «Arcani Maggiori», «Dialogo Tarot», «Parla con Maria Teresa» e i prezzi in EUR restano invariati.`;
 
 /**
  * Build Nina system prompt for one turn.
  * - welcome: site FAQ only — no Maggiori card inject (ENN-137)
  * - studio: FAQ + on-demand Maggiori cards (ENN-138)
+ * - ENN-188: Italian-only — `lang` is ignored (kept for API compat).
  */
 export function buildNinaSystemPrompt(params: {
   message: string;
@@ -103,6 +97,7 @@ export function buildNinaSystemPrompt(params: {
   lang?: string;
   mode?: NinaChatMode;
 }): string {
+  void params.lang;
   const mode: NinaChatMode = params.mode === 'studio' ? 'studio' : 'welcome';
   const persona =
     mode === 'studio' ? NINA_STUDIO_PERSONA : NINA_WELCOME_PERSONA;
@@ -110,7 +105,7 @@ export function buildNinaSystemPrompt(params: {
   if (mode === 'welcome') {
     return `${persona}
 
-${NINA_CHAT_SITE_KNOWLEDGE}${ninaReplyLanguageSuffix(params.lang)}`;
+${NINA_CHAT_SITE_KNOWLEDGE}`;
   }
 
   const maggiori = buildMaggioriKnowledgeForMessages({
@@ -121,7 +116,7 @@ ${NINA_CHAT_SITE_KNOWLEDGE}${ninaReplyLanguageSuffix(params.lang)}`;
 
 ${NINA_CHAT_SITE_KNOWLEDGE}
 
-${maggiori}${ninaReplyLanguageSuffix(params.lang)}`;
+${maggiori}`;
 }
 
 /**

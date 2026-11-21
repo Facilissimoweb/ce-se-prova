@@ -108,8 +108,8 @@ const studioEn = buildNinaSystemPrompt({
   lang: 'en',
 });
 assert(
-  studioEn.includes('English') && /Diavolo/i.test(studioEn),
-  'studio EN keeps Diavolo inject + reply-lang (ENN-143)'
+  /Rispondi sempre in italiano/i.test(studioEn) && /Diavolo/i.test(studioEn),
+  'studio EN keeps Diavolo inject + Italian-only (ENN-188)'
 );
 
 console.log('\n--- sizes ---');

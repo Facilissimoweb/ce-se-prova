@@ -1,7 +1,8 @@
 /**
- * Nina reply language from Google Translate (`googtrans` / `#googtrans`).
- * Knowledge stays Italian; the model (and deterministic soft-lock copy) answer
- * in the active browsing language (ENN-143).
+ * Nina reply language helpers.
+ * ENN-188 (launch): chat soft-lock / gate / unclear / outage are Italian-only.
+ * `normalizeNinaLang` / `ninaReplyLangLabel` remain for PDF/dispensa (not Nina chat).
+ * Multi-lang maps kept dormant for post-launch GT restore — do not wire into chat.
  */
 
 /** Native labels for prompt instructions — keys are normalized lowercase. */
@@ -161,10 +162,10 @@ const SOFT_LOCK_BY_LANG: Record<string, string> = {
   ko: SOFT_LOCK_KO,
 };
 
-/** Deterministic welcome soft-lock when deep Maggiori is asked (ENN-137 / ENN-143). */
-export function ninaStudioSoftLockReply(lang?: string | null): string {
-  const code = normalizeNinaLang(lang);
-  return SOFT_LOCK_BY_LANG[code] || SOFT_LOCK_BY_LANG[code.split('-')[0]] || SOFT_LOCK_EN;
+/** Deterministic welcome soft-lock when deep Maggiori is asked (ENN-137). ENN-188: always IT. */
+export function ninaStudioSoftLockReply(_lang?: string | null): string {
+  void _lang;
+  return SOFT_LOCK_IT;
 }
 
 type GateCopy = {
@@ -272,9 +273,10 @@ const GATE_BY_LANG: Record<string, GateCopy> = {
   ja: GATE_JA,
 };
 
-export function ninaStudioGateCopy(lang?: string | null): GateCopy {
-  const code = normalizeNinaLang(lang);
-  return GATE_BY_LANG[code] || GATE_BY_LANG[code.split('-')[0]] || GATE_EN;
+/** ENN-188: always Italian gate copy (lang ignored). */
+export function ninaStudioGateCopy(_lang?: string | null): GateCopy {
+  void _lang;
+  return GATE_IT;
 }
 
 /**
@@ -341,14 +343,10 @@ const UNCLEAR_BY_LANG: Record<string, string> = {
   ja: UNCLEAR_JA,
 };
 
-/** User-facing Nina reply when intent is unclear or the model returned empty/confused. */
-export function ninaUnclearIntentReply(lang?: string | null): string {
-  const code = normalizeNinaLang(lang);
-  return (
-    UNCLEAR_BY_LANG[code] ||
-    UNCLEAR_BY_LANG[code.split('-')[0]] ||
-    UNCLEAR_EN
-  );
+/** User-facing Nina reply when intent is unclear or the model returned empty/confused. ENN-188: always IT. */
+export function ninaUnclearIntentReply(_lang?: string | null): string {
+  void _lang;
+  return UNCLEAR_IT;
 }
 
 /** Soft outage copy — no provider/env names (those stay in Maria’s server logs). */
@@ -411,9 +409,10 @@ const OUTAGE_BY_LANG: Record<string, SoftOutageCopy> = {
   de: OUTAGE_DE,
 };
 
-export function ninaSoftOutageCopy(lang?: string | null): SoftOutageCopy {
-  const code = normalizeNinaLang(lang);
-  return OUTAGE_BY_LANG[code] || OUTAGE_BY_LANG[code.split('-')[0]] || OUTAGE_EN;
+/** ENN-188: always Italian outage copy (lang ignored). */
+export function ninaSoftOutageCopy(_lang?: string | null): SoftOutageCopy {
+  void _lang;
+  return OUTAGE_IT;
 }
 
 /**
