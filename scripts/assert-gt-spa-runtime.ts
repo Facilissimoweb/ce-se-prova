@@ -80,24 +80,25 @@ assert(screenFromHash('#corsi') === 'corsi', 'screen corsi');
 assert(sectionIdFromHash('#didattica') === 'home-didattica', 'section didattica');
 assert(normalizeHash('#Corsi') === 'corsi', 'normalize');
 
-// ENN-180 — non-IT hash must win over a stale /it/it cookie (combo blank-nudge).
+// ENN-180 — non-IT hash preference kept in source (active when GT_ENABLED).
 assert(
   runtime.includes('fromHash') &&
     runtime.includes('fromCookie') &&
     /fromHash\s*&&\s*fromHash\s*!==\s*GT_PAGE_LANG/.test(runtime),
   'readGoogTransLang prefers non-IT hash over cookie'
 );
+// ENN-185 launch freeze: live reads stay Italian even with leftover googtrans.
 withGoogtransDom('googtrans=/it/it', '#googtrans(it|ja)', () => {
   assert(
-    readGoogTransLang() === 'ja',
-    'stale /it/it cookie + ja hash → ja (ENN-180)'
+    readGoogTransLang() === 'it',
+    'freeze: stale cookie + ja hash → it (ENN-185)'
   );
 });
 withGoogtransDom('googtrans=/it/en', '', () => {
-  assert(readGoogTransLang() === 'en', 'cookie-only en still works');
+  assert(readGoogTransLang() === 'it', 'freeze: cookie-only en → it (ENN-185)');
 });
 withGoogtransDom('', '#googtrans(it|zh-CN)', () => {
-  assert(readGoogTransLang() === 'zh-CN', 'hash-only zh-CN');
+  assert(readGoogTransLang() === 'it', 'freeze: hash-only zh-CN → it (ENN-185)');
 });
 
 // ENN-184 — SPA lang switch harden (no non-IT location.reload).

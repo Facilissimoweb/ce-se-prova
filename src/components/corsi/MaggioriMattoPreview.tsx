@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { MaterialsLanguagePicker } from '../MaterialsLanguagePicker';
 import { PaymentTrustCues } from '../PaymentTrustCues';
+import { GT_ENABLED } from '../../lib/googleTranslateEnabled';
 import { DispensaFlashcards } from '../reserved/DispensaFlashcards';
 import { DispensaSchedaVisiva } from '../reserved/DispensaSchedaVisiva';
 import { FormattedDispensaBody } from '../reserved/FormattedDispensaBody';
@@ -176,8 +177,9 @@ export function MaggioriMattoPreview({
             <div className="flex flex-col items-stretch sm:items-end gap-2 shrink-0">
               <MaterialsLanguagePicker />
               <p className="text-[11px] text-[#A39B93] max-w-[16rem] sm:text-right">
-                Dopo l&apos;iscrizione: PDF brandizzato nella lingua di Traduci
-                (auto da italiano).
+                {GT_ENABLED
+                  ? 'Dopo l’iscrizione: PDF brandizzato nella lingua di Traduci (auto da italiano).'
+                  : 'Dopo l’iscrizione: PDF brandizzato in italiano.'}
               </p>
               <div className="flex flex-wrap gap-2">
                 <button
