@@ -96,17 +96,33 @@ export function isGoogtransHash(hash: string): boolean {
   return key.startsWith('googtrans');
 }
 
-/** Read active GT target from cookie or hash; default Italian source. */
+/**
+ * Read active GT target from cookie or hash; default Italian source.
+ *
+ * Prefer `#googtrans(it|xx)` when it advertises a non-IT target: Traduci SPA
+ * writes hash + cookie together, but TranslateElement combo blank-nudges can
+ * flicker the cookie back to `/it/it` while the hash (and often the visible
+ * page) still say the browsing language. Cookie-first made Nina send `lang=it`
+ * and keep prior-IT history after Traduci (ENN-180).
+ */
 export function readGoogTransLang(): string {
-  const cookie = document.cookie.match(/(?:^|;\s*)googtrans=([^;]*)/);
-  if (cookie?.[1]) {
-    const fromCookie = parseGoogtransTarget(cookie[1]);
-    if (fromCookie) return normalizeGoogTransLang(fromCookie);
-  }
+  let fromHash: string | null = null;
   const hash = window.location.hash.match(
     /googtrans\(([^|)]+)\|([^)]+)\)/i
   );
-  if (hash?.[2]) return normalizeGoogTransLang(hash[2]);
+  if (hash?.[2]) fromHash = normalizeGoogTransLang(hash[2]);
+
+  let fromCookie: string | null = null;
+  const cookie = document.cookie.match(/(?:^|;\s*)googtrans=([^;]*)/);
+  if (cookie?.[1]) {
+    const parsed = parseGoogtransTarget(cookie[1]);
+    if (parsed) fromCookie = normalizeGoogTransLang(parsed);
+  }
+
+  if (fromHash && fromHash !== GT_PAGE_LANG) return fromHash;
+  if (fromCookie && fromCookie !== GT_PAGE_LANG) return fromCookie;
+  if (fromHash) return fromHash;
+  if (fromCookie) return fromCookie;
   return GT_PAGE_LANG;
 }
 

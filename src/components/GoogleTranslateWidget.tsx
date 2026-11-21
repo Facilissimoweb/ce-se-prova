@@ -388,8 +388,13 @@ function BrandedLanguageMenu({
     setOpen(false);
     const live = readGoogTransLang();
     if (code === live) {
-      // Cookie/hash already match — sync UI if it drifted, skip reload.
+      // Cookie/hash already match — still notify + nudge so Nina / chrome
+      // re-sync if they drifted (ENN-180), without a full apply/reload.
       if (code !== current) setCurrent(code);
+      if (code !== GT_PAGE_LANG) {
+        notifyGoogleTranslateRefresh();
+        requestGoogleTranslateRefresh(40);
+      }
       return;
     }
     setSwitching(true);

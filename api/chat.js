@@ -11700,7 +11700,8 @@ function ninaReplyLanguageSuffix(lang) {
 
 ## Lingua di risposta (ENN-143 \xB7 Google Translate)
 L\u2019utente sta navigando il sito nella lingua di Google Traduttore: **${label}** (\`${code}\`).
-Rispondi SEMPRE in ${label}. La conoscenza ufficiale sopra resta in italiano come fonte (prezzi, FAQ, Maggiori): traducila fedelmente nella risposta senza inventare e senza riscrivere/ripetere l\u2019intero blocco conoscenza in un\u2019altra lingua nel system prompt.
+Rispondi SEMPRE e SOLO in ${label}. Se la cronologia ha messaggi in un\u2019altra lingua, ignorane la lingua: la navigazione googtrans ha priorit\xE0 assoluta sulla lingua di risposta.
+La conoscenza ufficiale sopra resta in italiano come fonte (prezzi, FAQ, Maggiori): traducila fedelmente nella risposta senza inventare e senza riscrivere/ripetere l\u2019intero blocco conoscenza in un\u2019altra lingua nel system prompt.
 I nomi \xABTarot Italia\xBB, \xABMaria Teresa Rogani\xBB, \xABNina\xBB, \xABNina Studio\xBB, \xABArcani Maggiori\xBB, \xABDialogo Tarot\xBB e i prezzi in EUR restano invariati.`;
 }
 function buildNinaSystemPrompt(params) {
