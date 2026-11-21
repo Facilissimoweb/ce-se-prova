@@ -8,7 +8,7 @@ export type StripeCheckoutSession = {
   metadata?: Record<string, string> | null;
   amount_total?: number | null;
   currency?: string | null;
-  error?: { message?: string };
+  error?: { message?: string; code?: string; type?: string };
 };
 
 export type StripeLineItem =
@@ -23,17 +23,92 @@ export type StripeLineItem =
       quantity?: number;
     };
 
-function stripeSecretKey(): string | null {
+/** Why STRIPE_SECRET_KEY cannot create Checkout Sessions (null = usable). */
+export type StripeSecretKeyIssue = 'missing' | 'publishable' | 'invalid';
+
+/**
+ * Client-safe copy when Production has pk_… (or Stripe returns secret_key_required).
+ * No secret values — only what Maria must fix in Vercel.
+ */
+export const STRIPE_SECRET_KEY_CLIENT_ERROR =
+  'Configurazione Stripe non valida: STRIPE_SECRET_KEY in Vercel Production deve essere una Secret key (sk_live_… / sk_test_…) o Restricted key (rk_live_…), non una Publishable key (pk_…). Aggiorna la variabile e fai Redeploy.';
+
+export const STRIPE_KEY_PERMISSION_CLIENT_ERROR =
+  'Chiave Stripe Restricted senza permesso Checkout Sessions (write). Usa sk_live_… oppure amplia i permessi della rk_live_…, poi Redeploy.';
+
+export function diagnoseStripeSecretKey(): StripeSecretKeyIssue | null {
   const key = process.env.STRIPE_SECRET_KEY?.trim();
   if (!key || key.startsWith('MY_') || key.length < 10) {
+    return 'missing';
+  }
+  if (key.startsWith('pk_')) {
+    return 'publishable';
+  }
+  if (key.startsWith('sk_') || key.startsWith('rk_')) {
     return null;
   }
-  return key;
+  return 'invalid';
 }
 
-/** True when a real Stripe secret key is configured. */
+function stripeSecretKey(): string | null {
+  if (diagnoseStripeSecretKey() !== null) {
+    return null;
+  }
+  return process.env.STRIPE_SECRET_KEY!.trim();
+}
+
+/** True when a real Stripe secret/restricted key is configured (not pk_…). */
 export function isStripeConfigured(): boolean {
   return Boolean(stripeSecretKey());
+}
+
+/**
+ * Map Stripe config / API auth failures to a client JSON response.
+ * Returns null for unrelated errors (caller keeps using mapSafeError).
+ */
+export function stripeCheckoutClientError(
+  error: unknown
+): { status: number; error: string } | null {
+  const msg = error instanceof Error ? error.message : '';
+  if (
+    msg === 'STRIPE_SECRET_KEY_PUBLISHABLE' ||
+    msg === 'STRIPE_SECRET_KEY_REQUIRED' ||
+    msg === 'STRIPE_SECRET_KEY_INVALID'
+  ) {
+    return { status: 400, error: STRIPE_SECRET_KEY_CLIENT_ERROR };
+  }
+  if (msg === 'STRIPE_KEY_PERMISSION') {
+    return { status: 403, error: STRIPE_KEY_PERMISSION_CLIENT_ERROR };
+  }
+  return null;
+}
+
+function throwFromStripeCheckoutError(
+  error: StripeCheckoutSession['error'] | undefined
+): never {
+  const code = (error?.code || '').toLowerCase();
+  const message = (error?.message || '').toLowerCase();
+  if (
+    code === 'secret_key_required' ||
+    message.includes('secret_key_required') ||
+    (message.includes('secret key') && message.includes('required'))
+  ) {
+    throw new Error('STRIPE_SECRET_KEY_REQUIRED');
+  }
+  if (
+    code === 'api_key_expired' ||
+    message.includes('invalid api key') ||
+    message.includes('invalid api_key')
+  ) {
+    throw new Error('STRIPE_SECRET_KEY_INVALID');
+  }
+  if (
+    message.includes('restricted') &&
+    (message.includes('permission') || message.includes('does not have'))
+  ) {
+    throw new Error('STRIPE_KEY_PERMISSION');
+  }
+  throw new Error('STRIPE_CHECKOUT_CREATE_FAILED');
 }
 
 /**
@@ -65,6 +140,13 @@ export async function createCheckoutSession(params: {
   lineItem: StripeLineItem;
   metadata: Record<string, string>;
 }): Promise<{ id: string; url: string }> {
+  const keyIssue = diagnoseStripeSecretKey();
+  if (keyIssue === 'publishable') {
+    throw new Error('STRIPE_SECRET_KEY_PUBLISHABLE');
+  }
+  if (keyIssue === 'invalid') {
+    throw new Error('STRIPE_SECRET_KEY_INVALID');
+  }
   const stripeKey = stripeSecretKey();
   if (!stripeKey) {
     throw new Error('STRIPE_NOT_CONFIGURED');
@@ -116,7 +198,7 @@ export async function createCheckoutSession(params: {
   const stripeData = (await stripeRes.json()) as StripeCheckoutSession;
   if (!stripeRes.ok || !stripeData.id || !stripeData.url) {
     console.error('Stripe checkout session create failed:', stripeData.error);
-    throw new Error('STRIPE_CHECKOUT_CREATE_FAILED');
+    throwFromStripeCheckoutError(stripeData.error);
   }
 
   return { id: stripeData.id, url: stripeData.url };
@@ -125,6 +207,13 @@ export async function createCheckoutSession(params: {
 export async function retrieveCheckoutSession(
   sessionId: string
 ): Promise<StripeCheckoutSession> {
+  const keyIssue = diagnoseStripeSecretKey();
+  if (keyIssue === 'publishable') {
+    throw new Error('STRIPE_SECRET_KEY_PUBLISHABLE');
+  }
+  if (keyIssue === 'invalid') {
+    throw new Error('STRIPE_SECRET_KEY_INVALID');
+  }
   const stripeKey = stripeSecretKey();
   if (!stripeKey) {
     throw new Error('STRIPE_NOT_CONFIGURED');
