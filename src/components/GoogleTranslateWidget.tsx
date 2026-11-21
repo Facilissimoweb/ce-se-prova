@@ -13,11 +13,13 @@ import {
 import {
   GT_HOST_ID,
   GT_PAGE_LANG,
+  applyGoogleTranslateSpaSwitch,
   clearGoogtransHash,
   expireGoogtransCookies,
   googleTranslateElementReady,
   notifyGoogleTranslateRefresh,
   readGoogTransLang,
+  registerGoogleTranslateHostRemount,
   requestGoogleTranslateRefresh,
   startGoogleTranslateSpaBridge,
   writeGoogtransCookie,
@@ -96,10 +98,11 @@ let spaBridgeStop: (() => void) | undefined;
  *
  * - IT: clear cookie/hash and **reload** so GT `<font>` nodes are purged
  *   (ENN-142 Italian restore).
- * - Other langs: write `/it/<code>` cookie + `#googtrans`, nudge the combo,
- *   and notify SPA listeners (Nina) — **no full reload**. ENN-142 freeze was
- *   from hash-only `location.replace` leaving the menu `aria-busy`; we unlock
- *   after notify/refresh instead of relying on navigation.
+ * - Other langs: write `/it/<code>` cookie + `#googtrans`, notify SPA listeners,
+ *   then {@link applyGoogleTranslateSpaSwitch} (wait/retry combo + remount
+ *   TranslateElement) — **no full reload** (ENN-184). ENN-142 freeze was from
+ *   hash-only `location.replace` leaving the menu `aria-busy`; we unlock after
+ *   the SPA switch settles instead of relying on navigation.
  *
  * `replaceState` does not fire `hashchange` — callers must use the return
  * value / `tarot:gt-refresh` (fired here) so ChatFab picks lang immediately.
@@ -134,14 +137,14 @@ export function applyGoogTransLang(code: string): 'reload' | 'spa' | 'noop' {
     `${path}#googtrans(${GT_PAGE_LANG}|${target})`
   );
   // Nina + Maggiori + booking listen for this; hashchange does not fire on replaceState.
-  // Late nudge (900ms): Area Personale remounts on GT_REFRESH before combo is ready.
   notifyGoogleTranslateRefresh();
-  requestGoogleTranslateRefresh(40);
+  // Hardened SPA path (ENN-184) — wait/retry combo; remount gadget if needed.
+  void applyGoogleTranslateSpaSwitch(target).finally(() => {
+    gtLangSwitchLock = false;
+  });
+  // Late refresh: Area Personale / Nina remount on GT_REFRESH before combo is ready.
   window.setTimeout(() => requestGoogleTranslateRefresh(220), 160);
   window.setTimeout(() => requestGoogleTranslateRefresh(900), 700);
-  window.setTimeout(() => {
-    gtLangSwitchLock = false;
-  }, 450);
   return 'spa';
 }
 
@@ -165,6 +168,7 @@ function ensureSpaBridge() {
   if (!spaBridgeStop) {
     spaBridgeStop = startGoogleTranslateSpaBridge();
   }
+  registerGoogleTranslateHostRemount(() => mountTranslateElement());
   requestGoogleTranslateRefresh(160);
 }
 
@@ -182,6 +186,7 @@ function mountTranslateElement() {
     },
     GT_HOST_ID
   );
+  registerGoogleTranslateHostRemount(() => mountTranslateElement());
   ensureSpaBridge();
   return true;
 }

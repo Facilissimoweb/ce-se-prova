@@ -1,5 +1,5 @@
 /**
- * ENN-148 / ENN-180 — googtrans hash helpers + readGoogTransLang priority.
+ * ENN-148 / ENN-180 / ENN-184 — googtrans hash helpers + SPA switch harden.
  * Run: npx tsx scripts/assert-gt-spa-runtime.ts
  */
 import { readFileSync } from 'node:fs';
@@ -18,6 +18,10 @@ import {
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const runtime = readFileSync(
   path.join(root, 'src/lib/googleTranslateRuntime.ts'),
+  'utf8'
+);
+const widget = readFileSync(
+  path.join(root, 'src/components/GoogleTranslateWidget.tsx'),
   'utf8'
 );
 
@@ -96,8 +100,45 @@ withGoogtransDom('', '#googtrans(it|zh-CN)', () => {
   assert(readGoogTransLang() === 'zh-CN', 'hash-only zh-CN');
 });
 
+// ENN-184 — SPA lang switch harden (no non-IT location.reload).
+assert(
+  runtime.includes('applyGoogleTranslateSpaSwitch') &&
+    runtime.includes('registerGoogleTranslateHostRemount') &&
+    runtime.includes('dispatchComboChange') &&
+    runtime.includes('InputEvent'),
+  'runtime exports SPA switch + remount + InputEvent combo fire'
+);
+assert(
+  runtime.includes('comboMissStreak') &&
+    /requestGoogleTranslateRefresh\(120\)/.test(runtime),
+  'reapply retries when .goog-te-combo is missing'
+);
+assert(
+  !/export async function applyGoogleTranslateSpaSwitch[\s\S]{0,1200}location\.reload/.test(
+    runtime
+  ),
+  'applyGoogleTranslateSpaSwitch never calls location.reload'
+);
+assert(
+  widget.includes('applyGoogleTranslateSpaSwitch') &&
+    widget.includes('registerGoogleTranslateHostRemount'),
+  'widget wires SPA switch + host remount'
+);
+assert(
+  /if\s*\(\s*target\s*===\s*GT_PAGE_LANG\s*\)[\s\S]{0,280}location\.reload\(\)/.test(
+    widget
+  ),
+  'IT restore still reloads'
+);
+assert(
+  !/writeGoogtransCookie\(target\);[\s\S]{0,400}window\.location\.reload\(\)/.test(
+    widget
+  ),
+  'non-IT applyGoogTransLang does not reload'
+);
+
 if (failed > 0) {
   console.error(`\n${failed} assertion(s) failed`);
   process.exit(1);
 }
-console.log('\nAll ENN-148 GT runtime assertions passed.');
+console.log('\nAll ENN-148 / ENN-184 GT runtime assertions passed.');
