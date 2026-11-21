@@ -8,6 +8,10 @@
  *
  * ENN-159 — cookie/hash targets are normalized via `normalizeGoogTransLang`
  * (zh-CN only; ar drives document RTL).
+ *
+ * ENN-184 — harden non-IT SPA lang switch: wait/retry for `.goog-te-combo`,
+ * fire bubbles InputEvent/change GT accepts, remount TranslateElement host
+ * if still failing — never `location.reload()` for non-IT.
  */
 
 import {
@@ -193,43 +197,249 @@ function notifyGtLayout(): void {
   window.dispatchEvent(new Event(GT_LAYOUT_EVENT));
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+/**
+ * Set select value the way browsers / TranslateElement expect, then fire
+ * bubbling input + change (plain `new Event('change')` is often ignored).
+ */
+function dispatchComboChange(
+  combo: HTMLSelectElement,
+  value: string
+): void {
+  const proto = Object.getOwnPropertyDescriptor(
+    HTMLSelectElement.prototype,
+    'value'
+  );
+  if (proto?.set) {
+    proto.set.call(combo, value);
+  } else {
+    combo.value = value;
+  }
+  // Keep property in sync when proto setter was a no-op on some embeds.
+  if (combo.value !== value) {
+    combo.value = value;
+  }
+
+  combo.dispatchEvent(new Event('input', { bubbles: true }));
+  try {
+    combo.dispatchEvent(
+      new InputEvent('input', { bubbles: true, composed: true, data: value })
+    );
+  } catch {
+    /* InputEvent unsupported — Event('input') above still fired */
+  }
+  combo.dispatchEvent(new Event('change', { bubbles: true }));
+
+  // Legacy HTMLEvents path some GT gadget builds still listen to.
+  try {
+    const legacy = document.createEvent('HTMLEvents');
+    legacy.initEvent('change', true, true);
+    combo.dispatchEvent(legacy);
+  } catch {
+    /* ignore */
+  }
+}
+
+function comboHasOption(combo: HTMLSelectElement, lang: string): boolean {
+  return Array.from(combo.options).some((opt) => opt.value === lang);
+}
+
+function pageLooksTranslated(lang: string): boolean {
+  const html = document.documentElement;
+  if (
+    html.classList.contains('translated-ltr') ||
+    html.classList.contains('translated-rtl')
+  ) {
+    return true;
+  }
+  // Fresh IT→xx: class can lag; combo already on target + any font under root.
+  const combo = comboSelect();
+  if (combo?.value === lang && document.querySelector('#root font, body font')) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Widget registers remount of hidden TranslateElement (clear host + new
+ * TranslateElement). Used when combo never appears or SPA switch stalls.
+ * Must NOT call location.reload.
+ */
+let remountTranslateHost: (() => boolean) | null = null;
+
+export function registerGoogleTranslateHostRemount(
+  remount: () => boolean
+): void {
+  remountTranslateHost = remount;
+}
+
+function tryRemountTranslateHost(): boolean {
+  if (!remountTranslateHost) return false;
+  try {
+    return Boolean(remountTranslateHost());
+  } catch {
+    return false;
+  }
+}
+
 let reapplyLockUntil = 0;
 let reapplyTimer: ReturnType<typeof setTimeout> | undefined;
 let spaBridgeStarted = false;
+/** Consecutive combo-misses from {@link reapplyGoogleTranslate} / refresh. */
+let comboMissStreak = 0;
+let spaSwitchGeneration = 0;
 
 /**
- * Re-trigger TranslateElement against the current DOM.
- * Prefer calling {@link requestGoogleTranslateRefresh} (debounced).
+ * Fire combo toward `lang`, blank-nudging when GT would ignore a same-value
+ * or cross-lang change.
  */
-export function reapplyGoogleTranslate(): boolean {
-  if (typeof window === 'undefined') return false;
-  const lang = ensureGoogtransPersisted();
-  if (lang === GT_PAGE_LANG) return false;
-
-  const combo = comboSelect();
-  if (!combo) return false;
-
+function fireComboToward(combo: HTMLSelectElement, lang: string): void {
   reapplyLockUntil = Date.now() + 1200;
-
-  const fire = (value: string) => {
-    combo.value = value;
-    combo.dispatchEvent(new Event('change'));
-  };
-
-  // Same-value change is often ignored — nudge via blank then restore.
-  if (combo.value === lang) {
-    fire('');
+  const prev = combo.value;
+  if (prev === lang || (prev && prev !== lang)) {
+    dispatchComboChange(combo, '');
     window.setTimeout(() => {
-      fire(lang);
+      const live = comboSelect() ?? combo;
+      dispatchComboChange(live, lang);
       window.setTimeout(notifyGtLayout, 120);
       window.setTimeout(notifyGtLayout, 400);
     }, 40);
   } else {
-    fire(lang);
+    dispatchComboChange(combo, lang);
     window.setTimeout(notifyGtLayout, 120);
     window.setTimeout(notifyGtLayout, 400);
   }
+}
+
+/**
+ * Re-trigger TranslateElement against the current DOM.
+ * Prefer calling {@link requestGoogleTranslateRefresh} (debounced).
+ * ENN-184: no silent miss — retry / remount when combo is absent.
+ */
+export function reapplyGoogleTranslate(): boolean {
+  if (typeof window === 'undefined') return false;
+  const lang = ensureGoogtransPersisted();
+  if (lang === GT_PAGE_LANG) {
+    comboMissStreak = 0;
+    return false;
+  }
+
+  const combo = comboSelect();
+  if (!combo || !comboHasOption(combo, lang)) {
+    comboMissStreak += 1;
+    if (comboMissStreak === 4) {
+      tryRemountTranslateHost();
+    }
+    if (comboMissStreak <= 10) {
+      requestGoogleTranslateRefresh(120);
+    } else {
+      comboMissStreak = 0;
+    }
+    return false;
+  }
+
+  comboMissStreak = 0;
+  fireComboToward(combo, lang);
   return true;
+}
+
+/**
+ * ENN-184 — non-IT Traduci without full reload: wait for combo, fire GT-accepted
+ * events, remount TranslateElement if still failing. Resolves true when combo
+ * settled on `target` (and preferably page shows translated chrome).
+ */
+export async function applyGoogleTranslateSpaSwitch(
+  target: string
+): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+  const lang = normalizeGoogTransLang(target);
+  if (lang === GT_PAGE_LANG) return false;
+
+  const gen = ++spaSwitchGeneration;
+  ensureGoogtransPersisted();
+  if (reapplyTimer !== undefined) {
+    clearTimeout(reapplyTimer);
+    reapplyTimer = undefined;
+  }
+
+  let remounted = false;
+  const deadline = Date.now() + 4500;
+
+  while (Date.now() < deadline) {
+    if (gen !== spaSwitchGeneration) return false;
+
+    let combo = comboSelect();
+    if (!combo || !comboHasOption(combo, lang)) {
+      if (!remounted) {
+        remounted = tryRemountTranslateHost();
+        await sleep(220);
+        continue;
+      }
+      await sleep(80);
+      continue;
+    }
+
+    // Always blank-nudge then set — cross-lang + same-value both need it.
+    dispatchComboChange(combo, '');
+    await sleep(50);
+    if (gen !== spaSwitchGeneration) return false;
+    combo = comboSelect() ?? combo;
+    // Cookie may flicker on blank nudge — re-assert target.
+    writeGoogtransCookie(lang);
+    dispatchComboChange(combo, lang);
+    await sleep(280);
+    if (gen !== spaSwitchGeneration) return false;
+
+    combo = comboSelect();
+    if (combo?.value === lang) {
+      if (pageLooksTranslated(lang)) {
+        notifyGtLayout();
+        window.setTimeout(notifyGtLayout, 200);
+        comboMissStreak = 0;
+        return true;
+      }
+      // Combo accepted; give GT a beat to wrap text.
+      await sleep(450);
+      if (gen !== spaSwitchGeneration) return false;
+      if (comboSelect()?.value === lang) {
+        notifyGtLayout();
+        comboMissStreak = 0;
+        // Accept combo match even if class lags (first IT→EN).
+        return true;
+      }
+    }
+
+    if (!remounted) {
+      ensureGoogtransPersisted();
+      remounted = tryRemountTranslateHost();
+      await sleep(280);
+      continue;
+    }
+
+    await sleep(120);
+  }
+
+  // Last ditch: remount + one fire (still no location.reload).
+  if (gen !== spaSwitchGeneration) return false;
+  ensureGoogtransPersisted();
+  tryRemountTranslateHost();
+  await sleep(320);
+  const last = comboSelect();
+  if (!last) return false;
+  dispatchComboChange(last, '');
+  await sleep(50);
+  writeGoogtransCookie(lang);
+  const live = comboSelect() ?? last;
+  dispatchComboChange(live, lang);
+  window.setTimeout(notifyGtLayout, 120);
+  window.setTimeout(notifyGtLayout, 400);
+  comboMissStreak = 0;
+  return comboSelect()?.value === lang;
 }
 
 /** Debounced refresh — route / auth / DOM landmarks. */
