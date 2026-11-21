@@ -147,6 +147,11 @@ assert(
   'Sigillo remounts Domanda/Risposta faces separately (ENN-162 — full GT both sides)'
 );
 assert(
+  /<button\b[^>]*\bkey=\{faceKey\}/.test(flash) ||
+    /key=\{faceKey\}[\s\S]{0,80}type="button"/.test(flash),
+  'Sigillo keys the card <button> (ENN-164 — not an inner div under GT-touched parent)'
+);
+assert(
   flash.includes('GtSafeBoundary'),
   'Sigillo face wrapped in GtSafeBoundary (ENN-162)'
 );

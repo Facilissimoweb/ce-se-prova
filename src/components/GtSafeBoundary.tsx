@@ -37,6 +37,14 @@ export class GtSafeBoundary extends React.Component<Props, State> {
     if (this.state.hasError) {
       return this.props.fallback ?? null;
     }
+    // Remount on resetKey so GT `<font>` wrappers are discarded (ENN-164).
+    if (this.props.resetKey !== undefined && this.props.resetKey !== null) {
+      return (
+        <React.Fragment key={String(this.props.resetKey)}>
+          {this.props.children}
+        </React.Fragment>
+      );
+    }
     return this.props.children;
   }
 }
