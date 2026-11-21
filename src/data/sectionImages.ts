@@ -16,22 +16,22 @@ export const TARIFF_SECTION_IMAGES: Record<ConsultationTariff['id'], SectionImag
   '20m': {
     src: consultoEssenzialeImg,
     alt: 'Singola carta dei Tarocchi bordata in oro su lino scuro per il Consulto Breve da venti minuti solo online',
-    caption: 'Consulto Breve · Solo online · Arcani Maggiori e Minori',
+    caption: 'Consulto Breve · Solo chiamata vocale WhatsApp · Arcani Maggiori e Minori',
   },
   '45m': {
     src: consultoEssenzialeImg,
     alt: 'Singola carta dei Tarocchi bordata in oro su lino scuro accanto a un candeliere in ottone battuto per il Consulto Essenziale',
-    caption: 'Consulto Essenziale · Più domande · Arcani Maggiori e Minori',
+    caption: 'Consulto Essenziale · Vocale o Studio Macerata · Arcani Maggiori e Minori',
   },
   '60m': {
     src: consultoEvolutivoImg,
     alt: 'Stesa a cinque carte su pietra scura con quaderno in pelle e penna stilografica in ottone per il Consulto Evolutivo Completo',
-    caption: 'Consulto Evolutivo · Arcani Maggiori e Minori',
+    caption: 'Consulto Evolutivo Completo · Il più scelto · Arcani Maggiori e Minori',
   },
   '90m': {
     src: consultoCicloImg,
     alt: 'Dodici carte dei Tarocchi disposte in ruota simmetrica attorno a un astrolabio in ottone e una candela accesa per la Sessione Integrata',
-    caption: 'Sessione Integrata · Arcani Maggiori e Minori · ciclo annuale',
+    caption: 'Sessione Integrata · Vocale o Studio Macerata · Arcani Maggiori e Minori',
   },
 };
 

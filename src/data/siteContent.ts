@@ -3,7 +3,6 @@ import type {
   ArcanaCard,
   ChatMessage,
   ClientTestimonial,
-  ConsultationTariff,
   DialoguePack,
   DisciplinaryCredential,
   EducationalCourse,
@@ -619,82 +618,8 @@ Assolutamente la consiglio!!!!`,
 ];
 
 
-export const consultationTariffs: ConsultationTariff[] = [
-  {
-    id: '20m',
-    durationMinutes: 20,
-    priceEur: 19,
-    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_20M',
-    cmsKeyTitle: '[COPY: tariffa.placeholder.0.title]',
-    title: 'Consulto Breve',
-    cmsKeyDesc: '[COPY: tariffa.placeholder.0.desc]',
-    description:
-      'Venti minuti solo online per una domanda chiara e un orientamento rapido, con lettura di Arcani Maggiori e Minori.',
-    cmsKeyFocus: '[COPY: tariffa.placeholder.0.focus]',
-    focusLabel: 'Solo online · Domanda rapida',
-    onlineOnly: true,
-    includes: [
-      '20 minuti di dialogo individuale solo online (chiamata vocale)',
-      'Lettura con Arcani Maggiori e Minori su un tema puntuale',
-      'Indicazioni pratiche via email o WhatsApp',
-    ],
-  },
-  {
-    id: '45m',
-    durationMinutes: 45,
-    priceEur: 50,
-    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_45M',
-    cmsKeyTitle: '[COPY: tariffa.placeholder.1.title]',
-    title: 'Consulto Essenziale',
-    cmsKeyDesc: '[COPY: tariffa.placeholder.1.desc]',
-    description:
-      'Un incontro mirato per approfondire più domande sul presente, con chiarezza simbolica ed equilibrio.',
-    cmsKeyFocus: '[COPY: tariffa.placeholder.1.focus]',
-    focusLabel: 'Più domande · Chiarezza immediata',
-    includes: [
-      '45 minuti di dialogo individuale (online o di persona)',
-      'Lettura con Arcani Maggiori e Minori su più domande',
-      'Sintesi scritta dei punti emersi via email o WhatsApp',
-    ],
-  },
-  {
-    id: '60m',
-    durationMinutes: 60,
-    priceEur: 75,
-    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_60M',
-    cmsKeyTitle: '[COPY: tariffa.placeholder.2.title]',
-    title: 'Consulto Evolutivo Completo',
-    cmsKeyDesc: '[COPY: tariffa.placeholder.2.desc]',
-    description:
-      'Il percorso consigliato per esplorare radici, risorse interiori e possibili direzioni di trasformazione consapevole.',
-    cmsKeyFocus: '[COPY: tariffa.placeholder.2.focus]',
-    focusLabel: 'Consigliato · Analisi approfondita',
-    includes: [
-      '60 minuti di sessione individuale in chiamata vocale o di persona a Macerata',
-      'Lettura combinata di Arcani Maggiori e Minori',
-      'Mappa delle domande maieutiche per le settimane successive',
-    ],
-    recommended: true,
-  },
-  {
-    id: '90m',
-    durationMinutes: 90,
-    priceEur: 90,
-    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_90M',
-    cmsKeyTitle: '[COPY: tariffa.placeholder.3.title]',
-    title: 'Sessione Integrata',
-    cmsKeyDesc: '[COPY: tariffa.placeholder.3.desc]',
-    description:
-      'Incontro esteso dedicato a momenti di svolta, bilanci di ciclo annuale o lavoro articolato su più ambiti di vita.',
-    cmsKeyFocus: '[COPY: tariffa.placeholder.3.focus]',
-    focusLabel: 'Ciclo annuale · Massima profondità',
-    includes: [
-      '90 minuti di dialogo olistico in chiamata vocale o di persona a Macerata',
-      'Lettura completa con Arcani Maggiori e Minori (dodici case o doppio confronto)',
-      'Follow-up scritto entro 48 ore tramite canale riservato',
-    ],
-  },
-];
+/** Re-export: canon packages live in `consultationTariffs.ts` (ENN-192). */
+export { consultationTariffs } from './consultationTariffs';
 
 export const consultiFaqs: HolisticFaqItem[] = [
   {

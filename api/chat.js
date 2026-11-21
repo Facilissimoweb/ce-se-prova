@@ -13,6 +13,101 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
+// src/data/consultationTariffs.ts
+function consultTariffModality(tariff) {
+  if (tariff.onlineOnly) return "solo online (chiamata vocale WhatsApp)";
+  return "vocale o Studio Macerata (Via Crispi 37)";
+}
+function formatConsultTariffsMarkdownList() {
+  return consultationTariffs.map((t) => {
+    const badge = t.recommended ? " \xB7 **Il pi\xF9 scelto**" : "";
+    return `- **${t.title}** \xB7 ${t.durationMinutes} min \xB7 **\u20AC${t.priceEur}** \xB7 ${consultTariffModality(t)}${badge}`;
+  }).join("\n");
+}
+function formatConsultTariffsMarkdownDetails() {
+  return consultationTariffs.map((t) => {
+    const includes = t.includes.map((item) => item).join("; ");
+    return `- **${t.title}**: ${t.description} Include: ${includes}.`;
+  }).join("\n");
+}
+var consultationTariffs;
+var init_consultationTariffs = __esm({
+  "src/data/consultationTariffs.ts"() {
+    consultationTariffs = [
+      {
+        id: "20m",
+        durationMinutes: 20,
+        priceEur: 19,
+        stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_20M",
+        cmsKeyTitle: "[COPY: tariffa.placeholder.0.title]",
+        title: "Consulto Breve",
+        cmsKeyDesc: "[COPY: tariffa.placeholder.0.desc]",
+        description: "Una domanda precisa, una lettura mirata, chiarezza immediata. Quando hai un dubbio puntuale che richiede attenzione \u2014 su una relazione, su un\u2019attesa o su una scelta vicina \u2014 e desideri comprendere con lucidit\xE0 cosa si sta muovendo prima di agire.",
+        cmsKeyFocus: "[COPY: tariffa.placeholder.0.focus]",
+        focusLabel: "Solo chiamata vocale WhatsApp",
+        onlineOnly: true,
+        includes: [
+          "Ci concentriamo su un unico tema attraverso i 78 Arcani, andando all\u2019essenza con ascolto e precisione",
+          "Dopo: una visione chiara della situazione e 2\u20133 indicazioni pratiche via WhatsApp o email",
+          "Indicato se desideri fare luce su una singola questione in modo rapido e accessibile (non adatto a pi\xF9 temi insieme)"
+        ]
+      },
+      {
+        id: "45m",
+        durationMinutes: 45,
+        priceEur: 50,
+        stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_45M",
+        cmsKeyTitle: "[COPY: tariffa.placeholder.1.title]",
+        title: "Consulto Essenziale",
+        cmsKeyDesc: "[COPY: tariffa.placeholder.1.desc]",
+        description: "Per fare ordine quando hai due o tre questioni aperte e vuoi orientare bene le tue energie. Quando una risposta veloce non basta perch\xE9 gli ambiti coinvolti sono pi\xF9 d\u2019uno \u2014 ad esempio affetti e lavoro, oppure una decisione importante da prendere con equilibrio e senza fretta.",
+        cmsKeyFocus: "[COPY: tariffa.placeholder.1.focus]",
+        focusLabel: "Vocale o Studio Macerata (Via Crispi 37)",
+        includes: [
+          "Osserviamo le situazioni collegate tra loro, mettendo a fuoco dinamiche, ostacoli e possibilit\xE0 concrete del presente",
+          "Dopo: una sintesi scritta dei punti principali emersi, da rileggere con calma",
+          "Indicato se cerchi chiarezza concreta su pi\xF9 aspetti della quotidianit\xE0 in un tempo raccolto ed equilibrato"
+        ]
+      },
+      {
+        id: "60m",
+        durationMinutes: 60,
+        priceEur: 75,
+        stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_60M",
+        cmsKeyTitle: "[COPY: tariffa.placeholder.2.title]",
+        title: "Consulto Evolutivo Completo",
+        cmsKeyDesc: "[COPY: tariffa.placeholder.2.desc]",
+        description: "Per comprendere le radici di ci\xF2 che vivi e ritrovare una direzione consapevole. Quando avverti che una dinamica si ripete \u2014 nelle relazioni, nel percorso professionale o nelle scelte personali \u2014 e desideri osservare con onest\xE0 sia il contesto esterno sia il tuo spazio di azione.",
+        cmsKeyFocus: "[COPY: tariffa.placeholder.2.focus]",
+        focusLabel: "Il pi\xF9 scelto \xB7 Vocale o Studio Macerata",
+        includes: [
+          "Un\u2019ora intera, senza fretta, per approfondire le cause profonde, riconoscere i punti ciechi e individuare le strade pi\xF9 autentiche",
+          "Dopo: una sintesi della lettura insieme a tracce di riflessione pratiche per le settimane successive",
+          "Indicato se desideri una lettura profonda e rispettosa che ti accompagni a scegliere con consapevolezza e autonomia"
+        ],
+        recommended: true
+      },
+      {
+        id: "90m",
+        durationMinutes: 90,
+        priceEur: 90,
+        stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_90M",
+        cmsKeyTitle: "[COPY: tariffa.placeholder.3.title]",
+        title: "Sessione Integrata",
+        cmsKeyDesc: "[COPY: tariffa.placeholder.3.desc]",
+        description: "Un\u2019ora e mezza dedicata a rimettere insieme tutti i fili e guardare con respiro al percorso che ti attende. Ideale quando stai chiudendo una fase impegnativa, iniziando un nuovo capitolo o senti il bisogno di esplorare insieme relazioni, lavoro, risorse personali e direzione generale senza frammentare il lavoro.",
+        cmsKeyFocus: "[COPY: tariffa.placeholder.3.focus]",
+        focusLabel: "Vocale o Studio Macerata (Via Crispi 37)",
+        includes: [
+          "Un incontro ampio e approfondito che abbraccia pi\xF9 ambiti della vita e definisce le priorit\xE0 dei prossimi mesi",
+          "Dopo: riscontro scritto entro 48 ore su un canale riservato, per fissare i passaggi chiave a mente serena",
+          "Indicato se desideri un lavoro completo in un unico spazio dedicato, con il miglior equilibrio tra tempo, profondit\xE0 e investimento"
+        ]
+      }
+    ];
+  }
+});
+
 // node_modules/drizzle-orm/entity.js
 function is(value, type) {
   if (!value || typeof value !== "object") {
@@ -9515,37 +9610,20 @@ function resolveBookingTariff(tariffId) {
 var BOOKING_TARIFF_CATALOG;
 var init_paymentCatalog = __esm({
   "src/lib/paymentCatalog.ts"() {
-    BOOKING_TARIFF_CATALOG = {
-      "20m": {
-        id: "20m",
-        title: "Consulto Breve",
-        durationMinutes: 20,
-        priceEur: 19,
-        stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_20M",
-        onlineOnly: true
-      },
-      "45m": {
-        id: "45m",
-        title: "Consulto Essenziale",
-        durationMinutes: 45,
-        priceEur: 50,
-        stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_45M"
-      },
-      "60m": {
-        id: "60m",
-        title: "Consulto Evolutivo Completo",
-        durationMinutes: 60,
-        priceEur: 75,
-        stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_60M"
-      },
-      "90m": {
-        id: "90m",
-        title: "Sessione Integrata",
-        durationMinutes: 90,
-        priceEur: 90,
-        stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_90M"
-      }
-    };
+    init_consultationTariffs();
+    BOOKING_TARIFF_CATALOG = Object.fromEntries(
+      consultationTariffs.map((t) => [
+        t.id,
+        {
+          id: t.id,
+          title: t.title,
+          durationMinutes: t.durationMinutes,
+          priceEur: t.priceEur,
+          stripePriceIdAnnotation: t.stripePriceIdAnnotation,
+          ...t.onlineOnly ? { onlineOnly: true } : {}
+        }
+      ])
+    );
   }
 });
 
@@ -10893,6 +10971,12 @@ var init_repository = __esm({
   }
 });
 
+// src/lib/groqChat.ts
+init_consultationTariffs();
+
+// src/lib/ninaChatKnowledge.ts
+init_consultationTariffs();
+
 // src/data/ninaMaggioriCards.generated.ts
 var NINA_MAGGIORI_CARDS_GENERATED = [
   {
@@ -11195,10 +11279,11 @@ function looksLikeNinaProviderLeak(text2) {
 }
 
 // src/lib/ninaChatKnowledge.ts
+var CONSULT_PRICE_LIST = consultationTariffs.map((t) => `\u20AC${t.priceEur}`).join(" / ");
 var NINA_CHAT_SITE_KNOWLEDGE = `Conoscenza ufficiale del sito (fonte: copy pubblico Tarot Italia \u2014 usa SOLO questi fatti; stile FAQ breve e caldo; per prezzi e FAQ cita le risposte qui sotto, senza inventare):
 
 ## Consulti \u2014 introduzione ufficiale
-Quattro durate calibrate per profondit\xE0 differenti. In ogni sessione leggo Arcani Maggiori e Minori: online in chiamata vocale riservata, oppure di persona a Macerata (Via Crispi 37) su appuntamento \u2014 il Consulto Breve \xE8 solo online.
+Quattro durate calibrate per profondit\xE0 differenti. In ogni sessione leggo Arcani Maggiori e Minori: online in chiamata vocale riservata, oppure di persona a Macerata (Via Crispi 37) su appuntamento \u2014 il Consulto Breve \xE8 solo online (chiamata vocale WhatsApp).
 
 Accoglienza: Che tu arrivi con una domanda immediata e sincera \u2014 anche semplice o legata agli affetti, come \xABMi pensa?\xBB \u2014 o con il bisogno di fare chiarezza su un passaggio complesso, i miei consulti nascono per trasformare il caos in cosmos. Integro la lettura viva della cartomanzia pura con la tarologia evolutiva attraverso tutti i 78 Arcani, Maggiori e Minori.
 
@@ -11206,32 +11291,26 @@ Non \xE8 richiesta alcuna conoscenza preliminare delle carte: ti guido passo dop
 
 Etica consulti: ogni consulto offre una lettura chiara del presente e delle tendenze future nel rispetto del libero arbitrio. Nessuna promessa miracolistica o sostituzione di pareri medici e legali.
 
-## Tariffe consulti (prezzi correnti, EUR)
+## Tariffe consulti (prezzi correnti, EUR, IVA inclusa)
 In **ogni** sessione Maria Teresa legge **Arcani Maggiori e Minori**.
 Quando elenchi le tariffe in chat, usa SEMPRE un elenco markdown con **una riga per voce** (mai un paragrafo unico con trattini):
 
-- **Consulto Breve** \xB7 20 min \xB7 **\u20AC19** \xB7 **solo online** (chiamata vocale) \xB7 Domanda rapida
-- **Consulto Essenziale** \xB7 45 min \xB7 **\u20AC50** \xB7 online o di persona \xB7 Pi\xF9 domande \xB7 Chiarezza immediata
-- **Consulto Evolutivo Completo** \xB7 60 min \xB7 **\u20AC75** \xB7 online o di persona a Macerata \xB7 Consigliato
-- **Sessione Integrata** \xB7 90 min \xB7 **\u20AC90** \xB7 online o di persona a Macerata \xB7 Ciclo annuale \xB7 Massima profondit\xE0
+${formatConsultTariffsMarkdownList()}
 
 Dettaglio (usa solo se chiesto; in elenco resta una riga per voce):
-- **Consulto Breve**: venti minuti solo online per una domanda chiara; Include: 20 min dialogo solo online (chiamata vocale); lettura Maggiori e Minori su un tema puntuale; indicazioni via email o WhatsApp.
-- **Consulto Essenziale**: incontro mirato su pi\xF9 domande; Include: 45 min (online o di persona); lettura Maggiori e Minori; sintesi scritta via email o WhatsApp.
-- **Consulto Evolutivo Completo**: percorso consigliato (radici, risorse, direzioni); Include: 60 min in chiamata o di persona a Macerata; lettura combinata Maggiori e Minori; mappa domande maieutiche.
-- **Sessione Integrata**: svolta / bilancio annuale; Include: 90 min olistici (chiamata o Macerata); lettura completa Maggiori e Minori; follow-up scritto entro 48 ore.
+${formatConsultTariffsMarkdownDetails()}
 
 ## Modalit\xE0, orari e sedute (Europe/Rome)
 - Slot pubblici tipici: dalle 09:00 alle 20:00.
 - Online = chiamata vocale riservata (WhatsApp).
 - Di persona: Via Crispi 37, 62100 Macerata, su appuntamento \u2014 disponibili fino alle 18:00; **dalle 19:00 solo online**.
-- Il **Consulto Breve** non \xE8 disponibile di persona (solo online).
+- Il **Consulto Breve** non \xE8 disponibile di persona (solo chiamata vocale WhatsApp).
 
 ## Prenotazione e pagamento (copy Prenota)
 Scegli durata, giorno e orario: in ogni sessione Maria Teresa legge Arcani Maggiori e Minori. Paga online con Stripe Checkout sul sito; il consulto si svolge su WhatsApp. Il Consulto Breve \xE8 solo online.
 
 - Contatti pubblici: WhatsApp / Telegram / telefono 379 103 82 53 \xB7 email info@tarotitalia.com.
-- Checkout Stripe attivo per i consulti (\u20AC19 / \u20AC50 / \u20AC75 / \u20AC90). WhatsApp = canale del consulto, non del pagamento.
+- Checkout Stripe attivo per i consulti (${CONSULT_PRICE_LIST}). WhatsApp = canale del consulto, non del pagamento.
 
 ## Corsi / didattica (copy ufficiale pagina Corsi)
 Questa settimana in offerta pubblica solo Arcani Maggiori a \u20AC 69 (listino \u20AC 149 barrato; prima \u20AC 190). Include Nina Studio (chat riservata di studio) a vita. Arcani Minori e Metodi di Stesura non sono in vendita pubblica \u2014 restano in preparazione (nascosti dal catalogo pubblico).
@@ -11385,6 +11464,8 @@ var NINA_CHAT_MAGGIORI_KNOWLEDGE = buildAllMaggioriKnowledge();
 var GROQ_CHAT_ENV_KEY = "TAROTITALIACHATGENERICAGROQ_API_KEY";
 var GROQ_CHAT_DEFAULT_MODEL = "openai/gpt-oss-20b";
 var GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions";
+var CONSULT_PRICE_SLASH = consultationTariffs.map((t) => `\u20AC${t.priceEur}`).join(" / ");
+var CONSULT_PRICE_COMPACT = consultationTariffs.map((t) => t.priceEur).join("/");
 var NINA_WELCOME_PERSONA = `Sei Nina, l\u2019assistente virtuale di **accoglienza** di Tarot Italia (tarotitalia.com) \u2014 chat pubblica e gratuita.
 
 Questa modalit\xE0 si chiama **Nina \xB7 Accoglienza** (non \xABNina Studio\xBB).
@@ -11394,8 +11475,8 @@ Tono e stile:
 - Ti presenti come Nina (accoglienza del sito), non come Maria Teresa in carne e ossa.
 
 Cosa puoi fare (solo questo):
-- Prezzi consulti ufficiali **\u20AC19 / \u20AC50 / \u20AC75 / \u20AC90**; Breve **solo online**; Maggiori e Minori in ogni sessione.
-- Modalit\xE0 di pagamento consulti: **Stripe Checkout** sul sito (\u20AC19/50/75/90); WhatsApp \xE8 il canale del consulto, non del pagamento.
+- Prezzi consulti ufficiali **${CONSULT_PRICE_SLASH}**; Breve **solo online** (chiamata vocale WhatsApp); Maggiori e Minori in ogni sessione; Evolutivo Completo = **Il pi\xF9 scelto**.
+- Modalit\xE0 di pagamento consulti: **Stripe Checkout** sul sito (\u20AC${CONSULT_PRICE_COMPACT}); WhatsApp \xE8 il canale del consulto, non del pagamento.
 - Mappa del sito e orientamento alle pagine pubbliche.
 - Sintesi leggera di **Chi sono** (formazione / Operatore Olistico L. 4/2013) \u2014 senza biografia inventata.
 - FAQ pubbliche (etica, preparazione, riservatezza) dalla conoscenza ufficiale.

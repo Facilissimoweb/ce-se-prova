@@ -1,6 +1,9 @@
 /**
  * Server-side payment catalogs. Never trust client-supplied price/duration.
+ * Booking tariffs derive from the shared `consultationTariffs` canon (ENN-192).
  */
+
+import { consultationTariffs } from '../data/consultationTariffs';
 
 export type BookingTariffId = '20m' | '45m' | '60m' | '90m';
 
@@ -15,37 +18,29 @@ export const BOOKING_TARIFF_CATALOG: Record<
     /** Se true, solo chiamata vocale online (niente studio di persona). */
     onlineOnly?: boolean;
   }
-> = {
-  '20m': {
-    id: '20m',
-    title: 'Consulto Breve',
-    durationMinutes: 20,
-    priceEur: 19,
-    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_20M',
-    onlineOnly: true,
-  },
-  '45m': {
-    id: '45m',
-    title: 'Consulto Essenziale',
-    durationMinutes: 45,
-    priceEur: 50,
-    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_45M',
-  },
-  '60m': {
-    id: '60m',
-    title: 'Consulto Evolutivo Completo',
-    durationMinutes: 60,
-    priceEur: 75,
-    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_60M',
-  },
-  '90m': {
-    id: '90m',
-    title: 'Sessione Integrata',
-    durationMinutes: 90,
-    priceEur: 90,
-    stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_90M',
-  },
-};
+> = Object.fromEntries(
+  consultationTariffs.map((t) => [
+    t.id,
+    {
+      id: t.id,
+      title: t.title,
+      durationMinutes: t.durationMinutes,
+      priceEur: t.priceEur,
+      stripePriceIdAnnotation: t.stripePriceIdAnnotation,
+      ...(t.onlineOnly ? { onlineOnly: true } : {}),
+    },
+  ])
+) as Record<
+  BookingTariffId,
+  {
+    id: BookingTariffId;
+    title: string;
+    durationMinutes: number;
+    priceEur: number;
+    stripePriceIdAnnotation: string;
+    onlineOnly?: boolean;
+  }
+>;
 
 export function resolveBookingTariff(tariffId: string) {
   if (

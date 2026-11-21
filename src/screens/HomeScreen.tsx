@@ -332,10 +332,10 @@ export function HomeScreen({
                     </span>
                     <span className="text-[#A39B93]">
                       {tariff.recommended
-                        ? 'Percorso Consigliato'
+                        ? 'Il più scelto'
                         : tariff.onlineOnly
                           ? 'Solo Online'
-                          : 'Individuale'}
+                          : 'Vocale o Studio'}
                     </span>
                   </div>
 
