@@ -420,9 +420,7 @@ export function App() {
         <TopBar
           activeScreen={topBarScreen}
           onNavigate={handleNavigate}
-          onOpenHandoff={() => setIsHandoffOpen(true)}
           onOpenPrivacy={() => setIsPrivacyOpen(true)}
-          showCmsKeys={showCmsKeys}
         />
 
         <main className="flex-1 w-full max-w-6xl mx-auto px-5 md:px-8 lg:px-12 pb-[max(6rem,env(safe-area-inset-bottom))] relative z-10">
