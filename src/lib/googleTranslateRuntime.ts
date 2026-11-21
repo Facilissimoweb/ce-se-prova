@@ -18,6 +18,7 @@ import {
   applyGtDocumentChrome,
   normalizeGoogTransLang,
 } from './gtLangCodes';
+import { GT_ENABLED } from './googleTranslateEnabled';
 
 export const GT_PAGE_LANG = 'it';
 export const GT_HOST_ID = 'tarot_italia_google_translate_host';
@@ -110,6 +111,9 @@ export function isGoogtransHash(hash: string): boolean {
  * and keep prior-IT history after Traduci (ENN-180).
  */
 export function readGoogTransLang(): string {
+  // ENN-185 launch freeze — Italian-only for Nina / PDF / chrome consumers.
+  if (!GT_ENABLED) return GT_PAGE_LANG;
+
   let fromHash: string | null = null;
   const hash = window.location.hash.match(
     /googtrans\(([^|)]+)\|([^)]+)\)/i
@@ -131,6 +135,7 @@ export function readGoogTransLang(): string {
 }
 
 export function writeGoogtransCookie(target: string): void {
+  if (!GT_ENABLED) return;
   expireGoogtransCookies();
   const canonical = normalizeGoogTransLang(target);
   const value = `/${GT_PAGE_LANG}/${canonical}`;
@@ -150,6 +155,7 @@ export function writeGoogtransCookie(target: string): void {
  * login and route changes. Empty when browsing Italian (or no cookie).
  */
 export function preservedGoogtransHash(): string {
+  if (!GT_ENABLED) return '';
   if (typeof window === 'undefined') return '';
   try {
     if (isGoogtransHash(window.location.hash)) {
@@ -170,7 +176,7 @@ export function preservedGoogtransHash(): string {
 export function ensureGoogtransPersisted(): string {
   const lang = readGoogTransLang();
   applyGtDocumentChrome(lang);
-  if (lang === GT_PAGE_LANG) return lang;
+  if (!GT_ENABLED || lang === GT_PAGE_LANG) return lang;
   writeGoogtransCookie(lang);
   const want = `#googtrans(${GT_PAGE_LANG}|${lang})`;
   // Rewrite hash when a legacy target (e.g. zh-TW) was normalized to zh-CN.
@@ -322,7 +328,7 @@ function fireComboToward(combo: HTMLSelectElement, lang: string): void {
  * ENN-184: no silent miss — retry / remount when combo is absent.
  */
 export function reapplyGoogleTranslate(): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined' || !GT_ENABLED) return false;
   const lang = ensureGoogtransPersisted();
   if (lang === GT_PAGE_LANG) {
     comboMissStreak = 0;
@@ -356,7 +362,7 @@ export function reapplyGoogleTranslate(): boolean {
 export async function applyGoogleTranslateSpaSwitch(
   target: string
 ): Promise<boolean> {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined' || !GT_ENABLED) return false;
   const lang = normalizeGoogTransLang(target);
   if (lang === GT_PAGE_LANG) return false;
 
@@ -444,7 +450,7 @@ export async function applyGoogleTranslateSpaSwitch(
 
 /** Debounced refresh — route / auth / DOM landmarks. */
 export function requestGoogleTranslateRefresh(delayMs = 120): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined' || !GT_ENABLED) return;
   if (readGoogTransLang() === GT_PAGE_LANG) return;
   if (reapplyTimer !== undefined) clearTimeout(reapplyTimer);
   reapplyTimer = setTimeout(() => {
@@ -497,7 +503,7 @@ function mutationLooksLikeAppContent(mutations: MutationRecord[]): boolean {
  * meaningful React mounts. Idempotent; returns disposer.
  */
 export function startGoogleTranslateSpaBridge(): () => void {
-  if (typeof window === 'undefined') return () => undefined;
+  if (typeof window === 'undefined' || !GT_ENABLED) return () => undefined;
   if (spaBridgeStarted) return () => undefined;
   spaBridgeStarted = true;
 

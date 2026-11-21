@@ -13,6 +13,7 @@
     "test:nina-studio": "npx tsx scripts/assert-nina-studio-split.ts && npx tsx scripts/assert-nina-maggiori-source.ts",
     "test:nina-chat-gt": "npx tsx scripts/assert-nina-chat-gt.ts",
     "test:gt-codes-ui": "npx tsx scripts/assert-gt-codes-ui.ts",
+    "test:gt-freeze": "npx tsx scripts/assert-gt-freeze.ts",
     "test:booking-lang-notice": "npx tsx scripts/assert-booking-lang-notice.ts",
     "seo:generate": "node scripts/generate-seo-assets.mjs",
     "preview": "vite preview",

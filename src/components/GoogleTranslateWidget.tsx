@@ -10,6 +10,7 @@ import {
   applyGtDocumentChrome,
   normalizeGoogTransLang,
 } from '../lib/gtLangCodes';
+import { GT_ENABLED } from '../lib/googleTranslateEnabled';
 import {
   GT_HOST_ID,
   GT_PAGE_LANG,
@@ -108,6 +109,7 @@ let spaBridgeStop: (() => void) | undefined;
  * value / `tarot:gt-refresh` (fired here) so ChatFab picks lang immediately.
  */
 export function applyGoogTransLang(code: string): 'reload' | 'spa' | 'noop' {
+  if (!GT_ENABLED) return 'noop';
   if (gtLangSwitchLock) return 'noop';
   gtLangSwitchLock = true;
 
@@ -204,6 +206,8 @@ function unloadGoogleTranslate() {
 }
 
 function injectGoogleTranslate() {
+  // ENN-185 — launch freeze: never load translate.google.com.
+  if (!GT_ENABLED) return;
   // Keep react-i18next DOM source Italian so GT does not double-translate overlays.
   void setSiteLanguage('it');
 
@@ -572,7 +576,16 @@ export function GoogleTranslateWidget({
     null
   );
 
+  // ENN-185 — purge leftover googtrans so returning visitors stay Italian-only.
   useEffect(() => {
+    if (GT_ENABLED) return;
+    if (variant !== 'header') return;
+    unloadGoogleTranslate();
+    applyGtDocumentChrome(GT_PAGE_LANG);
+  }, [variant]);
+
+  useEffect(() => {
+    if (!GT_ENABLED) return;
     const prefs = loadSavedCookiePreferences();
     setMarketingAllowed(Boolean(prefs?.marketing));
     return subscribeCookieConsent((next) => {
@@ -581,6 +594,7 @@ export function GoogleTranslateWidget({
   }, []);
 
   useEffect(() => {
+    if (!GT_ENABLED) return;
     // Only the header instance owns the GT script lifecycle (drawer is UI-only).
     if (variant !== 'header') return;
     // null = consent not read yet — never unload/clear googtrans during this gap.
@@ -591,6 +605,9 @@ export function GoogleTranslateWidget({
     }
     unloadGoogleTranslate();
   }, [marketingAllowed, variant]);
+
+  // Launch freeze: hide Traduci (header + drawer) — code kept for re-enable.
+  if (!GT_ENABLED) return null;
 
   if (marketingAllowed === null) {
     if (variant === 'drawer') return null;
