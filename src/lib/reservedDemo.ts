@@ -43,8 +43,8 @@ const DEMO_COURSE_SEEDS: DemoCourseSeed[] = [
     title: 'Arcani Maggiori',
     subtitle: 'Primo Step · Tre Settenari da 0 a XXI · Presente e Previsione',
     description:
-      'Dispensa formativa completa del Primo Step: mappa dei Tre Settenari, studio dei 22 Trionfi dal Matto al Mondo, schede visive e Sigillo.',
-    priceEur: 190,
+      'I 22 Trionfi da 0 a XXI: dispense, schede Waite-Smith, Sigillo — e Nina Studio inclusa a vita.',
+    priceEur: 69,
     lessonsCount: 4,
     totalHours: 'dispense + Sigillo',
     levelLabel: 'Livello Base e Intermedio',

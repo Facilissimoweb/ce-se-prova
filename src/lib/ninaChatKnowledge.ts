@@ -54,8 +54,8 @@ Scegli durata, giorno e orario: in ogni sessione Maria Teresa legge Arcani Maggi
 - Checkout Stripe attivo per i consulti (€19 / €50 / €75 / €90). WhatsApp = canale del consulto, non del pagamento.
 
 ## Corsi / didattica (copy ufficiale pagina Corsi)
-Pagina Corsi attiva: tre percorsi acquistabili singolarmente — Arcani Maggiori (€ 190), Arcani Minori (€ 210), Metodi di Stesura (€ 240).
-Catalogo, programma e form iscrizione sono disponibili su /corsi. I materiali didattici dettagliati possono ancora essere in distribuzione progressiva («Didattica in arrivo» sulle card).
+Pagina Corsi attiva (lancio): percorso acquistabile ora — Arcani Maggiori a € 69 (listino € 149 barrato; prima € 190). Include Nina Studio (chat riservata di studio) a vita. Arcani Minori (€ 210) e Metodi di Stesura (€ 240) restano in catalogo ma sono differiti al pubblico.
+Catalogo, programma e form iscrizione Maggiori su /corsi. Rate Klarna possibili in Stripe Checkout; pagamento sicuro via Stripe.
 Non inventare date di partenza o promozioni non presenti sul sito; per prezzi e iscrizione rinvia alla pagina Corsi o a «Parla con Maria Teresa».
 
 ## FAQ Home — Domande Frequenti su Approccio ed Etica
@@ -102,7 +102,7 @@ Spazio interattivo sul sito con i 22 Arcani Maggiori (riflessione guidata). Non 
 - **Chi sono** — percorso di Maria Teresa Rogani
 - **Consulti** — tariffe e modalità
 - **Dialogo Tarot** — percorso interattivo 22 Maggiori (separato da Nina)
-- **Corsi** — Maggiori (€190), Minori (€210), Metodi di Stesura (€240); checkout Maggiori su /corsi
+- **Corsi** — Maggiori €69 (listino €149 barrato) + Nina Studio; checkout su /corsi. Minori/Metodi differiti.
 - **Blog / News** — articoli (alcuni approfondimenti Maggiori riservati ai corsisti)
 - **Contatti** — email, telefono, mappa Macerata
 - **Prenota** — slot + pagamento Stripe Checkout; consulto su WhatsApp

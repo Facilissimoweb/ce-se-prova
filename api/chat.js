@@ -9177,8 +9177,8 @@ var init_seedData = __esm({
         slug: "arcani-maggiori",
         title: "Arcani Maggiori",
         subtitle: "Primo Step \xB7 Tre Settenari da 0 a XXI \xB7 Presente e Previsione",
-        description: "Dispensa formativa completa del Primo Step: mappa dei Tre Settenari, studio dei 22 Trionfi dal Matto al Mondo, visioni multiple, schede visive, Sigillo flashcard ed esercizi di verifica.",
-        priceEur: 190,
+        description: "I 22 Trionfi da 0 a XXI: dispense, schede Waite-Smith, Sigillo \u2014 e Nina Studio (chat riservata di studio) inclusa a vita.",
+        priceEur: 69,
         stripePriceId: process.env.STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI || "STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI",
         lessonsCount: 4,
         totalHours: "dispense + Sigillo",
@@ -11463,8 +11463,8 @@ Scegli durata, giorno e orario: in ogni sessione Maria Teresa legge Arcani Maggi
 - Checkout Stripe attivo per i consulti (\u20AC19 / \u20AC50 / \u20AC75 / \u20AC90). WhatsApp = canale del consulto, non del pagamento.
 
 ## Corsi / didattica (copy ufficiale pagina Corsi)
-Pagina Corsi attiva: tre percorsi acquistabili singolarmente \u2014 Arcani Maggiori (\u20AC 190), Arcani Minori (\u20AC 210), Metodi di Stesura (\u20AC 240).
-Catalogo, programma e form iscrizione sono disponibili su /corsi. I materiali didattici dettagliati possono ancora essere in distribuzione progressiva (\xABDidattica in arrivo\xBB sulle card).
+Pagina Corsi attiva (lancio): percorso acquistabile ora \u2014 Arcani Maggiori a \u20AC 69 (listino \u20AC 149 barrato; prima \u20AC 190). Include Nina Studio (chat riservata di studio) a vita. Arcani Minori (\u20AC 210) e Metodi di Stesura (\u20AC 240) restano in catalogo ma sono differiti al pubblico.
+Catalogo, programma e form iscrizione Maggiori su /corsi. Rate Klarna possibili in Stripe Checkout; pagamento sicuro via Stripe.
 Non inventare date di partenza o promozioni non presenti sul sito; per prezzi e iscrizione rinvia alla pagina Corsi o a \xABParla con Maria Teresa\xBB.
 
 ## FAQ Home \u2014 Domande Frequenti su Approccio ed Etica
@@ -11511,7 +11511,7 @@ Spazio interattivo sul sito con i 22 Arcani Maggiori (riflessione guidata). Non 
 - **Chi sono** \u2014 percorso di Maria Teresa Rogani
 - **Consulti** \u2014 tariffe e modalit\xE0
 - **Dialogo Tarot** \u2014 percorso interattivo 22 Maggiori (separato da Nina)
-- **Corsi** \u2014 Maggiori (\u20AC190), Minori (\u20AC210), Metodi di Stesura (\u20AC240); checkout Maggiori su /corsi
+- **Corsi** \u2014 Maggiori \u20AC69 (listino \u20AC149 barrato) + Nina Studio; checkout su /corsi. Minori/Metodi differiti.
 - **Blog / News** \u2014 articoli (alcuni approfondimenti Maggiori riservati ai corsisti)
 - **Contatti** \u2014 email, telefono, mappa Macerata
 - **Prenota** \u2014 slot + pagamento Stripe Checkout; consulto su WhatsApp

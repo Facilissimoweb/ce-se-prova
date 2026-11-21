@@ -753,18 +753,19 @@ export const educationalCourses: EducationalCourse[] = [
     subtitle: 'Il Viaggio Archetipico da 0 a XXI · Presente e Previsione',
     cmsKeyDesc: '[COPY: corso.placeholder.1.desc]',
     description:
-      'Primo Step completo sui 22 Trionfi: dispense formative, schede visive Waite-Smith, visioni multiple (simbologia, senso profondo, luce/ombra, presente e previsione) e domande di apprendimento con il Sigillo flashcard.',
-    priceEur: 190,
+      'I 22 Trionfi da 0 a XXI: dispense, schede Waite-Smith, Sigillo flashcard — e Nina Studio, la chat riservata di studio per i corsisti.',
+    priceEur: 69,
+    compareAtPriceEur: 149,
     stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI',
     lessonsCount: 4,
     totalHours: 'dispense + Sigillo',
     levelLabel: 'Livello Base e Intermedio',
-    formatLabel: 'Dispense interattive + Schede visive + Sigillo · PDF in arrivo',
+    formatLabel: 'Dispense interattive + Schede visive + Sigillo · Nina Studio',
     includes: [
-      '4 moduli con dispense formative sui 22 Trionfi (da 0 a XXI) e laboratorio di verifica',
-      'Schede visive Waite-Smith e Sigillo flashcard con domande di apprendimento',
-      'Visioni multiple per ogni lama: simbologia, senso profondo, luce/ombra, presente e previsione',
-      'Manuale PDF illustrato con schede archetipiche e parole chiave',
+      '4 moduli sui 22 Trionfi (da 0 a XXI) con Sigillo di verifica',
+      'Schede Waite-Smith: simbologia, senso, luce/ombra, previsione',
+      'Nina Studio: chat riservata di studio Maggiori (inclusa a vita)',
+      'Manuale PDF illustrato con schede archetipiche (in arrivo)',
     ],
     modules: [
       {

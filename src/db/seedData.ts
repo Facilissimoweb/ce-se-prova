@@ -28,8 +28,8 @@ export const COURSE_SEED_CATALOG: CourseSeedEntry[] = [
     title: 'Arcani Maggiori',
     subtitle: 'Primo Step · Tre Settenari da 0 a XXI · Presente e Previsione',
     description:
-      'Dispensa formativa completa del Primo Step: mappa dei Tre Settenari, studio dei 22 Trionfi dal Matto al Mondo, visioni multiple, schede visive, Sigillo flashcard ed esercizi di verifica.',
-    priceEur: 190,
+      'I 22 Trionfi da 0 a XXI: dispense, schede Waite-Smith, Sigillo — e Nina Studio (chat riservata di studio) inclusa a vita.',
+    priceEur: 69,
     stripePriceId:
       process.env.STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI ||
       'STRIPE_PRICE_ID_CORSO_ARCANI_MAGGIORI',

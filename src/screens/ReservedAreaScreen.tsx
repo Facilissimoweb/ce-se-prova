@@ -16,8 +16,15 @@ import type { CourseId, ScreenId } from '../types/handoff';
 import { useAuth } from '../context/AuthContext';
 import { CheckoutReturnBanner } from '../components/CheckoutReturnBanner';
 import { MaterialsLanguagePicker } from '../components/MaterialsLanguagePicker';
-import { PaymentTrustCues } from '../components/PaymentTrustCues';
+import {
+  CourseOfferPrice,
+  PaymentTrustCues,
+} from '../components/PaymentTrustCues';
+import { educationalCourses } from '../data/siteContent';
 import { FormattedDispensaBody } from '../components/reserved/FormattedDispensaBody';
+
+const MAGGIORI_COMPARE_AT_EUR =
+  educationalCourses.find((c) => c.id === 'arcani-maggiori')?.compareAtPriceEur;
 import { DispensaFlashcards } from '../components/reserved/DispensaFlashcards';
 import { DispensaSchedaVisiva } from '../components/reserved/DispensaSchedaVisiva';
 import { ReservedLoginGate } from '../components/reserved/ReservedLoginGate';
@@ -416,7 +423,16 @@ export function ReservedAreaScreen({
                         </>
                       ) : (
                         <>
-                          <Lock className="w-3.5 h-3.5" /> € {course.priceEur}
+                          <Lock className="w-3.5 h-3.5" />
+                          {course.slug === 'arcani-maggiori' ? (
+                            <CourseOfferPrice
+                              priceEur={course.priceEur}
+                              compareAtPriceEur={MAGGIORI_COMPARE_AT_EUR}
+                              size="sm"
+                            />
+                          ) : (
+                            <>€ {course.priceEur}</>
+                          )}
                         </>
                       )}
                     </span>
@@ -736,13 +752,23 @@ export function ReservedAreaScreen({
                       {activeCourse.title} · {activeCourse.dispenseCount} Moduli
                     </h2>
                   </div>
-                  <span className="font-display text-2xl text-[#D4AF37] tabular-nums">
-                    € {activeCourse.priceEur}
-                  </span>
+                  {activeCourse.slug === 'arcani-maggiori' ? (
+                    <CourseOfferPrice
+                      priceEur={activeCourse.priceEur}
+                      compareAtPriceEur={MAGGIORI_COMPARE_AT_EUR}
+                      size="md"
+                    />
+                  ) : (
+                    <span className="font-display text-2xl text-[#D4AF37] tabular-nums">
+                      € {activeCourse.priceEur}
+                    </span>
+                  )}
                 </div>
 
                 <p className="text-sm leading-relaxed text-[#A39B93]">
-                  {activeCourse.description}
+                  {activeCourse.slug === 'arcani-maggiori'
+                    ? 'Dispense Maggiori, Sigillo e Nina Studio (chat riservata di studio) — accesso perpetuo dopo il pagamento.'
+                    : activeCourse.description}
                 </p>
 
                 <div className="space-y-3 pt-1">
@@ -830,7 +856,11 @@ export function ReservedAreaScreen({
                       : `Paga e sblocca (€ ${activeCourse.priceEur})`}
                   </button>
 
-                  <PaymentTrustCues compact />
+                  {activeCourse.slug === 'arcani-maggiori' ? (
+                    <PaymentTrustCues compact prominent />
+                  ) : (
+                    <PaymentTrustCues compact />
+                  )}
 
                   <button
                     type="button"
