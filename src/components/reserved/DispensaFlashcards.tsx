@@ -123,33 +123,33 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
           </button>
         }
       >
+        {/*
+          ENN-164 — key the <button> itself (not an inner div). An inner remount
+          inserts fresh IT nodes into a GT-touched parent that TranslateElement
+          often skips; replacing the whole card face forces a re-scan (Q2+).
+        */}
         <button
+          key={faceKey}
           type="button"
           onClick={() => setFlipped((v) => !v)}
           aria-pressed={flipped}
           className="group relative w-full min-h-[200px] md:min-h-[240px] rounded-2xl border border-[#D4AF37]/35 bg-gradient-to-br from-[#1A1615] to-[#0E0C0B] px-5 py-6 text-left transition-all hover:border-[#D4AF37] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
         >
-          {/*
-            Keyed face remount: Domanda and Risposta are separate DOM trees so
-            GT re-scans each side from Italian source (ENN-162).
-          */}
-          <div key={faceKey}>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]/90 mb-3">
-              {flipped ? 'Risposta' : 'Domanda'}
-            </p>
-            <h2
-              className={`flashcard-body-text normal-case ${
-                flipped ? 'flashcard-body-answer' : 'flashcard-body-question'
-              }`}
-            >
-              {flipped ? current.answer : current.question}
-            </h2>
-            <p className="mt-5 text-[11px] text-[#A39B93] group-hover:text-[#E6C65C] transition-colors">
-              {flipped
-                ? 'Tocca per tornare alla domanda'
-                : 'Tocca per rivelare la risposta'}
-            </p>
-          </div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]/90 mb-3">
+            {flipped ? 'Risposta' : 'Domanda'}
+          </p>
+          <h2
+            className={`flashcard-body-text normal-case ${
+              flipped ? 'flashcard-body-answer' : 'flashcard-body-question'
+            }`}
+          >
+            {flipped ? current.answer : current.question}
+          </h2>
+          <p className="mt-5 text-[11px] text-[#A39B93] group-hover:text-[#E6C65C] transition-colors">
+            {flipped
+              ? 'Tocca per tornare alla domanda'
+              : 'Tocca per rivelare la risposta'}
+          </p>
         </button>
       </GtSafeBoundary>
 
