@@ -6,12 +6,15 @@ import {
   educationalCourses,
   holisticFaqs,
 } from '../data/siteContent';
+import { isCoursePubliclyPresented } from '../lib/coursePresentation';
 import type {
   ConsultationTariff,
   EducationalCourse,
   HolisticFaqItem,
 } from '../types/handoff';
 import { DEFAULT_LANG, getSiteLanguage } from './index';
+
+export { isCoursePubliclyPresented } from '../lib/coursePresentation';
 
 export function useLocalizedTariffs(): ConsultationTariff[] {
   const { t, i18n } = useTranslation('catalog');
@@ -57,11 +60,6 @@ export function useLocalizedConsultiFaqs(): HolisticFaqItem[] {
       answer: t(`cfaq.${faq.id}.answer`, { defaultValue: faq.answer }),
     }));
   }, [t, i18n.language]);
-}
-
-/** ENN-174 — public Home/Corsi omit courses with publicPresented: false. */
-export function isCoursePubliclyPresented(course: EducationalCourse): boolean {
-  return course.publicPresented !== false;
 }
 
 /**

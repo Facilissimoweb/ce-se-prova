@@ -57,8 +57,9 @@ export interface EducationalCourse {
   modules: CourseModuleItem[];
   recommended?: boolean;
   /**
-   * ENN-174 — when false, course stays in data (Area Riservata / seeds) but is
-   * omitted from public Home / Corsi / checkout switchers. Default: presented.
+   * ENN-174 / ENN-175 — when false, course stays in data/seeds but is omitted
+   * from public Home / Corsi / checkout and from Area Personale / reserved
+   * overview course strips. Default: presented.
    */
   publicPresented?: boolean;
 }

@@ -8303,6 +8303,19 @@ var HOUR_SLOTS = Array.from(
 // src/lib/zohoMail.ts
 import nodemailer from "nodemailer";
 
+// src/lib/coursePresentation.ts
+var COURSE_PUBLIC_PRESENTED = {
+  "arcani-minori": false,
+  "metodi-stesura": false
+};
+function isCourseSlugPubliclyPresented(slug) {
+  const flagged = COURSE_PUBLIC_PRESENTED[slug];
+  return flagged !== false;
+}
+function filterPublicPresentedBySlug(courses2) {
+  return courses2.filter((c) => isCourseSlugPubliclyPresented(c.slug));
+}
+
 // src/db/repository.ts
 async function getOrCreateUser(uid, email, displayName) {
   try {
@@ -8368,35 +8381,40 @@ async function getReservedAreaOverview(uid, email, displayName) {
         displayName: dbUser.displayName,
         phoneWhatsapp: dbUser.phoneWhatsapp
       },
-      courses: allCourses.map((course) => {
-        const purchase = userPurchases.find((p) => p.courseId === course.id);
-        const isUnlocked = Boolean(purchase);
-        const outline = allOutlineDispense.filter((d) => d.courseId === course.id);
-        const fullDispense = unlockedDispenseRows.filter((d) => d.courseId === course.id).map((d) => {
-          const prog = progressByDispensaId.get(d.id);
-          let parsedTakeaways = [];
-          try {
-            parsedTakeaways = JSON.parse(d.keyTakeaways);
-          } catch {
-            parsedTakeaways = [];
-          }
+      // ENN-175 — Maggiori-only in Area Personale (same publicPresented flag).
+      courses: filterPublicPresentedBySlug(
+        allCourses.map((course) => {
+          const purchase = userPurchases.find((p) => p.courseId === course.id);
+          const isUnlocked = Boolean(purchase);
+          const outline = allOutlineDispense.filter(
+            (d) => d.courseId === course.id
+          );
+          const fullDispense = unlockedDispenseRows.filter((d) => d.courseId === course.id).map((d) => {
+            const prog = progressByDispensaId.get(d.id);
+            let parsedTakeaways = [];
+            try {
+              parsedTakeaways = JSON.parse(d.keyTakeaways);
+            } catch {
+              parsedTakeaways = [];
+            }
+            return {
+              ...d,
+              keyTakeaways: parsedTakeaways,
+              completed: prog?.completed ?? false,
+              personalNotes: prog?.personalNotes ?? ""
+            };
+          });
           return {
-            ...d,
-            keyTakeaways: parsedTakeaways,
-            completed: prog?.completed ?? false,
-            personalNotes: prog?.personalNotes ?? ""
+            ...course,
+            isUnlocked,
+            purchasedAt: purchase?.purchasedAt ?? null,
+            amountPaidEur: purchase?.amountPaidEur ?? null,
+            dispenseCount: outline.length,
+            dispenseOutline: outline,
+            unlockedDispense: fullDispense
           };
-        });
-        return {
-          ...course,
-          isUnlocked,
-          purchasedAt: purchase?.purchasedAt ?? null,
-          amountPaidEur: purchase?.amountPaidEur ?? null,
-          dispenseCount: outline.length,
-          dispenseOutline: outline,
-          unlockedDispense: fullDispense
-        };
-      }),
+        })
+      ),
       bookings: userBookings,
       dialoguePasses: userDialoguePasses.map((p) => ({
         id: p.id,
@@ -9425,34 +9443,37 @@ function degradedOverviewFromSeed(user) {
       displayName: user.name ?? null,
       phoneWhatsapp: null
     },
-    courses: COURSE_SEED_CATALOG.map((course, index2) => ({
-      id: -(index2 + 1),
-      slug: course.slug,
-      title: course.title,
-      subtitle: course.subtitle,
-      description: course.description,
-      priceEur: course.priceEur,
-      stripePriceId: course.stripePriceId,
-      lessonsCount: course.lessonsCount,
-      totalHours: course.totalHours,
-      levelLabel: course.levelLabel,
-      sortOrder: course.sortOrder,
-      isUnlocked: false,
-      purchasedAt: null,
-      amountPaidEur: null,
-      dispenseCount: course.dispense.length,
-      dispenseOutline: course.dispense.map((d, i) => ({
-        id: -(index2 * 100 + i + 1),
-        courseId: -(index2 + 1),
-        moduleNumber: d.moduleNumber,
-        title: d.title,
-        subtitle: d.subtitle,
-        format: d.format,
-        readingMinutes: d.readingMinutes,
-        sortOrder: i + 1
-      })),
-      unlockedDispense: []
-    })),
+    // ENN-175 — same Maggiori-only filter as live overview / public catalog.
+    courses: filterPublicPresentedBySlug(
+      COURSE_SEED_CATALOG.map((course, index2) => ({
+        id: -(index2 + 1),
+        slug: course.slug,
+        title: course.title,
+        subtitle: course.subtitle,
+        description: course.description,
+        priceEur: course.priceEur,
+        stripePriceId: course.stripePriceId,
+        lessonsCount: course.lessonsCount,
+        totalHours: course.totalHours,
+        levelLabel: course.levelLabel,
+        sortOrder: course.sortOrder,
+        isUnlocked: false,
+        purchasedAt: null,
+        amountPaidEur: null,
+        dispenseCount: course.dispense.length,
+        dispenseOutline: course.dispense.map((d, i) => ({
+          id: -(index2 * 100 + i + 1),
+          courseId: -(index2 + 1),
+          moduleNumber: d.moduleNumber,
+          title: d.title,
+          subtitle: d.subtitle,
+          format: d.format,
+          readingMinutes: d.readingMinutes,
+          sortOrder: i + 1
+        })),
+        unlockedDispense: []
+      }))
+    ),
     bookings: [],
     dialoguePasses: [],
     degraded: true,
@@ -9505,6 +9526,11 @@ async function postReservedEnroll(params) {
     const course = await findCourseBySlug(courseSlug);
     if (!course) {
       return json2(404, { error: "Percorso didattico non trovato." });
+    }
+    if (!stripeSessionId && !isCourseSlugPubliclyPresented(course.slug)) {
+      return json2(404, {
+        error: "Questo percorso non \xE8 ancora in offerta. Disponibile a breve: Arcani Maggiori."
+      });
     }
     if (stripeSessionId) {
       const result = await activateCourseFromPaidSession({

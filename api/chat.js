@@ -10085,6 +10085,24 @@ var init_bookingFulfillment = __esm({
   }
 });
 
+// src/lib/coursePresentation.ts
+function isCourseSlugPubliclyPresented(slug) {
+  const flagged = COURSE_PUBLIC_PRESENTED[slug];
+  return flagged !== false;
+}
+function filterPublicPresentedBySlug(courses2) {
+  return courses2.filter((c) => isCourseSlugPubliclyPresented(c.slug));
+}
+var COURSE_PUBLIC_PRESENTED;
+var init_coursePresentation = __esm({
+  "src/lib/coursePresentation.ts"() {
+    COURSE_PUBLIC_PRESENTED = {
+      "arcani-minori": false,
+      "metodi-stesura": false
+    };
+  }
+});
+
 // src/db/repository.ts
 var repository_exports = {};
 __export(repository_exports, {
@@ -10179,35 +10197,40 @@ async function getReservedAreaOverview(uid, email, displayName) {
         displayName: dbUser.displayName,
         phoneWhatsapp: dbUser.phoneWhatsapp
       },
-      courses: allCourses.map((course) => {
-        const purchase = userPurchases.find((p) => p.courseId === course.id);
-        const isUnlocked = Boolean(purchase);
-        const outline = allOutlineDispense.filter((d) => d.courseId === course.id);
-        const fullDispense = unlockedDispenseRows.filter((d) => d.courseId === course.id).map((d) => {
-          const prog = progressByDispensaId.get(d.id);
-          let parsedTakeaways = [];
-          try {
-            parsedTakeaways = JSON.parse(d.keyTakeaways);
-          } catch {
-            parsedTakeaways = [];
-          }
+      // ENN-175 — Maggiori-only in Area Personale (same publicPresented flag).
+      courses: filterPublicPresentedBySlug(
+        allCourses.map((course) => {
+          const purchase = userPurchases.find((p) => p.courseId === course.id);
+          const isUnlocked = Boolean(purchase);
+          const outline = allOutlineDispense.filter(
+            (d) => d.courseId === course.id
+          );
+          const fullDispense = unlockedDispenseRows.filter((d) => d.courseId === course.id).map((d) => {
+            const prog = progressByDispensaId.get(d.id);
+            let parsedTakeaways = [];
+            try {
+              parsedTakeaways = JSON.parse(d.keyTakeaways);
+            } catch {
+              parsedTakeaways = [];
+            }
+            return {
+              ...d,
+              keyTakeaways: parsedTakeaways,
+              completed: prog?.completed ?? false,
+              personalNotes: prog?.personalNotes ?? ""
+            };
+          });
           return {
-            ...d,
-            keyTakeaways: parsedTakeaways,
-            completed: prog?.completed ?? false,
-            personalNotes: prog?.personalNotes ?? ""
+            ...course,
+            isUnlocked,
+            purchasedAt: purchase?.purchasedAt ?? null,
+            amountPaidEur: purchase?.amountPaidEur ?? null,
+            dispenseCount: outline.length,
+            dispenseOutline: outline,
+            unlockedDispense: fullDispense
           };
-        });
-        return {
-          ...course,
-          isUnlocked,
-          purchasedAt: purchase?.purchasedAt ?? null,
-          amountPaidEur: purchase?.amountPaidEur ?? null,
-          dispenseCount: outline.length,
-          dispenseOutline: outline,
-          unlockedDispense: fullDispense
-        };
-      }),
+        })
+      ),
       bookings: userBookings,
       dialoguePasses: userDialoguePasses.map((p) => ({
         id: p.id,
@@ -10840,6 +10863,7 @@ var init_repository = __esm({
     init_bookingRules();
     init_bookingSlots();
     init_bookingFulfillment();
+    init_coursePresentation();
     init_googleCalendar();
     init_courseCatalog();
     FREE_TRIAL_SECONDS = 300;
@@ -11463,9 +11487,9 @@ Scegli durata, giorno e orario: in ogni sessione Maria Teresa legge Arcani Maggi
 - Checkout Stripe attivo per i consulti (\u20AC19 / \u20AC50 / \u20AC75 / \u20AC90). WhatsApp = canale del consulto, non del pagamento.
 
 ## Corsi / didattica (copy ufficiale pagina Corsi)
-Pagina Corsi attiva (lancio): percorso acquistabile ora \u2014 Arcani Maggiori a \u20AC 69 (listino \u20AC 149 barrato; prima \u20AC 190). Include Nina Studio (chat riservata di studio) a vita. Arcani Minori (\u20AC 210) e Metodi di Stesura (\u20AC 240) restano in catalogo ma sono differiti al pubblico.
+Questa settimana in offerta pubblica solo Arcani Maggiori a \u20AC 69 (listino \u20AC 149 barrato; prima \u20AC 190). Include Nina Studio (chat riservata di studio) a vita. Arcani Minori e Metodi di Stesura non sono in vendita pubblica \u2014 restano in preparazione (nascosti dal catalogo pubblico).
 Catalogo, programma e form iscrizione Maggiori su /corsi. Rate Klarna possibili in Stripe Checkout; pagamento sicuro via Stripe.
-Non inventare date di partenza o promozioni non presenti sul sito; per prezzi e iscrizione rinvia alla pagina Corsi o a \xABParla con Maria Teresa\xBB.
+Non inventare date di partenza, prezzi Minori/Metodi, o promozioni non presenti sul sito; per prezzi e iscrizione rinvia alla pagina Corsi o a \xABParla con Maria Teresa\xBB.
 
 ## FAQ Home \u2014 Domande Frequenti su Approccio ed Etica
 (Rispondi fedelmente a queste Q&A quando pertinenti.)
@@ -11511,7 +11535,7 @@ Spazio interattivo sul sito con i 22 Arcani Maggiori (riflessione guidata). Non 
 - **Chi sono** \u2014 percorso di Maria Teresa Rogani
 - **Consulti** \u2014 tariffe e modalit\xE0
 - **Dialogo Tarot** \u2014 percorso interattivo 22 Maggiori (separato da Nina)
-- **Corsi** \u2014 Maggiori \u20AC69 (listino \u20AC149 barrato) + Nina Studio; checkout su /corsi. Minori/Metodi differiti.
+- **Corsi** \u2014 Maggiori \u20AC69 (listino \u20AC149 barrato) + Nina Studio; checkout su /corsi. Minori/Metodi nascosti (in preparazione).
 - **Blog / News** \u2014 articoli (alcuni approfondimenti Maggiori riservati ai corsisti)
 - **Contatti** \u2014 email, telefono, mappa Macerata
 - **Prenota** \u2014 slot + pagamento Stripe Checkout; consulto su WhatsApp

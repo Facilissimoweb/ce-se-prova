@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Mail, Phone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ConsultationTariff, CourseId, ScreenId } from './types/handoff';
-import { educationalCourses } from './data/siteContent';
+import { isCourseSlugPubliclyPresented } from './lib/coursePresentation';
 import { AuthProvider } from './context/AuthContext';
 import {
   FloatingSideRail,
@@ -394,12 +394,10 @@ export function App() {
   };
 
   const handleSelectCourseAndNavigate = (courseId: CourseId) => {
-    // ENN-174 — snap to Maggiori if a frozen course id is requested
-    const course = educationalCourses.find((c) => c.id === courseId);
-    const safeId: CourseId =
-      course && course.publicPresented !== false
-        ? courseId
-        : 'arcani-maggiori';
+    // ENN-174 / ENN-175 — snap to Maggiori if a frozen course id is requested
+    const safeId: CourseId = isCourseSlugPubliclyPresented(courseId)
+      ? courseId
+      : 'arcani-maggiori';
     setSelectedCourseId(safeId);
     handleNavigate('corsi', { focusId: SCROLL_LANDMARKS.corsi });
   };
