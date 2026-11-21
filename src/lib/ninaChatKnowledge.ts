@@ -3,8 +3,10 @@
  * Mirror of public copy from siteContent / booking / corsi — do not invent FAQ or prices.
  * Maggiori cards: compiled FROM Area Personale didactic sources (ENN-147) —
  * dispensa + schede visive + approfondimenti — not a hand KB, not Dialogo Tarot.
- * Inject only matched Trionfi per request (ENN-138). When knowledge changes:
- * `npx tsx scripts/build-nina-maggiori-cards.ts` then `npm run build:api`.
+ * Minori cards: compiled FROM Maria’s luce/ombra pack (ENN-200) —
+ * content/nina/arcani-minori-luce-ombra.md — Studio companion only; public Minori catalog stays hidden.
+ * Inject only matched cards per request (ENN-138 / ENN-200). When knowledge changes:
+ * `npx tsx scripts/build-nina-maggiori-cards.ts` / `build-nina-minori-cards.ts` then `npm run build:api`.
  */
 
 import {
@@ -13,6 +15,14 @@ import {
   formatConsultTariffsMarkdownList,
 } from '../data/consultationTariffs.ts';
 import { NINA_MAGGIORI_CARDS_GENERATED } from '../data/ninaMaggioriCards.generated.ts';
+import {
+  NINA_MINORI_CARDS_GENERATED,
+  NINA_MINORI_INTRO,
+  NINA_MINORI_PRATICA,
+  NINA_MINORI_SUIT_FRAMES,
+  type NinaMinoriCardGenerated,
+  type NinaMinoriSuitFrameGenerated,
+} from '../data/ninaMinoriCards.generated.ts';
 import { ninaStudioSoftLockReply } from './ninaReplyLang.ts';
 
 const CONSULT_PRICE_LIST = consultationTariffs
@@ -271,3 +281,150 @@ export function buildAllMaggioriKnowledge(): string {
 
 /** @deprecated Use buildMaggioriKnowledgeForMessages — kept for rebuild/smoke compatibility. */
 export const NINA_CHAT_MAGGIORI_KNOWLEDGE = buildAllMaggioriKnowledge();
+
+/* -------------------------------------------------------------------------- */
+/* ENN-200 — Arcani Minori (luce/ombra) on-demand for Nina Studio              */
+/* -------------------------------------------------------------------------- */
+
+export type NinaMinoriCard = NinaMinoriCardGenerated;
+export type NinaMinoriSuitFrame = NinaMinoriSuitFrameGenerated;
+
+export const NINA_MINORI_CARDS: readonly NinaMinoriCard[] =
+  NINA_MINORI_CARDS_GENERATED;
+
+/** Always-on Minori framing (no per-card bodies) — keeps payload small. */
+export const NINA_CHAT_MINORI_FRAME = `## Arcani Minori — schede luce/ombra (Studio)
+
+Fonte: pack didattico italiano Tarot Italia (ENN-200). Usa SOLO le schede Minori iniettate sotto (se presenti). Non inventare simbologia Waite assente dal pack. Il corso pubblico **Arcani Minori** non è in vendita: questa è conoscenza companion in Nina Studio per chi ha Maggiori.
+
+${NINA_MINORI_INTRO.slice(0, 420)}…
+
+Struttura risposta (quando chiedono un Minore — senso del seme, luce/ombra):
+1. **Senso** (seme / energia quotidiana)
+2. **Luce / ombra**
+3. Se utile, un cenno di pratica: ${NINA_MINORI_PRATICA.slice(0, 220)}…
+Tono: caldo, rigoroso, Tarot Italia. Semi: Bastoni · Coppe · Spade · Denari (Pentacoli). Ranks: Asso–10 + Fante, Cavallo, Regina, Re.
+Se manca la scheda nel contesto, chiedi quale carta (es. «Asso di Bastoni») e non inventare dettagli.`;
+
+const MAX_INJECTED_MINORI = 3;
+
+/**
+ * Match Minori by suit+rank aliases (e.g. «asso di bastoni», «regina di spade»).
+ * Caps at MAX_INJECTED_MINORI. Does not dump a whole suit of 14.
+ */
+export function selectMinoriCardsForText(text: string): NinaMinoriCard[] {
+  const hay = normalizeForMatch(text);
+  if (!hay.trim()) return [];
+
+  const matched: NinaMinoriCard[] = [];
+  const seen = new Set<string>();
+  for (const card of NINA_MINORI_CARDS) {
+    const hit = card.aliases.some((alias) => {
+      const needle = normalizeForMatch(alias);
+      if (!needle) return false;
+      if (needle.includes(' ')) return hay.includes(needle);
+      return new RegExp(
+        `(?:^|[^a-z0-9])${escapeRegExp(needle)}(?:[^a-z0-9]|$)`
+      ).test(hay);
+    });
+    if (hit && !seen.has(card.id)) {
+      seen.add(card.id);
+      matched.push(card);
+    }
+    if (matched.length >= MAX_INJECTED_MINORI) break;
+  }
+  return matched;
+}
+
+/** Suit-only frames when the user names a suit without a specific rank (max 2). */
+export function selectMinoriSuitFramesForText(
+  text: string
+): NinaMinoriSuitFrame[] {
+  const hay = normalizeForMatch(text);
+  if (!hay.trim()) return [];
+  // If specific cards already match, skip suit-only inject (cards carry suit senso).
+  if (selectMinoriCardsForText(hay).length > 0) return [];
+
+  // Avoid injecting from Maggiori tool lists («bastoni, coppe, spade e denari» on Bagatto)
+  // unless the ask is clearly about a Minori suit / luce-ombra / seme.
+  const suitStudyCue =
+    /\b(arcani?\s+minori|minori|seme|semi|luce|ombra|pentacol)\b/.test(hay) ||
+    /\b(?:parla(?:mi)?|spiega(?:mi)?|racconta(?:mi)?|cosa\s+(?:sono|significano)|approfond)\b/.test(
+      hay
+    );
+
+  const matched: NinaMinoriSuitFrame[] = [];
+  for (const suit of NINA_MINORI_SUIT_FRAMES) {
+    const hit = suit.aliases.some((alias) => {
+      const needle = normalizeForMatch(alias);
+      if (!needle || needle.length < 4) return false; // skip «cup» / «re»-like shorts
+      return new RegExp(
+        `(?:^|[^a-z0-9])${escapeRegExp(needle)}(?:[^a-z0-9]|$)`
+      ).test(hay);
+    });
+    if (hit && suitStudyCue) {
+      matched.push(suit);
+    }
+    if (matched.length >= 2) break;
+  }
+  return matched;
+}
+
+export function formatMinoriKnowledgeForCards(
+  cards: readonly NinaMinoriCard[],
+  suitFrames: readonly NinaMinoriSuitFrame[] = []
+): string {
+  if (cards.length === 0 && suitFrames.length === 0) {
+    return `${NINA_CHAT_MINORI_FRAME}
+
+(Nessuna scheda Minore iniettata in questo turno: se chiedono un Minore specifico, invita a nominare seme + grado — es. «3 di Coppe» — senza inventare.)`;
+  }
+  const parts = [NINA_CHAT_MINORI_FRAME, '', '### Schede Minori iniettate per questa conversazione'];
+  if (suitFrames.length > 0) {
+    parts.push(suitFrames.map((s) => s.body).join('\n\n'));
+  }
+  if (cards.length > 0) {
+    parts.push(cards.map((c) => c.body).join('\n\n'));
+  }
+  return parts.join('\n');
+}
+
+export function buildMinoriKnowledgeForMessages(params: {
+  message: string;
+  history?: Array<{ role: string; content: string }>;
+}): string {
+  const parts = [params.message];
+  const history = params.history ?? [];
+  for (const turn of history.slice(-6)) {
+    if (typeof turn.content === 'string' && turn.content.trim()) {
+      parts.push(turn.content);
+    }
+  }
+  const hay = parts.join('\n');
+  const cards = selectMinoriCardsForText(hay);
+  const suits = selectMinoriSuitFramesForText(hay);
+  return formatMinoriKnowledgeForCards(cards, suits);
+}
+
+const DEEP_MINORI_CUES =
+  /\b(arcani?\s+minori|minori\s+didatt|luce\s*\/?\s*ombra|asso\s+di\s+(bastoni|coppe|spade|denari|pentacol)|(?:fante|cavallo|regina|re|\d{1,2}|due|tre|quattro|cinque|sei|sette|otto|nove|dieci)\s+di\s+(bastoni|coppe|spade|denari|pentacol))/;
+
+/**
+ * Welcome soft-lock: named Minore and/or deep Minori study cues (ENN-200).
+ * Studio remains gated by Maggiori entitlement.
+ */
+export function looksLikeDeepMinoriStudy(params: {
+  message: string;
+  history?: Array<{ role: string; content: string }>;
+}): boolean {
+  const parts = [params.message];
+  for (const turn of (params.history ?? []).slice(-4)) {
+    if (typeof turn.content === 'string' && turn.content.trim()) {
+      parts.push(turn.content);
+    }
+  }
+  const hay = normalizeForMatch(parts.join('\n'));
+  if (!hay.trim()) return false;
+  if (selectMinoriCardsForText(hay).length > 0) return true;
+  return DEEP_MINORI_CUES.test(hay);
+}

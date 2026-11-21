@@ -24,6 +24,16 @@ if (ninaMaggiori.status !== 0) {
   process.exit(ninaMaggiori.status ?? 1);
 }
 
+/** ENN-200 — compile Nina Studio Minori luce/ombra cards before chat bundle. */
+const ninaMinori = spawnSync(
+  'npx',
+  ['tsx', 'scripts/build-nina-minori-cards.ts'],
+  { cwd: root, stdio: 'inherit', shell: false }
+);
+if (ninaMinori.status !== 0) {
+  process.exit(ninaMinori.status ?? 1);
+}
+
 const blog = buildBlogPosts();
 console.log(
   `[blog] ${blog.published}/${blog.count} post(s) → ${path.relative(root, blog.outFile)}`

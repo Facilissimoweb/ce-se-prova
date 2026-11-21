@@ -9,8 +9,9 @@
     "build": "node scripts/build-blog.mjs && vite build && node scripts/bundle-api.mjs",
     "build:api": "node scripts/bundle-api.mjs",
     "build:nina-maggiori": "npx tsx scripts/build-nina-maggiori-cards.ts",
+    "build:nina-minori": "npx tsx scripts/build-nina-minori-cards.ts",
     "build:blog": "node scripts/build-blog.mjs",
-    "test:nina-studio": "npx tsx scripts/assert-nina-studio-split.ts && npx tsx scripts/assert-nina-maggiori-source.ts",
+    "test:nina-studio": "npx tsx scripts/assert-nina-studio-split.ts && npx tsx scripts/assert-nina-maggiori-source.ts && npx tsx scripts/assert-nina-minori-source.ts",
     "test:nina-chat-gt": "npx tsx scripts/assert-nina-chat-gt.ts",
     "test:nina-it-bullets": "npx tsx scripts/assert-nina-it-bullets.ts && npx tsx scripts/assert-nina-gt-lang.ts",
 
