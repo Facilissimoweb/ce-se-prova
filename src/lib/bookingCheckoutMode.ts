@@ -1,11 +1,11 @@
 /**
  * Consulti booking checkout mode.
  *
- * Soft-freeze Stripe for consulti: the booking UI hands off to WhatsApp so Maria
- * can send payment details manually. Stripe create/confirm routes stay in the
- * codebase for when she re-enables checkout.
+ * Live Stripe Checkout for consult products (€19/50/75/90). WhatsApp remains the
+ * channel for the reading itself (and the ENN-166 non-IT written-chat notice),
+ * not the payment path. Flip to false only for an emergency soft-freeze.
  */
-export const CONSULTATION_STRIPE_ENABLED = false;
+export const CONSULTATION_STRIPE_ENABLED = true;
 
 export type BookingWhatsAppDraft = {
   tariffTitle: string;

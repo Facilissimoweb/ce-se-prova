@@ -8941,9 +8941,6 @@ function normalizeNinaLang(lang) {
   const raw = (lang || "it").trim().toLowerCase().replace(/_/g, "-");
   if (!raw) return "it";
   if (raw === "zh" || raw.startsWith("zh-")) {
-    if (raw.startsWith("zh-tw") || raw.startsWith("zh-hk") || raw.startsWith("zh-hant")) {
-      return raw;
-    }
     return "zh-cn";
   }
   if (NINA_REPLY_LANG_LABELS[raw]) return raw;

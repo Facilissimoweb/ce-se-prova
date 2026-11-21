@@ -217,12 +217,12 @@ export const siteContent = {
     subheading: {
       cmsKey: '[COPY: siteContent.booking.subheading]',
       liveText:
-        'Scegli durata, giorno e orario: in ogni sessione Maria Teresa legge Arcani Maggiori e Minori. Poi inviaci la richiesta su WhatsApp e riceverai le indicazioni per il pagamento. Il Consulto Breve è solo online.',
+        'Scegli durata, giorno e orario: in ogni sessione Maria Teresa legge Arcani Maggiori e Minori. Paga online con Stripe Checkout; il consulto si svolge su WhatsApp. Il Consulto Breve è solo online.',
     },
     stripeHandoffNote: {
       cmsKey: '[COPY: siteContent.booking.stripeNote]',
       liveText:
-        'Per ora il pagamento online è in pausa. Invia la prenotazione su WhatsApp: riceverai da Maria Teresa le modalità di pagamento e la conferma dello slot.',
+        'Pagamento sicuro con Stripe Checkout. Dopo il pagamento ricevi la conferma via email; Maria Teresa riceve un avviso dello slot. Il consulto si svolge su WhatsApp.',
     },
     /** ENN-166 — soft IT note (booking on site · consult on WhatsApp). */
     waConsultNoteIt: {

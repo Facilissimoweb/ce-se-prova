@@ -52,8 +52,8 @@ assert(
   'siteContent has ENN-166 booking copy keys'
 );
 assert(
-  /CONSULTATION_STRIPE_ENABLED\s*=\s*false/.test(checkout),
-  'Stripe consult flag stays false (ENN-167 separate)'
+  /CONSULTATION_STRIPE_ENABLED\s*=\s*true/.test(checkout),
+  'Stripe consult checkout enabled (ENN-167)'
 );
 assert(
   !notice.toLowerCase().includes('whatsapp cloud') &&

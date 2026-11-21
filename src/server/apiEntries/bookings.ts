@@ -58,7 +58,7 @@ export default async function handler(req: NodeLikeReq, res: NodeLikeRes) {
         return sendJson(res, 405, {
           error: 'Metodo non consentito.',
           allow: ['POST'],
-          hint: 'Usa POST /api/bookings per creare una prenotazione (Invia prenotazione → WhatsApp). Per gli slot: GET /api/bookings/availability?from=YYYY-MM-DD&to=YYYY-MM-DD.',
+          hint: 'Usa POST /api/bookings per creare una prenotazione (Stripe Checkout). Per gli slot: GET /api/bookings/availability?from=YYYY-MM-DD&to=YYYY-MM-DD.',
         });
       }
       await ensureSchemaOnce();

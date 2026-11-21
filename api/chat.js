@@ -11150,9 +11150,6 @@ function normalizeNinaLang(lang) {
   const raw = (lang || "it").trim().toLowerCase().replace(/_/g, "-");
   if (!raw) return "it";
   if (raw === "zh" || raw.startsWith("zh-")) {
-    if (raw.startsWith("zh-tw") || raw.startsWith("zh-hk") || raw.startsWith("zh-hant")) {
-      return raw;
-    }
     return "zh-cn";
   }
   if (NINA_REPLY_LANG_LABELS[raw]) return raw;
@@ -11460,12 +11457,10 @@ In **ogni** sessione Maria Teresa legge **Arcani Maggiori e Minori**.
 - Il **Consulto Breve** non \xE8 disponibile di persona (solo online).
 
 ## Prenotazione e pagamento (copy Prenota)
-Scegli durata, giorno e orario: in ogni sessione Maria Teresa legge Arcani Maggiori e Minori. Poi inviaci la richiesta su WhatsApp e riceverai le indicazioni per il pagamento. Il Consulto Breve \xE8 solo online.
-
-Per ora il pagamento online \xE8 in pausa. Invia la prenotazione su WhatsApp: riceverai da Maria Teresa le modalit\xE0 di pagamento e la conferma dello slot.
+Scegli durata, giorno e orario: in ogni sessione Maria Teresa legge Arcani Maggiori e Minori. Paga online con Stripe Checkout sul sito; il consulto si svolge su WhatsApp. Il Consulto Breve \xE8 solo online.
 
 - Contatti pubblici: WhatsApp / Telegram / telefono 379 103 82 53 \xB7 email info@tarotitalia.com.
-- Non promettere checkout Stripe attivo: il pagamento online \xE8 in pausa.
+- Checkout Stripe attivo per i consulti (\u20AC19 / \u20AC50 / \u20AC75 / \u20AC90). WhatsApp = canale del consulto, non del pagamento.
 
 ## Corsi / didattica (copy ufficiale pagina Corsi)
 Pagina Corsi attiva: tre percorsi acquistabili singolarmente \u2014 Arcani Maggiori (\u20AC 190), Arcani Minori (\u20AC 210), Metodi di Stesura (\u20AC 240).
@@ -11519,7 +11514,7 @@ Spazio interattivo sul sito con i 22 Arcani Maggiori (riflessione guidata). Non 
 - **Corsi** \u2014 Maggiori (\u20AC190), Minori (\u20AC210), Metodi di Stesura (\u20AC240); checkout Maggiori su /corsi
 - **Blog / News** \u2014 articoli (alcuni approfondimenti Maggiori riservati ai corsisti)
 - **Contatti** \u2014 email, telefono, mappa Macerata
-- **Prenota** \u2014 richiesta appuntamento via WhatsApp (Stripe in pausa per i consulti)
+- **Prenota** \u2014 slot + pagamento Stripe Checkout; consulto su WhatsApp
 - **Area Riservata** \u2014 dispense e percorsi dopo acquisto / accesso Google
 
 ## Chi sono (sintesi leggera)
@@ -11629,7 +11624,7 @@ Tono e stile:
 
 Cosa puoi fare (solo questo):
 - Prezzi consulti ufficiali **\u20AC19 / \u20AC50 / \u20AC75 / \u20AC90**; Breve **solo online**; Maggiori e Minori in ogni sessione.
-- Modalit\xE0 di pagamento consulti: **WhatsApp** (Stripe in pausa per i consulti) \u2014 non promettere checkout Stripe attivo.
+- Modalit\xE0 di pagamento consulti: **Stripe Checkout** sul sito (\u20AC19/50/75/90); WhatsApp \xE8 il canale del consulto, non del pagamento.
 - Mappa del sito e orientamento alle pagine pubbliche.
 - Sintesi leggera di **Chi sono** (formazione / Operatore Olistico L. 4/2013) \u2014 senza biografia inventata.
 - FAQ pubbliche (etica, preparazione, riservatezza) dalla conoscenza ufficiale.
