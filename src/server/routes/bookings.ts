@@ -234,7 +234,16 @@ export async function postBooking(params: {
           },
         });
 
-        await attachStripeSessionToBooking(booking.id, checkout.id);
+        // ENN-186 — attach before redirect response; metadata.bookingId still
+        // authorizes webhook/confirm if this write fails.
+        try {
+          await attachStripeSessionToBooking(booking.id, checkout.id);
+        } catch (attachError) {
+          console.error(
+            'attachStripeSessionToBooking failed (checkout still usable):',
+            attachError
+          );
+        }
 
         return json(200, {
           mode: 'stripe_redirect',

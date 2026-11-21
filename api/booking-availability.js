@@ -7648,6 +7648,18 @@ async function ensureBookingSchema() {
     return;
   }
   const pool = createPool();
+  try {
+    await pool.query("SELECT 1 FROM consultation_bookings LIMIT 1");
+    return;
+  } catch (error) {
+    if (isDbConnectionFailure(error)) {
+      console.error(
+        "ensureBookingSchema: probe failed (DB unreachable), skipping DDL"
+      );
+      resetDbPool();
+      return;
+    }
+  }
   for (const sql2 of SCHEMA_BOOTSTRAP_STATEMENTS) {
     try {
       await pool.query(sql2);

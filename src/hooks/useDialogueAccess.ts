@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from 'react';
 import type { DialogueAccessStatus, DialoguePackId } from '../types/handoff';
 import { dialogueTimePacks } from '../data/siteContent';
 import { getOrCreateDialogueSessionKey, nowTimeLabel } from '../lib/dialogueSession';
@@ -40,6 +46,8 @@ export function useDialogueAccess({
   const [customerEmail, setCustomerEmail] = useState('');
   const [unlocking, setUnlocking] = useState(false);
   const [unlockError, setUnlockError] = useState<string | null>(null);
+  /** ENN-186 — sync guard against double Checkout Session on rapid re-submit. */
+  const checkoutInFlightRef = useRef(false);
 
   const applyServerStatus = useCallback((nextStatus: DialogueAccessStatus) => {
     const serverNow = Date.parse(nextStatus.serverTimeIso);
@@ -209,6 +217,8 @@ export function useDialogueAccess({
         setUnlockError('Inserisci un indirizzo email valido.');
         return;
       }
+      if (checkoutInFlightRef.current) return;
+      checkoutInFlightRef.current = true;
 
       setUnlocking(true);
       try {
@@ -265,6 +275,7 @@ export function useDialogueAccess({
           err instanceof Error ? err.message : 'Errore durante l’attivazione.'
         );
       } finally {
+        checkoutInFlightRef.current = false;
         setUnlocking(false);
       }
     },

@@ -177,6 +177,23 @@ export async function ensureBookingSchema(): Promise<void> {
 
   const pool = createPool();
 
+  // ENN-186 — Production already has tables. Skip the full DDL list on every
+  // cold isolate so checkout (/api/bookings, dialogue, reserved) is not blocked
+  // by dozens of sequential CREATE/ALTER round-trips.
+  try {
+    await pool.query('SELECT 1 FROM consultation_bookings LIMIT 1');
+    return;
+  } catch (error) {
+    if (isDbConnectionFailure(error)) {
+      console.error(
+        'ensureBookingSchema: probe failed (DB unreachable), skipping DDL'
+      );
+      resetDbPool();
+      return;
+    }
+    // Missing relation / other schema gaps → fall through to bootstrap.
+  }
+
   for (const sql of SCHEMA_BOOTSTRAP_STATEMENTS) {
     try {
       await pool.query(sql);
