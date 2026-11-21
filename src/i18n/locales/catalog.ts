@@ -7,42 +7,44 @@ const en: Dict = {
   // Tariffs
   'tariff.20m.title': 'Short Reading',
   'tariff.20m.description':
-    'Twenty minutes online only for a clear question and rapid orientation, with Major and Minor Arcana.',
-  'tariff.20m.focus': 'Online only · Quick question',
+    'One precise question, a focused reading, immediate clarity. For a punctual doubt — a relationship, an expectation, or a nearby choice — when you want lucid insight before acting.',
+  'tariff.20m.focus': 'WhatsApp voice call only',
   'tariff.20m.includes.0':
-    '20 minutes of individual dialogue online only (voice call)',
+    'We focus on a single theme through the 78 Arcana, going to the essence with listening and precision',
   'tariff.20m.includes.1':
-    'Reading with Major and Minor Arcana on a focused theme',
-  'tariff.20m.includes.2': 'Practical notes via email or WhatsApp',
+    'Afterwards: a clear view of the situation and 2–3 practical indications via WhatsApp or email',
+  'tariff.20m.includes.2':
+    'Best if you want light on one question, quickly and accessibly (not suited to multiple themes together)',
   'tariff.45m.title': 'Essential Reading',
   'tariff.45m.description':
-    'A focused meeting to deepen several questions about the present, with symbolic clarity and balance.',
-  'tariff.45m.focus': 'More questions · Immediate clarity',
+    'To bring order when you have two or three open questions and want to steer your energy well. When a quick answer is not enough because more than one area is involved — for example love and work, or an important decision to take with balance.',
+  'tariff.45m.focus': 'Voice or Studio Macerata (Via Crispi 37)',
   'tariff.45m.includes.0':
-    '45 minutes of individual dialogue (online or in person)',
+    'We look at linked situations, focusing dynamics, obstacles and concrete possibilities in the present',
   'tariff.45m.includes.1':
-    'Reading with Major and Minor Arcana on several questions',
+    'Afterwards: a written summary of the main points that emerged, to reread calmly',
   'tariff.45m.includes.2':
-    'Written summary of key points via email or WhatsApp',
+    'Best if you seek concrete clarity on several aspects of daily life in a gathered, balanced time',
   'tariff.60m.title': 'Full Evolutive Reading',
   'tariff.60m.description':
-    'The recommended path to explore roots, inner resources and possible directions of conscious transformation.',
-  'tariff.60m.focus': 'Recommended · In-depth analysis',
+    'To understand the roots of what you live and find a conscious direction again. When a pattern repeats — in relationships, work, or personal choices — and you want to look honestly at both the outer context and your room for action.',
+  'tariff.60m.focus': 'Most chosen · Voice or Studio Macerata',
   'tariff.60m.includes.0':
-    '60 minutes of individual session by voice call or in person in Macerata',
-  'tariff.60m.includes.1': 'Combined reading of Major and Minor Arcana',
+    'A full hour, without rush, to deepen root causes, recognise blind spots and find the most authentic paths ahead',
+  'tariff.60m.includes.1':
+    'Afterwards: a synthesis of the reading plus practical reflection traces for the following weeks',
   'tariff.60m.includes.2':
-    'Map of maieutic questions for the following weeks',
+    'Best if you want a deep, respectful reading that helps you choose with awareness and autonomy',
   'tariff.90m.title': 'Integrated Session',
   'tariff.90m.description':
-    'An extended meeting for turning points, yearly reviews or articulated work across several life areas.',
-  'tariff.90m.focus': 'Yearly cycle · Maximum depth',
+    'An hour and a half to gather all the threads and look with breadth at the path ahead. Ideal when you are closing a demanding phase, starting a new chapter, or need to explore relationships, work, personal resources and overall direction without fragmenting the work.',
+  'tariff.90m.focus': 'Voice or Studio Macerata (Via Crispi 37)',
   'tariff.90m.includes.0':
-    '90 minutes of holistic dialogue by voice call or in person in Macerata',
+    'A wide, in-depth meeting that embraces several life areas and sets priorities for the coming months',
   'tariff.90m.includes.1':
-    'Full reading with Major and Minor Arcana (twelve houses or double comparison)',
+    'Afterwards: written feedback within 48 hours on a private channel, to lock in key steps with a calm mind',
   'tariff.90m.includes.2':
-    'Written follow-up within 48 hours via a private channel',
+    'Best if you want complete work in one dedicated space, with the best balance of time, depth and investment',
   // Home FAQs
   'faq.faq-1.category': 'Holistic Approach',
   'faq.faq-1.question':
@@ -211,42 +213,44 @@ const en: Dict = {
 const es: Dict = {
   'tariff.20m.title': 'Consulta Breve',
   'tariff.20m.description':
-    'Veinte minutos solo en línea para una pregunta clara y orientación rápida, con Arcanos Mayores y Menores.',
-  'tariff.20m.focus': 'Solo en línea · Pregunta rápida',
+    'Una pregunta precisa, una lectura enfocada, claridad inmediata. Para una duda puntual — una relación, una espera o una elección cercana — cuando deseas comprender con lucidez qué se está moviendo antes de actuar.',
+  'tariff.20m.focus': 'Solo llamada de voz por WhatsApp',
   'tariff.20m.includes.0':
-    '20 minutos de diálogo individual solo en línea (llamada de voz)',
+    'Nos concentramos en un único tema a través de los 78 Arcanos, yendo a la esencia con escucha y precisión',
   'tariff.20m.includes.1':
-    'Lectura con Arcanos Mayores y Menores sobre un tema puntual',
-  'tariff.20m.includes.2': 'Indicaciones prácticas por email o WhatsApp',
+    'Después: una visión clara de la situación y 2–3 indicaciones prácticas por WhatsApp o email',
+  'tariff.20m.includes.2':
+    'Indicada si deseas aclarar una sola cuestión de forma rápida y accesible (no apta para varios temas a la vez)',
   'tariff.45m.title': 'Consulta Esencial',
   'tariff.45m.description':
-    'Un encuentro orientado a profundizar varias preguntas sobre el presente, con claridad simbólica y equilibrio.',
-  'tariff.45m.focus': 'Más preguntas · Claridad inmediata',
+    'Para poner orden cuando tienes dos o tres cuestiones abiertas y quieres orientar bien tu energía. Cuando una respuesta rápida no basta porque hay más de un ámbito involucrado.',
+  'tariff.45m.focus': 'Voz o Estudio Macerata (Via Crispi 37)',
   'tariff.45m.includes.0':
-    '45 minutos de diálogo individual (en línea o en persona)',
+    'Observamos las situaciones conectadas, enfocando dinámicas, obstáculos y posibilidades concretas del presente',
   'tariff.45m.includes.1':
-    'Lectura con Arcanos Mayores y Menores sobre varias preguntas',
+    'Después: una síntesis escrita de los puntos principales emergentes, para releerlos con calma',
   'tariff.45m.includes.2':
-    'Síntesis escrita de los puntos emergentes por email o WhatsApp',
+    'Indicada si buscas claridad concreta sobre varios aspectos de tu cotidianidad en un tiempo recogido y equilibrado',
   'tariff.60m.title': 'Consulta Evolutiva Completa',
   'tariff.60m.description':
-    'El recorrido recomendado para explorar raíces, recursos interiores y posibles direcciones de transformación consciente.',
-  'tariff.60m.focus': 'Recomendado · Análisis profundo',
+    'Para comprender las raíces de lo que vives y recuperar una dirección consciente. Cuando sientes que una dinámica se repite y deseas mirar con honestidad el contexto externo y tu margen de acción.',
+  'tariff.60m.focus': 'La más elegida · Voz o Estudio Macerata',
   'tariff.60m.includes.0':
-    '60 minutos de sesión individual por llamada de voz o en persona en Macerata',
-  'tariff.60m.includes.1': 'Lectura combinada de Arcanos Mayores y Menores',
+    'Una hora entera, sin prisas, para profundizar causas profundas, reconocer puntos ciegos e identificar caminos auténticos',
+  'tariff.60m.includes.1':
+    'Después: una síntesis de la lectura junto a trazas de reflexión prácticas para las semanas siguientes',
   'tariff.60m.includes.2':
-    'Mapa de preguntas mayéuticas para las semanas siguientes',
+    'Indicada si deseas una lectura profunda y respetuosa que te acompañe a elegir con conciencia y autonomía',
   'tariff.90m.title': 'Sesión Integrada',
   'tariff.90m.description':
-    'Encuentro ampliado para momentos de giro, balances de ciclo anual o trabajo articulado en varios ámbitos de vida.',
-  'tariff.90m.focus': 'Ciclo anual · Máxima profundidad',
+    'Una hora y media para reunir todos los hilos y mirar con amplitud el recorrido que te espera. Ideal al cerrar una fase exigente, empezar un nuevo capítulo o explorar varios ámbitos sin fragmentar el trabajo.',
+  'tariff.90m.focus': 'Voz o Estudio Macerata (Via Crispi 37)',
   'tariff.90m.includes.0':
-    '90 minutos de diálogo holístico por llamada de voz o en persona en Macerata',
+    'Un encuentro amplio y profundo que abarca varios ámbitos de vida y define las prioridades de los próximos meses',
   'tariff.90m.includes.1':
-    'Lectura completa con Arcanos Mayores y Menores (doce casas o doble contraste)',
+    'Después: respuesta escrita en 48 horas por un canal reservado, para fijar los pasos clave con mente serena',
   'tariff.90m.includes.2':
-    'Seguimiento escrito en 48 horas por canal reservado',
+    'Indicada si deseas un trabajo completo en un único espacio dedicado, con el mejor equilibrio entre tiempo, profundidad e inversión',
   'faq.faq-1.category': 'Enfoque Holístico',
   'faq.faq-1.question':
     '¿Cómo leen los Tarots de Tarot Italia el presente y prevén el futuro?',
@@ -411,42 +415,44 @@ const es: Dict = {
 const fr: Dict = {
   'tariff.20m.title': 'Consultation Brève',
   'tariff.20m.description':
-    'Vingt minutes uniquement en ligne pour une question claire et une orientation rapide, avec Arcanes Majeurs et Mineurs.',
-  'tariff.20m.focus': 'Uniquement en ligne · Question rapide',
+    'Une question précise, une lecture ciblée, une clarté immédiate. Pour un doute ponctuel — relation, attente ou choix proche — quand vous voulez comprendre avec lucidité ce qui bouge avant d’agir.',
+  'tariff.20m.focus': 'Appel vocal WhatsApp uniquement',
   'tariff.20m.includes.0':
-    '20 minutes de dialogue individuel uniquement en ligne (appel vocal)',
+    'Nous nous concentrons sur un seul thème à travers les 78 Arcanes, jusqu’à l’essence, avec écoute et précision',
   'tariff.20m.includes.1':
-    'Lecture avec Arcanes Majeurs et Mineurs sur un thème précis',
-  'tariff.20m.includes.2': 'Indications pratiques par email ou WhatsApp',
+    'Ensuite : une vision claire de la situation et 2–3 indications pratiques via WhatsApp ou email',
+  'tariff.20m.includes.2':
+    'Indiquée si vous voulez éclairer une seule question rapidement et de façon accessible (pas adaptée à plusieurs thèmes)',
   'tariff.45m.title': 'Consultation Essentielle',
   'tariff.45m.description':
-    'Une rencontre ciblée pour approfondir plusieurs questions sur le présent, avec clarté symbolique et équilibre.',
-  'tariff.45m.focus': 'Plus de questions · Clarté immédiate',
+    'Pour remettre de l’ordre quand vous avez deux ou trois questions ouvertes et voulez bien orienter votre énergie. Quand une réponse rapide ne suffit pas parce que plusieurs domaines sont en jeu.',
+  'tariff.45m.focus': 'Vocal ou Studio Macerata (Via Crispi 37)',
   'tariff.45m.includes.0':
-    '45 minutes de dialogue individuel (en ligne ou en personne)',
+    'Nous observons les situations liées, en ciblant dynamiques, obstacles et possibilités concrètes du présent',
   'tariff.45m.includes.1':
-    'Lecture avec Arcanes Majeurs et Mineurs sur plusieurs questions',
+    'Ensuite : une synthèse écrite des points principaux émergés, à relire avec calme',
   'tariff.45m.includes.2':
-    'Synthèse écrite des points émergents par email ou WhatsApp',
+    'Indiquée si vous cherchez une clarté concrète sur plusieurs aspects du quotidien, dans un temps recueilli et équilibré',
   'tariff.60m.title': 'Consultation Évolutive Complète',
   'tariff.60m.description':
-    'Le parcours recommandé pour explorer racines, ressources intérieures et directions possibles de transformation consciente.',
-  'tariff.60m.focus': 'Recommandé · Analyse approfondie',
+    'Pour comprendre les racines de ce que vous vivez et retrouver une direction consciente. Quand une dynamique se répète et que vous voulez regarder avec honnêteté le contexte extérieur et votre marge d’action.',
+  'tariff.60m.focus': 'La plus choisie · Vocal ou Studio Macerata',
   'tariff.60m.includes.0':
-    '60 minutes de séance individuelle en appel vocal ou en personne à Macerata',
-  'tariff.60m.includes.1': 'Lecture combinée des Arcanes Majeurs et Mineurs',
+    'Une heure entière, sans précipitation, pour approfondir les causes profondes, reconnaître les angles morts et repérer les chemins les plus authentiques',
+  'tariff.60m.includes.1':
+    'Ensuite : une synthèse de la lecture avec des pistes de réflexion pratiques pour les semaines suivantes',
   'tariff.60m.includes.2':
-    'Carte des questions maïeutiques pour les semaines suivantes',
+    'Indiquée si vous désirez une lecture profonde et respectueuse qui vous aide à choisir avec conscience et autonomie',
   'tariff.90m.title': 'Séance Intégrée',
   'tariff.90m.description':
-    'Rencontre prolongée dédiée aux tournants, bilans de cycle annuel ou travail articulé sur plusieurs domaines de vie.',
-  'tariff.90m.focus': 'Cycle annuel · Profondeur maximale',
+    'Une heure et demie pour rassembler tous les fils et regarder avec ampleur le chemin qui vous attend. Idéale pour clore une phase exigeante, ouvrir un nouveau chapitre, ou explorer plusieurs domaines sans fragmenter le travail.',
+  'tariff.90m.focus': 'Vocal ou Studio Macerata (Via Crispi 37)',
   'tariff.90m.includes.0':
-    '90 minutes de dialogue holistique en appel vocal ou en personne à Macerata',
+    'Une rencontre large et approfondie qui embrasse plusieurs domaines de vie et définit les priorités des mois à venir',
   'tariff.90m.includes.1':
-    'Lecture complète avec Arcanes Majeurs et Mineurs (douze maisons ou double comparaison)',
+    'Ensuite : un retour écrit sous 48 heures sur un canal réservé, pour fixer les étapes clés l’esprit serein',
   'tariff.90m.includes.2':
-    'Suivi écrit sous 48 heures via canal réservé',
+    'Indiquée si vous voulez un travail complet dans un seul espace dédié, avec le meilleur équilibre entre temps, profondeur et investissement',
   'faq.faq-1.category': 'Approche holistique',
   'faq.faq-1.question':
     'Comment les Tarots de Tarot Italia lisent-ils le présent et prévoient-ils l’avenir ?',
@@ -611,42 +617,44 @@ const fr: Dict = {
 const de: Dict = {
   'tariff.20m.title': 'Kurze Beratung',
   'tariff.20m.description':
-    'Zwanzig Minuten nur online für eine klare Frage und schnelle Orientierung, mit Großen und Kleinen Arkana.',
-  'tariff.20m.focus': 'Nur online · Schnelle Frage',
+    'Eine präzise Frage, eine gezielte Deutung, sofortige Klarheit. Für einen punktuellen Zweifel — Beziehung, Erwartung oder nahe Entscheidung — wenn Sie mit Klarheit verstehen wollen, was sich bewegt, bevor Sie handeln.',
+  'tariff.20m.focus': 'Nur WhatsApp-Sprachanruf',
   'tariff.20m.includes.0':
-    '20 Minuten individueller Dialog nur online (Sprachanruf)',
+    'Wir konzentrieren uns auf ein einziges Thema durch die 78 Arkana und gehen mit Zuhören und Präzision zum Wesentlichen',
   'tariff.20m.includes.1':
-    'Deutung mit Großen und Kleinen Arkana zu einem gezielten Thema',
-  'tariff.20m.includes.2': 'Praktische Hinweise per E-Mail oder WhatsApp',
+    'Danach: eine klare Sicht auf die Situation und 2–3 praktische Hinweise per WhatsApp oder E-Mail',
+  'tariff.20m.includes.2':
+    'Geeignet, wenn Sie eine einzelne Frage schnell und zugänglich klären wollen (nicht für mehrere Themen zugleich)',
   'tariff.45m.title': 'Essenzielle Beratung',
   'tariff.45m.description':
-    'Ein gezieltes Treffen, um mehrere Fragen zur Gegenwart zu vertiefen — mit symbolischer Klarheit und Gleichgewicht.',
-  'tariff.45m.focus': 'Mehr Fragen · Sofortige Klarheit',
+    'Um Ordnung zu schaffen, wenn zwei oder drei Fragen offen sind und Sie Ihre Energie gut ausrichten wollen. Wenn eine schnelle Antwort nicht reicht, weil mehrere Bereiche berührt sind.',
+  'tariff.45m.focus': 'Sprachanruf oder Studio Macerata (Via Crispi 37)',
   'tariff.45m.includes.0':
-    '45 Minuten individueller Dialog (online oder vor Ort)',
+    'Wir betrachten verknüpfte Situationen und fokussieren Dynamiken, Hindernisse und konkrete Möglichkeiten der Gegenwart',
   'tariff.45m.includes.1':
-    'Deutung mit Großen und Kleinen Arkana zu mehreren Fragen',
+    'Danach: eine schriftliche Zusammenfassung der wichtigsten Punkte, zum ruhigen Nachlesen',
   'tariff.45m.includes.2':
-    'Schriftliche Zusammenfassung der Punkte per E-Mail oder WhatsApp',
+    'Geeignet, wenn Sie konkrete Klarheit zu mehreren Aspekten des Alltags in einer gesammelten, ausgewogenen Zeit suchen',
   'tariff.60m.title': 'Vollständige evolutive Beratung',
   'tariff.60m.description':
-    'Der empfohlene Weg, um Wurzeln, innere Ressourcen und mögliche Richtungen bewusster Transformation zu erkunden.',
-  'tariff.60m.focus': 'Empfohlen · Vertiefte Analyse',
+    'Um die Wurzeln dessen zu verstehen, was Sie erleben, und eine bewusste Richtung wiederzufinden. Wenn sich eine Dynamik wiederholt und Sie den äußeren Kontext und Ihren Handlungsspielraum ehrlich betrachten wollen.',
+  'tariff.60m.focus': 'Am häufigsten gewählt · Sprachanruf oder Studio Macerata',
   'tariff.60m.includes.0':
-    '60 Minuten Einzelsitzung per Sprachanruf oder vor Ort in Macerata',
-  'tariff.60m.includes.1': 'Kombinierte Deutung Großer und Kleiner Arkana',
+    'Eine volle Stunde, ohne Eile, um tiefe Ursachen zu vertiefen, blinde Flecken zu erkennen und die authentischsten Wege zu finden',
+  'tariff.60m.includes.1':
+    'Danach: eine Synthese der Deutung plus praktische Reflexionsspuren für die folgenden Wochen',
   'tariff.60m.includes.2':
-    'Karte der maieutischen Fragen für die folgenden Wochen',
+    'Geeignet, wenn Sie eine tiefe, respektvolle Deutung wünschen, die Sie hilft, bewusst und autonom zu wählen',
   'tariff.90m.title': 'Integrierte Sitzung',
   'tariff.90m.description':
-    'Erweitertes Treffen für Wendepunkte, Jahresbilanzen oder artikulierte Arbeit an mehreren Lebensbereichen.',
-  'tariff.90m.focus': 'Jahreszyklus · Maximale Tiefe',
+    'Eineinhalb Stunden, um alle Fäden zusammenzuführen und den Weg voraus mit Weite zu betrachten. Ideal beim Abschluss einer anspruchsvollen Phase, dem Beginn eines neuen Kapitels oder der Erkundung mehrerer Lebensbereiche ohne Zersplitterung.',
+  'tariff.90m.focus': 'Sprachanruf oder Studio Macerata (Via Crispi 37)',
   'tariff.90m.includes.0':
-    '90 Minuten holistischer Dialog per Sprachanruf oder vor Ort in Macerata',
+    'Ein weites, vertieftes Treffen, das mehrere Lebensbereiche umfasst und Prioritäten für die kommenden Monate setzt',
   'tariff.90m.includes.1':
-    'Vollständige Deutung mit Großen und Kleinen Arkana (zwölf Häuser oder Doppelvergleich)',
+    'Danach: schriftliches Feedback innerhalb von 48 Stunden über einen privaten Kanal, um die Schlüssel Schritte mit ruhigem Geist festzuhalten',
   'tariff.90m.includes.2':
-    'Schriftliches Follow-up innerhalb von 48 Stunden über privaten Kanal',
+    'Geeignet, wenn Sie komplette Arbeit in einem einzigen Raum wünschen — mit dem besten Gleichgewicht aus Zeit, Tiefe und Investition',
   'faq.faq-1.category': 'Holistischer Ansatz',
   'faq.faq-1.question':
     'Wie lesen die Tarots von Tarot Italia die Gegenwart und sehen die Zukunft voraus?',

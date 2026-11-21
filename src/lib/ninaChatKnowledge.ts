@@ -7,14 +7,23 @@
  * `npx tsx scripts/build-nina-maggiori-cards.ts` then `npm run build:api`.
  */
 
+import {
+  consultationTariffs,
+  formatConsultTariffsMarkdownDetails,
+  formatConsultTariffsMarkdownList,
+} from '../data/consultationTariffs.ts';
 import { NINA_MAGGIORI_CARDS_GENERATED } from '../data/ninaMaggioriCards.generated.ts';
 import { ninaStudioSoftLockReply } from './ninaReplyLang.ts';
+
+const CONSULT_PRICE_LIST = consultationTariffs
+  .map((t) => `€${t.priceEur}`)
+  .join(' / ');
 
 /** Fatti pubblici e FAQ del sito (copy ufficiale, fedele). */
 export const NINA_CHAT_SITE_KNOWLEDGE = `Conoscenza ufficiale del sito (fonte: copy pubblico Tarot Italia — usa SOLO questi fatti; stile FAQ breve e caldo; per prezzi e FAQ cita le risposte qui sotto, senza inventare):
 
 ## Consulti — introduzione ufficiale
-Quattro durate calibrate per profondità differenti. In ogni sessione leggo Arcani Maggiori e Minori: online in chiamata vocale riservata, oppure di persona a Macerata (Via Crispi 37) su appuntamento — il Consulto Breve è solo online.
+Quattro durate calibrate per profondità differenti. In ogni sessione leggo Arcani Maggiori e Minori: online in chiamata vocale riservata, oppure di persona a Macerata (Via Crispi 37) su appuntamento — il Consulto Breve è solo online (chiamata vocale WhatsApp).
 
 Accoglienza: Che tu arrivi con una domanda immediata e sincera — anche semplice o legata agli affetti, come «Mi pensa?» — o con il bisogno di fare chiarezza su un passaggio complesso, i miei consulti nascono per trasformare il caos in cosmos. Integro la lettura viva della cartomanzia pura con la tarologia evolutiva attraverso tutti i 78 Arcani, Maggiori e Minori.
 
@@ -22,32 +31,26 @@ Non è richiesta alcuna conoscenza preliminare delle carte: ti guido passo dopo 
 
 Etica consulti: ogni consulto offre una lettura chiara del presente e delle tendenze future nel rispetto del libero arbitrio. Nessuna promessa miracolistica o sostituzione di pareri medici e legali.
 
-## Tariffe consulti (prezzi correnti, EUR)
+## Tariffe consulti (prezzi correnti, EUR, IVA inclusa)
 In **ogni** sessione Maria Teresa legge **Arcani Maggiori e Minori**.
 Quando elenchi le tariffe in chat, usa SEMPRE un elenco markdown con **una riga per voce** (mai un paragrafo unico con trattini):
 
-- **Consulto Breve** · 20 min · **€19** · **solo online** (chiamata vocale) · Domanda rapida
-- **Consulto Essenziale** · 45 min · **€50** · online o di persona · Più domande · Chiarezza immediata
-- **Consulto Evolutivo Completo** · 60 min · **€75** · online o di persona a Macerata · Consigliato
-- **Sessione Integrata** · 90 min · **€90** · online o di persona a Macerata · Ciclo annuale · Massima profondità
+${formatConsultTariffsMarkdownList()}
 
 Dettaglio (usa solo se chiesto; in elenco resta una riga per voce):
-- **Consulto Breve**: venti minuti solo online per una domanda chiara; Include: 20 min dialogo solo online (chiamata vocale); lettura Maggiori e Minori su un tema puntuale; indicazioni via email o WhatsApp.
-- **Consulto Essenziale**: incontro mirato su più domande; Include: 45 min (online o di persona); lettura Maggiori e Minori; sintesi scritta via email o WhatsApp.
-- **Consulto Evolutivo Completo**: percorso consigliato (radici, risorse, direzioni); Include: 60 min in chiamata o di persona a Macerata; lettura combinata Maggiori e Minori; mappa domande maieutiche.
-- **Sessione Integrata**: svolta / bilancio annuale; Include: 90 min olistici (chiamata o Macerata); lettura completa Maggiori e Minori; follow-up scritto entro 48 ore.
+${formatConsultTariffsMarkdownDetails()}
 
 ## Modalità, orari e sedute (Europe/Rome)
 - Slot pubblici tipici: dalle 09:00 alle 20:00.
 - Online = chiamata vocale riservata (WhatsApp).
 - Di persona: Via Crispi 37, 62100 Macerata, su appuntamento — disponibili fino alle 18:00; **dalle 19:00 solo online**.
-- Il **Consulto Breve** non è disponibile di persona (solo online).
+- Il **Consulto Breve** non è disponibile di persona (solo chiamata vocale WhatsApp).
 
 ## Prenotazione e pagamento (copy Prenota)
 Scegli durata, giorno e orario: in ogni sessione Maria Teresa legge Arcani Maggiori e Minori. Paga online con Stripe Checkout sul sito; il consulto si svolge su WhatsApp. Il Consulto Breve è solo online.
 
 - Contatti pubblici: WhatsApp / Telegram / telefono 379 103 82 53 · email info@tarotitalia.com.
-- Checkout Stripe attivo per i consulti (€19 / €50 / €75 / €90). WhatsApp = canale del consulto, non del pagamento.
+- Checkout Stripe attivo per i consulti (${CONSULT_PRICE_LIST}). WhatsApp = canale del consulto, non del pagamento.
 
 ## Corsi / didattica (copy ufficiale pagina Corsi)
 Questa settimana in offerta pubblica solo Arcani Maggiori a € 69 (listino € 149 barrato; prima € 190). Include Nina Studio (chat riservata di studio) a vita. Arcani Minori e Metodi di Stesura non sono in vendita pubblica — restano in preparazione (nascosti dal catalogo pubblico).

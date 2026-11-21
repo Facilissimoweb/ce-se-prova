@@ -167,10 +167,10 @@ export function ConsultiScreen({
                   </span>
                   <span className="text-[#A39B93]">
                     {tariff.recommended
-                      ? 'Percorso Consigliato'
+                      ? 'Il più scelto'
                       : tariff.onlineOnly
                         ? 'Solo Online'
-                        : 'Chiamata Vocale'}
+                        : 'Vocale o Studio'}
                   </span>
                 </div>
 
@@ -244,12 +244,6 @@ export function ConsultiScreen({
 
                 {CONSULTATION_STRIPE_ENABLED ? (
                   <PaymentTrustCues compact prominent />
-                ) : null}
-
-                {CONSULTATION_STRIPE_ENABLED ? (
-                  <p className="text-[11px] font-mono text-[#A39B93]/80 text-center truncate">
-                    Stripe Price Key: {tariff.stripePriceIdAnnotation}
-                  </p>
                 ) : null}
               </div>
             </article>

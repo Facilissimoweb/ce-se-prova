@@ -43,7 +43,11 @@ function consultShortLabel(tariffId: string, title: string): string {
 function consultMetaPackageBlurb(): string {
   return consultationTariffs
     .map((t) => {
-      const mode = t.onlineOnly ? 'solo online' : 'online o Macerata';
+      const mode = t.onlineOnly
+        ? 'solo online'
+        : t.recommended
+          ? 'Il più scelto · vocale o Studio Macerata'
+          : 'vocale o Studio Macerata';
       return `${consultShortLabel(t.id, t.title)} ${t.durationMinutes}′ €${t.priceEur} (${mode})`;
     })
     .join(', ');

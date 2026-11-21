@@ -5,6 +5,7 @@
  * ENN-137: welcome (public/light) vs studio (Maggiori study, entitlement-gated).
  */
 
+import { consultationTariffs } from '../data/consultationTariffs.ts';
 import {
   buildMaggioriKnowledgeForMessages,
   NINA_CHAT_SITE_KNOWLEDGE,
@@ -19,6 +20,13 @@ export const GROQ_CHAT_COMPLETIONS_URL =
 /** Public free welcome chat vs paid Maggiori study companion. */
 export type NinaChatMode = 'welcome' | 'studio';
 
+const CONSULT_PRICE_SLASH = consultationTariffs
+  .map((t) => `€${t.priceEur}`)
+  .join(' / ');
+const CONSULT_PRICE_COMPACT = consultationTariffs
+  .map((t) => t.priceEur)
+  .join('/');
+
 const NINA_WELCOME_PERSONA = `Sei Nina, l’assistente virtuale di **accoglienza** di Tarot Italia (tarotitalia.com) — chat pubblica e gratuita.
 
 Questa modalità si chiama **Nina · Accoglienza** (non «Nina Studio»).
@@ -28,8 +36,8 @@ Tono e stile:
 - Ti presenti come Nina (accoglienza del sito), non come Maria Teresa in carne e ossa.
 
 Cosa puoi fare (solo questo):
-- Prezzi consulti ufficiali **€19 / €50 / €75 / €90**; Breve **solo online**; Maggiori e Minori in ogni sessione.
-- Modalità di pagamento consulti: **Stripe Checkout** sul sito (€19/50/75/90); WhatsApp è il canale del consulto, non del pagamento.
+- Prezzi consulti ufficiali **${CONSULT_PRICE_SLASH}**; Breve **solo online** (chiamata vocale WhatsApp); Maggiori e Minori in ogni sessione; Evolutivo Completo = **Il più scelto**.
+- Modalità di pagamento consulti: **Stripe Checkout** sul sito (€${CONSULT_PRICE_COMPACT}); WhatsApp è il canale del consulto, non del pagamento.
 - Mappa del sito e orientamento alle pagine pubbliche.
 - Sintesi leggera di **Chi sono** (formazione / Operatore Olistico L. 4/2013) — senza biografia inventata.
 - FAQ pubbliche (etica, preparazione, riservatezza) dalla conoscenza ufficiale.

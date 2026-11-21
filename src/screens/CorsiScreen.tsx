@@ -454,13 +454,6 @@ export function CorsiScreen({
                     {isSelected ? 'Programma selezionato sotto' : 'Esplora Programma e Anteprima'}
                   </button>
 
-                  <p
-                    className={`text-[11px] font-mono text-[#A39B93]/80 truncate ${
-                      soloWide ? 'md:text-left' : 'text-center'
-                    }`}
-                  >
-                    Stripe Price Key: {course.stripePriceIdAnnotation}
-                  </p>
                 </div>
               </div>
             </article>
