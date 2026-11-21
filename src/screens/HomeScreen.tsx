@@ -411,7 +411,7 @@ export function HomeScreen({
         </div>
       </section>
 
-      {/* Paid Educational Courses Showcase — 1) Arcani Maggiori, 2) Arcani Minori, 3) Metodi di Stesura */}
+      {/* Paid Educational Courses Showcase — ENN-174: Maggiori only in public catalog */}
       <section
         id={HOME_DIDATTICA_SECTION_ID}
         aria-labelledby="courses-preview-heading"
@@ -420,7 +420,7 @@ export function HomeScreen({
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2 max-w-2xl">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-              Formazione a Pagamento · 3 Moduli
+              Formazione a Pagamento · Arcani Maggiori
             </p>
             <h2
               id="courses-preview-heading"
