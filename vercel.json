@@ -70,7 +70,7 @@
       "destination": "/api/coming-soon?__path=$1"
     },
     {
-      "source": "/((?!api(?:/|$)|privacy\\.html|coming-soon\\.html|sitemap\\.xml|robots\\.txt|llms\\.txt|llms-full\\.txt).*)",
+      "source": "/((?!api(?:/|$)|\\.well-known(?:/|$)|privacy\\.html|coming-soon\\.html|sitemap\\.xml|robots\\.txt|llms\\.txt|llms-full\\.txt).*)",
       "destination": "/index.html"
     }
   ]

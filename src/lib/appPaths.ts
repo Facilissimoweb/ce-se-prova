@@ -78,19 +78,20 @@ export const SITEMAP_ENTRIES: {
     screen: 'consulti',
     path: '/consulti',
     label: 'Consulti',
-    description: 'Chiamata vocale online e tariffe',
+    description:
+      'Quattro pacchetti (€19 / €50 / €75 / €90 IVA inclusa) · WhatsApp vocale o Macerata',
   },
   {
     screen: 'corsi',
     path: '/corsi',
     label: 'Corsi',
-    description: 'Arcani Maggiori, Minori e metodi di stesura',
+    description: 'Arcani Maggiori (€69) · Nina Studio inclusa',
   },
   {
     screen: 'booking',
     path: '/prenota',
     label: 'Prenota Consulto',
-    description: 'Calendario e prenotazione consulto',
+    description: 'Calendario, Stripe Checkout e consulto WhatsApp',
   },
   {
     screen: 'chat',

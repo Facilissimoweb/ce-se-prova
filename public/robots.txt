@@ -1,8 +1,10 @@
-# Tarot Italia — ENN-62
+# Tarot Italia — ENN-62 / ENN-191
 # Allow public marketing pages for search engines and reputable AI crawlers.
 # Sitemap URL is host-relative so preview and production (pre-cutover) stay valid.
 # At domain cutover (ENN-43) no robots change is required unless Maria wants
 # different AI-crawler policy.
+# Launch: Italian-only public offer; Maggiori on /corsi; Minori/Metodi not public routes.
+# AI notes: /llms.txt, /llms-full.txt, /.well-known/llms.txt
 
 User-agent: *
 Allow: /

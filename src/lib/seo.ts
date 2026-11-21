@@ -9,7 +9,14 @@ import {
 import { getSiteLanguage } from '../i18n/index';
 import { blogSlugFromPath, pathForBlogPost, pathForScreen } from './appPaths';
 import { getBlogPostBySlug, type BlogPost } from './blogPosts';
-import { holisticFaqs, consultiFaqs } from '../data/siteContent';
+import {
+  consultationTariffs,
+  consultiFaqs,
+  educationalCourses,
+  holisticFaqs,
+} from '../data/siteContent';
+import { isCoursePubliclyPresented } from './coursePresentation';
+import { GT_ENABLED } from './googleTranslateEnabled';
 import { SITE_EMAIL, SITE_PHONE_E164, SITE_PIVA } from './siteContacts';
 
 /** Default brand strings (also used as index.html fallbacks). */
@@ -19,6 +26,48 @@ export const SEO_DEFAULT_TITLE =
 export const SEO_DEFAULT_DESCRIPTION =
   'Tarot Italia di Maria Teresa Rogani, operatore olistico. Consulenze simboliche, evolutive e previsionali dei Tarocchi per leggere il presente e il futuro nel rispetto del codice deontologico.';
 export const SEO_DEFAULT_OG_IMAGE = '/brand/tarot-italia-nav.png';
+
+/** EUR prices from shared `consultationTariffs` — keeps meta/JSON-LD off stale €40/€60. */
+export function consultPriceListLabel(): string {
+  return consultationTariffs.map((t) => `€${t.priceEur}`).join(' / ');
+}
+
+function consultShortLabel(tariffId: string, title: string): string {
+  if (tariffId === '20m') return 'Breve';
+  if (tariffId === '45m') return 'Essenziale';
+  if (tariffId === '60m') return 'Evolutivo';
+  if (tariffId === '90m') return 'Integrata';
+  return title;
+}
+
+function consultMetaPackageBlurb(): string {
+  return consultationTariffs
+    .map((t) => {
+      const mode = t.onlineOnly ? 'solo online' : 'online o Macerata';
+      return `${consultShortLabel(t.id, t.title)} ${t.durationMinutes}′ €${t.priceEur} (${mode})`;
+    })
+    .join(', ');
+}
+
+/** Public Maggiori course row (launch catalogue). */
+function publicMaggioriCourse() {
+  return educationalCourses.find(
+    (c) => c.id === 'arcani-maggiori' && isCoursePubliclyPresented(c)
+  );
+}
+
+function maggioriMetaBlurb(): string {
+  const course = publicMaggioriCourse();
+  if (!course) {
+    return 'Percorso formativo Tarot Italia · Arcani Maggiori: dispense, schede visive e Sigillo. Iscrizione online.';
+  }
+  const list =
+    course.compareAtPriceEur != null &&
+    course.compareAtPriceEur > course.priceEur
+      ? `€${course.priceEur} (listino €${course.compareAtPriceEur} barrato)`
+      : `€${course.priceEur}`;
+  return `Percorso formativo Tarot Italia · Arcani Maggiori ${list}: dispense, schede visive, Sigillo e Nina Studio. IVA inclusa. Iscrizione online su /corsi.`;
+}
 
 export type PageSeo = {
   title: string;
@@ -38,19 +87,16 @@ const PAGE_SEO: Record<ScreenId, PageSeo> = {
       'Formazione e percorso di Maria Teresa Rogani, Operatore Olistico: metodo simbolico ed evolutivo dei Tarocchi, etica e ascolto.',
   },
   consulti: {
-    title: 'Consulti — Tarot Italia · €19 / €50 / €75 / €90',
-    description:
-      'Consulti con Maria Teresa Rogani: Breve 20′ €19 (solo online), Essenziale 45′ €50, Evolutivo 60′ €75, Integrata 90′ €90. Arcani Maggiori e Minori in ogni sessione. Prenotazione WhatsApp.',
+    title: `Consulti — Tarot Italia · ${consultPriceListLabel()}`,
+    description: `Consulti con Maria Teresa Rogani (IVA inclusa): ${consultMetaPackageBlurb()}. Maggiori e Minori in ogni sessione. Prenota con Stripe sul sito; consulto in chiamata vocale WhatsApp.`,
   },
   corsi: {
     title: 'Corsi — Tarot Italia · Arcani Maggiori',
-    description:
-      'Percorso formativo Tarot Italia · Arcani Maggiori: dispense, schede visive e Sigillo. Catalogo, programma e iscrizione online.',
+    description: maggioriMetaBlurb(),
   },
   booking: {
     title: 'Prenota Consulto — Tarot Italia',
-    description:
-      'Scegli durata, giorno e orario e invia la prenotazione su WhatsApp. Consulti online in chiamata vocale o di persona a Macerata (Via Crispi 37).',
+    description: `Scegli durata (${consultPriceListLabel()}, IVA inclusa), giorno e orario: paga con Stripe Checkout sul sito (email di conferma). Consulto online in chiamata vocale WhatsApp o di persona a Macerata (Via Crispi 37; dalle 19:00 solo online).`,
   },
   chat: {
     title: 'Dialogo Tarot — Tarot Italia',
@@ -97,7 +143,7 @@ const PAGE_SEO: Record<ScreenId, PageSeo> = {
   sitemap: {
     title: 'Mappa del sito — Tarot Italia',
     description:
-      'Indice delle pagine pubbliche di Tarot Italia (Home, Chi sono, Consulti, Dialogo, Corsi, Blog, Contatti).',
+      'Indice delle pagine pubbliche di Tarot Italia (Home, Chi sono, Consulti, Dialogo, Corsi Maggiori, Blog, Contatti, Prenota).',
   },
   'not-found': {
     title: 'Pagina non trovata — Tarot Italia',
@@ -111,7 +157,8 @@ export function pageSeoForScreen(
   lang: SiteLang = DEFAULT_LANG
 ): PageSeo {
   const base = PAGE_SEO[screen] ?? PAGE_SEO.home;
-  if (lang === DEFAULT_LANG) return base;
+  // Launch: Italian-only meta while Traduci is frozen (ENN-185 / ENN-191).
+  if (!GT_ENABLED || lang === DEFAULT_LANG) return base;
   const overlay = seoTranslations[lang]?.[screen];
   if (!overlay) return base;
   return {
@@ -200,6 +247,9 @@ function upsertJsonLd(id: string, data: unknown): void {
 
 function organizationJsonLd(origin: string) {
   const url = origin || undefined;
+  const prices = consultationTariffs.map((t) => t.priceEur);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
   return {
     '@context': 'https://schema.org',
     '@type': ['Organization', 'LocalBusiness', 'ProfessionalService'],
@@ -220,13 +270,91 @@ function organizationJsonLd(origin: string) {
       addressCountry: 'IT',
     },
     areaServed: ['IT', 'Online'],
-    priceRange: '€19–€90',
+    priceRange: `€${min}–€${max}`,
     founder: {
       '@type': 'Person',
       name: 'Maria Teresa Rogani',
       jobTitle: 'Operatore Olistico',
     },
     sameAs: ['https://tarotitalia.substack.com/'],
+    inLanguage: 'it-IT',
+  };
+}
+
+/** Service + Offer nodes for the four consult packages (shared tariff catalog). */
+function consultServicesJsonLd(origin: string, pageUrl: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Consulti Tarot Italia',
+    url: pageUrl || undefined,
+    numberOfItems: consultationTariffs.length,
+    itemListElement: consultationTariffs.map((tariff, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Service',
+        name: tariff.title,
+        description: tariff.description,
+        provider: {
+          '@type': 'Person',
+          name: 'Maria Teresa Rogani',
+          jobTitle: 'Operatore Olistico',
+        },
+        areaServed: tariff.onlineOnly
+          ? ['Online']
+          : ['IT', 'Online', 'Macerata'],
+        serviceType: 'Consulenza Tarocchi',
+        offers: {
+          '@type': 'Offer',
+          price: tariff.priceEur,
+          priceCurrency: 'EUR',
+          availability: 'https://schema.org/InStock',
+          url: absoluteUrl('/prenota', origin) || undefined,
+          category: 'IVA inclusa',
+          description: `${tariff.durationMinutes} minuti · ${
+            tariff.onlineOnly
+              ? 'solo online (chiamata vocale WhatsApp)'
+              : 'online (WhatsApp vocale) o di persona a Macerata'
+          }`,
+        },
+      },
+    })),
+  };
+}
+
+/** Course JSON-LD for the public Maggiori offer only (Minori/Metodi stay hidden). */
+function maggioriCourseJsonLd(origin: string, pageUrl: string) {
+  const course = publicMaggioriCourse();
+  if (!course) return null;
+  const offer: Record<string, unknown> = {
+    '@type': 'Offer',
+    price: course.priceEur,
+    priceCurrency: 'EUR',
+    availability: 'https://schema.org/InStock',
+    url: pageUrl || absoluteUrl('/corsi', origin) || undefined,
+    category: 'IVA inclusa',
+  };
+  if (
+    course.compareAtPriceEur != null &&
+    course.compareAtPriceEur > course.priceEur
+  ) {
+    offer.description = `Listino €${course.compareAtPriceEur} barrato; prezzo attuale €${course.priceEur}`;
+  }
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: `Tarot Italia — ${course.title}`,
+    description: course.description,
+    provider: {
+      '@type': 'Organization',
+      name: SEO_SITE_NAME,
+      sameAs: absoluteUrl('/', origin) || undefined,
+    },
+    inLanguage: 'it-IT',
+    isAccessibleForFree: false,
+    offers: offer,
+    url: pageUrl || undefined,
   };
 }
 
@@ -313,9 +441,10 @@ function applySeoPayload(options: {
   upsertMeta({ attr: 'property', key: 'og:description' }, options.description);
   upsertMeta({ attr: 'property', key: 'og:type' }, options.ogType || 'website');
   upsertMeta({ attr: 'property', key: 'og:site_name' }, SEO_SITE_NAME);
+  // Launch: Italian-only (GT frozen) — do not advertise other og:locale values.
   upsertMeta(
     { attr: 'property', key: 'og:locale' },
-    LANG_OG[getSiteLanguage()]
+    GT_ENABLED ? LANG_OG[getSiteLanguage()] : LANG_OG[DEFAULT_LANG]
   );
   upsertMeta({ attr: 'property', key: 'og:image' }, image);
   if (canonical.startsWith('http')) {
@@ -393,6 +522,10 @@ export function applyDocumentSeo(screen: ScreenId): void {
     article: null,
   });
 
+  const pageUrl = canonical.startsWith('http')
+    ? canonical
+    : absoluteUrl(path, origin);
+
   if (screen === 'home') {
     upsertJsonLd(
       'json-ld-faq',
@@ -401,7 +534,7 @@ export function applyDocumentSeo(screen: ScreenId): void {
           question: f.question,
           answer: f.answer,
         })),
-        canonical.startsWith('http') ? canonical : absoluteUrl('/', origin)
+        pageUrl
       )
     );
   } else if (screen === 'consulti') {
@@ -412,10 +545,30 @@ export function applyDocumentSeo(screen: ScreenId): void {
           question: f.question,
           answer: f.answer,
         })),
-        canonical.startsWith('http') ? canonical : absoluteUrl('/consulti', origin)
+        pageUrl
       )
     );
   } else {
     document.getElementById('json-ld-faq')?.remove();
+  }
+
+  if (screen === 'consulti' || screen === 'booking') {
+    upsertJsonLd(
+      'json-ld-consult-services',
+      consultServicesJsonLd(origin, pageUrl)
+    );
+  } else {
+    document.getElementById('json-ld-consult-services')?.remove();
+  }
+
+  if (screen === 'corsi') {
+    const courseLd = maggioriCourseJsonLd(origin, pageUrl);
+    if (courseLd) {
+      upsertJsonLd('json-ld-course', courseLd);
+    } else {
+      document.getElementById('json-ld-course')?.remove();
+    }
+  } else {
+    document.getElementById('json-ld-course')?.remove();
   }
 }

@@ -3,6 +3,11 @@ import type { SiteLang } from '../types';
 
 type PageSeoStrings = { title: string; description: string };
 
+/**
+ * Non-IT SEO overlays (ENN-136). Launch is Italian-only (ENN-185 GT freeze);
+ * keep strings accurate anyway so re-enabling Traduci does not revive Minori
+ * catalogue claims or WhatsApp-only booking / paused Stripe copy.
+ */
 const en: Partial<Record<ScreenId, PageSeoStrings>> = {
   home: {
     title: 'Tarot Italia — Maria Teresa Rogani · Holistic Practitioner',
@@ -17,17 +22,17 @@ const en: Partial<Record<ScreenId, PageSeoStrings>> = {
   consulti: {
     title: 'Readings — Tarot Italia · €19 / €50 / €75 / €90',
     description:
-      'Readings with Maria Teresa Rogani: Short 20′ €19 (online only), Essential 45′ €50, Evolutive 60′ €75, Integrated 90′ €90. Major and Minor Arcana in every session. WhatsApp booking.',
+      'Readings with Maria Teresa Rogani (VAT included): Short 20′ €19 (online only), Essential 45′ €50, Evolutive 60′ €75, Integrated 90′ €90. Major and Minor Arcana in every session. Book with Stripe on site; live reading on WhatsApp voice.',
   },
   corsi: {
-    title: 'Courses — Tarot Italia · Didactic Paths',
+    title: 'Courses — Tarot Italia · Major Arcana',
     description:
-      'Tarot Italia training paths: Major Arcana, Minor Arcana and Spread Methods. Catalogue, programme and online enrolment.',
+      'Tarot Italia training · Major Arcana €69 (list €149 struck): materials, visual cards, Sigillo and Nina Studio. Minor Arcana and Spread Methods are not on public sale.',
   },
   booking: {
     title: 'Book a Reading — Tarot Italia',
     description:
-      'Choose duration, day and time and send the booking on WhatsApp. Online voice-call readings or in person in Macerata (Via Crispi 37).',
+      'Choose duration (€19 / €50 / €75 / €90 VAT included), day and time; pay with Stripe Checkout on the site. Live reading on WhatsApp voice, or in person in Macerata (Via Crispi 37; from 19:00 online only).',
   },
   chat: {
     title: 'Tarot Dialogue — Tarot Italia',
@@ -64,17 +69,17 @@ const es: Partial<Record<ScreenId, PageSeoStrings>> = {
   consulti: {
     title: 'Consultas — Tarot Italia · €19 / €50 / €75 / €90',
     description:
-      'Consultas con Maria Teresa Rogani: Breve 20′ €19 (solo en línea), Esencial 45′ €50, Evolutiva 60′ €75, Integrada 90′ €90. Arcanos Mayores y Menores en cada sesión. Reserva por WhatsApp.',
+      'Consultas con Maria Teresa Rogani (IVA incluida): Breve 20′ €19 (solo en línea), Esencial 45′ €50, Evolutiva 60′ €75, Integrada 90′ €90. Arcanos Mayores y Menores en cada sesión. Reserva con Stripe en el sitio; lectura en voz por WhatsApp.',
   },
   corsi: {
-    title: 'Cursos — Tarot Italia · Recorridos Didácticos',
+    title: 'Cursos — Tarot Italia · Arcanos Mayores',
     description:
-      'Recorridos formativos Tarot Italia: Arcanos Mayores, Menores y Métodos de Tirada. Catálogo, programa e inscripción en línea.',
+      'Formación Tarot Italia · Arcanos Mayores €69 (lista €149 tachada): materiales, fichas, Sigillo y Nina Studio. Menores y Métodos no están a la venta pública.',
   },
   booking: {
     title: 'Reservar consulta — Tarot Italia',
     description:
-      'Elige duración, día y hora y envía la reserva por WhatsApp. Consultas en línea por llamada de voz o en persona en Macerata (Via Crispi 37).',
+      'Elige duración (€19 / €50 / €75 / €90 IVA incluida), día y hora; paga con Stripe Checkout en el sitio. Lectura en voz por WhatsApp o en persona en Macerata (Via Crispi 37; desde las 19:00 solo en línea).',
   },
 };
 
@@ -87,17 +92,17 @@ const fr: Partial<Record<ScreenId, PageSeoStrings>> = {
   consulti: {
     title: 'Consultations — Tarot Italia · €19 / €50 / €75 / €90',
     description:
-      'Consultations avec Maria Teresa Rogani : Brève 20′ €19 (uniquement en ligne), Essentielle 45′ €50, Évolutive 60′ €75, Intégrée 90′ €90. Arcanes Majeurs et Mineurs à chaque séance. Réservation WhatsApp.',
+      'Consultations avec Maria Teresa Rogani (TVA incluse) : Brève 20′ €19 (uniquement en ligne), Essentielle 45′ €50, Évolutive 60′ €75, Intégrée 90′ €90. Arcanes Majeurs et Mineurs à chaque séance. Réservation Stripe sur le site ; lecture en voix WhatsApp.',
   },
   corsi: {
-    title: 'Cours — Tarot Italia · Parcours didactiques',
+    title: 'Cours — Tarot Italia · Arcanes Majeurs',
     description:
-      'Parcours formatifs Tarot Italia : Arcanes Majeurs, Mineurs et Méthodes de Tirage. Catalogue, programme et inscription en ligne.',
+      'Parcours Tarot Italia · Arcanes Majeurs €69 (liste €149 barré) : supports, fiches, Sigillo et Nina Studio. Mineurs et Méthodes ne sont pas en vente publique.',
   },
   booking: {
     title: 'Réserver une consultation — Tarot Italia',
     description:
-      'Choisissez durée, jour et horaire et envoyez la réservation sur WhatsApp. Consultations en ligne en appel vocal ou en personne à Macerata (Via Crispi 37).',
+      'Choisissez durée (€19 / €50 / €75 / €90 TVA incluse), jour et horaire ; payez avec Stripe Checkout sur le site. Lecture en voix WhatsApp ou en personne à Macerata (Via Crispi 37 ; à partir de 19:00 uniquement en ligne).',
   },
 };
 
@@ -110,17 +115,17 @@ const de: Partial<Record<ScreenId, PageSeoStrings>> = {
   consulti: {
     title: 'Beratungen — Tarot Italia · €19 / €50 / €75 / €90',
     description:
-      'Beratungen mit Maria Teresa Rogani: Kurz 20′ €19 (nur online), Essenziell 45′ €50, Evolutiv 60′ €75, Integriert 90′ €90. Große und Kleine Arkana in jeder Sitzung. Buchung per WhatsApp.',
+      'Beratungen mit Maria Teresa Rogani (inkl. MwSt.): Kurz 20′ €19 (nur online), Essenziell 45′ €50, Evolutiv 60′ €75, Integriert 90′ €90. Große und Kleine Arkana in jeder Sitzung. Buchung per Stripe auf der Website; Live-Reading per WhatsApp-Sprachanruf.',
   },
   corsi: {
-    title: 'Kurse — Tarot Italia · Didaktische Wege',
+    title: 'Kurse — Tarot Italia · Große Arkana',
     description:
-      'Ausbildungswege Tarot Italia: Große Arkana, Kleine Arkana und Legemethoden. Katalog, Programm und Online-Anmeldung.',
+      'Ausbildung Tarot Italia · Große Arkana €69 (Listenpreis €149 durchgestrichen): Materialien, Karten, Sigillo und Nina Studio. Kleine Arkana und Legemethoden sind nicht öffentlich im Verkauf.',
   },
   booking: {
     title: 'Beratung buchen — Tarot Italia',
     description:
-      'Wählen Sie Dauer, Tag und Uhrzeit und senden Sie die Buchung per WhatsApp. Online-Sprachanruf oder vor Ort in Macerata (Via Crispi 37).',
+      'Wählen Sie Dauer (€19 / €50 / €75 / €90 inkl. MwSt.), Tag und Uhrzeit; zahlen Sie per Stripe Checkout auf der Website. Live-Reading per WhatsApp-Sprachanruf oder vor Ort in Macerata (Via Crispi 37; ab 19:00 nur online).',
   },
 };
 

@@ -109,6 +109,8 @@ function isAllowlisted(pathname: string): boolean {
     path === '/sitemap.xml' ||
     path === '/llms.txt' ||
     path === '/llms-full.txt' ||
+    path === '/.well-known/llms.txt' ||
+    path.startsWith('/.well-known/') ||
     path === '/privacy.html' ||
     path === '/favicon.ico'
   ) {
