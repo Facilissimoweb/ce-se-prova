@@ -226,10 +226,14 @@ export function ChatFab() {
 
   // Lang change (SPA Traduci): drop prior-lang skipGt history so Groq follows
   // the new `lang`, and remount Italian seed for GT to scan.
+  // sendGen invalidates in-flight replies that would re-pollute history (ENN-180).
   const gtLangPrevRef = useRef(gtLang);
+  const sendGenRef = useRef(0);
   useEffect(() => {
     if (gtLangPrevRef.current === gtLang) return;
     gtLangPrevRef.current = gtLang;
+    sendGenRef.current += 1;
+    setSending(false);
     setTurns([seedTurn(mode)]);
     setSendError(null);
     setShowStudioCta(false);
@@ -359,16 +363,22 @@ export function ChatFab() {
     setSendError(null);
     setShowStudioCta(false);
     setDraft('');
-    // ENN-165: Groq history = user/API only. Italian seed must not bias reply lang.
-    const history = turns
-      .filter(
-        (turn) =>
-          turn.skipGt === true &&
-          (turn.role === 'user' || turn.role === 'assistant')
-      )
-      .map(({ role, content }) => ({ role, content }))
-      .slice(-12);
+    // Live googtrans first — React gtLang may lag one frame after Traduci.
     const replyLang = syncGtLang();
+    // ENN-165/180: Groq history = user/API only. If lang just changed and the
+    // reset effect has not flushed yet, omit prior-lang skipGt turns.
+    const history =
+      replyLang !== gtLang
+        ? []
+        : turns
+            .filter(
+              (turn) =>
+                turn.skipGt === true &&
+                (turn.role === 'user' || turn.role === 'assistant')
+            )
+            .map(({ role, content }) => ({ role, content }))
+            .slice(-12);
+    const sendGen = sendGenRef.current;
     setTurns((prev) => [
       ...prev,
       { role: 'user', content: message, skipGt: true },
@@ -395,6 +405,9 @@ export function ChatFab() {
         }),
       });
       const data = (await res.json().catch(() => ({}))) as ChatPostResponse;
+
+      // Traduci mid-flight: drop stale reply so it cannot bias the new lang.
+      if (sendGen !== sendGenRef.current) return;
 
       /** Never surface Groq/Grok/API strings from the API to the user (ENN-152). */
       function safeUserError(fallback: string): string {
@@ -478,9 +491,13 @@ export function ChatFab() {
         { role: 'assistant', content: data.reply as string, skipGt: true },
       ]);
     } catch {
-      setSendError(tIt('nina.errorOffline'));
+      if (sendGen === sendGenRef.current) {
+        setSendError(tIt('nina.errorOffline'));
+      }
     } finally {
-      setSending(false);
+      if (sendGen === sendGenRef.current) {
+        setSending(false);
+      }
     }
   }
 

@@ -54,6 +54,11 @@ assert(
   !zhPrompt.includes('Rispondi SEMPRE in italiano'),
   'zh-CN must not fall back to Italian instruction'
 );
+assert(
+  zhPrompt.includes('priorità assoluta') ||
+    zhPrompt.includes('Ignora la lingua dei messaggi precedenti'),
+  'non-IT suffix overrides prior-turn language (ENN-180)'
+);
 
 assert(
   ninaStudioSoftLockReply('zh-CN').includes('欢迎'),

@@ -68,6 +68,15 @@ assert(
   'resets seed/history when googtrans lang changes (SPA Traduci)'
 );
 assert(
+  chatFab.includes('sendGenRef') &&
+    chatFab.includes('sendGen !== sendGenRef.current'),
+  'invalidates in-flight replies on Traduci lang change (ENN-180)'
+);
+assert(
+  chatFab.includes('replyLang !== gtLang'),
+  'omits prior-lang history when gtLang state lags live googtrans'
+);
+assert(
   chatFab.includes('requestGoogleTranslateRefresh(900)'),
   'late GT refresh nudge when combo may still be mounting'
 );
@@ -93,6 +102,14 @@ assert(
     widget
   ),
   'non-IT applyGoogTransLang no longer ends in location.reload'
+);
+assert(
+  widget.includes('code === live') &&
+    widget.includes('notifyGoogleTranslateRefresh()') &&
+    /if\s*\(\s*code\s*===\s*live\s*\)[\s\S]{0,280}notifyGoogleTranslateRefresh\(/.test(
+      widget
+    ),
+  'same-lang Traduci re-click still notifies Nina (ENN-180)'
 );
 
 const critical = readFileSync(
