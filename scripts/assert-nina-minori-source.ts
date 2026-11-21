@@ -1,5 +1,5 @@
 /**
- * ENN-200 — Minori Studio cards from luce/ombra pack + retrieval discipline.
+ * ENN-200 / ENN-201 — Minori Studio cards (luce/ombra + domande) + retrieval discipline.
  * Run: npx tsx scripts/assert-nina-minori-source.ts
  */
 import { readFileSync } from 'node:fs';
@@ -38,6 +38,12 @@ assert(
     /scintilla creativa/i.test(assoBastoni.body) &&
     /fuochi di paglia/i.test(assoBastoni.body),
   'Asso di Bastoni has luce + ombra from source pack'
+);
+assert(
+  !!assoBastoni &&
+    /\*\*Domanda\*\*/i.test(assoBastoni.body) &&
+    /spinta viva/i.test(assoBastoni.body),
+  'Asso di Bastoni has Domanda from ENN-201 pack'
 );
 
 const reginaSpade = NINA_MINORI_CARDS.find((c) => c.id === 'spade-regina');
@@ -81,8 +87,19 @@ assert(
   'studio injects Asso di Bastoni body'
 );
 assert(
-  /Arcani Minori/i.test(studioAsso),
-  'studio prompt includes Minori frame'
+  /spinta viva/i.test(studioAsso) && /\*\*Domanda\*\*/i.test(studioAsso),
+  'studio injects Domanda for Asso di Bastoni'
+);
+assert(
+  /Arcani Minori/i.test(studioAsso) && /domande/i.test(studioAsso),
+  'studio prompt includes Minori frame with domande'
+);
+
+assert(
+  looksLikeDeepMinoriStudy({
+    message: 'Hai una domanda di pratica per i Minori?',
+  }),
+  'domande sui Minori ask triggers soft-lock detector'
 );
 
 const welcomeAsso = buildNinaSystemPrompt({
@@ -138,11 +155,30 @@ const sourceMd = readFileSync(
 );
 assert(
   /Asso\b/.test(sourceMd) && /Denari/.test(sourceMd) && /Ombra/.test(sourceMd),
-  'canonical Minori MD source present in repo'
+  'canonical Minori luce/ombra MD source present in repo'
+);
+
+const domandeMd = readFileSync(
+  path.join(root, 'content/nina/arcani-minori-domande.md'),
+  'utf8'
+);
+assert(
+  /Domanda/.test(domandeMd) &&
+    /Asso/.test(domandeMd) &&
+    /spinta viva/i.test(domandeMd),
+  'canonical Minori domande MD source present in repo'
+);
+
+const missingDomanda = NINA_MINORI_CARDS.filter(
+  (c) => !/\*\*Domanda\*\*/i.test(c.body)
+);
+assert(
+  missingDomanda.length === 0,
+  'all 56 Minori cards include Domanda field'
 );
 
 assert(
-  studioAsso.length < 28000,
+  studioAsso.length < 30000,
   'studio single-Minori prompt stays under soft payload budget'
 );
 
@@ -150,4 +186,4 @@ if (failed > 0) {
   console.error(`\n${failed} assertion(s) failed`);
   process.exit(1);
 }
-console.log('\nAll ENN-200 Minori smoke assertions passed.');
+console.log('\nAll ENN-200/ENN-201 Minori smoke assertions passed.');
