@@ -463,6 +463,9 @@ export function BookingScreen({
                     </button>
                   );
                 })}
+                {CONSULTATION_STRIPE_ENABLED ? (
+                  <PaymentTrustCues compact prominent className="pt-1" />
+                ) : null}
               </div>
 
               <div className="space-y-3 pt-2">
@@ -970,7 +973,7 @@ export function BookingScreen({
                   </div>
 
                   {CONSULTATION_STRIPE_ENABLED ? (
-                    <PaymentTrustCues className="pt-1" />
+                    <PaymentTrustCues prominent className="pt-1" />
                   ) : null}
 
                   {CONSULTATION_STRIPE_ENABLED ? (
@@ -1049,7 +1052,7 @@ export function BookingScreen({
           <BookingLangNotice showCmsKeys={showCmsKeys} compact />
 
           {CONSULTATION_STRIPE_ENABLED ? (
-            <PaymentTrustCues />
+            <PaymentTrustCues prominent />
           ) : (
             <p className="text-xs leading-relaxed text-[#A39B93]">
               Richiesta via WhatsApp · Maria Teresa invia le indicazioni di
