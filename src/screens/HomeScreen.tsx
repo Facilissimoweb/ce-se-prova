@@ -20,6 +20,10 @@ import {
   HomeSectionBookmarks,
 } from '../components/HomeSectionBookmarks';
 import { HomeTestimonialsCarousel } from '../components/HomeTestimonialsCarousel';
+import {
+  CourseOfferPrice,
+  PaymentTrustCues,
+} from '../components/PaymentTrustCues';
 import { COURSE_SECTION_IMAGES, TARIFF_SECTION_IMAGES } from '../data/sectionImages';
 import {
   SITE_ADDRESS,
@@ -499,9 +503,11 @@ export function HomeScreen({
                   </div>
 
                   <div className="py-3 border-y border-[#D4AF37]/15 flex items-baseline justify-between gap-2">
-                    <span className="font-display text-3xl text-[#F4F1EA] tabular-nums">
-                      € {course.priceEur}
-                    </span>
+                    <CourseOfferPrice
+                      priceEur={course.priceEur}
+                      compareAtPriceEur={course.compareAtPriceEur}
+                      size="lg"
+                    />
                     <span className="text-xs text-[#A39B93] text-right">
                       Accesso perpetuo · IVA incl.
                     </span>
@@ -534,7 +540,7 @@ export function HomeScreen({
                   </ul>
                 </div>
 
-                <div className="pt-2">
+                <div className="space-y-2.5 pt-2">
                   <button
                     type="button"
                     onClick={() => onSelectCourse(course.id)}
@@ -544,9 +550,14 @@ export function HomeScreen({
                         : 'bg-[#D4AF37]/10 border border-[#D4AF37]/35 hover:bg-[#D4AF37] hover:text-[#12100E] text-[#F4F1EA]'
                     }`}
                   >
-                    Scopri il percorso
+                    {course.id === 'arcani-maggiori'
+                      ? `Iscriviti (€ ${course.priceEur})`
+                      : 'Scopri il percorso'}
                     <ArrowRight className="w-4 h-4" />
                   </button>
+                  {course.id === 'arcani-maggiori' ? (
+                    <PaymentTrustCues compact prominent />
+                  ) : null}
                 </div>
               </article>
             );

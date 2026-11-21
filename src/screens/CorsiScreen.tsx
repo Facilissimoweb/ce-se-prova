@@ -19,7 +19,10 @@ import { ResilientImage } from '../components/ResilientImage';
 import { COURSE_SECTION_IMAGES } from '../data/sectionImages';
 import { MaggioriMattoPreview } from '../components/corsi/MaggioriMattoPreview';
 import { MinorArcanaSuitsPlate, SpreadGeometryExplorer } from '../components/CourseVisuals';
-import { PaymentTrustCues } from '../components/PaymentTrustCues';
+import {
+  CourseOfferPrice,
+  PaymentTrustCues,
+} from '../components/PaymentTrustCues';
 import { useAuth } from '../context/AuthContext';
 import {
   isValidEmail,
@@ -326,9 +329,11 @@ export function CorsiScreen({
 
                 {/* Price row */}
                 <div className="py-3 border-y border-[#D4AF37]/15 flex items-baseline justify-between gap-2">
-                  <span className="font-display text-3xl text-[#F4F1EA] tabular-nums">
-                    € {course.priceEur}
-                  </span>
+                  <CourseOfferPrice
+                    priceEur={course.priceEur}
+                    compareAtPriceEur={course.compareAtPriceEur}
+                    size="lg"
+                  />
                   <span className="text-xs text-[#A39B93] text-right">
                     Accesso perpetuo · IVA incl.
                   </span>
@@ -376,7 +381,7 @@ export function CorsiScreen({
                 </button>
 
                 {course.id === 'arcani-maggiori' ? (
-                  <PaymentTrustCues compact />
+                  <PaymentTrustCues compact prominent />
                 ) : null}
 
                 {course.id === 'arcani-maggiori' && (
@@ -472,7 +477,11 @@ export function CorsiScreen({
           <MaggioriMattoPreview
             priceEur={
               educationalCourses.find((c) => c.id === 'arcani-maggiori')
-                ?.priceEur ?? 190
+                ?.priceEur ?? 69
+            }
+            compareAtPriceEur={
+              educationalCourses.find((c) => c.id === 'arcani-maggiori')
+                ?.compareAtPriceEur
             }
             onEnroll={() => handleEnrollCourse('arcani-maggiori')}
             onOpenModuloBlog={onOpenMaggioriModuloBlog}
@@ -581,8 +590,12 @@ export function CorsiScreen({
                   <p className="font-display text-sm text-[#F4F1EA] mt-0.5 truncate">
                     {course.title}
                   </p>
-                  <p className="text-xs text-[#A39B93] tabular-nums mt-0.5">
-                    € {course.priceEur}
+                  <p className="mt-0.5">
+                    <CourseOfferPrice
+                      priceEur={course.priceEur}
+                      compareAtPriceEur={course.compareAtPriceEur}
+                      size="sm"
+                    />
                   </p>
                 </button>
               );
@@ -757,7 +770,11 @@ export function CorsiScreen({
             </button>
           </div>
 
-          <PaymentTrustCues />
+          {activeCourse.id === 'arcani-maggiori' ? (
+            <PaymentTrustCues prominent />
+          ) : (
+            <PaymentTrustCues />
+          )}
 
           {checkoutPayload && (
             <div className="mt-4 rounded-xl bg-[#12100E]/90 border border-[#D4AF37]/45 p-5 space-y-4">
@@ -854,21 +871,29 @@ export function CorsiScreen({
 
           <div className="gold-divider" aria-hidden="true" />
 
-          <div className="flex items-baseline justify-between">
+          <div className="flex items-baseline justify-between gap-2">
             <span className="text-sm text-[#A39B93]">Quota di iscrizione</span>
-            <span className="font-display text-2xl text-[#D4AF37] tabular-nums">
-              € {activeCourse.priceEur}
-            </span>
+            <CourseOfferPrice
+              priceEur={activeCourse.priceEur}
+              compareAtPriceEur={activeCourse.compareAtPriceEur}
+              size="md"
+            />
           </div>
 
           <div className="pt-2 flex items-start gap-2.5 text-xs text-[#A39B93]">
             <ShieldCheck className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" aria-hidden="true" />
             <p className="leading-relaxed">
-              Accesso illimitato nel tempo ai materiali didattici e attestato di partecipazione olistica rilasciato da Tarot Italia.
+              {activeCourse.id === 'arcani-maggiori'
+                ? 'Accesso perpetuo alle dispense Maggiori e a Nina Studio (chat riservata di studio).'
+                : 'Accesso illimitato nel tempo ai materiali didattici e attestato di partecipazione olistica rilasciato da Tarot Italia.'}
             </p>
           </div>
 
-          <PaymentTrustCues />
+          {activeCourse.id === 'arcani-maggiori' ? (
+            <PaymentTrustCues prominent />
+          ) : (
+            <PaymentTrustCues />
+          )}
         </aside>
       </section>
       </div>

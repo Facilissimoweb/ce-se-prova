@@ -23,6 +23,7 @@ import { SCROLL_LANDMARKS } from '../../lib/scrollNavigation';
 
 interface MaggioriMattoPreviewProps {
   priceEur: number;
+  compareAtPriceEur?: number;
   onEnroll: () => void;
   /** ENN-131 — open Modulo 01 gated blog companion (Il Matto) */
   onOpenModuloBlog?: () => void;
@@ -37,6 +38,7 @@ interface MaggioriMattoPreviewProps {
  */
 export function MaggioriMattoPreview({
   priceEur,
+  compareAtPriceEur,
   onEnroll,
   onOpenModuloBlog,
   onOpenBagattoBlog,
@@ -271,8 +273,24 @@ export function MaggioriMattoPreview({
                 Fine anteprima · dopo Il Matto
               </p>
               <p className="text-sm text-[#E8e1dd] leading-relaxed">
-                Bagatto–Carro, le dispense successive e gli Approfondimenti si
-                sbloccano con l&apos;iscrizione al percorso Arcani Maggiori.
+                Bagatto–Carro, le dispense successive, gli Approfondimenti e Nina
+                Studio (chat riservata) si sbloccano con l&apos;iscrizione
+                Maggiori
+                {compareAtPriceEur != null && compareAtPriceEur > priceEur ? (
+                  <>
+                    {' '}
+                    (
+                    <span className="tabular-nums line-through text-[#A39B93]">
+                      € {compareAtPriceEur}
+                    </span>{' '}
+                    <span className="tabular-nums font-semibold text-[#F4F1EA]">
+                      € {priceEur}
+                    </span>
+                    ).
+                  </>
+                ) : (
+                  <> (€ {priceEur}).</>
+                )}
               </p>
             </div>
             <div className="shrink-0 w-full sm:w-auto space-y-2">
@@ -284,7 +302,7 @@ export function MaggioriMattoPreview({
                 Iscriviti al Percorso (€ {priceEur})
                 <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </button>
-              <PaymentTrustCues compact />
+              <PaymentTrustCues compact prominent />
             </div>
           </div>
         </article>

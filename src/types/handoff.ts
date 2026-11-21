@@ -46,6 +46,8 @@ export interface EducationalCourse {
   cmsKeyDesc: string;
   description: string;
   priceEur: number;
+  /** Struck-through list price (launch offer). Display only — charge uses priceEur / Stripe Price. */
+  compareAtPriceEur?: number;
   stripePriceIdAnnotation: string;
   lessonsCount: number;
   totalHours: string;
