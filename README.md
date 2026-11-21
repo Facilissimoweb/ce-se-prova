@@ -34,7 +34,7 @@ npm run lint     # tsc --noEmit
    - `DATABASE_URL` (Postgres TCP; non usare socket `/cloudsql/…`)
    - `FIREBASE_SERVICE_ACCOUNT_JSON`
    - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
-   - `APP_URL` (URL pubblico, es. preview o `https://www.tarotitalia.com`)
+   - `APP_URL` + `VITE_SITE_ORIGIN` = `https://tarotitalia.com` su **Production** (mai `*.vercel.app`; altrimenti sitemap/canonical restano sul hostname di progetto)
    - Per Coming Soon su www: `COMING_SOON_ENABLED=true` + `COMING_SOON_PASSWORD` (o `COMING_SOON_PASSWORD_HASH`) — vedi doc ENN-92 nel Project Context
 3. Deploy: SPA in `dist/` + **10** funzioni Serverless (`api/health.ts` + **committed** `api/{courses,bookings,booking-availability,stripe,reserved,dialogue,news,chat,coming-soon}.js` from `npm run build:api`). Vercel only discovers functions present in the repo `api/` tree — generated-only JS was 404. Refresh bundles with `npm run build:api` before commit when entries change. Sotto-path via rewrite `?__path=`. Hobby: max 12. SPA rewrite skips `/api`, `privacy.html`, `coming-soon.html`. Root `middleware.ts` (Node routing middleware via `@vercel/functions`) gates document routes when Coming Soon is on — not Next.js Edge/`@vercel/edge`. `GET /api/news` serves published posts from `content/blog/*.{md,mdx}` (compiled into `src/data/blogPosts.generated.ts`). `GET|POST /api/chat` is the generic FAB chat (Groq) when `TAROTITALIACHATGENERICAGROQ_API_KEY` is set (server-only).
 
@@ -56,7 +56,8 @@ Vedi `.env.example`. Sintesi:
 |-----------|-----|
 | `DATABASE_URL` / `SQL_*` | Postgres (`DATABASE_URL` preferito su Vercel) |
 | `FIREBASE_SERVICE_ACCOUNT_JSON` | Admin SDK su Vercel |
-| `APP_URL` | URL pubblico (success/cancel Stripe) |
+| `APP_URL` | URL pubblico Production: `https://tarotitalia.com` (Stripe + SEO; mai `*.vercel.app`) |
+| `VITE_SITE_ORIGIN` | Stesso origin brand per sitemap/canonical a build (Production) |
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Checkout + webhook |
 | `STRIPE_PRICE_ID_*` | Price ID Dashboard (opzionali) |
 | `ZOHO_*` / `GOOGLE_*` | Email e Calendar prenotazioni |

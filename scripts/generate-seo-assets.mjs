@@ -1,17 +1,19 @@
 #!/usr/bin/env node
 /**
- * ENN-62 — Generate sitemap.xml with an env-driven absolute origin.
+ * ENN-62 / ENN-198 — Generate sitemap.xml with a brand-safe absolute origin.
  *
- * Origin resolution (first match wins):
- *   1. VITE_SITE_ORIGIN
- *   2. APP_URL
- *   3. https://$VERCEL_PROJECT_PRODUCTION_URL (Vercel Production builds)
- *   4. https://$VERCEL_URL (preview / other Vercel builds)
+ * Origin resolution (first usable match wins):
+ *   1. VITE_SITE_ORIGIN / SITE_ORIGIN / APP_URL / SITE_URL
+ *      — ignored when the value is a *.vercel.app host
+ *   2. Production builds (VERCEL_ENV=production or NODE_ENV=production):
+ *      https://tarotitalia.com (never VERCEL_PROJECT_PRODUCTION_URL /
+ *      VERCEL_URL, which stay on the default *.vercel.app project host)
+ *   3. Preview / local: path-only locs (empty origin)
  *
- * At domain cutover (ENN-43): set VITE_SITE_ORIGIN or APP_URL to
- * https://www.tarotitalia.com (no trailing slash) and redeploy.
- *
- * Does NOT hardcode www.tarotitalia.com as the only canonical host.
+ * Vercel Production env (recommended):
+ *   APP_URL=https://tarotitalia.com
+ *   VITE_SITE_ORIGIN=https://tarotitalia.com
+ * Both Production-scoped. Do not point them at ce-se-prova.vercel.app.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -37,26 +39,62 @@ const PUBLIC_URLS = [
   { path: '/sitemap', changefreq: 'monthly', priority: '0.3' },
 ];
 
-function resolveSiteOrigin() {
+/** Canonical public origin for Production sitemap / robots (ENN-198). */
+export const PRODUCTION_SITE_ORIGIN = 'https://tarotitalia.com';
+
+export function isVercelAppHost(value) {
+  if (!value || typeof value !== 'string') return false;
+  const raw = value.trim();
+  if (!raw) return false;
+  try {
+    const host = new URL(raw.includes('://') ? raw : `https://${raw}`)
+      .hostname
+      .toLowerCase();
+    return host === 'vercel.app' || host.endsWith('.vercel.app');
+  } catch {
+    return /\.vercel\.app$/i.test(raw.replace(/\/$/, ''));
+  }
+}
+
+function parseOrigin(raw) {
+  const value = typeof raw === 'string' ? raw.trim() : '';
+  if (!value) return '';
+  try {
+    return new URL(value).origin;
+  } catch {
+    return value.replace(/\/$/, '');
+  }
+}
+
+/**
+ * Resolve the absolute origin used in sitemap `<loc>` values.
+ * Never returns a *.vercel.app host for production SEO assets.
+ */
+export function resolveSiteOrigin(env = process.env) {
   const candidates = [
-    process.env.VITE_SITE_ORIGIN,
-    process.env.APP_URL,
-    process.env.VERCEL_ENV === 'production' &&
-    process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : '',
-    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
+    env.VITE_SITE_ORIGIN,
+    env.SITE_ORIGIN,
+    env.APP_URL,
+    env.SITE_URL,
   ];
 
   for (const raw of candidates) {
-    const value = typeof raw === 'string' ? raw.trim() : '';
-    if (!value) continue;
-    try {
-      return new URL(value).origin;
-    } catch {
-      return value.replace(/\/$/, '');
-    }
+    const origin = parseOrigin(raw);
+    if (!origin) continue;
+    if (isVercelAppHost(origin)) continue;
+    return origin;
   }
+
+  if (
+    env.VERCEL_ENV === 'production' ||
+    env.NODE_ENV === 'production'
+  ) {
+    return PRODUCTION_SITE_ORIGIN;
+  }
+
+  // Preview / local: leave locs path-only so preview hosts do not pollute
+  // a committed or production-served sitemap. Do not use VERCEL_URL /
+  // VERCEL_PROJECT_PRODUCTION_URL (default project *.vercel.app).
   return '';
 }
 
@@ -94,8 +132,8 @@ function buildSitemap(origin) {
   }).join('\n');
 
   const note = origin
-    ? `<!-- Generated with origin ${origin}. Override with VITE_SITE_ORIGIN / APP_URL (cutover: https://www.tarotitalia.com). -->`
-    : `<!-- Generated without absolute origin (local / missing env). Locs are path-only; Vercel builds inject VERCEL_URL. At cutover set VITE_SITE_ORIGIN=https://www.tarotitalia.com. -->`;
+    ? `<!-- Generated with origin ${origin}. Override with VITE_SITE_ORIGIN / APP_URL=https://tarotitalia.com (never *.vercel.app). -->`
+    : `<!-- Generated without absolute origin (local / preview). Locs are path-only. Production builds default to ${PRODUCTION_SITE_ORIGIN}. -->`;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 ${note}
@@ -105,18 +143,81 @@ ${urls}
 `;
 }
 
-export function generateSeoAssets({ outDir = publicDir } = {}) {
+function buildRobots(origin) {
+  const sitemapLine = origin
+    ? `Sitemap: ${origin}/sitemap.xml`
+    : 'Sitemap: /sitemap.xml';
+
+  return `# Tarot Italia — ENN-62 / ENN-191 / ENN-198
+# Allow public marketing pages for search engines and reputable AI crawlers.
+# Production sitemap locs use ${PRODUCTION_SITE_ORIGIN} (never *.vercel.app).
+# Launch: Italian-only public offer; Maggiori on /corsi; Minori/Metodi not public routes.
+# AI notes: /llms.txt, /llms-full.txt, /.well-known/llms.txt
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /area-riservata
+
+# OpenAI
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+Disallow: /area-riservata
+
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+Disallow: /area-riservata
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /api/
+Disallow: /area-riservata
+
+# Google Gemini / AI Overviews training signal
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+Disallow: /area-riservata
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+Disallow: /area-riservata
+
+# Apple Intelligence / Applebot extended
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /api/
+Disallow: /area-riservata
+
+${sitemapLine}
+`;
+}
+
+export function generateSeoAssets({ outDir = publicDir, env = process.env } = {}) {
   fs.mkdirSync(outDir, { recursive: true });
-  const origin = resolveSiteOrigin();
+  const origin = resolveSiteOrigin(env);
   const sitemapPath = path.join(outDir, 'sitemap.xml');
+  const robotsPath = path.join(outDir, 'robots.txt');
   fs.writeFileSync(sitemapPath, buildSitemap(origin), 'utf8');
-  return { origin, sitemapPath };
+  fs.writeFileSync(robotsPath, buildRobots(origin), 'utf8');
+  return { origin, sitemapPath, robotsPath };
 }
 
 const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
 if (isDirectRun) {
-  const result = generateSeoAssets();
+  // When regenerating committed public/ assets locally, prefer production
+  // canonical unless an explicit non-vercel origin is already in the env.
+  const env = { ...process.env };
+  if (!resolveSiteOrigin(env)) {
+    env.NODE_ENV = env.NODE_ENV || 'production';
+  }
+  const result = generateSeoAssets({ env });
   console.log(
-    `[seo] wrote ${path.relative(root, result.sitemapPath)} (origin=${result.origin || 'path-only'})`
+    `[seo] wrote ${path.relative(root, result.sitemapPath)} + robots.txt (origin=${result.origin || 'path-only'})`
   );
 }

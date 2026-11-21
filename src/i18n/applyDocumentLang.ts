@@ -10,9 +10,20 @@ import { GT_ENABLED } from '../lib/googleTranslateEnabled';
 const HREFLANG_ATTR = 'data-ti-hreflang';
 
 /** Local origin helper — avoid importing `seo.ts` (circular with i18n). */
+function isVercelAppOrigin(value: string): boolean {
+  try {
+    const host = new URL(
+      value.includes('://') ? value : `https://${value}`
+    ).hostname.toLowerCase();
+    return host === 'vercel.app' || host.endsWith('.vercel.app');
+  } catch {
+    return /\.vercel\.app$/i.test(value.replace(/\/$/, ''));
+  }
+}
+
 function siteOrigin(): string {
   const fromEnv = import.meta.env.VITE_SITE_ORIGIN?.trim();
-  if (fromEnv) {
+  if (fromEnv && !isVercelAppOrigin(fromEnv)) {
     try {
       return new URL(fromEnv).origin;
     } catch {
@@ -22,7 +33,7 @@ function siteOrigin(): string {
   if (typeof window !== 'undefined' && window.location?.origin) {
     return window.location.origin;
   }
-  return '';
+  return 'https://tarotitalia.com';
 }
 
 function absoluteHref(pathWithQuery: string, origin: string): string {
