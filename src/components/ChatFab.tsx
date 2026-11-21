@@ -208,6 +208,7 @@ export function ChatFab() {
   }, [i18n.language, mode]);
 
   // Track googtrans so chrome remounts when Traduci changes (ENN-165).
+  // Prefer GT_REFRESH: applyGoogTransLang uses replaceState (no hashchange).
   useEffect(() => {
     const sync = () => {
       syncGtLang();
@@ -223,6 +224,19 @@ export function ChatFab() {
     };
   }, []);
 
+  // Lang change (SPA Traduci): drop prior-lang skipGt history so Groq follows
+  // the new `lang`, and remount Italian seed for GT to scan.
+  const gtLangPrevRef = useRef(gtLang);
+  useEffect(() => {
+    if (gtLangPrevRef.current === gtLang) return;
+    gtLangPrevRef.current = gtLang;
+    setTurns([seedTurn(mode)]);
+    setSendError(null);
+    setShowStudioCta(false);
+    bumpPanel();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- lang edge only
+  }, [gtLang]);
+
   // Fresh remount on open so GT scans clean Italian chrome (not stale fonts).
   useEffect(() => {
     if (!open) return;
@@ -232,11 +246,17 @@ export function ChatFab() {
   }, [open]);
 
   // Panel remounts chrome + seed — re-apply googtrans (same as Sigillo ENN-157).
+  // Extra late nudge: TranslateElement combo may not exist yet right after switch.
   useEffect(() => {
     if (!open) return;
+    if (gtLang === GT_PAGE_LANG) return;
     requestGoogleTranslateRefresh(160);
-    const later = window.setTimeout(() => requestGoogleTranslateRefresh(360), 280);
-    return () => window.clearTimeout(later);
+    const mid = window.setTimeout(() => requestGoogleTranslateRefresh(360), 280);
+    const late = window.setTimeout(() => requestGoogleTranslateRefresh(900), 700);
+    return () => {
+      window.clearTimeout(mid);
+      window.clearTimeout(late);
+    };
   }, [open, mode, turns.length, showStudioCta, sending, panelEpoch, gtLang]);
 
   // If Studio entitlement is lost, fall back to welcome.

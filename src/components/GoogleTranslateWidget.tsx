@@ -16,6 +16,7 @@ import {
   clearGoogtransHash,
   expireGoogtransCookies,
   googleTranslateElementReady,
+  notifyGoogleTranslateRefresh,
   readGoogTransLang,
   requestGoogleTranslateRefresh,
   startGoogleTranslateSpaBridge,
@@ -92,15 +93,19 @@ let spaBridgeStop: (() => void) | undefined;
 
 /**
  * Apply a browsing language via googtrans.
- * IT clears cookie/hash and reloads to Italian source.
- * Other langs clear stale cookies, write /it/<code> + #googtrans, then reload.
  *
- * Important (ENN-142): never rely on location.replace/assign when only the
- * `#googtrans(...)` hash changes — browsers treat that as in-page navigation
- * (no reload), which left the menu stuck busy/disabled (EN→ES→DE freeze).
+ * - IT: clear cookie/hash and **reload** so GT `<font>` nodes are purged
+ *   (ENN-142 Italian restore).
+ * - Other langs: write `/it/<code>` cookie + `#googtrans`, nudge the combo,
+ *   and notify SPA listeners (Nina) — **no full reload**. ENN-142 freeze was
+ *   from hash-only `location.replace` leaving the menu `aria-busy`; we unlock
+ *   after notify/refresh instead of relying on navigation.
+ *
+ * `replaceState` does not fire `hashchange` — callers must use the return
+ * value / `tarot:gt-refresh` (fired here) so ChatFab picks lang immediately.
  */
-export function applyGoogTransLang(code: string) {
-  if (gtLangSwitchLock) return;
+export function applyGoogTransLang(code: string): 'reload' | 'spa' | 'noop' {
+  if (gtLangSwitchLock) return 'noop';
   gtLangSwitchLock = true;
 
   // Keep react-i18next on Italian so GT does not double-translate overlays.
@@ -119,18 +124,23 @@ export function applyGoogTransLang(code: string) {
     // Strip hash first so reload cannot resurrect a foreign googtrans target.
     window.history.replaceState(null, '', path);
     window.location.reload();
-    return;
+    return 'reload';
   }
 
   writeGoogtransCookie(target);
-  // Cookie + hash; replaceState then reload forces a full document load even
-  // when the previous URL already had a different #googtrans(...).
   window.history.replaceState(
     null,
     '',
     `${path}#googtrans(${GT_PAGE_LANG}|${target})`
   );
-  window.location.reload();
+  // Nina + booking notices listen for this; hashchange does not fire on replaceState.
+  notifyGoogleTranslateRefresh();
+  requestGoogleTranslateRefresh(40);
+  window.setTimeout(() => requestGoogleTranslateRefresh(220), 160);
+  window.setTimeout(() => {
+    gtLangSwitchLock = false;
+  }, 450);
+  return 'spa';
 }
 
 function clearGoogleTranslateArtifacts(clearCookies: boolean) {
@@ -382,7 +392,12 @@ function BrandedLanguageMenu({
     }
     setSwitching(true);
     setCurrent(code);
-    applyGoogTransLang(code);
+    const outcome = applyGoogTransLang(code);
+    // SPA non-IT path: unlock menu (ENN-142 freeze was leaving aria-busy stuck).
+    // IT / reload leaves this component unmounted.
+    if (outcome === 'spa' || outcome === 'noop') {
+      setSwitching(false);
+    }
   };
 
   if (variant === 'drawer') {
