@@ -441,123 +441,155 @@ export function HomeScreen({
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 items-stretch">
+        {/* ENN-176: single public course → full-width horizontal on desktop */}
+        <div
+          className={`grid gap-5 md:gap-6 items-stretch ${
+            educationalCourses.length === 1
+              ? 'grid-cols-1'
+              : 'grid-cols-1 md:grid-cols-3'
+          }`}
+        >
           {educationalCourses.map((course) => {
             const courseImage = COURSE_SECTION_IMAGES[course.id];
             const lessonsMeta =
               course.id === 'arcani-maggiori'
                 ? `${course.lessonsCount} moduli · ${course.totalHours}`
                 : `${course.lessonsCount} lezioni · ${course.totalHours}`;
+            const soloWide = educationalCourses.length === 1;
             return (
               <article
                 key={course.id}
-                className={`rounded-2xl p-6 md:p-7 flex flex-col justify-between gap-6 transition-all duration-200 ${
+                className={`rounded-2xl p-6 md:p-7 flex transition-all duration-200 ${
+                  soloWide
+                    ? 'flex-col md:flex-row md:items-stretch gap-6 md:gap-8'
+                    : 'flex-col justify-between gap-6'
+                } ${
                   course.recommended
                     ? 'glass-tier-2 border-[#D4AF37]/45 shadow-[0_0_28px_rgba(212,175,55,0.12)]'
                     : 'glass-tier-1 hover:border-[#D4AF37]/35'
                 }`}
               >
-                <div className="space-y-5">
-                  <div className="rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#12100E]">
-                    <ResilientImage
-                      src={courseImage.src}
-                      alt={courseImage.alt}
-                      className="w-full aspect-[4/3] object-cover"
-                      fallbackLabel={course.title}
-                    />
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <span className="font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                      {course.orderLabel}
-                    </span>
-                    <span className="text-[#A39B93]">
-                      {course.recommended ? 'Percorso Consigliato' : lessonsMeta}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h3 className="font-display text-xl md:text-2xl text-[#F4F1EA]">
-                      {showCmsKeys ? (
-                        <CopyText
-                          entry={{ cmsKey: course.cmsKeyTitle, liveText: course.title }}
-                          showKeys={true}
-                        />
-                      ) : (
-                        course.title
-                      )}
-                    </h3>
-                    <p className="text-xs font-medium text-[#D4AF37]/90">
-                      {showCmsKeys ? (
-                        <CopyText
-                          entry={{ cmsKey: course.cmsKeySubtitle, liveText: course.subtitle }}
-                          showKeys={true}
-                        />
-                      ) : (
-                        course.subtitle
-                      )}
-                    </p>
-                    {course.recommended ? (
-                      <p className="text-[11px] text-[#A39B93] tabular-nums">{lessonsMeta}</p>
-                    ) : null}
-                  </div>
-
-                  <div className="py-3 border-y border-[#D4AF37]/15 flex items-baseline justify-between gap-2">
-                    <CourseOfferPrice
-                      priceEur={course.priceEur}
-                      compareAtPriceEur={course.compareAtPriceEur}
-                      size="lg"
-                    />
-                    <span className="text-xs text-[#A39B93] text-right">
-                      Accesso perpetuo · IVA incl.
-                    </span>
-                  </div>
-
-                  <p className="text-sm leading-relaxed text-[#A39B93]">
-                    {showCmsKeys ? (
-                      <CopyText
-                        entry={{ cmsKey: course.cmsKeyDesc, liveText: course.description }}
-                        showKeys={true}
-                      />
-                    ) : (
-                      course.description
-                    )}
-                  </p>
-
-                  <ul className="space-y-2.5 pt-1">
-                    {course.includes.map((item) => (
-                      <li
-                        key={item}
-                        className="flex items-start gap-2.5 text-xs md:text-sm text-[#E8e1dd]"
-                      >
-                        <Check
-                          className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5"
-                          aria-hidden="true"
-                        />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                <div
+                  className={`rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#12100E] ${
+                    soloWide
+                      ? 'md:w-[min(42%,22rem)] md:shrink-0'
+                      : ''
+                  }`}
+                >
+                  <ResilientImage
+                    src={courseImage.src}
+                    alt={courseImage.alt}
+                    className={`w-full object-cover ${
+                      soloWide
+                        ? 'aspect-[4/3] md:aspect-auto md:h-full md:min-h-[16rem]'
+                        : 'aspect-[4/3]'
+                    }`}
+                    fallbackLabel={course.title}
+                  />
                 </div>
 
-                <div className="space-y-2.5 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => onSelectCourse(course.id)}
-                    className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] ${
-                      course.recommended
-                        ? 'bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)]'
-                        : 'bg-[#D4AF37]/10 border border-[#D4AF37]/35 hover:bg-[#D4AF37] hover:text-[#12100E] text-[#F4F1EA]'
-                    }`}
-                  >
-                    {course.id === 'arcani-maggiori'
-                      ? `Iscriviti (€ ${course.priceEur})`
-                      : 'Scopri il percorso'}
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                  {course.id === 'arcani-maggiori' ? (
-                    <PaymentTrustCues compact prominent />
-                  ) : null}
+                <div
+                  className={`flex flex-col justify-between gap-6 ${
+                    soloWide ? 'flex-1 min-w-0' : ''
+                  }`}
+                >
+                  <div className="space-y-5">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <span className="font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                        {course.orderLabel}
+                      </span>
+                      <span className="text-[#A39B93]">
+                        {course.recommended ? 'Percorso Consigliato' : lessonsMeta}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h3 className="font-display text-xl md:text-2xl text-[#F4F1EA]">
+                        {showCmsKeys ? (
+                          <CopyText
+                            entry={{ cmsKey: course.cmsKeyTitle, liveText: course.title }}
+                            showKeys={true}
+                          />
+                        ) : (
+                          course.title
+                        )}
+                      </h3>
+                      <p className="text-xs font-medium text-[#D4AF37]/90">
+                        {showCmsKeys ? (
+                          <CopyText
+                            entry={{ cmsKey: course.cmsKeySubtitle, liveText: course.subtitle }}
+                            showKeys={true}
+                          />
+                        ) : (
+                          course.subtitle
+                        )}
+                      </p>
+                      {course.recommended ? (
+                        <p className="text-[11px] text-[#A39B93] tabular-nums">{lessonsMeta}</p>
+                      ) : null}
+                    </div>
+
+                    <div className="py-3 border-y border-[#D4AF37]/15 flex items-baseline justify-between gap-2">
+                      <CourseOfferPrice
+                        priceEur={course.priceEur}
+                        compareAtPriceEur={course.compareAtPriceEur}
+                        size="lg"
+                      />
+                      <span className="text-xs text-[#A39B93] text-right">
+                        Accesso perpetuo · IVA incl.
+                      </span>
+                    </div>
+
+                    <p className="text-sm leading-relaxed text-[#A39B93]">
+                      {showCmsKeys ? (
+                        <CopyText
+                          entry={{ cmsKey: course.cmsKeyDesc, liveText: course.description }}
+                          showKeys={true}
+                        />
+                      ) : (
+                        course.description
+                      )}
+                    </p>
+
+                    <ul className="space-y-2.5 pt-1">
+                      {course.includes.map((item) => (
+                        <li
+                          key={item}
+                          className="flex items-start gap-2.5 text-xs md:text-sm text-[#E8e1dd]"
+                        >
+                          <Check
+                            className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5"
+                            aria-hidden="true"
+                          />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="space-y-2.5 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => onSelectCourse(course.id)}
+                      className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] ${
+                        course.recommended
+                          ? 'bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)]'
+                          : 'bg-[#D4AF37]/10 border border-[#D4AF37]/35 hover:bg-[#D4AF37] hover:text-[#12100E] text-[#F4F1EA]'
+                      } ${soloWide ? 'md:max-w-sm' : ''}`}
+                    >
+                      {course.id === 'arcani-maggiori'
+                        ? `Iscriviti (€ ${course.priceEur})`
+                        : 'Scopri il percorso'}
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                    {course.id === 'arcani-maggiori' ? (
+                      <PaymentTrustCues
+                        compact
+                        prominent
+                        className={soloWide ? 'md:justify-start' : ''}
+                      />
+                    ) : null}
+                  </div>
                 </div>
               </article>
             );
