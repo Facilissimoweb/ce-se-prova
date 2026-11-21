@@ -400,7 +400,8 @@ export function ChatFab() {
         body: JSON.stringify({
           message,
           history,
-          lang: replyLang || activeChatLang(),
+          // ENN-188: Italian-only — ignore googtrans (GT freeze; do not re-enable).
+          lang: 'it',
           mode: effectiveMode,
         }),
       });

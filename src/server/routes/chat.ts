@@ -13,7 +13,6 @@ import {
 } from '../../lib/ninaChatKnowledge.ts';
 import {
   looksLikeNinaProviderLeak,
-  normalizeNinaLang,
   ninaSoftOutageCopy,
   ninaStudioGateCopy,
   ninaUnclearIntentReply,
@@ -249,9 +248,8 @@ export async function postChatMessage(params: {
 
   const mode = parseMode(body.mode);
   const history = asHistory(body.history);
-  const lang = normalizeNinaLang(
-    typeof body.lang === 'string' ? body.lang : 'it'
-  );
+  // ENN-188: force Italian — ignore client/googtrans lang (do not re-enable GT).
+  const lang = 'it';
 
   // Entitlement / soft-lock before Groq — works even if the key is missing.
   if (mode === 'studio') {

@@ -1,10 +1,12 @@
 import React from 'react';
+import { parseNinaMessageBlocks } from '../../lib/ninaMessageBlocks';
 import { SITE_EMAIL } from '../../lib/siteContacts';
 
 /**
  * Safe rendering for Nina chat replies.
  * Never uses dangerouslySetInnerHTML — only React text nodes + allowlisted links.
- * Supports: short paragraphs, **bold**, markdown links.
+ * Supports: short paragraphs, **bold**, markdown links, `- ` / `* ` / numbered lists.
+ * ENN-188: lists render as real bullets (not a dense hyphen paragraph).
  * Trailing contact CTA blocks (--- / Prenota·WhatsApp·Telegram·email) are stripped:
  * those actions live only in the ChatFab «Parla con Maria Teresa» panel.
  */
@@ -131,24 +133,38 @@ function stripTrailingCtaBlock(content: string): string {
   return normalized;
 }
 
-function paragraphsFrom(text: string): string[] {
-  return text
-    .split(/\n{2,}/)
-    .map((p) => p.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim())
-    .filter(Boolean);
-}
-
 export function NinaMessageBody({ content }: { content: string }) {
   const body = stripTrailingCtaBlock(content);
-  const paras = paragraphsFrom(body);
+  const blocks = parseNinaMessageBlocks(body);
 
   return (
     <div className="space-y-2.5 text-sm leading-relaxed">
-      {paras.map((para, idx) => (
-        <p key={`p-${idx}`} className="break-words text-[#D6CFC6]">
-          {renderInline(para, `p${idx}`)}
-        </p>
-      ))}
+      {blocks.map((block, idx) => {
+        if (block.type === 'list') {
+          const ListTag = block.ordered ? 'ol' : 'ul';
+          return (
+            <ListTag
+              key={`list-${idx}`}
+              className={
+                block.ordered
+                  ? 'list-decimal space-y-1.5 pl-5 text-[#D6CFC6]'
+                  : 'list-disc space-y-1.5 pl-5 text-[#D6CFC6]'
+              }
+            >
+              {block.items.map((item, itemIdx) => (
+                <li key={`li-${idx}-${itemIdx}`} className="break-words pl-0.5">
+                  {renderInline(item, `l${idx}i${itemIdx}`)}
+                </li>
+              ))}
+            </ListTag>
+          );
+        }
+        return (
+          <p key={`p-${idx}`} className="break-words text-[#D6CFC6]">
+            {renderInline(block.text, `p${idx}`)}
+          </p>
+        );
+      })}
     </div>
   );
 }

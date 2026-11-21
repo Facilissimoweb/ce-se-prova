@@ -24,22 +24,18 @@ Etica consulti: ogni consulto offre una lettura chiara del presente e delle tend
 
 ## Tariffe consulti (prezzi correnti, EUR)
 In **ogni** sessione Maria Teresa legge **Arcani Maggiori e Minori**.
+Quando elenchi le tariffe in chat, usa SEMPRE un elenco markdown con **una riga per voce** (mai un paragrafo unico con trattini):
 
-- **Consulto Breve** · 20 min · **€19** · **solo online** (chiamata vocale) · Solo online · Domanda rapida
-  Venti minuti solo online per una domanda chiara e un orientamento rapido, con lettura di Arcani Maggiori e Minori.
-  Include: 20 minuti di dialogo individuale solo online (chiamata vocale); Lettura con Arcani Maggiori e Minori su un tema puntuale; Indicazioni pratiche via email o WhatsApp.
-
+- **Consulto Breve** · 20 min · **€19** · **solo online** (chiamata vocale) · Domanda rapida
 - **Consulto Essenziale** · 45 min · **€50** · online o di persona · Più domande · Chiarezza immediata
-  Un incontro mirato per approfondire più domande sul presente, con chiarezza simbolica ed equilibrio.
-  Include: 45 minuti di dialogo individuale (online o di persona); Lettura con Arcani Maggiori e Minori su più domande; Sintesi scritta dei punti emersi via email o WhatsApp.
-
-- **Consulto Evolutivo Completo** · 60 min · **€75** · online o di persona a Macerata · Consigliato · Analisi approfondita (percorso consigliato)
-  Il percorso consigliato per esplorare radici, risorse interiori e possibili direzioni di trasformazione consapevole.
-  Include: 60 minuti di sessione individuale in chiamata vocale o di persona a Macerata; Lettura combinata di Arcani Maggiori e Minori; Mappa delle domande maieutiche per le settimane successive.
-
+- **Consulto Evolutivo Completo** · 60 min · **€75** · online o di persona a Macerata · Consigliato
 - **Sessione Integrata** · 90 min · **€90** · online o di persona a Macerata · Ciclo annuale · Massima profondità
-  Incontro esteso dedicato a momenti di svolta, bilanci di ciclo annuale o lavoro articolato su più ambiti di vita.
-  Include: 90 minuti di dialogo olistico in chiamata vocale o di persona a Macerata; Lettura completa con Arcani Maggiori e Minori (dodici case o doppio confronto); Follow-up scritto entro 48 ore tramite canale riservato.
+
+Dettaglio (usa solo se chiesto; in elenco resta una riga per voce):
+- **Consulto Breve**: venti minuti solo online per una domanda chiara; Include: 20 min dialogo solo online (chiamata vocale); lettura Maggiori e Minori su un tema puntuale; indicazioni via email o WhatsApp.
+- **Consulto Essenziale**: incontro mirato su più domande; Include: 45 min (online o di persona); lettura Maggiori e Minori; sintesi scritta via email o WhatsApp.
+- **Consulto Evolutivo Completo**: percorso consigliato (radici, risorse, direzioni); Include: 60 min in chiamata o di persona a Macerata; lettura combinata Maggiori e Minori; mappa domande maieutiche.
+- **Sessione Integrata**: svolta / bilancio annuale; Include: 90 min olistici (chiamata o Macerata); lettura completa Maggiori e Minori; follow-up scritto entro 48 ore.
 
 ## Modalità, orari e sedute (Europe/Rome)
 - Slot pubblici tipici: dalle 09:00 alle 20:00.
@@ -152,7 +148,7 @@ const MAX_INJECTED_CARDS = 3;
 
 /**
  * Soft-lock copy when welcome chat asks for deep Maggiori study (ENN-137).
- * Prefer `ninaStudioSoftLockReply(lang)` so GT browsing language is respected (ENN-143).
+ * ENN-188: Italian-only (lang ignored).
  */
 export const NINA_STUDIO_SOFT_LOCK_REPLY = ninaStudioSoftLockReply('it');
 
