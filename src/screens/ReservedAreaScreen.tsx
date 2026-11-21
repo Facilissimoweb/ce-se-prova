@@ -262,7 +262,7 @@ export function ReservedAreaScreen({
             <span>{user.email}</span>
             <span aria-hidden="true" className="text-[#D4AF37]/60">·</span>
             <span>
-              {unlockedCount} / {overview?.courses.length ?? 3} percorsi attivi
+              {unlockedCount} / {overview?.courses.length ?? 1} percorsi attivi
             </span>
             <span aria-hidden="true" className="text-[#D4AF37]/60">·</span>
             <span>
@@ -392,7 +392,13 @@ export function ReservedAreaScreen({
           {/* Course Selector Strip */}
           <div
             id={SCROLL_LANDMARKS.reservedPercorsi}
-            className="grid grid-cols-1 md:grid-cols-3 gap-4 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
+            className={`grid grid-cols-1 gap-4 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))] ${
+              overview.courses.length >= 3
+                ? 'md:grid-cols-3'
+                : overview.courses.length === 2
+                  ? 'md:grid-cols-2'
+                  : ''
+            }`}
           >
             {overview.courses.map((course, idx) => {
               const isSelected = course.slug === activeCourse.slug;

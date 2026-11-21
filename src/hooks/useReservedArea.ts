@@ -6,6 +6,7 @@ import {
 import { readGoogTransLang } from '../components/GoogleTranslateWidget';
 import { stripDispensaEmbedMarkers } from '../lib/stripDispensaEmbeds';
 import { readJsonResponse } from '../lib/readJsonResponse';
+import { filterPublicPresentedBySlug } from '../lib/coursePresentation';
 import {
   RESERVED_DEMO_UID,
   buildReservedDemoOverview,
@@ -16,6 +17,16 @@ import type {
   ReservedCourseItem,
   ReservedUnlockedDispensa,
 } from '../types/handoff';
+
+/** ENN-175 — Area Personale lists only publicPresented courses. */
+function presentOverviewCourses(
+  overview: ReservedAreaOverview
+): ReservedAreaOverview {
+  return {
+    ...overview,
+    courses: filterPublicPresentedBySlug(overview.courses),
+  };
+}
 
 type GetIdToken = () => Promise<string | null>;
 
@@ -74,7 +85,7 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
     try {
       if (currentUser.uid === RESERVED_DEMO_UID) {
         if (signal?.aborted || requestId !== overviewRequestIdRef.current) return;
-        setOverview(buildReservedDemoOverview());
+        setOverview(presentOverviewCourses(buildReservedDemoOverview()));
         setEnrollName((prev) => prev || currentUser.displayName || 'Demo Corsista');
         return;
       }
@@ -106,7 +117,9 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
       if (!res.ok) {
         throw new Error(json.error || FALLBACK_OVERVIEW_ERROR);
       }
-      const overviewPayload = json as ReservedAreaOverview;
+      const overviewPayload = presentOverviewCourses(
+        json as ReservedAreaOverview
+      );
       setOverview(overviewPayload);
       if (overviewPayload.degraded || overviewPayload.notice) {
         setDataError(overviewPayload.notice || FALLBACK_OVERVIEW_ERROR);
@@ -160,6 +173,13 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
       overview.courses[0] ??
       null
     );
+  }, [overview, activeCourseSlug]);
+
+  // If a frozen course slug was sticky, snap to first presented percorso.
+  useEffect(() => {
+    if (!overview?.courses.length) return;
+    if (overview.courses.some((c) => c.slug === activeCourseSlug)) return;
+    setActiveCourseSlug(overview.courses[0].slug);
   }, [overview, activeCourseSlug]);
 
   useEffect(() => {

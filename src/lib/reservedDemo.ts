@@ -1,4 +1,5 @@
 import { ARCANI_MAGGIORI_DISPENSE } from '../data/courses/arcaniMaggioriDispense';
+import { filterPublicPresentedBySlug } from './coursePresentation';
 import type {
   CourseId,
   ReservedAreaOverview,
@@ -185,7 +186,10 @@ export function buildReservedDemoOverview(): ReservedAreaOverview {
       displayName: 'Demo Corsista',
       phoneWhatsapp: null,
     },
-    courses: DEMO_COURSE_SEEDS.map((c, i) => toUnlockedCourse(c, i + 1)),
+    // ENN-175 — keep Minori/Metodi seeds above; hide via publicPresented.
+    courses: filterPublicPresentedBySlug(
+      DEMO_COURSE_SEEDS.map((c, i) => toUnlockedCourse(c, i + 1))
+    ),
     bookings: [],
     dialoguePasses: [],
   };

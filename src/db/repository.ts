@@ -27,6 +27,7 @@ import {
 } from '../lib/bookingRules.ts';
 import { occupiedKey, type OccupiedSlot } from '../lib/bookingSlots.ts';
 import { fulfillConfirmedBooking } from '../lib/bookingFulfillment.ts';
+import { filterPublicPresentedBySlug } from '../lib/coursePresentation.ts';
 import { fetchGoogleBusySlotKeys } from '../lib/googleCalendar.ts';
 import { ensureCatalogSeeded } from './courseCatalog.ts';
 
@@ -151,38 +152,43 @@ export async function getReservedAreaOverview(
         displayName: dbUser.displayName,
         phoneWhatsapp: dbUser.phoneWhatsapp,
       },
-      courses: allCourses.map((course) => {
-        const purchase = userPurchases.find((p) => p.courseId === course.id);
-        const isUnlocked = Boolean(purchase);
-        const outline = allOutlineDispense.filter((d) => d.courseId === course.id);
-        const fullDispense = unlockedDispenseRows
-          .filter((d) => d.courseId === course.id)
-          .map((d) => {
-            const prog = progressByDispensaId.get(d.id);
-            let parsedTakeaways: string[] = [];
-            try {
-              parsedTakeaways = JSON.parse(d.keyTakeaways) as string[];
-            } catch {
-              parsedTakeaways = [];
-            }
-            return {
-              ...d,
-              keyTakeaways: parsedTakeaways,
-              completed: prog?.completed ?? false,
-              personalNotes: prog?.personalNotes ?? '',
-            };
-          });
+      // ENN-175 — Maggiori-only in Area Personale (same publicPresented flag).
+      courses: filterPublicPresentedBySlug(
+        allCourses.map((course) => {
+          const purchase = userPurchases.find((p) => p.courseId === course.id);
+          const isUnlocked = Boolean(purchase);
+          const outline = allOutlineDispense.filter(
+            (d) => d.courseId === course.id
+          );
+          const fullDispense = unlockedDispenseRows
+            .filter((d) => d.courseId === course.id)
+            .map((d) => {
+              const prog = progressByDispensaId.get(d.id);
+              let parsedTakeaways: string[] = [];
+              try {
+                parsedTakeaways = JSON.parse(d.keyTakeaways) as string[];
+              } catch {
+                parsedTakeaways = [];
+              }
+              return {
+                ...d,
+                keyTakeaways: parsedTakeaways,
+                completed: prog?.completed ?? false,
+                personalNotes: prog?.personalNotes ?? '',
+              };
+            });
 
-        return {
-          ...course,
-          isUnlocked,
-          purchasedAt: purchase?.purchasedAt ?? null,
-          amountPaidEur: purchase?.amountPaidEur ?? null,
-          dispenseCount: outline.length,
-          dispenseOutline: outline,
-          unlockedDispense: fullDispense,
-        };
-      }),
+          return {
+            ...course,
+            isUnlocked,
+            purchasedAt: purchase?.purchasedAt ?? null,
+            amountPaidEur: purchase?.amountPaidEur ?? null,
+            dispenseCount: outline.length,
+            dispenseOutline: outline,
+            unlockedDispense: fullDispense,
+          };
+        })
+      ),
       bookings: userBookings,
       dialoguePasses: userDialoguePasses.map((p) => ({
         id: p.id,

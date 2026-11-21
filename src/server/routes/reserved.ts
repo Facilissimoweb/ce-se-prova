@@ -41,6 +41,10 @@ import {
   STRIPE_SECRET_KEY_CLIENT_ERROR,
 } from '../../lib/stripe.ts';
 import { courseStripePriceAnnotation } from '../../lib/paymentCatalog.ts';
+import {
+  filterPublicPresentedBySlug,
+  isCourseSlugPubliclyPresented,
+} from '../../lib/coursePresentation.ts';
 import { activateCourseFromPaidSession } from '../activations.ts';
 import {
   json,
@@ -80,34 +84,37 @@ function degradedOverviewFromSeed(user: ApiUser) {
       displayName: user.name ?? null,
       phoneWhatsapp: null,
     },
-    courses: COURSE_SEED_CATALOG.map((course, index) => ({
-      id: -(index + 1),
-      slug: course.slug,
-      title: course.title,
-      subtitle: course.subtitle,
-      description: course.description,
-      priceEur: course.priceEur,
-      stripePriceId: course.stripePriceId,
-      lessonsCount: course.lessonsCount,
-      totalHours: course.totalHours,
-      levelLabel: course.levelLabel,
-      sortOrder: course.sortOrder,
-      isUnlocked: false,
-      purchasedAt: null,
-      amountPaidEur: null,
-      dispenseCount: course.dispense.length,
-      dispenseOutline: course.dispense.map((d, i) => ({
-        id: -(index * 100 + i + 1),
-        courseId: -(index + 1),
-        moduleNumber: d.moduleNumber,
-        title: d.title,
-        subtitle: d.subtitle,
-        format: d.format,
-        readingMinutes: d.readingMinutes,
-        sortOrder: i + 1,
-      })),
-      unlockedDispense: [],
-    })),
+    // ENN-175 — same Maggiori-only filter as live overview / public catalog.
+    courses: filterPublicPresentedBySlug(
+      COURSE_SEED_CATALOG.map((course, index) => ({
+        id: -(index + 1),
+        slug: course.slug,
+        title: course.title,
+        subtitle: course.subtitle,
+        description: course.description,
+        priceEur: course.priceEur,
+        stripePriceId: course.stripePriceId,
+        lessonsCount: course.lessonsCount,
+        totalHours: course.totalHours,
+        levelLabel: course.levelLabel,
+        sortOrder: course.sortOrder,
+        isUnlocked: false,
+        purchasedAt: null,
+        amountPaidEur: null,
+        dispenseCount: course.dispense.length,
+        dispenseOutline: course.dispense.map((d, i) => ({
+          id: -(index * 100 + i + 1),
+          courseId: -(index + 1),
+          moduleNumber: d.moduleNumber,
+          title: d.title,
+          subtitle: d.subtitle,
+          format: d.format,
+          readingMinutes: d.readingMinutes,
+          sortOrder: i + 1,
+        })),
+        unlockedDispense: [],
+      }))
+    ),
     bookings: [],
     dialoguePasses: [],
     degraded: true,
@@ -175,6 +182,15 @@ export async function postReservedEnroll(params: {
     const course = await findCourseBySlug(courseSlug);
     if (!course) {
       return json(404, { error: 'Percorso didattico non trovato.' });
+    }
+
+    // ENN-175 — freeze Minori/Metodi checkout in Area Personale this week.
+    // Paid Stripe return (stripeSessionId) still activates if already paid.
+    if (!stripeSessionId && !isCourseSlugPubliclyPresented(course.slug)) {
+      return json(404, {
+        error:
+          'Questo percorso non è ancora in offerta. Disponibile a breve: Arcani Maggiori.',
+      });
     }
 
     if (stripeSessionId) {

@@ -1,3 +1,4 @@
+import { COURSE_PUBLIC_PRESENTED } from '../lib/coursePresentation';
 import type {
   ArcanaCard,
   ChatMessage,
@@ -815,8 +816,8 @@ export const educationalCourses: EducationalCourse[] = [
     levelLabel: 'Livello Intermedio',
     formatLabel: 'On-Demand + Atlante dei Semi PDF + 1h Q&A Live',
     recommended: true,
-    /** ENN-174 — Maggiori-only public launch this week */
-    publicPresented: false,
+    /** ENN-174 / ENN-175 — see COURSE_PUBLIC_PRESENTED */
+    publicPresented: COURSE_PUBLIC_PRESENTED['arcani-minori'],
     includes: [
       '14 videolezioni dedicate ai 4 Semi (Bastoni, Coppe, Spade, Denari)',
       'Mappa comparativa della Numerologia dall’Asso al Dieci per seme',
@@ -870,8 +871,8 @@ export const educationalCourses: EducationalCourse[] = [
     totalHours: '7h 30m video',
     levelLabel: 'Livello Avanzato & Pratica',
     formatLabel: 'On-Demand + Schemi Vettoriali + Supervisione Live',
-    /** ENN-174 — Maggiori-only public launch this week */
-    publicPresented: false,
+    /** ENN-174 / ENN-175 — see COURSE_PUBLIC_PRESENTED */
+    publicPresented: COURSE_PUBLIC_PRESENTED['metodi-stesura'],
     includes: [
       '10 videolezioni operative sulle architetture di stesa classiche e previsionali',
       'Quaderno con 12 schemi di stesa scaricabili e checklist di conduzione',
