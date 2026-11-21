@@ -9,6 +9,7 @@ import {
 } from '../../lib/groqChat.ts';
 import {
   looksLikeDeepMaggioriStudy,
+  looksLikeDeepMinoriStudy,
   ninaStudioSoftLockReply,
 } from '../../lib/ninaChatKnowledge.ts';
 import {
@@ -255,8 +256,12 @@ export async function postChatMessage(params: {
   if (mode === 'studio') {
     const denied = await assertNinaStudioAccess(authorization, lang);
     if (denied) return denied;
-  } else if (looksLikeDeepMaggioriStudy({ message, history })) {
-    // Deterministic soft lock — no Maggiori cards, no Groq spend on jailbreaks.
+  } else if (
+    looksLikeDeepMaggioriStudy({ message, history }) ||
+    looksLikeDeepMinoriStudy({ message, history })
+  ) {
+    // Deterministic soft lock — no Maggiori/Minori cards, no Groq spend on jailbreaks.
+    // ENN-200: Minori Studio knowledge is companion-only (Maggiori entitlement).
     return json(200, {
       available: true,
       mode: 'welcome',
