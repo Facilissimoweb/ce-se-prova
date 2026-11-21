@@ -48,12 +48,10 @@ In **ogni** sessione Maria Teresa legge **Arcani Maggiori e Minori**.
 - Il **Consulto Breve** non è disponibile di persona (solo online).
 
 ## Prenotazione e pagamento (copy Prenota)
-Scegli durata, giorno e orario: in ogni sessione Maria Teresa legge Arcani Maggiori e Minori. Poi inviaci la richiesta su WhatsApp e riceverai le indicazioni per il pagamento. Il Consulto Breve è solo online.
-
-Per ora il pagamento online è in pausa. Invia la prenotazione su WhatsApp: riceverai da Maria Teresa le modalità di pagamento e la conferma dello slot.
+Scegli durata, giorno e orario: in ogni sessione Maria Teresa legge Arcani Maggiori e Minori. Paga online con Stripe Checkout sul sito; il consulto si svolge su WhatsApp. Il Consulto Breve è solo online.
 
 - Contatti pubblici: WhatsApp / Telegram / telefono 379 103 82 53 · email info@tarotitalia.com.
-- Non promettere checkout Stripe attivo: il pagamento online è in pausa.
+- Checkout Stripe attivo per i consulti (€19 / €50 / €75 / €90). WhatsApp = canale del consulto, non del pagamento.
 
 ## Corsi / didattica (copy ufficiale pagina Corsi)
 Pagina Corsi attiva: tre percorsi acquistabili singolarmente — Arcani Maggiori (€ 190), Arcani Minori (€ 210), Metodi di Stesura (€ 240).
@@ -107,7 +105,7 @@ Spazio interattivo sul sito con i 22 Arcani Maggiori (riflessione guidata). Non 
 - **Corsi** — Maggiori (€190), Minori (€210), Metodi di Stesura (€240); checkout Maggiori su /corsi
 - **Blog / News** — articoli (alcuni approfondimenti Maggiori riservati ai corsisti)
 - **Contatti** — email, telefono, mappa Macerata
-- **Prenota** — richiesta appuntamento via WhatsApp (Stripe in pausa per i consulti)
+- **Prenota** — slot + pagamento Stripe Checkout; consulto su WhatsApp
 - **Area Riservata** — dispense e percorsi dopo acquisto / accesso Google
 
 ## Chi sono (sintesi leggera)

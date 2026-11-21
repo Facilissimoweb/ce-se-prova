@@ -70,9 +70,9 @@ const en: ContentDict = {
     'Members-area access only after verified Stripe payment (Checkout Session paid / webhook) and enrolment on Postgres, protected by Firebase Auth.',
   'siteContent.booking.heading': 'Book a Session',
   'siteContent.booking.subheading':
-    'Choose duration, day and time: in every session Maria Teresa reads Major and Minor Arcana. Then send the request on WhatsApp and you will receive payment instructions. The Short Reading is online only.',
+    'Choose duration, day and time: in every session Maria Teresa reads Major and Minor Arcana. Pay online with Stripe Checkout; the reading takes place on WhatsApp. The Short Reading is online only.',
   'siteContent.booking.stripeNote':
-    'Online payment is paused for now. Send your booking on WhatsApp: Maria Teresa will send payment details and confirm the slot.',
+    'Secure payment with Stripe Checkout. After payment you receive email confirmation; Maria Teresa gets a slot alert. The reading takes place on WhatsApp.',
   'siteContent.chat.title': 'Tarot Dialogue',
   'siteContent.chat.subtitle':
     'Guided reflection space · 5 free minutes and timed passes',
@@ -151,9 +151,9 @@ const es: ContentDict = {
     'Acceso al área reservada solo tras pago Stripe verificado (Checkout Session paid / webhook) e inscripción en Postgres, protegida por Firebase Auth.',
   'siteContent.booking.heading': 'Reserva de Sesión',
   'siteContent.booking.subheading':
-    'Elige duración, día y hora: en cada sesión Maria Teresa lee Arcanos Mayores y Menores. Luego envíanos la solicitud por WhatsApp y recibirás las indicaciones de pago. La Consulta Breve es solo en línea.',
+    'Elige duración, día y hora: en cada sesión Maria Teresa lee Arcanos Mayores y Menores. Paga en línea con Stripe Checkout; la consulta se realiza por WhatsApp. La Consulta Breve es solo en línea.',
   'siteContent.booking.stripeNote':
-    'Por ahora el pago en línea está en pausa. Envía la reserva por WhatsApp: Maria Teresa te enviará las modalidades de pago y la confirmación del horario.',
+    'Pago seguro con Stripe Checkout. Tras el pago recibes confirmación por email; Maria Teresa recibe un aviso del horario. La consulta se realiza por WhatsApp.',
   'siteContent.chat.title': 'Diálogo Tarot',
   'siteContent.chat.subtitle':
     'Espacio de reflexión guiada · 5 minutos gratis y pases temporizados',
@@ -232,9 +232,9 @@ const fr: ContentDict = {
     'Accès à l’espace réservé uniquement après paiement Stripe vérifié (Checkout Session paid / webhook) et inscription sur Postgres, protégée par Firebase Auth.',
   'siteContent.booking.heading': 'Réservation de séance',
   'siteContent.booking.subheading':
-    'Choisissez durée, jour et horaire : à chaque séance Maria Teresa lit les Arcanes Majeurs et Mineurs. Envoyez ensuite la demande sur WhatsApp et vous recevrez les indications de paiement. La Consultation Brève est uniquement en ligne.',
+    'Choisissez durée, jour et horaire : à chaque séance Maria Teresa lit les Arcanes Majeurs et Mineurs. Payez en ligne avec Stripe Checkout ; la consultation se déroule sur WhatsApp. La Consultation Brève est uniquement en ligne.',
   'siteContent.booking.stripeNote':
-    'Pour l’instant le paiement en ligne est en pause. Envoyez la réservation sur WhatsApp : Maria Teresa vous enverra les modalités de paiement et la confirmation du créneau.',
+    'Paiement sécurisé avec Stripe Checkout. Après le paiement vous recevez une confirmation par e-mail ; Maria Teresa reçoit une alerte du créneau. La consultation se déroule sur WhatsApp.',
   'siteContent.chat.title': 'Dialogue Tarot',
   'siteContent.chat.subtitle':
     'Espace de réflexion guidée · 5 minutes gratuites et passes chronométrées',
@@ -313,9 +313,9 @@ const de: ContentDict = {
     'Zugang zum Mitgliederbereich erst nach verifizierter Stripe-Zahlung (Checkout Session paid / Webhook) und Einschreibung in Postgres, geschützt durch Firebase Auth.',
   'siteContent.booking.heading': 'Sitzung buchen',
   'siteContent.booking.subheading':
-    'Wählen Sie Dauer, Tag und Uhrzeit: In jeder Sitzung liest Maria Teresa Große und Kleine Arkana. Senden Sie dann die Anfrage per WhatsApp und Sie erhalten die Zahlungsangaben. Die Kurze Beratung ist nur online.',
+    'Wählen Sie Dauer, Tag und Uhrzeit: In jeder Sitzung liest Maria Teresa Große und Kleine Arkana. Zahlen Sie online mit Stripe Checkout; die Beratung findet über WhatsApp statt. Die Kurze Beratung ist nur online.',
   'siteContent.booking.stripeNote':
-    'Die Online-Zahlung ist vorerst pausiert. Senden Sie die Buchung per WhatsApp: Maria Teresa schickt Ihnen die Zahlungsmodalitäten und die Slot-Bestätigung.',
+    'Sichere Zahlung mit Stripe Checkout. Nach der Zahlung erhalten Sie eine E-Mail-Bestätigung; Maria Teresa bekommt eine Slot-Benachrichtigung. Die Beratung findet über WhatsApp statt.',
   'siteContent.chat.title': 'Tarot-Dialog',
   'siteContent.chat.subtitle':
     'Geführter Reflexionsraum · 5 Freiminuten und zeitlich begrenzte Pässe',

@@ -159,9 +159,8 @@ export async function postBooking(params: {
       return json(200, { mode: 'confirmed', booking: result.booking });
     }
 
-    // Soft-freeze: consulti booking UI uses WhatsApp handoff; keep Stripe path
-    // compiled for later re-enable via CONSULTATION_STRIPE_ENABLED.
-    // Still INSERT a pending_payment row so the slot is occupied immediately
+    // Emergency soft-freeze only: when CONSULTATION_STRIPE_ENABLED is false,
+    // hand off to WhatsApp. Still INSERT pending_payment so the slot is occupied
     // (availability + unique index consultation_bookings_active_slot_idx).
     if (!CONSULTATION_STRIPE_ENABLED) {
       const booking = await createConsultationBooking({

@@ -454,8 +454,8 @@ function BlogCta({
           Vuoi approfondire con Maria Teresa?
         </h2>
         <p className="text-sm leading-relaxed text-[#A39B93]">
-          Prenota un consulto (WhatsApp, Stripe in pausa) oppure apri il Dialogo
-          Tarot con i 22 Arcani Maggiori.
+          Prenota un consulto (Stripe Checkout sul sito; lettura su WhatsApp)
+          oppure apri il Dialogo Tarot con i 22 Arcani Maggiori.
         </p>
       </div>
       <div className="flex shrink-0 flex-wrap items-center gap-3">
