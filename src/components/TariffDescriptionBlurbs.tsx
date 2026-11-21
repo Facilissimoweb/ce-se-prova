@@ -45,8 +45,8 @@ export function TariffDescriptionBlurbs({
     <div
       className={
         compact
-          ? 'space-y-1.5 text-xs md:text-sm leading-relaxed text-[#A39B93]'
-          : 'space-y-2 text-sm leading-relaxed text-[#A39B93]'
+          ? 'space-y-2 text-xs md:text-sm leading-relaxed text-[#A39B93]'
+          : 'space-y-3 text-sm leading-relaxed text-[#A39B93]'
       }
     >
       {blocks.map((paragraph) => (
