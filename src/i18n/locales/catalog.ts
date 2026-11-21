@@ -6,8 +6,10 @@ type Dict = Record<string, string>;
 const en: Dict = {
   // Tariffs
   'tariff.20m.title': 'Short Reading',
-  'tariff.20m.description':
-    'One precise question, a focused reading, immediate clarity. For a punctual doubt — a relationship, an expectation, or a nearby choice — when you want lucid insight before acting.',
+  'tariff.20m.description.0':
+    'One precise question, a focused reading, immediate clarity.',
+  'tariff.20m.description.1':
+    'When you have a punctual doubt that needs attention — a relationship, an expectation, or a nearby choice — and want lucid insight into what is moving before you act.',
   'tariff.20m.focus': 'WhatsApp voice call only',
   'tariff.20m.includes.0':
     'We focus on a single theme through the 78 Arcana, going to the essence with listening and precision',
@@ -16,8 +18,10 @@ const en: Dict = {
   'tariff.20m.includes.2':
     'Best if you want light on one question, quickly and accessibly (not suited to multiple themes together)',
   'tariff.45m.title': 'Essential Reading',
-  'tariff.45m.description':
-    'To bring order when you have two or three open questions and want to steer your energy well. When a quick answer is not enough because more than one area is involved — for example love and work, or an important decision to take with balance.',
+  'tariff.45m.description.0':
+    'To bring order when you have two or three open questions and want to steer your energy well.',
+  'tariff.45m.description.1':
+    'When a quick answer is not enough because more than one area is involved — for example love and work, or an important decision to take with balance and without haste.',
   'tariff.45m.focus': 'Voice or Studio Macerata (Via Crispi 37)',
   'tariff.45m.includes.0':
     'We look at linked situations, focusing dynamics, obstacles and concrete possibilities in the present',
@@ -26,8 +30,10 @@ const en: Dict = {
   'tariff.45m.includes.2':
     'Best if you seek concrete clarity on several aspects of daily life in a gathered, balanced time',
   'tariff.60m.title': 'Full Evolutive Reading',
-  'tariff.60m.description':
-    'To understand the roots of what you live and find a conscious direction again. When a pattern repeats — in relationships, work, or personal choices — and you want to look honestly at both the outer context and your room for action.',
+  'tariff.60m.description.0':
+    'To understand the roots of what you live and find a conscious direction again.',
+  'tariff.60m.description.1':
+    'When a pattern repeats — in relationships, work, or personal choices — and you want to look honestly at both the outer context and your room for action.',
   'tariff.60m.focus': 'Most chosen · Voice or Studio Macerata',
   'tariff.60m.includes.0':
     'A full hour, without rush, to deepen root causes, recognise blind spots and find the most authentic paths ahead',
@@ -36,8 +42,10 @@ const en: Dict = {
   'tariff.60m.includes.2':
     'Best if you want a deep, respectful reading that helps you choose with awareness and autonomy',
   'tariff.90m.title': 'Integrated Session',
-  'tariff.90m.description':
-    'An hour and a half to gather all the threads and look with breadth at the path ahead. Ideal when you are closing a demanding phase, starting a new chapter, or need to explore relationships, work, personal resources and overall direction without fragmenting the work.',
+  'tariff.90m.description.0':
+    'An hour and a half to gather all the threads and look with breadth at the path ahead.',
+  'tariff.90m.description.1':
+    'Ideal when you are closing a demanding phase, starting a new chapter, or need to explore relationships, work, personal resources and overall direction without fragmenting the work.',
   'tariff.90m.focus': 'Voice or Studio Macerata (Via Crispi 37)',
   'tariff.90m.includes.0':
     'A wide, in-depth meeting that embraces several life areas and sets priorities for the coming months',
@@ -212,8 +220,10 @@ const en: Dict = {
 /** Compact ES/FR/DE — full commerce strings; modules summaries abbreviated where needed. */
 const es: Dict = {
   'tariff.20m.title': 'Consulta Breve',
-  'tariff.20m.description':
-    'Una pregunta precisa, una lectura enfocada, claridad inmediata. Para una duda puntual — una relación, una espera o una elección cercana — cuando deseas comprender con lucidez qué se está moviendo antes de actuar.',
+  'tariff.20m.description.0':
+    'Una pregunta precisa, una lectura enfocada, claridad inmediata.',
+  'tariff.20m.description.1':
+    'Cuando tienes una duda puntual que requiere atención — una relación, una espera o una elección cercana — y deseas comprender con lucidez qué se está moviendo antes de actuar.',
   'tariff.20m.focus': 'Solo llamada de voz por WhatsApp',
   'tariff.20m.includes.0':
     'Nos concentramos en un único tema a través de los 78 Arcanos, yendo a la esencia con escucha y precisión',
@@ -222,8 +232,10 @@ const es: Dict = {
   'tariff.20m.includes.2':
     'Indicada si deseas aclarar una sola cuestión de forma rápida y accesible (no apta para varios temas a la vez)',
   'tariff.45m.title': 'Consulta Esencial',
-  'tariff.45m.description':
-    'Para poner orden cuando tienes dos o tres cuestiones abiertas y quieres orientar bien tu energía. Cuando una respuesta rápida no basta porque hay más de un ámbito involucrado.',
+  'tariff.45m.description.0':
+    'Para poner orden cuando tienes dos o tres cuestiones abiertas y quieres orientar bien tu energía.',
+  'tariff.45m.description.1':
+    'Cuando una respuesta rápida no basta porque hay más de un ámbito involucrado — por ejemplo afectos y trabajo, o una decisión importante a tomar con equilibrio y sin prisa.',
   'tariff.45m.focus': 'Voz o Estudio Macerata (Via Crispi 37)',
   'tariff.45m.includes.0':
     'Observamos las situaciones conectadas, enfocando dinámicas, obstáculos y posibilidades concretas del presente',
@@ -232,8 +244,10 @@ const es: Dict = {
   'tariff.45m.includes.2':
     'Indicada si buscas claridad concreta sobre varios aspectos de tu cotidianidad en un tiempo recogido y equilibrado',
   'tariff.60m.title': 'Consulta Evolutiva Completa',
-  'tariff.60m.description':
-    'Para comprender las raíces de lo que vives y recuperar una dirección consciente. Cuando sientes que una dinámica se repite y deseas mirar con honestidad el contexto externo y tu margen de acción.',
+  'tariff.60m.description.0':
+    'Para comprender las raíces de lo que vives y recuperar una dirección consciente.',
+  'tariff.60m.description.1':
+    'Cuando sientes que una dinámica se repite — en las relaciones, en el recorrido profesional o en las elecciones personales — y deseas mirar con honestidad el contexto externo y tu margen de acción.',
   'tariff.60m.focus': 'La más elegida · Voz o Estudio Macerata',
   'tariff.60m.includes.0':
     'Una hora entera, sin prisas, para profundizar causas profundas, reconocer puntos ciegos e identificar caminos auténticos',
@@ -242,8 +256,10 @@ const es: Dict = {
   'tariff.60m.includes.2':
     'Indicada si deseas una lectura profunda y respetuosa que te acompañe a elegir con conciencia y autonomía',
   'tariff.90m.title': 'Sesión Integrada',
-  'tariff.90m.description':
-    'Una hora y media para reunir todos los hilos y mirar con amplitud el recorrido que te espera. Ideal al cerrar una fase exigente, empezar un nuevo capítulo o explorar varios ámbitos sin fragmentar el trabajo.',
+  'tariff.90m.description.0':
+    'Una hora y media dedicada a reunir todos los hilos y mirar con amplitud el recorrido que te espera.',
+  'tariff.90m.description.1':
+    'Ideal al cerrar una fase exigente, empezar un nuevo capítulo o sentir la necesidad de explorar juntos relaciones, trabajo, recursos personales y dirección general sin fragmentar el trabajo.',
   'tariff.90m.focus': 'Voz o Estudio Macerata (Via Crispi 37)',
   'tariff.90m.includes.0':
     'Un encuentro amplio y profundo que abarca varios ámbitos de vida y define las prioridades de los próximos meses',
@@ -414,8 +430,10 @@ const es: Dict = {
 
 const fr: Dict = {
   'tariff.20m.title': 'Consultation Brève',
-  'tariff.20m.description':
-    'Une question précise, une lecture ciblée, une clarté immédiate. Pour un doute ponctuel — relation, attente ou choix proche — quand vous voulez comprendre avec lucidité ce qui bouge avant d’agir.',
+  'tariff.20m.description.0':
+    'Une question précise, une lecture ciblée, une clarté immédiate.',
+  'tariff.20m.description.1':
+    'Quand vous avez un doute ponctuel qui demande de l’attention — relation, attente ou choix proche — et que vous voulez comprendre avec lucidité ce qui bouge avant d’agir.',
   'tariff.20m.focus': 'Appel vocal WhatsApp uniquement',
   'tariff.20m.includes.0':
     'Nous nous concentrons sur un seul thème à travers les 78 Arcanes, jusqu’à l’essence, avec écoute et précision',
@@ -424,8 +442,10 @@ const fr: Dict = {
   'tariff.20m.includes.2':
     'Indiquée si vous voulez éclairer une seule question rapidement et de façon accessible (pas adaptée à plusieurs thèmes)',
   'tariff.45m.title': 'Consultation Essentielle',
-  'tariff.45m.description':
-    'Pour remettre de l’ordre quand vous avez deux ou trois questions ouvertes et voulez bien orienter votre énergie. Quand une réponse rapide ne suffit pas parce que plusieurs domaines sont en jeu.',
+  'tariff.45m.description.0':
+    'Pour remettre de l’ordre quand vous avez deux ou trois questions ouvertes et voulez bien orienter votre énergie.',
+  'tariff.45m.description.1':
+    'Quand une réponse rapide ne suffit pas parce que plusieurs domaines sont en jeu — par exemple affectif et travail, ou une décision importante à prendre avec équilibre et sans précipitation.',
   'tariff.45m.focus': 'Vocal ou Studio Macerata (Via Crispi 37)',
   'tariff.45m.includes.0':
     'Nous observons les situations liées, en ciblant dynamiques, obstacles et possibilités concrètes du présent',
@@ -434,8 +454,10 @@ const fr: Dict = {
   'tariff.45m.includes.2':
     'Indiquée si vous cherchez une clarté concrète sur plusieurs aspects du quotidien, dans un temps recueilli et équilibré',
   'tariff.60m.title': 'Consultation Évolutive Complète',
-  'tariff.60m.description':
-    'Pour comprendre les racines de ce que vous vivez et retrouver une direction consciente. Quand une dynamique se répète et que vous voulez regarder avec honnêteté le contexte extérieur et votre marge d’action.',
+  'tariff.60m.description.0':
+    'Pour comprendre les racines de ce que vous vivez et retrouver une direction consciente.',
+  'tariff.60m.description.1':
+    'Quand une dynamique se répète — dans les relations, le parcours professionnel ou les choix personnels — et que vous voulez regarder avec honnêteté le contexte extérieur et votre marge d’action.',
   'tariff.60m.focus': 'La plus choisie · Vocal ou Studio Macerata',
   'tariff.60m.includes.0':
     'Une heure entière, sans précipitation, pour approfondir les causes profondes, reconnaître les angles morts et repérer les chemins les plus authentiques',
@@ -444,8 +466,10 @@ const fr: Dict = {
   'tariff.60m.includes.2':
     'Indiquée si vous désirez une lecture profonde et respectueuse qui vous aide à choisir avec conscience et autonomie',
   'tariff.90m.title': 'Séance Intégrée',
-  'tariff.90m.description':
-    'Une heure et demie pour rassembler tous les fils et regarder avec ampleur le chemin qui vous attend. Idéale pour clore une phase exigeante, ouvrir un nouveau chapitre, ou explorer plusieurs domaines sans fragmenter le travail.',
+  'tariff.90m.description.0':
+    'Une heure et demie dédiée à rassembler tous les fils et regarder avec ampleur le chemin qui vous attend.',
+  'tariff.90m.description.1':
+    'Idéale pour clore une phase exigeante, ouvrir un nouveau chapitre, ou explorer ensemble relations, travail, ressources personnelles et direction générale sans fragmenter le travail.',
   'tariff.90m.focus': 'Vocal ou Studio Macerata (Via Crispi 37)',
   'tariff.90m.includes.0':
     'Une rencontre large et approfondie qui embrasse plusieurs domaines de vie et définit les priorités des mois à venir',
@@ -616,8 +640,10 @@ const fr: Dict = {
 
 const de: Dict = {
   'tariff.20m.title': 'Kurze Beratung',
-  'tariff.20m.description':
-    'Eine präzise Frage, eine gezielte Deutung, sofortige Klarheit. Für einen punktuellen Zweifel — Beziehung, Erwartung oder nahe Entscheidung — wenn Sie mit Klarheit verstehen wollen, was sich bewegt, bevor Sie handeln.',
+  'tariff.20m.description.0':
+    'Eine präzise Frage, eine gezielte Deutung, sofortige Klarheit.',
+  'tariff.20m.description.1':
+    'Wenn Sie einen punktuellen Zweifel haben, der Aufmerksamkeit braucht — Beziehung, Erwartung oder nahe Entscheidung — und mit Klarheit verstehen wollen, was sich bewegt, bevor Sie handeln.',
   'tariff.20m.focus': 'Nur WhatsApp-Sprachanruf',
   'tariff.20m.includes.0':
     'Wir konzentrieren uns auf ein einziges Thema durch die 78 Arkana und gehen mit Zuhören und Präzision zum Wesentlichen',
@@ -626,8 +652,10 @@ const de: Dict = {
   'tariff.20m.includes.2':
     'Geeignet, wenn Sie eine einzelne Frage schnell und zugänglich klären wollen (nicht für mehrere Themen zugleich)',
   'tariff.45m.title': 'Essenzielle Beratung',
-  'tariff.45m.description':
-    'Um Ordnung zu schaffen, wenn zwei oder drei Fragen offen sind und Sie Ihre Energie gut ausrichten wollen. Wenn eine schnelle Antwort nicht reicht, weil mehrere Bereiche berührt sind.',
+  'tariff.45m.description.0':
+    'Um Ordnung zu schaffen, wenn zwei oder drei Fragen offen sind und Sie Ihre Energie gut ausrichten wollen.',
+  'tariff.45m.description.1':
+    'Wenn eine schnelle Antwort nicht reicht, weil mehrere Bereiche berührt sind — zum Beispiel Beziehungen und Arbeit, oder eine wichtige Entscheidung mit Balance und ohne Hast.',
   'tariff.45m.focus': 'Sprachanruf oder Studio Macerata (Via Crispi 37)',
   'tariff.45m.includes.0':
     'Wir betrachten verknüpfte Situationen und fokussieren Dynamiken, Hindernisse und konkrete Möglichkeiten der Gegenwart',
@@ -636,8 +664,10 @@ const de: Dict = {
   'tariff.45m.includes.2':
     'Geeignet, wenn Sie konkrete Klarheit zu mehreren Aspekten des Alltags in einer gesammelten, ausgewogenen Zeit suchen',
   'tariff.60m.title': 'Vollständige evolutive Beratung',
-  'tariff.60m.description':
-    'Um die Wurzeln dessen zu verstehen, was Sie erleben, und eine bewusste Richtung wiederzufinden. Wenn sich eine Dynamik wiederholt und Sie den äußeren Kontext und Ihren Handlungsspielraum ehrlich betrachten wollen.',
+  'tariff.60m.description.0':
+    'Um die Wurzeln dessen zu verstehen, was Sie erleben, und eine bewusste Richtung wiederzufinden.',
+  'tariff.60m.description.1':
+    'Wenn sich eine Dynamik wiederholt — in Beziehungen, im beruflichen Weg oder in persönlichen Entscheidungen — und Sie den äußeren Kontext und Ihren Handlungsspielraum ehrlich betrachten wollen.',
   'tariff.60m.focus': 'Am häufigsten gewählt · Sprachanruf oder Studio Macerata',
   'tariff.60m.includes.0':
     'Eine volle Stunde, ohne Eile, um tiefe Ursachen zu vertiefen, blinde Flecken zu erkennen und die authentischsten Wege zu finden',
@@ -646,8 +676,10 @@ const de: Dict = {
   'tariff.60m.includes.2':
     'Geeignet, wenn Sie eine tiefe, respektvolle Deutung wünschen, die Sie hilft, bewusst und autonom zu wählen',
   'tariff.90m.title': 'Integrierte Sitzung',
-  'tariff.90m.description':
-    'Eineinhalb Stunden, um alle Fäden zusammenzuführen und den Weg voraus mit Weite zu betrachten. Ideal beim Abschluss einer anspruchsvollen Phase, dem Beginn eines neuen Kapitels oder der Erkundung mehrerer Lebensbereiche ohne Zersplitterung.',
+  'tariff.90m.description.0':
+    'Eineinhalb Stunden, um alle Fäden zusammenzuführen und den Weg voraus mit Weite zu betrachten.',
+  'tariff.90m.description.1':
+    'Ideal beim Abschluss einer anspruchsvollen Phase, dem Beginn eines neuen Kapitels oder dem Wunsch, Beziehungen, Arbeit, persönliche Ressourcen und Gesamtrichtung gemeinsam zu erkunden — ohne Zersplitterung.',
   'tariff.90m.focus': 'Sprachanruf oder Studio Macerata (Via Crispi 37)',
   'tariff.90m.includes.0':
     'Ein weites, vertieftes Treffen, das mehrere Lebensbereiche umfasst und Prioritäten für die kommenden Monate setzt',

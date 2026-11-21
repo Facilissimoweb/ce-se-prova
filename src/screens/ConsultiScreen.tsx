@@ -15,6 +15,7 @@ import {
 } from '../i18n/useLocalizedCatalog';
 import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
+import { TariffDescriptionBlurbs } from '../components/TariffDescriptionBlurbs';
 import { TARIFF_SECTION_IMAGES } from '../data/sectionImages';
 import consultiDeskImg from '../assets/images/consulti_desk_linen_1794651607906.jpg';
 import { PaymentTrustCues } from '../components/PaymentTrustCues';
@@ -207,16 +208,12 @@ export function ConsultiScreen({
                   </span>
                 </div>
 
-                <p className="text-sm leading-relaxed text-[#A39B93]">
-                  {showCmsKeys ? (
-                    <CopyText
-                      entry={{ cmsKey: tariff.cmsKeyDesc, liveText: tariff.description }}
-                      showKeys={true}
-                    />
-                  ) : (
-                    tariff.description
-                  )}
-                </p>
+                <TariffDescriptionBlurbs
+                  paragraphs={tariff.descriptionParagraphs}
+                  flatDescription={tariff.description}
+                  cmsKeyDesc={tariff.cmsKeyDesc}
+                  showCmsKeys={showCmsKeys}
+                />
 
                 <ul className="space-y-2.5 pt-1">
                   {tariff.includes.map((item) => (

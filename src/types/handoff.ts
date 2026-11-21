@@ -168,7 +168,13 @@ export interface ConsultationTariff {
   cmsKeyTitle: string;
   title: string;
   cmsKeyDesc: string;
+  /**
+   * Flat single-string description for SEO / Nina / JSON-LD.
+   * Prefer `descriptionParagraphs` for card UI (ENN-195).
+   */
   description: string;
+  /** Lead blurbs as short paragraphs for package cards (hook + “Quando…”). */
+  descriptionParagraphs: string[];
   cmsKeyFocus: string;
   focusLabel: string;
   includes: string[];

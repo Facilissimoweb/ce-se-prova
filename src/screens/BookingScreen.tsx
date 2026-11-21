@@ -14,6 +14,7 @@ import type { BookingDraft, ConsultationTariff } from '../types/handoff';
 import { siteContent } from '../data/siteContent';
 import { useLocalizedTariffs } from '../i18n/useLocalizedCatalog';
 import { CopyText } from '../components/CopyText';
+import { TariffDescriptionBlurbs } from '../components/TariffDescriptionBlurbs';
 import { BookingCalendar } from '../components/booking/BookingCalendar';
 import { BookingLangNotice } from '../components/booking/BookingLangNotice';
 import { CheckoutReturnBanner } from '../components/CheckoutReturnBanner';
@@ -456,9 +457,13 @@ export function BookingScreen({
                             tariff.title
                           )}
                         </p>
-                        <p className="text-xs md:text-sm text-[#A39B93]">
-                          {tariff.description}
-                        </p>
+                        <TariffDescriptionBlurbs
+                          paragraphs={tariff.descriptionParagraphs}
+                          flatDescription={tariff.description}
+                          cmsKeyDesc={tariff.cmsKeyDesc}
+                          showCmsKeys={showCmsKeys}
+                          compact
+                        />
                       </div>
 
                       <div className="flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0">
