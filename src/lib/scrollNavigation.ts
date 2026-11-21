@@ -169,6 +169,74 @@ export function scrollWindowTo(
   });
 }
 
+/**
+ * Reset window + documentElement + body + overflow ancestors.
+ * Some mobile browsers scroll `documentElement`/`body` independently of
+ * `window.scrollTo`, and wizard UIs may sit under nested scrollports.
+ */
+export function scrollAllPortsToTop(from?: Element | null): void {
+  if (typeof window === 'undefined') return;
+  withInstantScroll(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    let el: Element | null = from ?? document.body;
+    while (el instanceof HTMLElement) {
+      if (el.scrollTop) el.scrollTop = 0;
+      el = el.parentElement;
+    }
+  });
+}
+
+/**
+ * ENN-196 — land a wizard step at the top under the sticky header.
+ *
+ * Why a dedicated helper: tapping persistent step-pill buttons keeps focus on
+ * the pill. Mobile browsers then re-scroll to keep the focused control in view,
+ * undoing a plain `window.scrollTo(0,0)` after paint. We blur first, reset every
+ * scrollport, `scrollIntoView({ block: 'start' })` the step heading, then correct
+ * for the sticky header — immediately and again after double-rAF + settle retries.
+ */
+export function scrollStepToTopAfterPaint(
+  landmark: Element | null | (() => Element | null),
+  options?: { from?: Element | null; behavior?: ScrollBehavior }
+): () => void {
+  if (typeof window === 'undefined') return () => undefined;
+
+  const behavior = options?.behavior ?? 'auto';
+  const from = options?.from ?? null;
+
+  const run = () => {
+    const active = document.activeElement;
+    if (
+      active instanceof HTMLElement &&
+      active !== document.body &&
+      active !== document.documentElement
+    ) {
+      active.blur();
+    }
+
+    scrollAllPortsToTop(from);
+
+    const el = typeof landmark === 'function' ? landmark() : landmark;
+    if (!el) {
+      scrollWindowTo(0, behavior);
+      return;
+    }
+
+    try {
+      el.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'auto' });
+    } catch {
+      // Older WebKit without options object — sticky correction below still runs.
+    }
+    // Sticky header offset (scrollIntoView alone leaves the title under the bar).
+    scrollToElement(el, { behavior, extraOffset: 0 });
+  };
+
+  run();
+  return afterLayoutSettle(run);
+}
+
 export function scrollToElement(
   el: Element | null,
   options?: { behavior?: ScrollBehavior; extraOffset?: number }
