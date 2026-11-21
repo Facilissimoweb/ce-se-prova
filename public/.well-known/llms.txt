@@ -50,6 +50,6 @@ Every session includes Maggiori and Minori.
 - Mirror: /.well-known/llms.txt
 
 ## Optional
-- Brand domain after cutover (ENN-43): https://www.tarotitalia.com
+- Canonical public origin: https://tarotitalia.com (sitemap / robots / OG — never *.vercel.app)
 - Do not treat private /area-riservata as public content
 - Coming Soon may gate visitors on some deployments; this file describes the real public offer when the site is open/indexed

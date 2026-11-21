@@ -176,15 +176,29 @@ export function pageTitleForScreen(screen: ScreenId): string {
   return pageSeoForScreen(screen).title;
 }
 
+/** Production canonical (ENN-198). Never bake *.vercel.app into public SEO. */
+export const PRODUCTION_SITE_ORIGIN = 'https://tarotitalia.com';
+
+function isVercelAppOrigin(value: string): boolean {
+  try {
+    const host = new URL(
+      value.includes('://') ? value : `https://${value}`
+    ).hostname.toLowerCase();
+    return host === 'vercel.app' || host.endsWith('.vercel.app');
+  } catch {
+    return /\.vercel\.app$/i.test(value.replace(/\/$/, ''));
+  }
+}
+
 /**
- * Public origin for absolute SEO URLs (canonical, OG, sitemap).
- * Prefer `VITE_SITE_ORIGIN` (or mirror of `APP_URL`) so previews keep their host;
- * at domain cutover set it to `https://www.tarotitalia.com`.
- * Runtime fallback: `window.location.origin` (never hardcodes the brand domain alone).
+ * Public origin for absolute SEO URLs (canonical, OG).
+ * Prefer `VITE_SITE_ORIGIN` when it is the brand host (not *.vercel.app).
+ * Runtime fallback: `window.location.origin` on the custom domain; ignore a
+ * mis-set VITE_SITE_ORIGIN that still points at ce-se-prova.vercel.app.
  */
 export function getSiteOrigin(): string {
   const fromEnv = import.meta.env.VITE_SITE_ORIGIN?.trim();
-  if (fromEnv) {
+  if (fromEnv && !isVercelAppOrigin(fromEnv)) {
     try {
       return new URL(fromEnv).origin;
     } catch {
@@ -194,7 +208,7 @@ export function getSiteOrigin(): string {
   if (typeof window !== 'undefined' && window.location?.origin) {
     return window.location.origin;
   }
-  return '';
+  return PRODUCTION_SITE_ORIGIN;
 }
 
 export function absoluteUrl(path: string, origin = getSiteOrigin()): string {

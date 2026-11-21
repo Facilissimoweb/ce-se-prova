@@ -1,8 +1,6 @@
-# Tarot Italia — ENN-62 / ENN-191
+# Tarot Italia — ENN-62 / ENN-191 / ENN-198
 # Allow public marketing pages for search engines and reputable AI crawlers.
-# Sitemap URL is host-relative so preview and production (pre-cutover) stay valid.
-# At domain cutover (ENN-43) no robots change is required unless Maria wants
-# different AI-crawler policy.
+# Production sitemap locs use https://tarotitalia.com (never *.vercel.app).
 # Launch: Italian-only public offer; Maggiori on /corsi; Minori/Metodi not public routes.
 # AI notes: /llms.txt, /llms-full.txt, /.well-known/llms.txt
 
@@ -46,4 +44,4 @@ Allow: /
 Disallow: /api/
 Disallow: /area-riservata
 
-Sitemap: /sitemap.xml
+Sitemap: https://tarotitalia.com/sitemap.xml
