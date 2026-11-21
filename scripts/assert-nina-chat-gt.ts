@@ -85,6 +85,10 @@ assert(
   'non-IT Traduci uses SPA path; IT still reloads'
 );
 assert(
+  widget.includes('requestGoogleTranslateRefresh(900)'),
+  'SPA Traduci late combo nudge after Maggiori/Nina remount (ENN-182)'
+);
+assert(
   !/writeGoogtransCookie\(target\);[\s\S]{0,220}window\.location\.reload\(\)/.test(
     widget
   ),
