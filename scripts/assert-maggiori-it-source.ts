@@ -161,6 +161,28 @@ assert(
   'Sigillo dual GT refresh after face remount (ENN-162)'
 );
 
+const reserved = readFileSync(
+  path.join(root, 'src/screens/ReservedAreaScreen.tsx'),
+  'utf8'
+);
+assert(
+  reserved.includes('GtSafeBoundary') &&
+    reserved.includes('dispensaEpoch') &&
+    reserved.includes('dispensaRemountKey') &&
+    /dispensa-\$\{activeDispensa\.id\}-\$\{dispensaEpoch\}/.test(reserved),
+  'Area Personale dispensa wrapped in GtSafeBoundary + remount key (ENN-178)'
+);
+assert(
+  reserved.includes('requestGoogleTranslateRefresh(160)') &&
+    reserved.includes('requestGoogleTranslateRefresh(360)'),
+  'Dispensa switch dual GT refresh (ENN-178)'
+);
+assert(
+  reserved.includes('Ricarica la dispensa') &&
+    !/notranslate/.test(reserved),
+  'Dispensa recovery CTA; didactic text stays GT-able (ENN-178)'
+);
+
 const catalog = readFileSync(
   path.join(root, 'src/i18n/useLocalizedCatalog.ts'),
   'utf8'

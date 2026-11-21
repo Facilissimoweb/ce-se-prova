@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight,
   BookOpen,
@@ -29,6 +29,7 @@ import { DispensaFlashcards } from '../components/reserved/DispensaFlashcards';
 import { DispensaSchedaVisiva } from '../components/reserved/DispensaSchedaVisiva';
 import { ReservedLoginGate } from '../components/reserved/ReservedLoginGate';
 import { ReservedNotesPanel } from '../components/reserved/ReservedNotesPanel';
+import { GtSafeBoundary } from '../components/GtSafeBoundary';
 import {
   getFlashcardDeck,
   getInlineFlashcardDeck,
@@ -40,6 +41,7 @@ import {
   MAGGIORI_MODULO_01_BLOG_SLUG,
 } from '../data/maggioriGatedBlog';
 import { openNinaChat } from '../lib/ninaChatOpen';
+import { requestGoogleTranslateRefresh } from '../lib/googleTranslateRuntime';
 import {
   SCROLL_LANDMARKS,
   scrollToIdAfterPaint,
@@ -115,10 +117,29 @@ export function ReservedAreaScreen({
     totalDispenseCount,
   } = area;
 
+  // ENN-178 — remount whole dispensa article under GT so 01→02 cannot
+  // removeChild against Translate `<font>` wrappers (same class as ENN-161).
+  const [dispensaEpoch, setDispensaEpoch] = useState(0);
+
   const activeFlashcardDeck = useMemo(() => {
     if (!activeCourse || !activeDispensa) return null;
     return getFlashcardDeck(activeCourse.slug, activeDispensa.moduleNumber);
   }, [activeCourse, activeDispensa]);
+
+  const dispensaRemountKey = activeDispensa
+    ? `dispensa-${activeDispensa.id}-${dispensaEpoch}`
+    : `dispensa-none-${dispensaEpoch}`;
+
+  // Fresh Italian DOM after id/epoch change — dual refresh like Sigillo / Nina.
+  useEffect(() => {
+    if (!activeDispensa) return;
+    requestGoogleTranslateRefresh(160);
+    const later = window.setTimeout(
+      () => requestGoogleTranslateRefresh(360),
+      280
+    );
+    return () => window.clearTimeout(later);
+  }, [activeDispensa?.id, dispensaEpoch]);
 
   /**
    * ENN-113–122 — mid-dispensa embeds for Maggiori Dispensa 01.
@@ -541,208 +562,233 @@ export function ReservedAreaScreen({
 
               {/* Right Column: Dispensa Content + Study Notes */}
               {activeDispensa && (
-                <article
-                  id={SCROLL_LANDMARKS.reservedDispensaContent}
-                  className="lg:col-span-8 glass-tier-1 rounded-2xl p-6 md:p-8 space-y-6 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-[#D4AF37]/15 pb-5">
-                    <div className="space-y-1.5">
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-[#D4AF37]">
-                        <span className="font-semibold uppercase tracking-[0.08em]">
-                          Modulo {activeDispensa.moduleNumber}
-                        </span>
-                        <span aria-hidden="true" className="text-[#D4AF37]/50">·</span>
-                        <span className="text-[#A39B93]">{activeDispensa.format}</span>
-                        <span aria-hidden="true" className="text-[#D4AF37]/50">·</span>
-                        <span className="text-[#A39B93] inline-flex items-center gap-1 tabular-nums">
-                          <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
-                          {activeDispensa.readingMinutes} min lettura
-                        </span>
-                      </div>
-                      <h3 className="font-display text-2xl md:text-[28px] text-[#F4F1EA]">
-                        {activeDispensa.title}
-                      </h3>
-                      <p className="text-sm text-[#A39B93]">
-                        {activeDispensa.subtitle}
-                      </p>
-                      {activeCourse.slug === 'arcani-maggiori' &&
-                        activeDispensa.moduleNumber === '01' &&
-                        onOpenBlogPost && (
-                          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-1 sm:gap-3 pt-1">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                onOpenBlogPost(MAGGIORI_MODULO_01_BLOG_SLUG)
-                              }
-                              className="inline-flex min-h-[40px] items-center gap-1.5 text-xs font-medium text-[#D4AF37] transition-colors hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-sm"
-                            >
-                              <BookOpen
-                                className="w-3.5 h-3.5"
-                                aria-hidden="true"
-                              />
-                              Blog · Il Matto
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                onOpenBlogPost(MAGGIORI_BAGATTO_BLOG_SLUG)
-                              }
-                              className="inline-flex min-h-[40px] items-center gap-1.5 text-xs font-medium text-[#D4AF37] transition-colors hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-sm"
-                            >
-                              <BookOpen
-                                className="w-3.5 h-3.5"
-                                aria-hidden="true"
-                              />
-                              Blog · Il Bagatto
-                            </button>
-                          </div>
-                        )}
-                    </div>
-
-                    <div className="flex flex-col items-stretch sm:items-end gap-2 shrink-0">
-                      {activeCourse.slug === 'arcani-maggiori' && (
-                        <MaterialsLanguagePicker />
-                      )}
-                      <div className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          void handleDownloadDispensa(
-                            activeCourse.title,
-                            activeDispensa,
-                            activeCourse.slug
-                          )
-                        }
-                        className="px-3.5 py-2 min-h-[40px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs font-medium text-[#F4F1EA] inline-flex items-center gap-1.5 whitespace-nowrap"
-                      >
-                        <Download className="w-3.5 h-3.5 text-[#D4AF37]" />
-                        Scarica Dispensa
-                      </button>
-
-                      <button
-                        type="button"
-                        disabled={savingNotes}
-                        onClick={() =>
-                          handleSaveProgress(
-                            activeDispensa,
-                            !activeDispensa.completed
-                          )
-                        }
-                        className={`px-3.5 py-2 min-h-[40px] rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 whitespace-nowrap transition-colors ${
-                          activeDispensa.completed
-                            ? 'bg-[#D4AF37] text-[#12100E]'
-                            : 'bg-[#D4AF37]/12 border border-[#D4AF37]/35 text-[#F4F1EA] hover:border-[#D4AF37]'
-                        }`}
-                      >
-                        <Check className="w-3.5 h-3.5" />
-                        {activeDispensa.completed
-                          ? 'Modulo Completato'
-                          : 'Segna Completato'}
-                      </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Key Takeaways */}
-                  {activeDispensa.keyTakeaways.length > 0 && (
-                    <div className="rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/20 p-4 md:p-5 space-y-2.5">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                        Concetti Chiave della Dispensa
-                      </p>
-                      <ul className="space-y-2">
-                        {activeDispensa.keyTakeaways.map((point) => (
-                          <li
-                            key={point}
-                            className="flex items-start gap-2.5 text-xs md:text-sm text-[#E8e1dd]"
-                          >
-                            <Check className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
-                            <span>{point}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Formatted Dispensa Body (+ inline sigilli, e.g. Il Matto) */}
-                  <FormattedDispensaBody
-                    markdown={activeDispensa.contentMarkdown}
-                    embeds={dispensaFlashcardEmbeds}
-                  />
-
-                  {activeFlashcardDeck && (
-                    <>
-                      <div className="gold-divider" aria-hidden="true" />
-                      <DispensaFlashcards deck={activeFlashcardDeck} />
-                    </>
-                  )}
-
-                  <div className="gold-divider" aria-hidden="true" />
-
-                  {/* Personal Study Notebook */}
-                  <div className="space-y-3">
-                    <label
-                      htmlFor="dispensa-personal-notes"
-                      className="block text-xs font-semibold uppercase tracking-[0.08em] text-[#D4AF37]"
+                <div className="lg:col-span-8 min-w-0">
+                <GtSafeBoundary
+                  resetKey={dispensaRemountKey}
+                  onError={() => setDispensaEpoch((n) => n + 1)}
+                  fallback={
+                    <article
+                      id={SCROLL_LANDMARKS.reservedDispensaContent}
+                      className="glass-tier-1 rounded-2xl p-6 md:p-8 space-y-4 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
                     >
-                      Quaderno Appunti Personali del Modulo
-                    </label>
-                    <textarea
-                      id="dispensa-personal-notes"
-                      rows={4}
-                      value={notesDraft}
-                      onChange={(e) => {
-                        setNotesDraft(e.target.value);
-                        setNotesFeedback(null);
-                      }}
-                      placeholder="Annota qui le tue osservazioni sugli Arcani, domande emerse o stese di esercitazione..."
-                      className="w-full px-3.5 py-2.5 rounded-lg input-inset text-sm resize-y"
-                    />
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <p className="text-xs text-[#A39B93]">
-                        {notesFeedback || 'Gli appunti restano salvati nella tua Area Riservata.'}
+                      <p className="text-sm text-[#E8e1dd]">
+                        La dispensa si è riavviata. Puoi ricaricarla e continuare.
                       </p>
                       <button
                         type="button"
-                        disabled={savingNotes}
-                        onClick={() => handleSaveProgress(activeDispensa)}
-                        className="px-4 py-2.5 min-h-[42px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-xs font-semibold inline-flex items-center gap-2 whitespace-nowrap"
+                        onClick={() => setDispensaEpoch((n) => n + 1)}
+                        className="min-h-[44px] px-4 py-2.5 rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/15 text-xs font-semibold text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
                       >
-                        <Save className="w-3.5 h-3.5" />
-                        {savingNotes ? 'Salvataggio...' : 'Salva Appunti'}
+                        Ricarica la dispensa
                       </button>
+                    </article>
+                  }
+                >
+                  <article
+                    key={dispensaRemountKey}
+                    id={SCROLL_LANDMARKS.reservedDispensaContent}
+                    className="glass-tier-1 rounded-2xl p-6 md:p-8 space-y-6 scroll-mt-[calc(4.75rem+env(safe-area-inset-top,0px))] md:scroll-mt-[calc(5rem+env(safe-area-inset-top,0px))]"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-[#D4AF37]/15 pb-5">
+                      <div className="space-y-1.5">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-[#D4AF37]">
+                          <span className="font-semibold uppercase tracking-[0.08em]">
+                            Modulo {activeDispensa.moduleNumber}
+                          </span>
+                          <span aria-hidden="true" className="text-[#D4AF37]/50">·</span>
+                          <span className="text-[#A39B93]">{activeDispensa.format}</span>
+                          <span aria-hidden="true" className="text-[#D4AF37]/50">·</span>
+                          <span className="text-[#A39B93] inline-flex items-center gap-1 tabular-nums">
+                            <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
+                            {activeDispensa.readingMinutes} min lettura
+                          </span>
+                        </div>
+                        <h3 className="font-display text-2xl md:text-[28px] text-[#F4F1EA]">
+                          {activeDispensa.title}
+                        </h3>
+                        <p className="text-sm text-[#A39B93]">
+                          {activeDispensa.subtitle}
+                        </p>
+                        {activeCourse.slug === 'arcani-maggiori' &&
+                          activeDispensa.moduleNumber === '01' &&
+                          onOpenBlogPost && (
+                            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-1 sm:gap-3 pt-1">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  onOpenBlogPost(MAGGIORI_MODULO_01_BLOG_SLUG)
+                                }
+                                className="inline-flex min-h-[40px] items-center gap-1.5 text-xs font-medium text-[#D4AF37] transition-colors hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-sm"
+                              >
+                                <BookOpen
+                                  className="w-3.5 h-3.5"
+                                  aria-hidden="true"
+                                />
+                                Blog · Il Matto
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  onOpenBlogPost(MAGGIORI_BAGATTO_BLOG_SLUG)
+                                }
+                                className="inline-flex min-h-[40px] items-center gap-1.5 text-xs font-medium text-[#D4AF37] transition-colors hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-sm"
+                              >
+                                <BookOpen
+                                  className="w-3.5 h-3.5"
+                                  aria-hidden="true"
+                                />
+                                Blog · Il Bagatto
+                              </button>
+                            </div>
+                          )}
+                      </div>
+
+                      <div className="flex flex-col items-stretch sm:items-end gap-2 shrink-0">
+                        {activeCourse.slug === 'arcani-maggiori' && (
+                          <MaterialsLanguagePicker />
+                        )}
+                        <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void handleDownloadDispensa(
+                              activeCourse.title,
+                              activeDispensa,
+                              activeCourse.slug
+                            )
+                          }
+                          className="px-3.5 py-2 min-h-[40px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs font-medium text-[#F4F1EA] inline-flex items-center gap-1.5 whitespace-nowrap"
+                        >
+                          <Download className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          Scarica Dispensa
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={savingNotes}
+                          onClick={() =>
+                            handleSaveProgress(
+                              activeDispensa,
+                              !activeDispensa.completed
+                            )
+                          }
+                          className={`px-3.5 py-2 min-h-[40px] rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 whitespace-nowrap transition-colors ${
+                            activeDispensa.completed
+                              ? 'bg-[#D4AF37] text-[#12100E]'
+                              : 'bg-[#D4AF37]/12 border border-[#D4AF37]/35 text-[#F4F1EA] hover:border-[#D4AF37]'
+                          }`}
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          {activeDispensa.completed
+                            ? 'Modulo Completato'
+                            : 'Segna Completato'}
+                        </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="gold-divider" aria-hidden="true" />
-
-                  {/* End-of-module: next dispensa or back to percorsi */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-                    <p className="text-xs text-[#A39B93]">
-                      {nextDispensa
-                        ? `Fine modulo ${activeDispensa.moduleNumber}. Continua con la dispensa successiva.`
-                        : `Ultimo modulo del percorso ${activeCourse.title}.`}
-                    </p>
-                    {nextDispensa ? (
-                      <button
-                        type="button"
-                        onClick={goToNextDispensa}
-                        className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
-                      >
-                        Prosegui a dispensa {nextDispensa.moduleNumber}
-                        <ArrowRight className="w-4 h-4 shrink-0" />
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={returnToPercorsi}
-                        className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/10 hover:border-[#D4AF37] hover:bg-[#D4AF37]/18 text-[#F4F1EA] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
-                      >
-                        Torna ai percorsi
-                        <ArrowRight className="w-4 h-4 shrink-0 text-[#D4AF37]" />
-                      </button>
+                    {/* Key Takeaways */}
+                    {activeDispensa.keyTakeaways.length > 0 && (
+                      <div className="rounded-xl bg-[#12100E]/75 border border-[#D4AF37]/20 p-4 md:p-5 space-y-2.5">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                          Concetti Chiave della Dispensa
+                        </p>
+                        <ul className="space-y-2">
+                          {activeDispensa.keyTakeaways.map((point) => (
+                            <li
+                              key={point}
+                              className="flex items-start gap-2.5 text-xs md:text-sm text-[#E8e1dd]"
+                            >
+                              <Check className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
+                              <span>{point}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     )}
-                  </div>
-                </article>
+
+                    {/* Formatted Dispensa Body (+ inline sigilli, e.g. Il Matto) */}
+                    <FormattedDispensaBody
+                      markdown={activeDispensa.contentMarkdown}
+                      embeds={dispensaFlashcardEmbeds}
+                    />
+
+                    {activeFlashcardDeck && (
+                      <>
+                        <div className="gold-divider" aria-hidden="true" />
+                        <DispensaFlashcards deck={activeFlashcardDeck} />
+                      </>
+                    )}
+
+                    <div className="gold-divider" aria-hidden="true" />
+
+                    {/* Personal Study Notebook */}
+                    <div className="space-y-3">
+                      <label
+                        htmlFor="dispensa-personal-notes"
+                        className="block text-xs font-semibold uppercase tracking-[0.08em] text-[#D4AF37]"
+                      >
+                        Quaderno Appunti Personali del Modulo
+                      </label>
+                      <textarea
+                        id="dispensa-personal-notes"
+                        rows={4}
+                        value={notesDraft}
+                        onChange={(e) => {
+                          setNotesDraft(e.target.value);
+                          setNotesFeedback(null);
+                        }}
+                        placeholder="Annota qui le tue osservazioni sugli Arcani, domande emerse o stese di esercitazione..."
+                        className="w-full px-3.5 py-2.5 rounded-lg input-inset text-sm resize-y"
+                      />
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <p className="text-xs text-[#A39B93]">
+                          {notesFeedback || 'Gli appunti restano salvati nella tua Area Riservata.'}
+                        </p>
+                        <button
+                          type="button"
+                          disabled={savingNotes}
+                          onClick={() => handleSaveProgress(activeDispensa)}
+                          className="px-4 py-2.5 min-h-[42px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-xs font-semibold inline-flex items-center gap-2 whitespace-nowrap"
+                        >
+                          <Save className="w-3.5 h-3.5" />
+                          {savingNotes ? 'Salvataggio...' : 'Salva Appunti'}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="gold-divider" aria-hidden="true" />
+
+                    {/* End-of-module: next dispensa or back to percorsi */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                      <p className="text-xs text-[#A39B93]">
+                        {nextDispensa
+                          ? `Fine modulo ${activeDispensa.moduleNumber}. Continua con la dispensa successiva.`
+                          : `Ultimo modulo del percorso ${activeCourse.title}.`}
+                      </p>
+                      {nextDispensa ? (
+                        <button
+                          type="button"
+                          onClick={goToNextDispensa}
+                          className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+                        >
+                          Prosegui a dispensa {nextDispensa.moduleNumber}
+                          <ArrowRight className="w-4 h-4 shrink-0" />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={returnToPercorsi}
+                          className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/10 hover:border-[#D4AF37] hover:bg-[#D4AF37]/18 text-[#F4F1EA] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                        >
+                          Torna ai percorsi
+                          <ArrowRight className="w-4 h-4 shrink-0 text-[#D4AF37]" />
+                        </button>
+                      )}
+                    </div>
+                  </article>
+                </GtSafeBoundary>
+                </div>
               )}
             </div>
           ) : (
