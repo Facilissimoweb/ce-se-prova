@@ -1,5 +1,5 @@
 /**
- * ENN-158 — Nina chat chrome + welcome follow Google Translate.
+ * ENN-158 / ENN-165 — Nina chat chrome + welcome follow Google Translate.
  * Static source checks (no browser GT). Run: npx tsx scripts/assert-nina-chat-gt.ts
  */
 import { readFileSync } from 'node:fs';
@@ -52,6 +52,20 @@ assert(
 assert(
   chatFab.includes('requestGoogleTranslateRefresh'),
   'opens panel with GT refresh'
+);
+assert(
+  /panelKey\s*=\s*`nina-\$\{gtLang\}/.test(chatFab) ||
+    chatFab.includes('nina-${gtLang}-'),
+  'panelKey includes googtrans gtLang (ENN-165 remount)'
+);
+assert(
+  chatFab.includes('GT_REFRESH_EVENT') && chatFab.includes('syncGtLang'),
+  'syncs googtrans lang for chrome remount + Groq'
+);
+assert(
+  chatFab.includes('turn.skipGt === true') &&
+    chatFab.includes('.map(({ role, content })'),
+  'Groq history omits Italian seed (skipGt-only) so replies track lang'
 );
 assert(
   chatFab.includes('Scrivi qui'),
