@@ -42,12 +42,20 @@ export class GtSafeBoundary extends React.Component<Props, State> {
     if (this.state.hasError) {
       return this.props.fallback ?? null;
     }
-    // Remount on resetKey so GT `<font>` wrappers are discarded (ENN-164 / 182).
+    // ENN-164/181/182 — remount on resetKey with a real DOM shell.
+    // A keyed Fragment only swaps React fibers; children stay under the same
+    // GT-touched ancestor, so TranslateElement often skips fresh Italian (Q2+).
+    // `display: contents` keeps layout (Nina flex panel) while giving GT a
+    // fresh unscanned parent for the next combo refresh.
     if (this.props.resetKey !== undefined && this.props.resetKey !== null) {
       return (
-        <React.Fragment key={String(this.props.resetKey)}>
+        <div
+          key={String(this.props.resetKey)}
+          data-gt-remount={String(this.props.resetKey)}
+          style={{ display: 'contents' }}
+        >
           {this.props.children}
-        </React.Fragment>
+        </div>
       );
     }
     return this.props.children;

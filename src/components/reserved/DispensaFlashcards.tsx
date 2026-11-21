@@ -56,19 +56,28 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
     ? `sigillo-${deck.moduleNumber}-${current.id}-${flipped ? 'a' : 'q'}-${faceEpoch}`
     : `sigillo-empty-${faceEpoch}`;
 
-  // Flip / prev-next / shuffle / deck change — dual refresh like SchedaVisiva.
+  // Flip / prev-next / shuffle / deck change — refresh like Nina (late nudge
+  // after remount; TranslateElement often misses the first combo pulse).
   useEffect(() => {
     requestGoogleTranslateRefresh(140);
-    const later = window.setTimeout(
+    const mid = window.setTimeout(
       () => requestGoogleTranslateRefresh(380),
       300
     );
-    return () => window.clearTimeout(later);
+    const late = window.setTimeout(
+      () => requestGoogleTranslateRefresh(900),
+      700
+    );
+    return () => {
+      window.clearTimeout(mid);
+      window.clearTimeout(late);
+    };
   }, [deck.courseSlug, deck.moduleNumber, faceKey]);
 
   const go = (delta: number) => {
     if (total === 0) return;
     setFlipped(false);
+    setFaceEpoch((n) => n + 1);
     setIndex((prev) => (prev + delta + total) % total);
   };
 
@@ -76,12 +85,14 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
     setOrder(shuffleIds(baseOrder));
     setIndex(0);
     setFlipped(false);
+    setFaceEpoch((n) => n + 1);
   };
 
   const handleReset = () => {
     setOrder(baseOrder);
     setIndex(0);
     setFlipped(false);
+    setFaceEpoch((n) => n + 1);
   };
 
   if (!current || total === 0) return null;
@@ -110,7 +121,13 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
         </p>
       </div>
 
+      {/*
+        ENN-181 — key GtSafeBoundary itself so the whole face tree remounts
+        (Fragment-only remount left children under a GT-touched ancestor).
+        Keep button key from ENN-164; bump faceEpoch on nav/shuffle/reset.
+      */}
       <GtSafeBoundary
+        key={faceKey}
         resetKey={faceKey}
         onError={() => setFaceEpoch((n) => n + 1)}
         fallback={
@@ -123,11 +140,6 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
           </button>
         }
       >
-        {/*
-          ENN-164 — key the <button> itself (not an inner div). An inner remount
-          inserts fresh IT nodes into a GT-touched parent that TranslateElement
-          often skips; replacing the whole card face forces a re-scan (Q2+).
-        */}
         <button
           key={faceKey}
           type="button"
