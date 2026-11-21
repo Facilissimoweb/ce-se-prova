@@ -10,6 +10,7 @@ import {
 } from '../i18n/useLocalizedCatalog';
 import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
+import { TariffDescriptionBlurbs } from '../components/TariffDescriptionBlurbs';
 import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
 import { TAROT_ITALIA_HOME_HERO_SRC, TarotEmblemLogo } from '../components/TarotEmblem';
 import { HomeHeroNebula } from '../components/HomeHeroNebula';
@@ -371,16 +372,12 @@ export function HomeScreen({
                     </span>
                   </div>
 
-                  <p className="text-sm leading-relaxed text-[#A39B93]">
-                    {showCmsKeys ? (
-                      <CopyText
-                        entry={{ cmsKey: tariff.cmsKeyDesc, liveText: tariff.description }}
-                        showKeys={true}
-                      />
-                    ) : (
-                      tariff.description
-                    )}
-                  </p>
+                  <TariffDescriptionBlurbs
+                    paragraphs={tariff.descriptionParagraphs}
+                    flatDescription={tariff.description}
+                    cmsKeyDesc={tariff.cmsKeyDesc}
+                    showCmsKeys={showCmsKeys}
+                  />
 
                   <ul className="space-y-2.5 pt-1">
                     {tariff.includes.map((item) => (

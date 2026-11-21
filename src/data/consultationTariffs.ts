@@ -1,11 +1,28 @@
 import type { ConsultationTariff } from '../types/handoff';
 
+/** Join card paragraphs into one string for SEO / Nina / JSON-LD. */
+export function joinTariffDescription(paragraphs: string[]): string {
+  return paragraphs.map((p) => p.trim()).filter(Boolean).join(' ');
+}
+
+function tariffWithParagraphs(
+  base: Omit<ConsultationTariff, 'description' | 'descriptionParagraphs'> & {
+    descriptionParagraphs: string[];
+  }
+): ConsultationTariff {
+  return {
+    ...base,
+    description: joinTariffDescription(base.descriptionParagraphs),
+  };
+}
+
 /**
  * Canon listino consulti (ENN-192) — unica fonte per UI, booking catalog, SEO e Nina.
  * Fonte copy: Nuovi prezzi per consulti.pdf (Maria Teresa Rogani).
+ * ENN-195: lead copy as short paragraphs for readable package cards.
  */
 export const consultationTariffs: ConsultationTariff[] = [
-  {
+  tariffWithParagraphs({
     id: '20m',
     durationMinutes: 20,
     priceEur: 19,
@@ -13,8 +30,10 @@ export const consultationTariffs: ConsultationTariff[] = [
     cmsKeyTitle: '[COPY: tariffa.placeholder.0.title]',
     title: 'Consulto Breve',
     cmsKeyDesc: '[COPY: tariffa.placeholder.0.desc]',
-    description:
-      'Una domanda precisa, una lettura mirata, chiarezza immediata. Quando hai un dubbio puntuale che richiede attenzione — su una relazione, su un’attesa o su una scelta vicina — e desideri comprendere con lucidità cosa si sta muovendo prima di agire.',
+    descriptionParagraphs: [
+      'Una domanda precisa, una lettura mirata, chiarezza immediata.',
+      'Quando hai un dubbio puntuale che richiede attenzione — su una relazione, su un’attesa o su una scelta vicina — e desideri comprendere con lucidità cosa si sta muovendo prima di agire.',
+    ],
     cmsKeyFocus: '[COPY: tariffa.placeholder.0.focus]',
     focusLabel: 'Solo chiamata vocale WhatsApp',
     onlineOnly: true,
@@ -23,8 +42,8 @@ export const consultationTariffs: ConsultationTariff[] = [
       'Dopo: una visione chiara della situazione e 2–3 indicazioni pratiche via WhatsApp o email',
       'Indicato se desideri fare luce su una singola questione in modo rapido e accessibile (non adatto a più temi insieme)',
     ],
-  },
-  {
+  }),
+  tariffWithParagraphs({
     id: '45m',
     durationMinutes: 45,
     priceEur: 50,
@@ -32,8 +51,10 @@ export const consultationTariffs: ConsultationTariff[] = [
     cmsKeyTitle: '[COPY: tariffa.placeholder.1.title]',
     title: 'Consulto Essenziale',
     cmsKeyDesc: '[COPY: tariffa.placeholder.1.desc]',
-    description:
-      'Per fare ordine quando hai due o tre questioni aperte e vuoi orientare bene le tue energie. Quando una risposta veloce non basta perché gli ambiti coinvolti sono più d’uno — ad esempio affetti e lavoro, oppure una decisione importante da prendere con equilibrio e senza fretta.',
+    descriptionParagraphs: [
+      'Per fare ordine quando hai due o tre questioni aperte e vuoi orientare bene le tue energie.',
+      'Quando una risposta veloce non basta perché gli ambiti coinvolti sono più d’uno — ad esempio affetti e lavoro, oppure una decisione importante da prendere con equilibrio e senza fretta.',
+    ],
     cmsKeyFocus: '[COPY: tariffa.placeholder.1.focus]',
     focusLabel: 'Vocale o Studio Macerata (Via Crispi 37)',
     includes: [
@@ -41,8 +62,8 @@ export const consultationTariffs: ConsultationTariff[] = [
       'Dopo: una sintesi scritta dei punti principali emersi, da rileggere con calma',
       'Indicato se cerchi chiarezza concreta su più aspetti della quotidianità in un tempo raccolto ed equilibrato',
     ],
-  },
-  {
+  }),
+  tariffWithParagraphs({
     id: '60m',
     durationMinutes: 60,
     priceEur: 75,
@@ -50,8 +71,10 @@ export const consultationTariffs: ConsultationTariff[] = [
     cmsKeyTitle: '[COPY: tariffa.placeholder.2.title]',
     title: 'Consulto Evolutivo Completo',
     cmsKeyDesc: '[COPY: tariffa.placeholder.2.desc]',
-    description:
-      'Per comprendere le radici di ciò che vivi e ritrovare una direzione consapevole. Quando avverti che una dinamica si ripete — nelle relazioni, nel percorso professionale o nelle scelte personali — e desideri osservare con onestà sia il contesto esterno sia il tuo spazio di azione.',
+    descriptionParagraphs: [
+      'Per comprendere le radici di ciò che vivi e ritrovare una direzione consapevole.',
+      'Quando avverti che una dinamica si ripete — nelle relazioni, nel percorso professionale o nelle scelte personali — e desideri osservare con onestà sia il contesto esterno sia il tuo spazio di azione.',
+    ],
     cmsKeyFocus: '[COPY: tariffa.placeholder.2.focus]',
     focusLabel: 'Il più scelto · Vocale o Studio Macerata',
     includes: [
@@ -60,8 +83,8 @@ export const consultationTariffs: ConsultationTariff[] = [
       'Indicato se desideri una lettura profonda e rispettosa che ti accompagni a scegliere con consapevolezza e autonomia',
     ],
     recommended: true,
-  },
-  {
+  }),
+  tariffWithParagraphs({
     id: '90m',
     durationMinutes: 90,
     priceEur: 90,
@@ -69,8 +92,10 @@ export const consultationTariffs: ConsultationTariff[] = [
     cmsKeyTitle: '[COPY: tariffa.placeholder.3.title]',
     title: 'Sessione Integrata',
     cmsKeyDesc: '[COPY: tariffa.placeholder.3.desc]',
-    description:
-      'Un’ora e mezza dedicata a rimettere insieme tutti i fili e guardare con respiro al percorso che ti attende. Ideale quando stai chiudendo una fase impegnativa, iniziando un nuovo capitolo o senti il bisogno di esplorare insieme relazioni, lavoro, risorse personali e direzione generale senza frammentare il lavoro.',
+    descriptionParagraphs: [
+      'Un’ora e mezza dedicata a rimettere insieme tutti i fili e guardare con respiro al percorso che ti attende.',
+      'Ideale quando stai chiudendo una fase impegnativa, iniziando un nuovo capitolo o senti il bisogno di esplorare insieme relazioni, lavoro, risorse personali e direzione generale senza frammentare il lavoro.',
+    ],
     cmsKeyFocus: '[COPY: tariffa.placeholder.3.focus]',
     focusLabel: 'Vocale o Studio Macerata (Via Crispi 37)',
     includes: [
@@ -78,7 +103,7 @@ export const consultationTariffs: ConsultationTariff[] = [
       'Dopo: riscontro scritto entro 48 ore su un canale riservato, per fissare i passaggi chiave a mente serena',
       'Indicato se desideri un lavoro completo in un unico spazio dedicato, con il miglior equilibrio tra tempo, profondità e investimento',
     ],
-  },
+  }),
 ];
 
 /** Compact one-line modality for lists / Nina / SEO. */

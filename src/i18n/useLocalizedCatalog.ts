@@ -6,6 +6,7 @@ import {
   educationalCourses,
   holisticFaqs,
 } from '../data/siteContent';
+import { joinTariffDescription } from '../data/consultationTariffs';
 import { isCoursePubliclyPresented } from '../lib/coursePresentation';
 import type {
   ConsultationTariff,
@@ -20,19 +21,26 @@ export function useLocalizedTariffs(): ConsultationTariff[] {
   const { t, i18n } = useTranslation('catalog');
   return useMemo(() => {
     if (getSiteLanguage() === DEFAULT_LANG) return consultationTariffs;
-    return consultationTariffs.map((tariff) => ({
-      ...tariff,
-      title: t(`tariff.${tariff.id}.title`, { defaultValue: tariff.title }),
-      description: t(`tariff.${tariff.id}.description`, {
-        defaultValue: tariff.description,
-      }),
-      focusLabel: t(`tariff.${tariff.id}.focus`, {
-        defaultValue: tariff.focusLabel,
-      }),
-      includes: tariff.includes.map((item, index) =>
-        t(`tariff.${tariff.id}.includes.${index}`, { defaultValue: item })
-      ),
-    }));
+    return consultationTariffs.map((tariff) => {
+      const descriptionParagraphs = tariff.descriptionParagraphs.map(
+        (paragraph, index) =>
+          t(`tariff.${tariff.id}.description.${index}`, {
+            defaultValue: paragraph,
+          })
+      );
+      return {
+        ...tariff,
+        title: t(`tariff.${tariff.id}.title`, { defaultValue: tariff.title }),
+        descriptionParagraphs,
+        description: joinTariffDescription(descriptionParagraphs),
+        focusLabel: t(`tariff.${tariff.id}.focus`, {
+          defaultValue: tariff.focusLabel,
+        }),
+        includes: tariff.includes.map((item, index) =>
+          t(`tariff.${tariff.id}.includes.${index}`, { defaultValue: item })
+        ),
+      };
+    });
   }, [t, i18n.language]);
 }
 
