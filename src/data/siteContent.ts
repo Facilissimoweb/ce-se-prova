@@ -93,7 +93,7 @@ export const siteContent = {
     coursesIntro: {
       cmsKey: '[COPY: siteContent.home.coursesIntro]',
       liveText:
-        'Tre moduli formativi a pagamento per apprendere la lettura simbolica e previsionale dei Tarocchi con metodo rigoroso ed etico.',
+        'In lancio questa settimana: il percorso Arcani Maggiori. Altri moduli didattici restano in preparazione.',
     },
   },
   chiSono: {
@@ -179,7 +179,7 @@ export const siteContent = {
   corsi: {
     kicker: {
       cmsKey: '[COPY: siteContent.corsi.kicker]',
-      liveText: 'Formazione Olistica & Tarologia · 3 Percorsi a Pagamento',
+      liveText: 'Formazione Olistica & Tarologia · Arcani Maggiori',
     },
     heading: {
       cmsKey: '[COPY: siteContent.corsi.heading]',
@@ -188,7 +188,7 @@ export const siteContent = {
     subheading: {
       cmsKey: '[COPY: siteContent.corsi.subheading]',
       liveText:
-        'Un itinerario progressivo in tre moduli autonomi e acquistabili singolarmente per padroneggiare gli Arcani Maggiori, gli Arcani Minori e i Metodi di Stesura previsionali ed evolutivi.',
+        'Questa settimana è in offerta il percorso Arcani Maggiori: dispense, schede visive e Sigillo. Arcani Minori e Metodi di Stesura restano in preparazione.',
     },
     soonBadge: {
       cmsKey: '[COPY: siteContent.corsi.soonBadge]',
@@ -815,6 +815,8 @@ export const educationalCourses: EducationalCourse[] = [
     levelLabel: 'Livello Intermedio',
     formatLabel: 'On-Demand + Atlante dei Semi PDF + 1h Q&A Live',
     recommended: true,
+    /** ENN-174 — Maggiori-only public launch this week */
+    publicPresented: false,
     includes: [
       '14 videolezioni dedicate ai 4 Semi (Bastoni, Coppe, Spade, Denari)',
       'Mappa comparativa della Numerologia dall’Asso al Dieci per seme',
@@ -868,6 +870,8 @@ export const educationalCourses: EducationalCourse[] = [
     totalHours: '7h 30m video',
     levelLabel: 'Livello Avanzato & Pratica',
     formatLabel: 'On-Demand + Schemi Vettoriali + Supervisione Live',
+    /** ENN-174 — Maggiori-only public launch this week */
+    publicPresented: false,
     includes: [
       '10 videolezioni operative sulle architetture di stesa classiche e previsionali',
       'Quaderno con 12 schemi di stesa scaricabili e checklist di conduzione',

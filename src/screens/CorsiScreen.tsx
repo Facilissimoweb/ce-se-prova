@@ -63,6 +63,16 @@ export function CorsiScreen({
     educationalCourses.find((c) => c.id === selectedCourseId) ??
     educationalCourses[0];
 
+  // ENN-174 — if selection points at a frozen course, snap to first public one
+  useEffect(() => {
+    if (
+      educationalCourses.length > 0 &&
+      !educationalCourses.some((c) => c.id === selectedCourseId)
+    ) {
+      onChangeCourseId(educationalCourses[0].id);
+    }
+  }, [educationalCourses, selectedCourseId, onChangeCourseId]);
+
   const [fullName, setFullName] = useState(user?.displayName ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
   const [phoneWhatsApp, setPhoneWhatsApp] = useState('');

@@ -64,11 +64,10 @@ export function ReservedLoginGate({
               Entra nella tua biblioteca simbolica personale
             </h2>
             <p className="text-sm leading-relaxed text-[#A39B93]">
-              Ogni dispensa dei percorsi{' '}
-              <strong className="text-[#F4F1EA]">Arcani Maggiori</strong>,{' '}
-              <strong className="text-[#F4F1EA]">Arcani Minori</strong> e{' '}
-              <strong className="text-[#F4F1EA]">Metodi di Stesura</strong> è collegata in
-              modo personale al tuo profilo protetto.
+              Ogni dispensa del percorso{' '}
+              <strong className="text-[#F4F1EA]">Arcani Maggiori</strong> (e di eventuali
+              altri percorsi già acquistati) è collegata in modo personale al tuo profilo
+              protetto.
             </p>
 
             {authError && (
@@ -96,7 +95,7 @@ export function ReservedLoginGate({
               onClick={() => onNavigate('corsi')}
               className="px-5 py-3 min-h-[46px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-sm font-medium text-[#F4F1EA] inline-flex items-center gap-2 whitespace-nowrap transition-colors"
             >
-              Vedi i 3 Percorsi Didattici
+              Vedi il Percorso Arcani Maggiori
               <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
             </button>
           </div>

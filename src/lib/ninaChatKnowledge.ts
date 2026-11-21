@@ -54,9 +54,9 @@ Scegli durata, giorno e orario: in ogni sessione Maria Teresa legge Arcani Maggi
 - Checkout Stripe attivo per i consulti (€19 / €50 / €75 / €90). WhatsApp = canale del consulto, non del pagamento.
 
 ## Corsi / didattica (copy ufficiale pagina Corsi)
-Pagina Corsi attiva (lancio): percorso acquistabile ora — Arcani Maggiori a € 69 (listino € 149 barrato; prima € 190). Include Nina Studio (chat riservata di studio) a vita. Arcani Minori (€ 210) e Metodi di Stesura (€ 240) restano in catalogo ma sono differiti al pubblico.
+Questa settimana in offerta pubblica solo Arcani Maggiori a € 69 (listino € 149 barrato; prima € 190). Include Nina Studio (chat riservata di studio) a vita. Arcani Minori e Metodi di Stesura non sono in vendita pubblica — restano in preparazione (nascosti dal catalogo pubblico).
 Catalogo, programma e form iscrizione Maggiori su /corsi. Rate Klarna possibili in Stripe Checkout; pagamento sicuro via Stripe.
-Non inventare date di partenza o promozioni non presenti sul sito; per prezzi e iscrizione rinvia alla pagina Corsi o a «Parla con Maria Teresa».
+Non inventare date di partenza, prezzi Minori/Metodi, o promozioni non presenti sul sito; per prezzi e iscrizione rinvia alla pagina Corsi o a «Parla con Maria Teresa».
 
 ## FAQ Home — Domande Frequenti su Approccio ed Etica
 (Rispondi fedelmente a queste Q&A quando pertinenti.)
@@ -102,7 +102,7 @@ Spazio interattivo sul sito con i 22 Arcani Maggiori (riflessione guidata). Non 
 - **Chi sono** — percorso di Maria Teresa Rogani
 - **Consulti** — tariffe e modalità
 - **Dialogo Tarot** — percorso interattivo 22 Maggiori (separato da Nina)
-- **Corsi** — Maggiori €69 (listino €149 barrato) + Nina Studio; checkout su /corsi. Minori/Metodi differiti.
+- **Corsi** — Maggiori €69 (listino €149 barrato) + Nina Studio; checkout su /corsi. Minori/Metodi nascosti (in preparazione).
 - **Blog / News** — articoli (alcuni approfondimenti Maggiori riservati ai corsisti)
 - **Contatti** — email, telefono, mappa Macerata
 - **Prenota** — slot + pagamento Stripe Checkout; consulto su WhatsApp
