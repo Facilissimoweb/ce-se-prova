@@ -1,5 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { GT_ENABLED } from '../lib/googleTranslateEnabled';
 import { applyDocumentLang } from './applyDocumentLang';
 import { detectSiteLang, persistSiteLang, syncLangQueryParam } from './detect';
 import { catalogTranslations } from './locales/catalog';
@@ -47,7 +48,11 @@ function buildResources() {
 let initialized = false;
 
 export function initI18n(search?: string): typeof i18n {
-  const lng = detectSiteLang(search);
+  // ENN-204 — while Traduci/GT is the public language system, keep react-i18next
+  // on Italian so curated EN/ES/… overlays are not “stuck” and GT can translate
+  // a single Italian DOM source (same policy as applyGoogTransLang).
+  const detected = detectSiteLang(search);
+  const lng: SiteLang = GT_ENABLED ? DEFAULT_LANG : detected;
 
   if (!initialized) {
     void i18n.use(initReactI18next).init({

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight,
   BookOpen,
@@ -10,9 +10,16 @@ import {
 import { MaterialsLanguagePicker } from '../MaterialsLanguagePicker';
 import { PaymentTrustCues } from '../PaymentTrustCues';
 import { GT_ENABLED } from '../../lib/googleTranslateEnabled';
+import {
+  GT_PAGE_LANG,
+  GT_REFRESH_EVENT,
+  readGoogTransLang,
+  requestGoogleTranslateRefresh,
+} from '../../lib/googleTranslateRuntime';
 import { DispensaFlashcards } from '../reserved/DispensaFlashcards';
 import { DispensaSchedaVisiva } from '../reserved/DispensaSchedaVisiva';
 import { FormattedDispensaBody } from '../reserved/FormattedDispensaBody';
+import { GtSafeBoundary } from '../GtSafeBoundary';
 import {
   getMaggioriDispensa01,
   getMaggioriMattoPreviewFlashcardDeck,
@@ -49,6 +56,54 @@ export function MaggioriMattoPreview({
   const markdown = useMemo(() => getMaggioriMattoPreviewMarkdown(), []);
   const mattoDeck = useMemo(() => getMaggioriMattoPreviewFlashcardDeck(), []);
 
+  // ENN-204 — remount public Corsi Sigillo anteprima under SPA Traduci
+  // (Area Personale already remounts via ReservedAreaScreen ENN-178/182).
+  const [previewEpoch, setPreviewEpoch] = useState(0);
+  const [gtLang, setGtLang] = useState(() =>
+    typeof document !== 'undefined' ? readGoogTransLang() : GT_PAGE_LANG
+  );
+
+  useEffect(() => {
+    if (!GT_ENABLED) return;
+    const sync = () => setGtLang(readGoogTransLang());
+    sync();
+    window.addEventListener('hashchange', sync);
+    window.addEventListener(GT_REFRESH_EVENT, sync);
+    const id = window.setInterval(sync, 1500);
+    return () => {
+      window.removeEventListener('hashchange', sync);
+      window.removeEventListener(GT_REFRESH_EVENT, sync);
+      window.clearInterval(id);
+    };
+  }, []);
+
+  const gtLangPrevRef = useRef(gtLang);
+  useEffect(() => {
+    if (gtLangPrevRef.current === gtLang) return;
+    gtLangPrevRef.current = gtLang;
+    setPreviewEpoch((n) => n + 1);
+  }, [gtLang]);
+
+  const previewRemountKey = `corsi-maggiori-preview-${gtLang}-${previewEpoch}`;
+
+  useEffect(() => {
+    if (!GT_ENABLED) return;
+    if (gtLang === GT_PAGE_LANG) return;
+    requestGoogleTranslateRefresh(160);
+    const mid = window.setTimeout(
+      () => requestGoogleTranslateRefresh(360),
+      280
+    );
+    const late = window.setTimeout(
+      () => requestGoogleTranslateRefresh(900),
+      700
+    );
+    return () => {
+      window.clearTimeout(mid);
+      window.clearTimeout(late);
+    };
+  }, [gtLang, previewEpoch]);
+
   const embeds = useMemo(() => {
     const map: Record<string, React.ReactNode> = {};
     const scheda = getSchedaVisiva('il-matto');
@@ -70,7 +125,29 @@ export function MaggioriMattoPreview({
       </h2>
 
       {/* Same 12-col workspace as Area Personale unlocked Maggiori reader */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <GtSafeBoundary
+        key={previewRemountKey}
+        resetKey={previewRemountKey}
+        onError={() => setPreviewEpoch((n) => n + 1)}
+        fallback={
+          <div className="rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-6 space-y-3">
+            <p className="text-sm text-[#E8e1dd]">
+              L&apos;anteprima si è riavviata. Puoi ricaricarla e continuare.
+            </p>
+            <button
+              type="button"
+              onClick={() => setPreviewEpoch((n) => n + 1)}
+              className="min-h-[44px] px-4 py-2.5 rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/15 text-xs font-semibold text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+            >
+              Ricarica l&apos;anteprima
+            </button>
+          </div>
+        }
+      >
+      <div
+        key={previewRemountKey}
+        className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
+      >
         <aside className="lg:col-span-4 space-y-3">
           <div className="space-y-1 px-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
@@ -309,6 +386,7 @@ export function MaggioriMattoPreview({
           </div>
         </article>
       </div>
+      </GtSafeBoundary>
     </section>
   );
 }

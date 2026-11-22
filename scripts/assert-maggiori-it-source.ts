@@ -88,6 +88,14 @@ assert(
     !preview.includes('translate="no"'),
   'MaggioriMattoPreview has no leftover notranslate shell'
 );
+assert(
+  preview.includes('GT_REFRESH_EVENT') &&
+    preview.includes('previewRemountKey') &&
+    preview.includes('readGoogTransLang') &&
+    preview.includes('GtSafeBoundary') &&
+    preview.includes('requestGoogleTranslateRefresh(900)'),
+  'Corsi Maggiori anteprima remounts under SPA Traduci so Sigillo follows GT (ENN-204)'
+);
 
 const body = readFileSync(
   path.join(root, 'src/components/reserved/FormattedDispensaBody.tsx'),
@@ -122,8 +130,9 @@ assert(
   'Sigillo shell section is GT-able (ENN-155)'
 );
 assert(
-  /Layers[\s\S]{0,120}Sigillo di apprendimento/.test(flash),
-  'Sigillo eyebrow label present'
+  flash.includes("tIt('sigillo.eyebrow')") &&
+    flash.includes("getFixedT('it', 'common')"),
+  'Sigillo chrome uses Italian tIt keys (ENN-204 — GT DOM source)'
 );
 assert(
   /SECTION_LABELS[\s\S]*mappa:\s*'Mappa della composizione'/.test(scheda) &&
