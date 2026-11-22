@@ -6,9 +6,9 @@ import {
   FileText,
   Lock,
   ShieldCheck,
-  UserCheck,
 } from 'lucide-react';
 import type { ScreenId } from '../../types/handoff';
+import { GoogleSignInButton } from '../GoogleSignInButton';
 import { TarotEmblemLogo } from '../TarotEmblem';
 
 interface ReservedLoginGateProps {
@@ -81,14 +81,7 @@ export function ReservedLoginGate({
           </div>
 
           <div className="flex flex-wrap items-center gap-4 pt-2">
-            <button
-              type="button"
-              onClick={onSignIn}
-              className="px-6 py-3 min-h-[46px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center gap-2.5 whitespace-nowrap transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
-            >
-              <UserCheck className="w-4 h-4" />
-              Accedi con Google
-            </button>
+            <GoogleSignInButton onClick={onSignIn} />
 
             <button
               type="button"

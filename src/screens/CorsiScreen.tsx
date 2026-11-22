@@ -15,6 +15,7 @@ import type { CourseId, StripeCheckoutHandoffPayload } from '../types/handoff';
 import { siteContent } from '../data/siteContent';
 import { useLocalizedCourses } from '../i18n/useLocalizedCatalog';
 import { CopyText } from '../components/CopyText';
+import { GoogleSignInButton } from '../components/GoogleSignInButton';
 import { ResilientImage } from '../components/ResilientImage';
 import { COURSE_SECTION_IMAGES } from '../data/sectionImages';
 import { MaggioriMattoPreview } from '../components/corsi/MaggioriMattoPreview';
@@ -790,13 +791,9 @@ export function CorsiScreen({
                 Chiedi nel Dialogo Tarot
               </button>
               {!user && (
-                <button
-                  type="button"
-                  onClick={signInWithGoogle}
-                  className="px-4 py-2.5 min-h-[44px] rounded-lg border border-[#D4AF37]/40 bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-xs font-medium text-[#E6C65C]"
-                >
+                <GoogleSignInButton onClick={signInWithGoogle}>
                   Accedi con Google per Sbloccare
-                </button>
+                </GoogleSignInButton>
               )}
             </div>
 
