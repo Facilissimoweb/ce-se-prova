@@ -24,7 +24,7 @@ export type GtCriticalKey =
 export const GT_CRITICAL_IT: Record<GtCriticalKey, string> = {
   bookConsult: 'Prenota consulto',
   bookSession: 'Prenota una sessione',
-  welcomeMode: 'Accoglienza del sito',
+  welcomeMode: 'Accoglienza',
   bookNow: 'Prenota un consulto',
   sendBooking: 'Invia prenotazione',
   whatsappContact: 'Contatto WhatsApp',

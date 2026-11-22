@@ -4,7 +4,6 @@ import {
   Loader2,
   Lock,
   Mail,
-  MessageCircle,
   Send,
   Sparkles,
   X,
@@ -92,8 +91,27 @@ function TelegramLogo({ className }: { className?: string }) {
   );
 }
 
-const linkClass =
-  'flex min-w-0 items-center justify-center gap-1.5 rounded-lg border border-[#D4AF37]/15 bg-[#12100E]/55 px-2 py-1.5 text-[11px] font-semibold leading-tight text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:justify-start sm:gap-2 sm:px-2.5 sm:py-2 sm:text-xs';
+function NinaCardAvatar({ className }: { className?: string }) {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#E2BE48"
+      strokeWidth="1.6"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="4" y="3" width="11" height="17" rx="2" />
+      <path d="M9.5 8.5l2 3-2 3-2-3 2-3z" />
+      <path
+        d="M13 13.5c0-2.2 2-4 4.5-4s4.5 1.8 4.5 4c0 1.1-.5 2.1-1.3 2.8l.6 2.2-2.2-.7c-.5.2-1 .2-1.6.2-2.5 0-4.5-1.8-4.5-4.5z"
+        fill="#14120E"
+      />
+    </svg>
+  );
+}
 
 /**
  * ENN-213: independent left FAB (always visible) — not in «Strumenti» cluster.
@@ -105,6 +123,7 @@ const linkClass =
  * panel remount + GtSafeBoundary so Studio tab cannot blank the site under GT.
  * ENN-165: panelKey includes googtrans lang; Groq history omits Italian seed;
  * seed never gets stale notranslate; lang re-read on send.
+ * ENN-225: Maria modal structure + Studio = general tarot (Maggiori + Minori).
  */
 export function ChatFab() {
   const { i18n } = useTranslation('common');
@@ -350,9 +369,8 @@ export function ChatFab() {
     threadRef.current.scrollTop = threadRef.current.scrollHeight;
   }, [open, turns, sending, showStudioCta]);
 
-  async function sendMessage(event: React.FormEvent) {
-    event.preventDefault();
-    const message = draft.trim();
+  async function submitPrompt(rawMessage: string) {
+    const message = rawMessage.trim();
     if (!message || sending || !chatAvailable) return;
 
     const effectiveMode: NinaMode =
@@ -500,6 +518,26 @@ export function ChatFab() {
     }
   }
 
+  async function sendMessage(event: React.FormEvent) {
+    event.preventDefault();
+    await submitPrompt(draft);
+  }
+
+  const quickChips = [
+    {
+      label: tIt('nina.chipTariffs'),
+      prompt: tIt('nina.chipTariffsPrompt'),
+    },
+    {
+      label: tIt('nina.chipStudio'),
+      prompt: tIt('nina.chipStudioPrompt'),
+    },
+    {
+      label: tIt('nina.chipAbout'),
+      prompt: tIt('nina.chipAboutPrompt'),
+    },
+  ] as const;
+
   const titleLabel =
     mode === 'studio' && canUseStudio
       ? tIt('nina.fabTitleStudio')
@@ -529,7 +567,7 @@ export function ChatFab() {
         title={titleLabel}
         className="fixed bottom-24 left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[5.75rem] md:left-6"
       >
-        <MessageCircle className="h-4 w-4" aria-hidden="true" />
+        <NinaCardAvatar className="h-5 w-5" />
       </button>
 
       {open && (
@@ -565,39 +603,35 @@ export function ChatFab() {
               </div>
             }
           >
-            <div
-              key={panelKey}
-              className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-2.5 md:px-4 md:pb-4 md:pt-3"
-            >
-              <div className="mb-2 flex shrink-0 items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0">
-                    <p className="font-display text-[10px] tracking-[0.1em] text-[#D4AF37] uppercase sm:text-[11px]">
-                      Tarot Italia
-                    </p>
-                    <h2 className="font-display text-base leading-none text-[#F4F1EA] sm:text-lg">
+            <div key={panelKey} className="nina-chat-modal">
+              <div className="nina-header">
+                <div className="nina-profile">
+                  <div className="nina-avatar">
+                    <NinaCardAvatar />
+                    <span className="online-dot" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="brand-tag">{tIt('nina.brandTag')}</span>
+                    <h3>
                       {mode === 'studio' && canUseStudio
                         ? 'Nina Studio'
                         : 'Nina'}
-                    </h2>
+                    </h3>
+                    <p>{subtitle}</p>
                   </div>
-                  <p className="mt-1 text-[11px] leading-snug text-[#A39B93] sm:text-xs">
-                    {subtitle}
-                  </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label="Chiudi chat con Nina"
-                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/25 text-[#A39B93] transition-colors hover:bg-[#D4AF37]/10 hover:text-[#F4F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                  className="close-btn"
                 >
                   <X className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
               </div>
 
-              {/* Mode switch — Accoglienza vs Studio */}
               <div
-                className="mb-2 flex shrink-0 flex-wrap items-center gap-1.5"
+                className="nina-tabs"
                 role="group"
                 aria-label={tIt('nina.modeAria')}
               >
@@ -605,54 +639,38 @@ export function ChatFab() {
                   type="button"
                   aria-pressed={mode === 'welcome'}
                   onClick={() => switchMode('welcome')}
-                  className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:text-xs ${
-                    mode === 'welcome'
-                      ? 'border-[#D4AF37]/45 bg-[#D4AF37]/15 text-[#E6C65C]'
-                      : 'border-[#D4AF37]/15 text-[#A39B93] hover:border-[#D4AF37]/30 hover:text-[#F4F1EA]'
-                  }`}
+                  className={`tab${mode === 'welcome' ? ' active' : ''}`}
                 >
-                  <MessageCircle className="h-3 w-3" aria-hidden />
                   <GtCriticalLabel uiKey="welcomeMode" />
                 </button>
                 <button
                   type="button"
                   aria-pressed={mode === 'studio' && canUseStudio}
                   onClick={() => switchMode('studio')}
-                  className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:text-xs ${
-                    mode === 'studio' && canUseStudio
-                      ? 'border-[#D4AF37]/45 bg-[#D4AF37]/15 text-[#E6C65C]'
-                      : 'border-[#D4AF37]/15 text-[#A39B93] hover:border-[#D4AF37]/30 hover:text-[#F4F1EA]'
+                  className={`tab${
+                    mode === 'studio' && canUseStudio ? ' active' : ''
                   }`}
                 >
-                  {canUseStudio ? (
-                    <Sparkles className="h-3 w-3" aria-hidden />
-                  ) : (
+                  {canUseStudio ? null : (
                     <Lock className="h-3 w-3" aria-hidden />
                   )}
-                  {tIt('nina.modeStudio')}
+                  <span>{tIt('nina.modeStudio')}</span>{' '}
+                  <span className="badge-pro">{tIt('nina.proBadge')}</span>
                 </button>
               </div>
 
               {showStudioCta && (
-                <div
-                  className="mb-2 shrink-0 rounded-xl border border-[#D4AF37]/25 bg-[#D4AF37]/08 px-3 py-2.5"
-                  role="status"
-                >
-                  <p className="text-xs leading-relaxed text-[#E8e1dd]">
-                    {tIt('nina.studioLockedHint')}
-                  </p>
-                  <a
-                    href={`/corsi#${SCROLL_LANDMARKS.corsiCheckout}`}
-                    className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/15 px-2.5 py-1.5 text-[11px] font-semibold text-[#E6C65C] transition-colors hover:bg-[#D4AF37]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
-                  >
+                <div className="nina-studio-lock" role="status">
+                  <p>{tIt('nina.studioLockedHint')}</p>
+                  <a href={`/corsi#${SCROLL_LANDMARKS.corsiCheckout}`}>
                     <Sparkles className="h-3 w-3" aria-hidden />
                     {tIt('nina.studioCta')}
                   </a>
                 </div>
               )}
 
-              {chatAvailable && (
-                <div className="mb-2 flex min-h-0 min-w-0 flex-1 flex-col">
+              {chatAvailable ? (
+                <>
                   {/*
                     ENN-158/161: chrome + seed welcome stay GT-able (Italian DOM).
                     Only API/user bubbles use notranslate — replies already follow
@@ -660,15 +678,12 @@ export function ChatFab() {
                   */}
                   <div
                     ref={threadRef}
-                    className="mb-2 min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain rounded-xl border border-[#D4AF37]/12 bg-[#0F0D0B]/70 p-2.5"
+                    className="nina-messages"
                     aria-live="polite"
                   >
                     {turns.map((turn, index) => {
                       const baseClass =
-                        turn.role === 'user'
-                          ? 'ml-6 break-words rounded-lg bg-[#D4AF37]/15 px-2.5 py-2 text-sm text-[#F4F1EA] whitespace-pre-wrap'
-                          : 'mr-2 break-words rounded-lg bg-[#1C1916] px-2.5 py-2.5';
-                      // skipGt only for API/user — never seed (stale notranslate left IT).
+                        turn.role === 'user' ? 'bubble-user' : 'bubble-nina';
                       const localized = turn.skipGt === true;
                       return (
                         <div
@@ -687,7 +702,7 @@ export function ChatFab() {
                       );
                     })}
                     {sending && (
-                      <div className="mr-4 flex items-center gap-2 rounded-lg bg-[#1C1916] px-2.5 py-2 text-sm text-[#A39B93]">
+                      <div className="bubble-nina flex items-center gap-2 text-[#A39B93]">
                         <Loader2
                           className="h-3.5 w-3.5 animate-spin"
                           aria-hidden
@@ -697,24 +712,32 @@ export function ChatFab() {
                     )}
                   </div>
 
-                  <form
-                    onSubmit={sendMessage}
-                    className="flex min-w-0 shrink-0 items-end gap-2"
-                  >
+                  {mode === 'welcome' && turns.length <= 1 && !sending && (
+                    <div className="nina-chips">
+                      {quickChips.map((chip) => (
+                        <button
+                          key={chip.label}
+                          type="button"
+                          disabled={sending || !chatAvailable}
+                          onClick={() => void submitPrompt(chip.prompt)}
+                        >
+                          {chip.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <form onSubmit={sendMessage} className="nina-input-row">
                     <label htmlFor={composerId} className="sr-only">
                       Messaggio per Nina
                     </label>
-                    {/*
-                      GT does not translate HTML placeholder attrs — use a visible
-                      Italian text node so googtrans can localize «Scrivi qui…».
-                    */}
-                    <div className="relative min-h-[2.5rem] min-w-0 flex-1">
+                    <div className="nina-composer">
                       {!draft.trim() && (
                         <span
                           aria-hidden="true"
-                          className="pointer-events-none absolute top-2 left-3 right-3 text-sm leading-snug text-[#6F675F]"
+                          className="pointer-events-none absolute top-3 left-3.5 right-3 text-sm leading-snug text-[#6F675F]"
                         >
-                          Scrivi qui…
+                          {tIt('nina.inputPlaceholder')}
                         </span>
                       )}
                       <textarea
@@ -724,88 +747,77 @@ export function ChatFab() {
                         onChange={(e) => setDraft(e.target.value)}
                         disabled={sending}
                         placeholder=""
-                        className="min-h-[2.5rem] w-full resize-none rounded-xl border border-[#D4AF37]/20 bg-[#12100E] px-3 py-2 text-sm text-[#F4F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:opacity-60"
                       />
                     </div>
                     <button
                       type="submit"
                       disabled={sending || !draft.trim()}
                       aria-label="Invia messaggio"
-                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#D4AF37]/35 bg-[#D4AF37]/15 text-[#D4AF37] transition-colors hover:bg-[#D4AF37]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] disabled:cursor-not-allowed disabled:opacity-40"
+                      className="send-btn"
                     >
-                      <Send className="h-3.5 w-3.5" aria-hidden="true" />
+                      <Send className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </form>
 
                   {sendError && (
                     <p
-                      className="mt-1.5 shrink-0 text-xs leading-relaxed text-[#C9A27A]"
+                      className="px-4 pb-2 text-xs leading-relaxed text-[#C9A27A]"
                       role="alert"
                     >
                       {sendError}
                     </p>
                   )}
+                </>
+              ) : (
+                <div className="nina-messages">
+                  <div className="bubble-nina">
+                    {statusLoading ? '…' : tIt('nina.subtitleUnavailable')}
+                  </div>
                 </div>
               )}
 
               <div
-                className={`rounded-lg border border-[#D4AF37]/20 bg-[#0F0D0B]/55 px-2 py-1.5 sm:px-2.5 sm:py-2 ${
-                  chatAvailable ? 'shrink-0' : 'mt-auto shrink-0'
-                }`}
+                className="mt-footer"
                 role="group"
                 aria-label={tIt('nina.sectionAria')}
               >
-                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                  {tIt('cta.talkMaria')}
-                </p>
-                <ul className="grid grid-cols-2 gap-1.5 md:grid-cols-4">
-                  <li>
-                    <a href="/prenota" className={linkClass}>
-                      <CalendarDays
-                        className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]"
-                        aria-hidden="true"
-                      />
-                      <GtCriticalLabel uiKey="bookConsult" />
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href={whatsappHref(
-                        'Buongiorno Maria Teresa, vorrei scrivere in chat.'
-                      )}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={linkClass}
-                    >
-                      <WhatsAppLogo className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />
-                      <GtCriticalLabel uiKey="whatsappContact" />
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href={telegramHref()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={linkClass}
-                    >
-                      <TelegramLogo className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />
-                      Telegram
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href={`mailto:${SITE_EMAIL}`}
-                      className={linkClass}
-                      title={`Email · ${SITE_EMAIL}`}
-                    >
-                      <Mail
-                        className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]"
-                        aria-hidden="true"
-                      />
-                      <span className="min-w-0 truncate">Email</span>
-                    </a>
-                  </li>
-                </ul>
+                <span className="mt-label">{tIt('cta.talkMaria')}</span>
+                <div className="mt-actions">
+                  <a href="/prenota" className="btn-prenota">
+                    <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
+                    <GtCriticalLabel uiKey="bookConsult" />
+                  </a>
+                  <a
+                    href={whatsappHref(
+                      'Buongiorno Maria Teresa, vorrei scrivere in chat.'
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-icon wa"
+                    aria-label="WhatsApp"
+                  >
+                    <WhatsAppLogo className="h-4 w-4" />
+                    WA
+                  </a>
+                  <a
+                    href={telegramHref()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-icon"
+                    aria-label="Telegram"
+                  >
+                    <TelegramLogo className="h-4 w-4" />
+                    TG
+                  </a>
+                  <a
+                    href={`mailto:${SITE_EMAIL}`}
+                    className="btn-icon"
+                    title={`Email · ${SITE_EMAIL}`}
+                    aria-label="Email"
+                  >
+                    <Mail className="h-4 w-4" aria-hidden="true" />
+                  </a>
+                </div>
               </div>
             </div>
           </GtSafeBoundary>
