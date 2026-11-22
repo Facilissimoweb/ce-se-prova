@@ -81,6 +81,67 @@ const NAV_ITEM_DEFS: {
   },
 ];
 
+/** ENN-224 — Maria custom SVGs for mobile ti-menu-list only. */
+function TiMenuIcon({ id }: { id: ScreenId }) {
+  const common = {
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.5,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true as const,
+  };
+
+  switch (id) {
+    case 'home':
+      return (
+        <svg {...common}>
+          <path d="M12 2.5L3 9.5h18L12 2.5z" />
+          <path d="M5.5 9.5v10M18.5 9.5v10M3 19.5h18" />
+          <circle cx="12" cy="14.5" r="2.6" />
+          <path d="M12 10.5v1M12 17.5v1M8.5 14.5h1M14.5 14.5h1" />
+        </svg>
+      );
+    case 'chi-sono':
+      return (
+        <svg {...common}>
+          <path d="M7.5 3.5a6.5 6.5 0 0 0 9 0" />
+          <circle cx="12" cy="8.5" r="3" />
+          <path d="M5.5 20.5c0-3.8 2.9-6.5 6.5-6.5s6.5 2.7 6.5 6.5" />
+          <path d="M12 14v3M10.8 15.5h2.4" />
+        </svg>
+      );
+    case 'consulti':
+      return (
+        <svg {...common}>
+          <rect x="8.5" y="3.5" width="7" height="12" rx="1.2" />
+          <path d="M8.5 6.2L4.2 8.2l3.8 9.8 1.5-.6" />
+          <path d="M15.5 6.2l4.3 2-3.8 9.8-1.5-.6" />
+          <path d="M12 7.8l1.1 1.7-1.1 1.7-1.1-1.7z" />
+        </svg>
+      );
+    case 'news':
+      return (
+        <svg {...common}>
+          <path d="M15 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-5" />
+          <path d="M8.5 7.5h4M8.5 11.5h3M8.5 15.5h5" />
+          <path d="M20.5 3.5c-2.5 0-5.5 2.5-6.5 6.5l2.5 1c2.5-1.5 4-4.5 4-7.5z" />
+        </svg>
+      );
+    case 'contatti':
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="8" r="4.5" />
+          <circle cx="12" cy="8" r="1.4" />
+          <path d="M12 12.5V21M12 16.5h3.5M12 19.5h2.5" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
+
 const HEADER_HEIGHT_CLASS =
   'h-[calc(4.75rem+env(safe-area-inset-top,0px))] md:h-[calc(5rem+env(safe-area-inset-top,0px))] pt-[env(safe-area-inset-top,0px)]';
 const HEADER_OFFSET_TOP =
@@ -310,11 +371,11 @@ export function TopBar({
                 </button>
               </div>
 
-              <nav aria-label={t('nav.pagesAria')} className="space-y-2">
+              {/* ENN-224 — Maria ti-menu-list (icon boxes + title/sub + arrow) */}
+              <nav aria-label={t('nav.pagesAria')} className="ti-menu-list">
                 {navItems
                   .filter((item) => item.id !== 'corsi' && item.id !== 'chat')
                   .map((item) => {
-                    const Icon = item.icon;
                     const isActive = activeScreen === item.id;
                     return (
                       <button
@@ -322,39 +383,19 @@ export function TopBar({
                         type="button"
                         onClick={() => handleMobileSelect(item.id)}
                         aria-current={isActive ? 'page' : undefined}
-                        className={`w-full min-h-[52px] px-3.5 py-2.5 rounded-xl border text-left flex items-center justify-between gap-3 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
-                          isActive
-                            ? 'bg-[#D4AF37]/12 border-[#D4AF37]/70 text-[#F4F1EA]'
-                            : 'bg-transparent border-[#D4AF37]/12 text-[#F4F1EA] hover:border-[#D4AF37]/35 hover:bg-[#151311]/60'
-                        }`}
+                        className="ti-menu-item focus-visible:ring-2 focus-visible:ring-[#E2BE48]/60"
                       >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <span
-                            className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                              isActive
-                                ? 'bg-[#D4AF37] text-[#12100E]'
-                                : 'bg-[#1D1B19] text-[#D4AF37]'
-                            }`}
-                          >
-                            <Icon className="w-3.5 h-3.5" aria-hidden="true" />
-                          </span>
+                        <div className="ti-menu-left">
+                          <div className="ti-icon-box">
+                            <TiMenuIcon id={item.id} />
+                          </div>
                           <div className="min-w-0">
-                            <span
-                              className={`block font-display text-sm tracking-[0.04em] truncate ${
-                                isActive ? 'text-[#D4AF37]' : 'text-[#F4F1EA]'
-                              }`}
-                            >
-                              {item.label}
-                            </span>
-                            <span className="block text-[11px] leading-snug text-[#A39B93] truncate">
-                              {item.subtitle}
-                            </span>
+                            <h3 className="ti-title truncate">{item.label}</h3>
+                            <p className="ti-sub truncate">{item.subtitle}</p>
                           </div>
                         </div>
                         <ArrowRight
-                          className={`w-3.5 h-3.5 shrink-0 ${
-                            isActive ? 'text-[#D4AF37]' : 'text-[#A39B93]/70'
-                          }`}
+                          className="ti-arrow w-[15px] h-[15px]"
                           aria-hidden="true"
                         />
                       </button>
