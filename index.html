@@ -44,6 +44,33 @@
       href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <script>
+      // Patch anti-crash per Google Translate (React issue #11538)
+      // Google Translate sostituisce i nodi di testo del DOM con tag <font>,
+      // rompendo i riferimenti che React tiene ai nodi. Questa patch rende
+      // removeChild e insertBefore tolleranti a nodi orfani, prevenendo il crash.
+      (function () {
+        if (typeof Node !== 'function' || !Node.prototype) return;
+
+        const originalRemoveChild = Node.prototype.removeChild;
+        Node.prototype.removeChild = function (child) {
+          if (child.parentNode !== this) {
+            console.warn('[gtranslate-patch] removeChild saltato: nodo non figlio (DOM modificato da Google Translate)');
+            return child;
+          }
+          return originalRemoveChild.apply(this, arguments);
+        };
+
+        const originalInsertBefore = Node.prototype.insertBefore;
+        Node.prototype.insertBefore = function (newNode, referenceNode) {
+          if (referenceNode && referenceNode.parentNode !== this) {
+            console.warn('[gtranslate-patch] insertBefore saltato: nodo di riferimento non figlio (DOM modificato da Google Translate)');
+            return newNode;
+          }
+          return originalInsertBefore.apply(this, arguments);
+        };
+      })();
+    </script>
   </head>
   <body class="bg-[#12100E] text-[#F4F1EA] antialiased selection:bg-[#D4AF37]/30 selection:text-[#F4F1EA]">
     <div id="root"></div>
