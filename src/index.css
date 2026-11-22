@@ -153,6 +153,51 @@ html.a11y-reduce-motion .foglio-smeraldo {
   animation: none;
 }
 
+/**
+ * ENN-221 — Mobile hamburger menu CTA strip only.
+ * Does not alter sitewide `.btn-primary` / crystal `.btn-secondary`.
+ */
+.mobile-menu-cta-area-personale {
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.58),
+    rgba(234, 88, 12, 0.58)
+  );
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid rgba(253, 186, 116, 0.8);
+  box-shadow:
+    0 8px 32px rgba(234, 88, 12, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.65);
+  color: #ffffff;
+  transition: filter 150ms ease;
+}
+
+.mobile-menu-cta-area-personale:hover {
+  filter: brightness(1.06);
+}
+
+.mobile-menu-cta-gold {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 230, 100, 0.85),
+    rgba(217, 119, 6, 0.85)
+  );
+  border-radius: 12px;
+  border-top: 2px solid #ffffff;
+  border-bottom: 3px solid #78350f;
+  border-left: none;
+  border-right: none;
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.55);
+  color: #140d02;
+  font-weight: 800;
+  transition: filter 150ms ease;
+}
+
+.mobile-menu-cta-gold:hover {
+  filter: brightness(1.05);
+}
+
 .input-inset {
   background-color: rgba(18, 16, 14, 0.85);
   border: 1px solid rgba(163, 155, 147, 0.25);
