@@ -96,8 +96,11 @@ assert(
   'Traduci SPA switch notifies Nina via GT_REFRESH'
 );
 assert(
-  /return 'spa'/.test(widget) && widget.includes("return 'reload'"),
-  'non-IT Traduci uses SPA path; IT still reloads'
+  /return 'spa'/.test(widget) &&
+    !widget.includes("return 'reload'") &&
+    !/\blocation\.reload\s*\(/.test(widget) &&
+    widget.includes('applyGoogleTranslateSpaRestore'),
+  'Traduci IT + non-IT both use SPA path (ENN-205; no reload)'
 );
 assert(
   widget.includes('requestGoogleTranslateRefresh(900)'),
@@ -125,6 +128,19 @@ const critical = readFileSync(
 assert(
   critical.includes('GT_REFRESH_EVENT'),
   'GtCriticalLabel follows SPA Traduci (Accoglienza / Prenota)'
+);
+
+const bookFab = readFileSync(
+  path.join(root, 'src/components/BookSessionFab.tsx'),
+  'utf8'
+);
+assert(
+  bookFab.includes('GT_REFRESH_EVENT') &&
+    bookFab.includes('readGoogTransLang') &&
+    !/useEffect\(\(\)\s*=>\s*\{[^}]*setLang\([^)]*\)[^}]*\},\s*\[\]\)/.test(
+      bookFab
+    ),
+  'BookSessionFab (Accoglienza Prenota) follows SPA Traduci — no mount-only lang freeze (ENN-205)'
 );
 assert(
   chatFab.includes('turn.skipGt === true') &&

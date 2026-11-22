@@ -4,6 +4,7 @@ import { resolveGtCriticalLabel } from '../lib/gtCriticalUi';
 import { normalizeGoogTransLang } from '../lib/gtLangCodes';
 import {
   GT_PAGE_LANG,
+  GT_REFRESH_EVENT,
   readGoogTransLang,
 } from '../lib/googleTranslateRuntime';
 
@@ -16,12 +17,22 @@ type Props = {
  * Icon-only shopping bag on the right, clear of left «Strumenti» and the
  * centered contact dock. Same destination as the former top-bar Prenota.
  * Desktop keeps the text button in the nav.
+ *
+ * ENN-205 — lang follows SPA Traduci (`GT_REFRESH`); do not freeze at mount.
  */
 export function BookSessionFab({ onBook }: Props) {
   const [lang, setLang] = useState(GT_PAGE_LANG);
 
   useEffect(() => {
-    setLang(normalizeGoogTransLang(readGoogTransLang()));
+    const sync = () =>
+      setLang(normalizeGoogTransLang(readGoogTransLang()));
+    sync();
+    window.addEventListener('hashchange', sync);
+    window.addEventListener(GT_REFRESH_EVENT, sync);
+    return () => {
+      window.removeEventListener('hashchange', sync);
+      window.removeEventListener(GT_REFRESH_EVENT, sync);
+    };
   }, []);
 
   const { text: label, useCurated } = resolveGtCriticalLabel(
