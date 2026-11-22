@@ -3,7 +3,7 @@ import {
   CalendarDays,
   Loader2,
   Lock,
-  Mail,
+  Phone,
   Send,
   Sparkles,
   X,
@@ -22,7 +22,8 @@ import {
   type NinaChatOpenDetail,
 } from '../lib/ninaChatOpen';
 import {
-  SITE_EMAIL,
+  SITE_PHONE_DISPLAY,
+  SITE_PHONE_TEL,
   telegramHref,
   whatsappHref,
 } from '../lib/siteContacts';
@@ -782,9 +783,13 @@ export function ChatFab() {
               >
                 <span className="mt-label">{tIt('cta.talkMaria')}</span>
                 <div className="mt-actions">
-                  <a href="/prenota" className="btn-prenota">
-                    <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
-                    <GtCriticalLabel uiKey="bookConsult" />
+                  <a
+                    href="/prenota"
+                    className="btn-icon prenota"
+                    aria-label={tIt('nav.bookLong')}
+                    title={tIt('nav.bookLong')}
+                  >
+                    <CalendarDays className="h-5 w-5" aria-hidden="true" />
                   </a>
                   <a
                     href={whatsappHref(
@@ -807,12 +812,12 @@ export function ChatFab() {
                     <TelegramLogo className="h-5 w-5" />
                   </a>
                   <a
-                    href={`mailto:${SITE_EMAIL}`}
-                    className="btn-icon mail"
-                    title={`Email · ${SITE_EMAIL}`}
-                    aria-label="Email"
+                    href={`tel:${SITE_PHONE_TEL}`}
+                    className="btn-icon phone"
+                    title={`Telefono · ${SITE_PHONE_DISPLAY}`}
+                    aria-label={`Telefono ${SITE_PHONE_DISPLAY}`}
                   >
-                    <Mail className="h-5 w-5" aria-hidden="true" />
+                    <Phone className="h-5 w-5" aria-hidden="true" />
                   </a>
                 </div>
               </div>
