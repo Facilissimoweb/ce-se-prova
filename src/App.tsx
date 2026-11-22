@@ -697,11 +697,13 @@ export function App() {
         {/* ENN-160: mobile shopper FAB (right) — booking; clear of Strumenti + dock */}
         <BookSessionFab onBook={() => handleNavigate('booking')} />
 
-        {/* Mobile: single «Strumenti» FAB; desktop: full vertical stack */}
+        {/* ENN-213: Nina stands alone — not inside Strumenti aria/cluster */}
+        <ChatFab />
+
+        {/* Mobile: «Strumenti» expands cookie / a11y / Torna su; desktop stack */}
         <ToolsFab />
         <div id={LEFT_TOOLS_MENU_ID}>
           <BackToTopFab />
-          <ChatFab />
           <AccessibilityFab />
           <PrivacyCookiesWidget
             showCmsKeys={showCmsKeys}

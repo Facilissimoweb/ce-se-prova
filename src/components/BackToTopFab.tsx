@@ -3,8 +3,8 @@ import { ArrowUp } from 'lucide-react';
 import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
 
 /**
- * Left FAB stack (lowest tool): cookie → accessibility → chat → Torna su.
- * On mobile, only visible when «Strumenti» is open (sits above the toggle).
+ * Left tools cluster: cookie → accessibility → Torna su (ENN-213: Nina detached).
+ * On mobile, only visible when «Strumenti» is open — above always-visible Nina.
  * Smooth-scrolls to top. Italian label «Torna su».
  */
 export function BackToTopFab() {
@@ -22,7 +22,7 @@ export function BackToTopFab() {
       }}
       aria-label="Torna su"
       title="Torna su"
-      className="fixed bottom-24 left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-8 md:left-6"
+      className="fixed bottom-[9.5rem] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-8 md:left-6"
     >
       <ArrowUp className="h-4 w-4" aria-hidden="true" />
     </button>
