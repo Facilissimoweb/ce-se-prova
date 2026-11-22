@@ -327,6 +327,396 @@ html.a11y-reduce-motion .ti-arrow {
   transform: none;
 }
 
+/**
+ * ENN-225 — Nina chat modal (Maria structure): header avatar, tabs,
+ * bubbles, chips, input, compact «Parla con Maria Teresa» footer.
+ * Dark + gold glass; does not alter sitewide primary/secondary buttons.
+ */
+.nina-chat-modal {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  font-family: var(--font-sans);
+  color: #f4f1ea;
+}
+
+.nina-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.16);
+  background: linear-gradient(
+    180deg,
+    rgba(36, 32, 26, 0.92),
+    rgba(21, 19, 17, 0.55)
+  );
+}
+
+.nina-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.nina-avatar {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #14120e;
+  border: 1px solid rgba(226, 190, 72, 0.35);
+  box-shadow:
+    inset 0 0 14px rgba(226, 190, 72, 0.12),
+    0 0 16px rgba(226, 190, 72, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nina-avatar .online-dot {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #34d399;
+  border: 2px solid #151311;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.55);
+}
+
+.nina-header .brand-tag {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #e2be48;
+  text-transform: uppercase;
+}
+
+.nina-header h3 {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.15;
+}
+
+.nina-header p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #9ca3af;
+  line-height: 1.35;
+}
+
+.nina-header .close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: rgba(18, 16, 14, 0.55);
+  color: #a39b93;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.nina-header .close-btn:hover,
+.nina-header .close-btn:focus-visible {
+  color: #f4f1ea;
+  border-color: rgba(226, 190, 72, 0.55);
+  background: rgba(226, 190, 72, 0.1);
+  outline: none;
+}
+
+.nina-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px 8px;
+}
+
+.nina-tabs .tab {
+  flex: 1;
+  min-height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  background: rgba(24, 22, 18, 0.72);
+  color: #a39b93;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.nina-tabs .tab.active,
+.nina-tabs .tab[aria-pressed='true'] {
+  border-color: rgba(226, 190, 72, 0.55);
+  background: rgba(226, 190, 72, 0.14);
+  color: #e6c65c;
+  box-shadow: 0 0 14px rgba(226, 190, 72, 0.12);
+}
+
+.nina-tabs .tab .badge-pro {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #14120e;
+  background: linear-gradient(135deg, #f6d574, #e2be48);
+}
+
+.nina-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bubble-nina,
+.bubble-user {
+  max-width: 92%;
+  border-radius: 16px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.bubble-nina {
+  align-self: flex-start;
+  background: rgba(28, 25, 22, 0.92);
+  border: 1px solid rgba(212, 175, 55, 0.16);
+  box-shadow: inset 0 0 18px rgba(212, 175, 55, 0.05);
+  color: #f4f1ea;
+}
+
+.bubble-user {
+  align-self: flex-end;
+  background: rgba(226, 190, 72, 0.16);
+  border: 1px solid rgba(226, 190, 72, 0.35);
+  color: #f4f1ea;
+}
+
+.nina-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 16px 10px;
+}
+
+.nina-chips button {
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: rgba(24, 22, 18, 0.75);
+  color: #e8e1dd;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 12px;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.nina-chips button:hover,
+.nina-chips button:focus-visible {
+  border-color: rgba(226, 190, 72, 0.6);
+  background: rgba(226, 190, 72, 0.12);
+  color: #f6d574;
+  outline: none;
+}
+
+.nina-chips button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.nina-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 0 16px 12px;
+}
+
+.nina-input-row .nina-composer {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.nina-input-row textarea,
+.nina-input-row input {
+  width: 100%;
+  min-height: 44px;
+  resize: none;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: rgba(18, 16, 14, 0.88);
+  color: #f4f1ea;
+  padding: 11px 14px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.nina-input-row textarea:focus,
+.nina-input-row input:focus {
+  outline: none;
+  border-color: rgba(226, 190, 72, 0.65);
+  box-shadow: 0 0 0 3px rgba(226, 190, 72, 0.14);
+}
+
+.nina-input-row .send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(226, 190, 72, 0.45);
+  background: rgba(226, 190, 72, 0.16);
+  color: #e2be48;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    filter 0.2s ease;
+}
+
+.nina-input-row .send-btn:hover:not(:disabled),
+.nina-input-row .send-btn:focus-visible:not(:disabled) {
+  background: rgba(226, 190, 72, 0.28);
+  color: #fff;
+  outline: none;
+}
+
+.nina-input-row .send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.mt-footer {
+  margin-top: auto;
+  padding: 10px 16px 14px;
+  border-top: 1px solid rgba(212, 175, 55, 0.16);
+  background: rgba(15, 13, 11, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.mt-footer .mt-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #e2be48;
+}
+
+.mt-footer .mt-actions {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, 1fr);
+  gap: 8px;
+}
+
+.mt-footer .btn-prenota,
+.mt-footer .btn-icon {
+  min-height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: rgba(24, 22, 18, 0.8);
+  color: #f4f1ea;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.mt-footer .btn-prenota {
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.45),
+    rgba(234, 88, 12, 0.4)
+  );
+  border-color: rgba(253, 186, 116, 0.55);
+}
+
+.mt-footer .btn-icon.wa {
+  color: #86efac;
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+.mt-footer .btn-prenota:hover,
+.mt-footer .btn-icon:hover,
+.mt-footer .btn-prenota:focus-visible,
+.mt-footer .btn-icon:focus-visible {
+  border-color: rgba(226, 190, 72, 0.65);
+  background: rgba(226, 190, 72, 0.14);
+  color: #f6d574;
+  outline: none;
+}
+
+.nina-studio-lock {
+  margin: 0 16px 8px;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: rgba(226, 190, 72, 0.08);
+  padding: 12px 14px;
+}
+
+.nina-studio-lock p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #e8e1dd;
+}
+
+.nina-studio-lock a {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(226, 190, 72, 0.4);
+  background: rgba(226, 190, 72, 0.14);
+  color: #e6c65c;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+
 .input-inset {
   background-color: rgba(18, 16, 14, 0.85);
   border: 1px solid rgba(163, 155, 147, 0.25);

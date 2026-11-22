@@ -81,9 +81,9 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'home.bookmarksAria': 'Segnalibri laterali Consulti e Didattica',
     'nina.sectionAria': 'Parla con Maria Teresa',
     'nina.subtitleAvailable':
-      'Accoglienza del sito: prezzi, WhatsApp, mappa. Per un consulto autentico usa Parla con Maria Teresa qui sotto.',
+      'Assistente di accoglienza & studio',
     'nina.subtitleStudio':
-      'Nina Studio · compagnia di studio Maggiori (simbologia, senso, luce/ombra, previsione).',
+      'Nina Studio · studio dei tarocchi (Maggiori e Minori)',
     'nina.subtitleUnavailable':
       'Nina non è attiva. Usa Parla con Maria Teresa qui sotto.',
     'nina.errorOffline':
@@ -95,18 +95,27 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'nina.errorRephrase':
       'Non sono sicura di aver colto bene la tua domanda. Puoi **riformularla** o **specificare l’Arcano** / il tema? Così ti rispondo con più precisione.',
     'nina.welcome':
-      'Ciao, sono **Nina**, l’assistente di **accoglienza** di Tarot Italia.\n\nTi oriento su **prezzi**, prenotazione **WhatsApp**, mappa del sito e **Chi sono**.\n\nLo studio profondo dei Maggiori è in **Nina Studio** (corso Arcani Maggiori). Per un consulto autentico usa **Parla con Maria Teresa** qui sotto.',
+      'Ciao, sono **Nina**, l’assistente di **accoglienza** di Tarot Italia.\n\nTi oriento su **prezzi**, prenotazione **WhatsApp**, mappa del sito e **Chi sono**.\n\nLo studio dei tarocchi (Maggiori e Minori) è in **Nina Studio**. Per un consulto autentico usa **Parla con Maria Teresa** qui sotto.',
     'nina.welcomeStudio':
-      'Ciao, sono **Nina Studio** — la compagnia di studio degli **Arcani Maggiori**.\n\nPossiamo esplorare simbologia, senso, luce/ombra e chiave previsionale (schede ufficiali del corso).\n\nIl Dialogo Tarot resta un percorso separato. Per un consulto con Maria Teresa usa la sezione qui sotto.',
-    'nina.modeWelcome': 'Accoglienza del sito',
+      'Ciao, sono **Nina Studio** — compagnia di studio dei **tarocchi** (Arcani Maggiori e Minori).\n\nPossiamo esplorare simbologia, senso, luce/ombra e pratica sulle carte. Le schede ufficiali Maggiori del corso restano disponibili; per i Minori uso le schede didattiche di Studio.\n\nIl Dialogo Tarot resta un percorso separato. Per un consulto con Maria Teresa usa la sezione qui sotto.',
+    'nina.modeWelcome': 'Accoglienza',
     'nina.modeStudio': 'Nina Studio',
     'nina.modeAria': 'Modalità chat Nina',
     'nina.studioLockedHint':
-      'Nina Studio è inclusa nel corso Arcani Maggiori.',
+      'Nina Studio (studio Maggiori e Minori) è inclusa nel corso Arcani Maggiori.',
     'nina.studioCta': 'Apri Corsi Maggiori',
     'nina.fabTitleWelcome': 'Chat Nina · Accoglienza',
-    'nina.fabTitleStudio': 'Nina Studio · Maggiori',
+    'nina.fabTitleStudio': 'Nina Studio · Tarocchi',
     'nina.listening': 'Nina sta ascoltando…',
+    'nina.chipTariffs': '✦ Tariffe consulti',
+    'nina.chipStudio': '📖 Cos’è Nina Studio?',
+    'nina.chipAbout': '🌙 Chi è Maria Teresa',
+    'nina.chipTariffsPrompt': 'Quali sono le tariffe dei consulti?',
+    'nina.chipStudioPrompt': 'Cos’è Nina Studio?',
+    'nina.chipAboutPrompt': 'Chi è Maria Teresa?',
+    'nina.inputPlaceholder': 'Chiedi qualcosa a Nina…',
+    'nina.brandTag': 'TAROT ITALIA',
+    'nina.proBadge': 'PRO',
     // ENN-204 — Sigillo flashcard chrome (IT DOM source for Google Translate)
     'sigillo.eyebrow': 'Sigillo di apprendimento',
     'sigillo.aria': 'Sigillo di apprendimento con flashcard',
