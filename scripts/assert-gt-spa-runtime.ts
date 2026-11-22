@@ -114,13 +114,14 @@ withGoogtransDom('', '#googtrans(it|zh-CN)', () => {
   );
 });
 
-// ENN-184 — SPA lang switch harden (no non-IT location.reload).
+// ENN-184 / ENN-205 — SPA lang switch (no location.reload for any target).
 assert(
   runtime.includes('applyGoogleTranslateSpaSwitch') &&
+    runtime.includes('applyGoogleTranslateSpaRestore') &&
     runtime.includes('registerGoogleTranslateHostRemount') &&
     runtime.includes('dispatchComboChange') &&
     runtime.includes('InputEvent'),
-  'runtime exports SPA switch + remount + InputEvent combo fire'
+  'runtime exports SPA switch + IT restore + remount + InputEvent combo fire'
 );
 assert(
   runtime.includes('comboMissStreak') &&
@@ -134,15 +135,26 @@ assert(
   'applyGoogleTranslateSpaSwitch never calls location.reload'
 );
 assert(
-  widget.includes('applyGoogleTranslateSpaSwitch') &&
-    widget.includes('registerGoogleTranslateHostRemount'),
-  'widget wires SPA switch + host remount'
+  !/export async function applyGoogleTranslateSpaRestore[\s\S]{0,1200}location\.reload/.test(
+    runtime
+  ),
+  'applyGoogleTranslateSpaRestore never calls location.reload'
 );
 assert(
-  /if\s*\(\s*target\s*===\s*GT_PAGE_LANG\s*\)[\s\S]{0,280}location\.reload\(\)/.test(
+  widget.includes('applyGoogleTranslateSpaSwitch') &&
+    widget.includes('applyGoogleTranslateSpaRestore') &&
+    widget.includes('registerGoogleTranslateHostRemount'),
+  'widget wires SPA switch + IT restore + host remount'
+);
+assert(
+  !/\blocation\.reload\s*\(/.test(widget),
+  'applyGoogTransLang never calls location.reload (ENN-205)'
+);
+assert(
+  /if\s*\(\s*target\s*===\s*GT_PAGE_LANG\s*\)[\s\S]{0,480}applyGoogleTranslateSpaRestore/.test(
     widget
   ),
-  'IT restore still reloads'
+  'IT restore uses SPA restore path'
 );
 assert(
   !/writeGoogtransCookie\(target\);[\s\S]{0,400}window\.location\.reload\(\)/.test(

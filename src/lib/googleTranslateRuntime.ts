@@ -12,6 +12,9 @@
  * ENN-184 — harden non-IT SPA lang switch: wait/retry for `.goog-te-combo`,
  * fire bubbles InputEvent/change GT accepts, remount TranslateElement host
  * if still failing — never `location.reload()` for non-IT.
+ *
+ * ENN-205 — Italian restore is also SPA (`applyGoogleTranslateSpaRestore`):
+ * clear combo → remount host → notify listeners — never `location.reload()`.
  */
 
 import {
@@ -446,6 +449,62 @@ export async function applyGoogleTranslateSpaSwitch(
   window.setTimeout(notifyGtLayout, 400);
   comboMissStreak = 0;
   return comboSelect()?.value === lang;
+}
+
+/**
+ * ENN-205 — restore Italian without full page reload.
+ * Caller must already expire googtrans cookies + strip `#googtrans` hash.
+ * Cancels any in-flight non-IT SPA switch, blanks the combo (original),
+ * remounts TranslateElement, and notifies layout listeners.
+ */
+export async function applyGoogleTranslateSpaRestore(): Promise<boolean> {
+  if (typeof window === 'undefined' || !GT_ENABLED) return false;
+
+  const gen = ++spaSwitchGeneration;
+  if (reapplyTimer !== undefined) {
+    clearTimeout(reapplyTimer);
+    reapplyTimer = undefined;
+  }
+  comboMissStreak = 0;
+  reapplyLockUntil = Date.now() + 1200;
+
+  document.documentElement.classList.remove('translated-ltr', 'translated-rtl');
+  document.body?.style.removeProperty('top');
+  applyGtDocumentChrome(GT_PAGE_LANG);
+
+  // Prefer blanking the live combo before remount so GT unwraps `<font>`.
+  const combo = comboSelect();
+  if (combo) {
+    dispatchComboChange(combo, '');
+    await sleep(80);
+    if (gen !== spaSwitchGeneration) return false;
+  }
+
+  tryRemountTranslateHost();
+  await sleep(280);
+  if (gen !== spaSwitchGeneration) return false;
+
+  // Post-remount: blank again if gadget rebuilt with a stale selection.
+  const after = comboSelect();
+  if (after && after.value && after.value !== GT_PAGE_LANG) {
+    dispatchComboChange(after, '');
+    await sleep(60);
+  }
+
+  // Drop residual banner / tooltip chrome left from the prior target.
+  document
+    .querySelectorAll(
+      'iframe.goog-te-banner-frame, #goog-gt-tt, .goog-te-spinner-pos'
+    )
+    .forEach((el) => el.remove());
+
+  document.documentElement.classList.remove('translated-ltr', 'translated-rtl');
+  document.body?.style.removeProperty('top');
+  applyGtDocumentChrome(GT_PAGE_LANG);
+  notifyGtLayout();
+  window.setTimeout(notifyGtLayout, 200);
+  comboMissStreak = 0;
+  return true;
 }
 
 /** Debounced refresh — route / auth / DOM landmarks. */
