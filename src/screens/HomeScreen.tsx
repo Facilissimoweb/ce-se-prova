@@ -168,7 +168,7 @@ export function HomeScreen({
             <button
               type="button"
               onClick={() => onNavigate('chat')}
-              className="btn-secondario-tarot cta-label shrink-0"
+              className="btn-secondary cta-label px-6 py-3 min-h-[44px] rounded-lg text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0"
             >
               <MessageCircle className="icona-dialogo" aria-hidden="true" />
               {t('home.openDialogue')}
@@ -392,10 +392,8 @@ export function HomeScreen({
                   <button
                     type="button"
                     onClick={() => onSelectTariffAndBook(tariff.id)}
-                    className={`cta-label ${
-                      tariff.recommended
-                        ? 'btn-primary w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2'
-                        : 'btn-secondario-tarot'
+                    className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 ${
+                      tariff.recommended ? 'btn-primary' : 'btn-secondary'
                     }`}
                   >
                     {t('home.bookTariff', { minutes: tariff.durationMinutes })}
@@ -571,13 +569,9 @@ export function HomeScreen({
                     <button
                       type="button"
                       onClick={() => onSelectCourse(course.id)}
-                      className={`cta-label ${
-                        course.recommended
-                          ? `btn-primary w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 ${
-                              soloWide ? 'md:max-w-sm' : ''
-                            }`
-                          : `btn-secondario-tarot ${soloWide ? 'md:max-w-sm' : ''}`
-                      }`}
+                      className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 ${
+                        course.recommended ? 'btn-primary' : 'btn-secondary'
+                      } ${soloWide ? 'md:max-w-sm' : ''}`}
                     >
                       {course.id === 'arcani-maggiori'
                         ? `Iscriviti (€ ${course.priceEur})`
@@ -725,21 +719,21 @@ export function HomeScreen({
               )}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-secondario-tarot cta-label shrink-0"
+              className="btn-secondary cta-label px-4 py-2.5 min-h-[44px] rounded-lg text-xs md:text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0"
             >
               <MessageCircle className="icona-dialogo" aria-hidden="true" />
               {t('cta.whatsapp')}
             </a>
             <a
               href={`tel:${SITE_PHONE_TEL}`}
-              className="btn-secondario-tarot cta-label shrink-0"
+              className="btn-secondary cta-label px-4 py-2.5 min-h-[44px] rounded-lg text-xs md:text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0"
             >
               <Phone className="w-4 h-4 shrink-0" aria-hidden="true" />
               {SITE_PHONE_DISPLAY}
             </a>
             <a
               href={`mailto:${SITE_EMAIL}`}
-              className="btn-secondario-tarot cta-label shrink-0"
+              className="btn-secondary cta-label px-4 py-2.5 min-h-[44px] rounded-lg text-xs md:text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0"
             >
               <Mail className="w-4 h-4 shrink-0" aria-hidden="true" />
               {SITE_EMAIL}
