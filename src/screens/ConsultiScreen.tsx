@@ -19,6 +19,7 @@ import { TariffDescriptionBlurbs } from '../components/TariffDescriptionBlurbs';
 import { TARIFF_SECTION_IMAGES } from '../data/sectionImages';
 import consultiDeskImg from '../assets/images/consulti_desk_linen_1794651607906.jpg';
 import { PaymentTrustCues } from '../components/PaymentTrustCues';
+import { ConsultTrustLine } from '../components/ConsultTrustLine';
 import { CONSULTATION_STRIPE_ENABLED } from '../lib/bookingCheckoutMode';
 
 interface ConsultiScreenProps {
@@ -222,6 +223,7 @@ export function ConsultiScreen({
               </div>
 
               <div className="space-y-3 pt-2">
+                <ConsultTrustLine />
                 <button
                   type="button"
                   onClick={() => onSelectTariffAndBook(tariff.id)}
