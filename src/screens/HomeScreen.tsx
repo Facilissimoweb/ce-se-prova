@@ -11,7 +11,6 @@ import {
 import { CopyText } from '../components/CopyText';
 import { ResilientImage } from '../components/ResilientImage';
 import { TariffDescriptionBlurbs } from '../components/TariffDescriptionBlurbs';
-import { MajorArcanaArtwork } from '../components/MajorArcanaArtwork';
 import { TAROT_ITALIA_HOME_HERO_SRC, TarotEmblemLogo } from '../components/TarotEmblem';
 import { HomeHeroNebula } from '../components/HomeHeroNebula';
 import { HomeArticlesLoop } from '../components/HomeArticlesLoop';
@@ -219,12 +218,12 @@ export function HomeScreen({
             </span>
             <span className="font-mono tabular-nums">IX</span>
           </div>
-          <div className="mx-auto my-2 w-40 overflow-hidden rounded-xl transition-transform duration-300 group-hover:-translate-y-1">
-            <MajorArcanaArtwork
-              number={9}
-              numeral="IX"
-              name="L'Eremita"
-              className="h-auto w-full"
+          <div className="mx-auto my-2 w-full overflow-hidden rounded-xl transition-transform duration-300 group-hover:-translate-y-1">
+            <ResilientImage
+              src="/assets/arcani-del-giorno.jpg"
+              alt="Tarot Italia — cerchio di carte degli arcani intorno al marchio con occhio e triangolo"
+              className="h-auto w-full object-cover"
+              fallbackLabel="Arcani del Giorno"
             />
           </div>
           <div className="mt-4 flex items-center justify-between border-t border-[#D4AF37]/15 pt-3">
