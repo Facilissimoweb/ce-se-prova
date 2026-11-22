@@ -1,7 +1,8 @@
 import React from 'react';
-import { ArrowRight, BookOpen, Lock, LogIn } from 'lucide-react';
+import { ArrowRight, BookOpen, Lock } from 'lucide-react';
 import type { CourseId, ScreenId } from '../types/handoff';
 import { SCROLL_LANDMARKS } from '../lib/scrollNavigation';
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 type Props = {
   courseSlug: CourseId;
@@ -102,16 +103,13 @@ export function BlogCourseGate({
           )}
 
           {!signedIn && (
-            <button
-              type="button"
+            <GoogleSignInButton
               onClick={() => {
                 void onSignIn();
               }}
-              className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-lg border border-[#D4AF37]/25 px-5 py-3 text-sm font-medium text-[#A39B93] transition-colors hover:border-[#D4AF37]/50 hover:text-[#F4F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
             >
-              <LogIn className="h-4 w-4" aria-hidden="true" />
               Accedi per sbloccare
-            </button>
+            </GoogleSignInButton>
           )}
 
           {signedIn && (

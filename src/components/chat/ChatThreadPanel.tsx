@@ -4,6 +4,7 @@ import type { ArcanaCard, ChatMessage, DialoguePack } from '../../types/handoff'
 import type { DialogueDomain } from '../../data/majorArcana';
 import { dialogueTimePacks, siteContent } from '../../data/siteContent';
 import { CopyText } from '../CopyText';
+import { GoogleSignInButton } from '../GoogleSignInButton';
 
 interface QuickPromptChip {
   label: string;
@@ -194,13 +195,7 @@ export function ChatThreadPanel({
             <div className="flex flex-wrap items-center justify-between gap-2.5">
               <div className="flex flex-wrap items-center gap-2">
                 {!isSignedIn && (
-                  <button
-                    type="button"
-                    onClick={onSignIn}
-                    className="px-3.5 py-2 min-h-[40px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs font-medium text-[#E6C65C] whitespace-nowrap"
-                  >
-                    Accedi con Google
-                  </button>
+                  <GoogleSignInButton onClick={onSignIn} />
                 )}
                 <button
                   type="button"
