@@ -1,8 +1,8 @@
 /**
- * ENN-185 / ENN-203 — Google Translate / Traduci gate.
+ * ENN-185 / ENN-207 — Google Translate / Traduci launch freeze.
  *
- * `true` restores site-wide GT (nav selector, script inject,
+ * Flip to `true` to restore site-wide GT (nav selector, script inject,
  * cookie/hash switching, Nina/PDF lang follow). Code paths remain in place;
  * this flag only gates runtime + UI mounts.
  */
-export const GT_ENABLED = true;
+export const GT_ENABLED = false;

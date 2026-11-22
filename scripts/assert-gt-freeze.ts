@@ -1,7 +1,7 @@
 /**
- * ENN-185 / ENN-203 / ENN-204 — Google Translate enablement guards.
- * While live testing (ENN-203+), GT_ENABLED must be true and googtrans readable.
- * Freeze path (flag false + Italian-forced reads) remains coded for re-freeze.
+ * ENN-185 / ENN-207 — Google Translate launch freeze (Italian-only).
+ * Static guards: flag off, UI early-return, no script inject when disabled.
+ * Freeze path (flag false + Italian-forced reads) must stay coded for launch.
  * Run: npx tsx scripts/assert-gt-freeze.ts
  */
 import { readFileSync } from 'node:fs';
@@ -22,15 +22,15 @@ function assert(cond: boolean, label: string) {
   }
 }
 
-assert(GT_ENABLED === true, 'GT_ENABLED is true for live Traduci testing');
+assert(GT_ENABLED === false, 'GT_ENABLED is false for launch freeze');
 
 const flag = readFileSync(
   path.join(root, 'src/lib/googleTranslateEnabled.ts'),
   'utf8'
 );
 assert(
-  /export const GT_ENABLED\s*=\s*true/.test(flag),
-  'flag source exports GT_ENABLED = true'
+  /export const GT_ENABLED\s*=\s*false/.test(flag),
+  'flag source exports GT_ENABLED = false'
 );
 
 const widget = readFileSync(
@@ -54,7 +54,7 @@ assert(
 );
 assert(
   widget.includes('BrandedLanguageMenu') && widget.includes('Traduci'),
-  'Traduci menu code retained'
+  'Traduci menu code retained for post-launch re-enable'
 );
 
 const runtime = readFileSync(
@@ -109,7 +109,7 @@ assert(
   'initI18n forces Italian when GT is the public language system (ENN-204)'
 );
 
-// Live read with cookie/hash must report the browsing language while enabled.
+// Live read with leftover cookie/hash must still report Italian.
 const prevDoc = (globalThis as { document?: unknown }).document;
 const prevWin = (globalThis as { window?: unknown }).window;
 (globalThis as { document: unknown }).document = {
@@ -128,8 +128,8 @@ const prevWin = (globalThis as { window?: unknown }).window;
 };
 try {
   assert(
-    readGoogTransLang() === 'ja',
-    'googtrans hash preferred over cookie while GT enabled (ENN-180/204)'
+    readGoogTransLang() === 'it',
+    'stale googtrans cookie/hash ignored while freeze on'
   );
 } finally {
   if (prevDoc === undefined) {
@@ -148,4 +148,4 @@ if (failed > 0) {
   console.error(`\n${failed} assertion(s) failed`);
   process.exit(1);
 }
-console.log('\nAll ENN-204 GT enablement asserts passed.');
+console.log('\nAll ENN-185/ENN-207 GT freeze asserts passed.');
