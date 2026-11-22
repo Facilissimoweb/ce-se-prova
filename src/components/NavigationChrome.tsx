@@ -379,7 +379,7 @@ export function TopBar({
                   className="mobile-menu-cta-gold w-full min-h-[48px] px-5 py-3 text-sm inline-flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FBBF24]"
                 >
                   <MessageCircle className="w-4 h-4" aria-hidden="true" />
-                  {t('nav.dialogo')}
+                  {t('nav.dialogaCoi22Arcani')}
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
