@@ -672,18 +672,65 @@ html.a11y-reduce-motion .ti-arrow {
   border-color: rgba(253, 186, 116, 0.55);
 }
 
+.mt-footer .btn-icon {
+  width: 100%;
+  min-width: 40px;
+  padding: 0;
+  gap: 0;
+}
+
+/*
+ * ENN-226 — icon-only WA / TG / mail with official brand colors
+ * (NOT Tarot Italia gold). Prenota may keep site amber.
+ * WhatsApp #25D366 · Telegram #2AABEE · Email #EA4335
+ */
 .mt-footer .btn-icon.wa {
-  color: #86efac;
-  border-color: rgba(52, 211, 153, 0.35);
+  color: #25d366;
+  border-color: #25d366;
+  background: rgba(37, 211, 102, 0.14);
+}
+
+.mt-footer .btn-icon.tg {
+  color: #2aabee;
+  border-color: #2aabee;
+  background: rgba(42, 171, 238, 0.14);
+}
+
+.mt-footer .btn-icon.mail {
+  color: #ea4335;
+  border-color: #ea4335;
+  background: rgba(234, 67, 53, 0.14);
 }
 
 .mt-footer .btn-prenota:hover,
-.mt-footer .btn-icon:hover,
-.mt-footer .btn-prenota:focus-visible,
-.mt-footer .btn-icon:focus-visible {
+.mt-footer .btn-prenota:focus-visible {
   border-color: rgba(226, 190, 72, 0.65);
   background: rgba(226, 190, 72, 0.14);
   color: #f6d574;
+  outline: none;
+}
+
+.mt-footer .btn-icon.wa:hover,
+.mt-footer .btn-icon.wa:focus-visible {
+  color: #25d366;
+  border-color: #25d366;
+  background: rgba(37, 211, 102, 0.24);
+  outline: none;
+}
+
+.mt-footer .btn-icon.tg:hover,
+.mt-footer .btn-icon.tg:focus-visible {
+  color: #2aabee;
+  border-color: #2aabee;
+  background: rgba(42, 171, 238, 0.24);
+  outline: none;
+}
+
+.mt-footer .btn-icon.mail:hover,
+.mt-footer .btn-icon.mail:focus-visible {
+  color: #ea4335;
+  border-color: #ea4335;
+  background: rgba(234, 67, 53, 0.24);
   outline: none;
 }
 

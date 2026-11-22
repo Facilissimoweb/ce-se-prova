@@ -21,7 +21,6 @@ import {
   NINA_CHAT_OPEN_EVENT,
   type NinaChatOpenDetail,
 } from '../lib/ninaChatOpen';
-import { SCROLL_LANDMARKS } from '../lib/scrollNavigation';
 import {
   SITE_EMAIL,
   telegramHref,
@@ -662,7 +661,7 @@ export function ChatFab() {
               {showStudioCta && (
                 <div className="nina-studio-lock" role="status">
                   <p>{tIt('nina.studioLockedHint')}</p>
-                  <a href={`/corsi#${SCROLL_LANDMARKS.corsiCheckout}`}>
+                  <a href="/corsi">
                     <Sparkles className="h-3 w-3" aria-hidden />
                     {tIt('nina.studioCta')}
                   </a>
@@ -796,26 +795,24 @@ export function ChatFab() {
                     className="btn-icon wa"
                     aria-label="WhatsApp"
                   >
-                    <WhatsAppLogo className="h-4 w-4" />
-                    WA
+                    <WhatsAppLogo className="h-5 w-5" />
                   </a>
                   <a
                     href={telegramHref()}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-icon"
+                    className="btn-icon tg"
                     aria-label="Telegram"
                   >
-                    <TelegramLogo className="h-4 w-4" />
-                    TG
+                    <TelegramLogo className="h-5 w-5" />
                   </a>
                   <a
                     href={`mailto:${SITE_EMAIL}`}
-                    className="btn-icon"
+                    className="btn-icon mail"
                     title={`Email · ${SITE_EMAIL}`}
                     aria-label="Email"
                   >
-                    <Mail className="h-4 w-4" aria-hidden="true" />
+                    <Mail className="h-5 w-5" aria-hidden="true" />
                   </a>
                 </div>
               </div>

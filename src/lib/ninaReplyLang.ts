@@ -59,11 +59,11 @@ export function isNinaDefaultLang(lang?: string | null): boolean {
   return normalizeNinaLang(lang) === 'it';
 }
 
-const SOFT_LOCK_IT = `Quella domanda entra nello **studio didattico degli Arcani Maggiori** (simbologia, senso, luce/ombra, chiave previsionale).
+const SOFT_LOCK_IT = `Quella domanda entra nello **studio didattico dei tarocchi** (Maggiori e Minori: simbologia, senso, luce/ombra, pratica).
 
-Qui in **accoglienza** ti oriento su prezzi, prenotazione WhatsApp, mappa del sito e Chi sono — senza le schede profonde del corso.
+Qui in **accoglienza** ti oriento su prezzi, prenotazione WhatsApp, mappa del sito e Chi sono — senza le schede profonde di Studio.
 
-**Nina Studio** si sblocca con l’acquisto del percorso **Arcani Maggiori** (stesso accesso dell’Area Riservata e del blog riservato). Trovi il checkout su **Corsi → Arcani Maggiori**.
+**Nina Studio** accompagna lo studente a svelare **tutto il mondo dei tarocchi**. Si sblocca con l’acquisto del corso **Arcani Maggiori** (stesso accesso dell’Area Riservata e del blog riservato). Trovi i percorsi su **Corsi** (/corsi).
 
 Per un consulto personale con Maria Teresa, usa **Parla con Maria Teresa** qui sotto.`;
 
@@ -179,9 +179,9 @@ const GATE_IT: GateCopy = {
   studioAuth:
     'Per Nina Studio accedi con Google (stesso account dell’Area Riservata).',
   studioLocked:
-    'Nina Studio si sblocca con l’acquisto del corso Arcani Maggiori (stesso accesso dell’Area Riservata). Trovi il checkout su Corsi.',
+    'Nina Studio accompagna lo studio di tutto il mondo dei tarocchi. Si sblocca con l’acquisto del corso Arcani Maggiori (stesso accesso dell’Area Riservata). Apri Corsi.',
   studioLockedDemo:
-    'Nina Studio è riservata a chi ha acquistato Arcani Maggiori. Apri Corsi per il checkout.',
+    'Nina Studio è riservata a chi ha accesso Corsi (Arcani Maggiori). Apri Corsi.',
   studioEntitlement:
     'Non riesco a verificare l’accesso a Nina Studio in questo momento. Riprova tra poco oppure apri l’Area Riservata.',
 };
