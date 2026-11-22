@@ -105,8 +105,9 @@
 }
 
 /**
- * ENN-218 — Consulti tariff cards: Maria’s emerald glass (Foglio 3).
- * Apply `.foglio-smeraldo` on Consulti consult/product cards only.
+ * ENN-218 / ENN-219 — Consult/tariff product cards: Maria’s emerald glass (Foglio 3).
+ * Apply `.foglio-smeraldo` sitewide on consult/tariff/reading cards
+ * (Consulti, Home pathways, Prenota tariff pickers).
  */
 @keyframes respiroSmeraldo {
   0%,

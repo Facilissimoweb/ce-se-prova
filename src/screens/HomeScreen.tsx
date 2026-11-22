@@ -310,11 +310,7 @@ export function HomeScreen({
             return (
               <article
                 key={tariff.id}
-                className={`rounded-2xl p-6 md:p-7 flex flex-col justify-between gap-6 transition-all duration-200 ${
-                  tariff.recommended
-                    ? 'glass-tier-2 border-[#D4AF37]/45 shadow-[0_0_28px_rgba(212,175,55,0.12)]'
-                    : 'glass-tier-1 hover:border-[#D4AF37]/35'
-                }`}
+                className="foglio-smeraldo p-6 md:p-7 flex flex-col justify-between gap-6"
               >
                 <div className="space-y-5">
                   <div className="rounded-xl overflow-hidden border border-[#D4AF37]/20 bg-[#12100E]">
