@@ -347,27 +347,28 @@ export function TopBar({
           aria-label={t('nav.mobileDialog')}
           className={`md:hidden fixed inset-x-0 bottom-0 ${HEADER_OFFSET_TOP} z-50 bg-[#12100E]/96 backdrop-blur-xl border-t border-[#D4AF37]/20 overflow-y-auto`}
         >
-          <div className="min-h-full px-5 pt-5 pb-[max(5.5rem,env(safe-area-inset-bottom))] flex flex-col justify-between gap-10 max-w-lg mx-auto">
-            <div className="space-y-7">
+          {/* ENN-228 — pack from top (no min-h/justify-between stretch) so Area personale→Dialoga stay a prima vista */}
+          <div className="px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-col gap-2 max-w-lg mx-auto">
+            <div className="space-y-2">
               {/* ENN-221 — Top strip: Area personale + Prenotazione (was Menù title) */}
-              <div className="mobile-menu-cta-strip space-y-3">
+              <div className="mobile-menu-cta-strip">
                 <button
                   type="button"
                   onClick={() => handleMobileSelect('area-riservata')}
-                  className="mobile-menu-cta-area-personale w-full min-h-[48px] px-5 py-3 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FDBA74]"
+                  className="mobile-menu-cta-area-personale w-full min-h-[36px] px-3 py-1.5 rounded-xl text-[13px] font-semibold inline-flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FDBA74]"
                 >
-                  <Lock className="w-4 h-4" aria-hidden="true" />
+                  <Lock className="w-3.5 h-3.5" aria-hidden="true" />
                   {t('nav.areaPersonale')}
-                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                  <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
                 <button
                   type="button"
                   onClick={() => handleMobileSelect('booking')}
-                  className="btn-primary w-full min-h-[48px] px-5 py-3 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2"
+                  className="btn-primary w-full min-h-[36px] px-3 py-1.5 rounded-xl text-[13px] font-semibold inline-flex items-center justify-center gap-1.5"
                 >
-                  <Calendar className="w-4 h-4" aria-hidden="true" />
+                  <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
                   {t('nav.bookLong')}
-                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                  <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
               </div>
 
@@ -391,11 +392,11 @@ export function TopBar({
                           </div>
                           <div className="min-w-0">
                             <h3 className="ti-title truncate">{item.label}</h3>
-                            <p className="ti-sub truncate">{item.subtitle}</p>
+                            <p className="ti-sub">{item.subtitle}</p>
                           </div>
                         </div>
                         <ArrowRight
-                          className="ti-arrow w-[15px] h-[15px]"
+                          className="ti-arrow w-[13px] h-[13px]"
                           aria-hidden="true"
                         />
                       </button>
@@ -404,29 +405,29 @@ export function TopBar({
               </nav>
 
               {/* ENN-221 — Former CTA slot: Corsi + Dialoghi (gold strip only here) */}
-              <div className="mobile-menu-cta-strip space-y-3 pt-1">
+              <div className="mobile-menu-cta-strip">
                 <button
                   type="button"
                   onClick={() => handleMobileSelect('corsi')}
-                  className="mobile-menu-cta-gold w-full min-h-[48px] px-5 py-3 text-sm inline-flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FBBF24]"
+                  className="mobile-menu-cta-gold w-full min-h-[36px] px-3 py-1.5 text-[13px] inline-flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FBBF24]"
                 >
-                  <BookOpen className="w-4 h-4" aria-hidden="true" />
+                  <BookOpen className="w-3.5 h-3.5" aria-hidden="true" />
                   {t('nav.corsi')}
-                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                  <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
                 <button
                   type="button"
                   onClick={() => handleMobileSelect('chat')}
-                  className="mobile-menu-cta-gold w-full min-h-[48px] px-5 py-3 text-sm inline-flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FBBF24]"
+                  className="mobile-menu-cta-gold w-full min-h-[36px] px-3 py-1.5 text-[13px] inline-flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FBBF24]"
                 >
-                  <MessageCircle className="w-4 h-4" aria-hidden="true" />
+                  <MessageCircle className="w-3.5 h-3.5" aria-hidden="true" />
                   {t('nav.dialogaCoi22Arcani')}
-                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                  <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
               </div>
             </div>
 
-            <p className="text-[11px] tracking-wide text-[#A39B93]/90 text-center pt-2 border-t border-[#D4AF37]/10">
+            <p className="text-[10px] leading-tight tracking-wide text-[#A39B93]/90 text-center pt-0.5 border-t border-[#D4AF37]/10">
               {t('nav.practitionerLine')}
             </p>
           </div>
