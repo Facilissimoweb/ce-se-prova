@@ -113,7 +113,7 @@ export function HomeScreen({
   }, []);
 
   return (
-    <div className="space-y-16 md:space-y-24 pb-8">
+    <div className="home-page space-y-16 md:space-y-24 pb-8">
       <HomeSectionBookmarks visible />
 
       {/* Opening brand mark — full-bleed hero so nebula can reach true viewport edges */}
@@ -160,7 +160,7 @@ export function HomeScreen({
             <button
               type="button"
               onClick={() => onNavigate('consulti')}
-              className="cta-label px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 shrink-0 transition-all duration-150 hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+              className="home-btn-primary cta-label px-6 py-3 min-h-[44px] rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 shrink-0 transition-all duration-150"
             >
               {t('home.chooseReading')}
               <ArrowRight className="w-4 h-4 shrink-0" />
@@ -169,9 +169,9 @@ export function HomeScreen({
             <button
               type="button"
               onClick={() => onNavigate('chat')}
-              className="cta-label px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37]/5 border border-[#D4AF37]/30 hover:bg-[#D4AF37]/12 hover:border-[#D4AF37] text-[#F4F1EA] text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+              className="home-btn-secondary cta-label px-6 py-3 min-h-[44px] rounded-lg text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0 transition-colors duration-150"
             >
-              <MessageCircle className="w-4 h-4 text-[#D4AF37] shrink-0" />
+              <MessageCircle className="w-4 h-4 shrink-0" />
               {t('home.openDialogue')}
             </button>
           </div>
@@ -393,10 +393,8 @@ export function HomeScreen({
                   <button
                     type="button"
                     onClick={() => onSelectTariffAndBook(tariff.id)}
-                    className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] ${
-                      tariff.recommended
-                        ? 'bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)]'
-                        : 'bg-[#D4AF37]/10 border border-[#D4AF37]/35 hover:bg-[#D4AF37] hover:text-[#12100E] text-[#F4F1EA]'
+                    className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 ${
+                      tariff.recommended ? 'home-btn-primary' : 'home-btn-secondary'
                     }`}
                   >
                     {t('home.bookTariff', { minutes: tariff.durationMinutes })}
@@ -572,10 +570,8 @@ export function HomeScreen({
                     <button
                       type="button"
                       onClick={() => onSelectCourse(course.id)}
-                      className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] ${
-                        course.recommended
-                          ? 'bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)]'
-                          : 'bg-[#D4AF37]/10 border border-[#D4AF37]/35 hover:bg-[#D4AF37] hover:text-[#12100E] text-[#F4F1EA]'
+                      className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 ${
+                        course.recommended ? 'home-btn-primary' : 'home-btn-secondary'
                       } ${soloWide ? 'md:max-w-sm' : ''}`}
                     >
                       {course.id === 'arcani-maggiori'
