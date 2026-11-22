@@ -33,7 +33,7 @@ const STAR_SIGILS = [
 export function AmbientSanctuaryBackground() {
   return (
     <div
-      className="pointer-events-none fixed inset-0 overflow-hidden z-0"
+      className="ti-ambient-sanctuary pointer-events-none fixed inset-0 overflow-hidden z-0"
       aria-hidden="true"
     >
       {/* Top-center primary breathing gold aura */}
