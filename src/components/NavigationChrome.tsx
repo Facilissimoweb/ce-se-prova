@@ -277,101 +277,110 @@ export function TopBar({
         <div className={`md:hidden ${HEADER_HEIGHT_CLASS}`} aria-hidden="true" />
       )}
 
-      {/* Mobile Hamburger Drawer — sits under the always-visible top navbar (ENN-187) */}
+      {/* Mobile Hamburger Drawer — sits under the always-visible top navbar (ENN-187 / ENN-221) */}
       {isMobileMenuOpen && (
         <div
           id="mobile-hamburger-menu"
           role="dialog"
           aria-modal="true"
-          aria-labelledby="mobile-menu-title"
           aria-label={t('nav.mobileDialog')}
           className={`md:hidden fixed inset-x-0 bottom-0 ${HEADER_OFFSET_TOP} z-50 bg-[#12100E]/96 backdrop-blur-xl border-t border-[#D4AF37]/20 overflow-y-auto`}
         >
           <div className="min-h-full px-5 pt-5 pb-[max(5.5rem,env(safe-area-inset-bottom))] flex flex-col justify-between gap-10 max-w-lg mx-auto">
             <div className="space-y-7">
-              <header className="space-y-2">
-                <h2
-                  id="mobile-menu-title"
-                  className="font-display text-xl tracking-[0.14em] text-[#F4F1EA]"
+              {/* ENN-221 — Top strip: Area personale + Prenotazione (was Menù title) */}
+              <div className="mobile-menu-cta-strip space-y-3">
+                <button
+                  type="button"
+                  onClick={() => handleMobileSelect('area-riservata')}
+                  className="mobile-menu-cta-area-personale w-full min-h-[48px] px-5 py-3 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FDBA74]"
                 >
-                  {t('nav.menuTitle')}
-                </h2>
-                <div
-                  className="h-px w-12 bg-gradient-to-r from-[#D4AF37] to-transparent"
-                  aria-hidden="true"
-                />
-              </header>
-
-              <nav aria-label={t('nav.pagesAria')} className="space-y-2">
-                {navItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeScreen === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => handleMobileSelect(item.id)}
-                      aria-current={isActive ? 'page' : undefined}
-                      className={`w-full min-h-[52px] px-3.5 py-2.5 rounded-xl border text-left flex items-center justify-between gap-3 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
-                        isActive
-                          ? 'bg-[#D4AF37]/12 border-[#D4AF37]/70 text-[#F4F1EA]'
-                          : 'bg-transparent border-[#D4AF37]/12 text-[#F4F1EA] hover:border-[#D4AF37]/35 hover:bg-[#151311]/60'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span
-                          className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                            isActive
-                              ? 'bg-[#D4AF37] text-[#12100E]'
-                              : 'bg-[#1D1B19] text-[#D4AF37]'
-                          }`}
-                        >
-                          <Icon className="w-3.5 h-3.5" aria-hidden="true" />
-                        </span>
-                        <div className="min-w-0">
-                          <span
-                            className={`block font-display text-sm tracking-[0.04em] truncate ${
-                              isActive ? 'text-[#D4AF37]' : 'text-[#F4F1EA]'
-                            }`}
-                          >
-                            {item.label}
-                          </span>
-                          <span className="block text-[11px] leading-snug text-[#A39B93] truncate">
-                            {item.subtitle}
-                          </span>
-                        </div>
-                      </div>
-                      <ArrowRight
-                        className={`w-3.5 h-3.5 shrink-0 ${
-                          isActive ? 'text-[#D4AF37]' : 'text-[#A39B93]/70'
-                        }`}
-                        aria-hidden="true"
-                      />
-                    </button>
-                  );
-                })}
-              </nav>
-
-              <div className="space-y-3 pt-1">
+                  <Lock className="w-4 h-4" aria-hidden="true" />
+                  {t('nav.areaPersonale')}
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </button>
                 <button
                   type="button"
                   onClick={() => handleMobileSelect('booking')}
                   className="btn-primary w-full min-h-[48px] px-5 py-3 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2"
                 >
                   <Calendar className="w-4 h-4" aria-hidden="true" />
-                  {t('nav.bookings')}
+                  {t('nav.bookLong')}
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </button>
+              </div>
 
-                {/* Distinct from gold Prenotazioni — soft forest green (brand nebula family) */}
+              <nav aria-label={t('nav.pagesAria')} className="space-y-2">
+                {navItems
+                  .filter((item) => item.id !== 'corsi' && item.id !== 'chat')
+                  .map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeScreen === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleMobileSelect(item.id)}
+                        aria-current={isActive ? 'page' : undefined}
+                        className={`w-full min-h-[52px] px-3.5 py-2.5 rounded-xl border text-left flex items-center justify-between gap-3 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
+                          isActive
+                            ? 'bg-[#D4AF37]/12 border-[#D4AF37]/70 text-[#F4F1EA]'
+                            : 'bg-transparent border-[#D4AF37]/12 text-[#F4F1EA] hover:border-[#D4AF37]/35 hover:bg-[#151311]/60'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                              isActive
+                                ? 'bg-[#D4AF37] text-[#12100E]'
+                                : 'bg-[#1D1B19] text-[#D4AF37]'
+                            }`}
+                          >
+                            <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+                          </span>
+                          <div className="min-w-0">
+                            <span
+                              className={`block font-display text-sm tracking-[0.04em] truncate ${
+                                isActive ? 'text-[#D4AF37]' : 'text-[#F4F1EA]'
+                              }`}
+                            >
+                              {item.label}
+                            </span>
+                            <span className="block text-[11px] leading-snug text-[#A39B93] truncate">
+                              {item.subtitle}
+                            </span>
+                          </div>
+                        </div>
+                        <ArrowRight
+                          className={`w-3.5 h-3.5 shrink-0 ${
+                            isActive ? 'text-[#D4AF37]' : 'text-[#A39B93]/70'
+                          }`}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    );
+                  })}
+              </nav>
+
+              {/* ENN-221 — Former CTA slot: Corsi + Dialoghi (gold strip only here) */}
+              <div className="mobile-menu-cta-strip space-y-3 pt-1">
                 <button
                   type="button"
-                  onClick={() => handleMobileSelect('area-riservata')}
-                  className="w-full min-h-[48px] px-5 py-3 rounded-xl bg-[#2F5A45] hover:bg-[#376B52] border border-[#5FA87E]/55 text-[#EAF6EF] text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7BC49A]"
+                  onClick={() => handleMobileSelect('corsi')}
+                  className="mobile-menu-cta-gold w-full min-h-[48px] px-5 py-3 text-sm inline-flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FBBF24]"
                 >
-                  <Lock className="w-4 h-4 text-[#A8E0C0]" aria-hidden="true" />
-                  {t('nav.areaPersonale')}
-                  <ArrowRight className="w-4 h-4 text-[#A8E0C0]" aria-hidden="true" />
+                  <BookOpen className="w-4 h-4" aria-hidden="true" />
+                  {t('nav.corsi')}
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleMobileSelect('chat')}
+                  className="mobile-menu-cta-gold w-full min-h-[48px] px-5 py-3 text-sm inline-flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FBBF24]"
+                >
+                  <MessageCircle className="w-4 h-4" aria-hidden="true" />
+                  {t('nav.dialogo')}
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
             </div>
