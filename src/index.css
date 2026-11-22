@@ -1279,6 +1279,201 @@ html.a11y-reduce-motion .btn-secondario-tarot .icona-dialogo {
   animation: mandalaPulse 14s ease-in-out infinite;
 }
 
+/* ── ENN-230 — Footer esoteric skyline (footer-scoped only) ── */
+.ti-footer-skyline {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  /* Keep silhouette strongest at the bottom so link columns stay clear */
+  -webkit-mask-image: linear-gradient(
+    to top,
+    #000 0%,
+    #000 42%,
+    rgba(0, 0, 0, 0.55) 68%,
+    transparent 92%
+  );
+  mask-image: linear-gradient(
+    to top,
+    #000 0%,
+    #000 42%,
+    rgba(0, 0, 0, 0.55) 68%,
+    transparent 92%
+  );
+}
+
+.ti-footer-skyline__veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(18, 16, 14, 0.55) 0%,
+    rgba(18, 16, 14, 0.18) 42%,
+    transparent 78%
+  );
+}
+
+.ti-footer-skyline__layer {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 148%;
+  max-width: none;
+  height: clamp(9.5rem, 32vw, 14.5rem);
+  transform: translate3d(-50%, 0, 0);
+  will-change: transform, opacity;
+}
+
+.ti-footer-skyline__layer--far {
+  bottom: 0.65rem;
+  width: 156%;
+  height: clamp(10.5rem, 36vw, 16rem);
+  opacity: 0.72;
+  animation: tiFooterSkylineDriftFar 48s ease-in-out infinite;
+}
+
+.ti-footer-skyline__layer--near {
+  bottom: 0;
+  width: 142%;
+  height: clamp(9rem, 30vw, 13.5rem);
+  opacity: 1;
+  animation: tiFooterSkylineDriftNear 36s ease-in-out infinite;
+}
+
+.ti-footer-skyline__fill {
+  fill: rgba(18, 16, 14, 0.55);
+}
+
+.ti-footer-skyline__fill--near {
+  fill: rgba(18, 16, 14, 0.62);
+}
+
+.ti-footer-skyline__stroke {
+  stroke: rgba(212, 175, 55, 0.52);
+  stroke-width: 1.25;
+}
+
+.ti-footer-skyline__stroke--soft {
+  stroke: rgba(244, 241, 234, 0.22);
+  stroke-width: 1;
+}
+
+.ti-footer-skyline__accent {
+  fill: rgba(230, 198, 92, 0.34);
+  stroke: rgba(212, 175, 55, 0.45);
+  stroke-width: 0.75;
+}
+
+.ti-footer-skyline__detail {
+  fill: none;
+  stroke: rgba(230, 198, 92, 0.55);
+  stroke-width: 0.95;
+}
+
+.ti-footer-skyline__sigil {
+  fill: rgba(230, 198, 92, 0.3);
+  stroke: rgba(244, 241, 234, 0.45);
+  stroke-width: 0.8;
+}
+
+.ti-footer-skyline__horizon {
+  stroke: rgba(212, 175, 55, 0.2);
+  stroke-width: 0.9;
+  fill: none;
+}
+
+.ti-footer-skyline__shimmer {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: 0;
+  height: min(42%, 11rem);
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(230, 198, 92, 0.03) 35%,
+    rgba(244, 241, 234, 0.06) 48%,
+    rgba(212, 175, 55, 0.04) 58%,
+    transparent 78%
+  );
+  background-size: 220% 100%;
+  animation: tiFooterSkylineShimmer 56s ease-in-out infinite;
+  mix-blend-mode: soft-light;
+  opacity: 0.85;
+}
+
+@keyframes tiFooterSkylineDriftFar {
+  0%,
+  100% {
+    transform: translate3d(-52%, 0, 0);
+  }
+  50% {
+    transform: translate3d(-48%, -2px, 0);
+  }
+}
+
+@keyframes tiFooterSkylineDriftNear {
+  0%,
+  100% {
+    transform: translate3d(-48%, 0, 0);
+  }
+  50% {
+    transform: translate3d(-52%, 1px, 0);
+  }
+}
+
+@keyframes tiFooterSkylineShimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+    opacity: 0.55;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 0.9;
+  }
+}
+
+@media (min-width: 768px) {
+  .ti-footer-skyline__layer--far {
+    width: 132%;
+  }
+
+  .ti-footer-skyline__layer--near {
+    width: 118%;
+  }
+
+  .ti-footer-skyline__stroke {
+    stroke: rgba(212, 175, 55, 0.58);
+  }
+
+  .ti-footer-skyline__detail {
+    stroke: rgba(230, 198, 92, 0.6);
+  }
+}
+
+@media (max-width: 640px) {
+  .ti-footer-skyline__layer--far {
+    width: 190%;
+    opacity: 0.55;
+  }
+
+  .ti-footer-skyline__layer--near {
+    width: 168%;
+    opacity: 0.92;
+  }
+
+  .ti-footer-skyline__detail {
+    opacity: 0.95;
+  }
+
+  .ti-footer-skyline__shimmer {
+    height: min(38%, 8.5rem);
+    opacity: 0.7;
+  }
+}
+
 @keyframes homeArticleIn {
   from {
     opacity: 0;
