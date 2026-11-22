@@ -104,6 +104,54 @@
   box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
 }
 
+/**
+ * ENN-218 — Consulti tariff cards: Maria’s emerald glass (Foglio 3).
+ * Apply `.foglio-smeraldo` on Consulti consult/product cards only.
+ */
+@keyframes respiroSmeraldo {
+  0%,
+  100% {
+    border-color: rgba(74, 222, 160, 0.4);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.6),
+      inset 0 0 24px rgba(52, 211, 153, 0.14);
+  }
+  50% {
+    border-color: rgba(110, 231, 183, 0.8);
+    box-shadow:
+      0 12px 45px rgba(16, 185, 129, 0.22),
+      inset 0 0 36px rgba(52, 211, 153, 0.28);
+  }
+}
+
+.foglio-smeraldo {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    145deg,
+    rgba(12, 42, 33, 0.48),
+    rgba(7, 22, 18, 0.36)
+  );
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(74, 222, 160, 0.42);
+  border-radius: 24px;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.6),
+    inset 0 0 28px rgba(52, 211, 153, 0.16);
+  animation: respiroSmeraldo 4.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .foglio-smeraldo {
+    animation: none;
+  }
+}
+
+html.a11y-reduce-motion .foglio-smeraldo {
+  animation: none;
+}
+
 .input-inset {
   background-color: rgba(18, 16, 14, 0.85);
   border: 1px solid rgba(163, 155, 147, 0.25);
