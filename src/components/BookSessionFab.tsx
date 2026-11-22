@@ -47,7 +47,7 @@ export function BookSessionFab({ onBook }: Props) {
       onClick={onBook}
       aria-label={label}
       title={label}
-      className="fixed bottom-10 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-[#D4AF37] text-[#12100E] shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition-colors hover:bg-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] md:hidden"
+      className="btn-primary fixed bottom-10 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full md:hidden"
     >
       <ShoppingBag className="h-5 w-5" aria-hidden="true" strokeWidth={2.25} />
       {useCurated ? (

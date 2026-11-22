@@ -573,7 +573,7 @@ export function BookingScreen({
                   type="button"
                   onClick={() => goToStep(2)}
                   data-nowrap-keep
-                  className="cta-label w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors"
+                  className="btn-primary cta-label w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap"
                 >
                   Prosegui a Data e Ora
                   <ArrowRight className="w-4 h-4 shrink-0" />
@@ -672,7 +672,7 @@ export function BookingScreen({
                   type="button"
                   onClick={() => goToStep(1)}
                   data-nowrap-keep
-                  className="cta-label w-full sm:w-auto px-5 py-3 min-h-[44px] rounded-lg border border-[#D4AF37]/30 text-sm font-medium text-[#F4F1EA] hover:border-[#D4AF37] inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                  className="btn-secondary cta-label w-full sm:w-auto px-5 py-3 min-h-[44px] rounded-lg text-sm font-medium inline-flex items-center justify-center gap-2 whitespace-nowrap"
                 >
                   <ArrowLeft className="w-4 h-4 shrink-0" />
                   Indietro
@@ -682,7 +682,7 @@ export function BookingScreen({
                   disabled={openHours.length === 0}
                   onClick={() => goToStep(3)}
                   data-nowrap-keep
-                  className="cta-label w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-50 text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                  className="btn-primary cta-label w-full sm:w-auto px-6 py-3 min-h-[44px] rounded-lg disabled:opacity-50 text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap"
                 >
                   Prosegui ai Dati
                   <ArrowRight className="w-4 h-4 shrink-0" />
@@ -760,7 +760,7 @@ export function BookingScreen({
                       )}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs font-semibold"
+                      className="btn-primary inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-lg text-xs font-semibold"
                     >
                       <MessageCircle className="w-3.5 h-3.5" />
                       Riapri WhatsApp
@@ -769,7 +769,7 @@ export function BookingScreen({
                   <button
                     type="button"
                     onClick={onOpenChat}
-                    className="px-4 py-2.5 min-h-[44px] rounded-lg border border-[#A39B93]/30 text-xs font-medium text-[#A39B93] hover:text-[#F4F1EA]"
+                    className="btn-secondary px-4 py-2.5 min-h-[44px] rounded-lg text-xs font-medium"
                   >
                     Torna al Dialogo Tarot
                   </button>
@@ -999,7 +999,7 @@ export function BookingScreen({
                       type="button"
                       onClick={() => goToStep(2)}
                       data-nowrap-keep
-                      className="cta-label w-full sm:w-auto px-5 py-3 min-h-[44px] rounded-lg border border-[#D4AF37]/30 text-sm font-medium text-[#F4F1EA] hover:border-[#D4AF37] inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                      className="btn-secondary cta-label w-full sm:w-auto px-5 py-3 min-h-[44px] rounded-lg text-sm font-medium inline-flex items-center justify-center gap-2 whitespace-nowrap"
                     >
                       <ArrowLeft className="w-4 h-4 shrink-0" />
                       Modifica Data
@@ -1008,7 +1008,7 @@ export function BookingScreen({
                       type="submit"
                       disabled={submitting}
                       data-nowrap-keep
-                      className="cta-label w-full sm:w-auto px-6 py-3 min-h-[46px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                      className="btn-primary cta-label w-full sm:w-auto px-6 py-3 min-h-[46px] rounded-lg disabled:opacity-60 text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap"
                     >
                       {CONSULTATION_STRIPE_ENABLED ? (
                         <CreditCard className="w-4 h-4 shrink-0" />

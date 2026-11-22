@@ -135,14 +135,14 @@ export function PrivacyCookiesWidget({
               <button
                 type="button"
                 onClick={() => persistPreferences(true, true, true)}
-                className="px-3.5 py-2 min-h-[40px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs font-semibold whitespace-nowrap transition-colors"
+                className="btn-primary px-3.5 py-2 min-h-[40px] rounded-lg text-xs font-semibold whitespace-nowrap"
               >
                 Accetta Tutti
               </button>
               <button
                 type="button"
                 onClick={() => persistPreferences(false, false, false)}
-                className="px-3.5 py-2 min-h-[40px] rounded-lg bg-[#12100E]/80 border border-[#D4AF37]/25 hover:border-[#D4AF37] text-[#F4F1EA] text-xs font-medium whitespace-nowrap transition-colors"
+                className="btn-secondary px-3.5 py-2 min-h-[40px] rounded-lg text-xs font-medium whitespace-nowrap"
               >
                 Solo Necessari
               </button>
@@ -399,14 +399,14 @@ export function PrivacyCookiesWidget({
                       draftMarketing
                     )
                   }
-                  className="px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/40 hover:border-[#D4AF37] text-xs font-semibold text-[#F4F1EA] whitespace-nowrap transition-colors"
+                  className="btn-secondary px-4 py-2.5 min-h-[44px] rounded-lg text-xs font-semibold whitespace-nowrap"
                 >
                   Salva Preferenze
                 </button>
                 <button
                   type="button"
                   onClick={() => persistPreferences(true, true, true)}
-                  className="px-5 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs font-semibold whitespace-nowrap transition-colors"
+                  className="btn-primary px-5 py-2.5 min-h-[44px] rounded-lg text-xs font-semibold whitespace-nowrap"
                 >
                   Accetta Tutti
                 </button>

@@ -293,7 +293,7 @@ export function LegalNotice({ kind, onClose }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded-lg bg-[#D4AF37] px-4 py-3 text-sm font-semibold text-[#12100E] hover:bg-[#E6C65C]"
+              className="btn-primary w-full rounded-lg px-4 py-3 text-sm font-semibold"
             >
               {legalContent.disclaimer.conferma}
             </button>

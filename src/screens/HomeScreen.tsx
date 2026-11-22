@@ -160,7 +160,7 @@ export function HomeScreen({
             <button
               type="button"
               onClick={() => onNavigate('consulti')}
-              className="home-btn-primary cta-label px-6 py-3 min-h-[44px] rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 shrink-0 transition-all duration-150"
+              className="btn-primary cta-label px-6 py-3 min-h-[44px] rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 shrink-0"
             >
               {t('home.chooseReading')}
               <ArrowRight className="w-4 h-4 shrink-0" />
@@ -169,7 +169,7 @@ export function HomeScreen({
             <button
               type="button"
               onClick={() => onNavigate('chat')}
-              className="home-btn-secondary cta-label px-6 py-3 min-h-[44px] rounded-lg text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0 transition-colors duration-150"
+              className="btn-secondary cta-label px-6 py-3 min-h-[44px] rounded-lg text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0"
             >
               <MessageCircle className="w-4 h-4 shrink-0" />
               {t('home.openDialogue')}
@@ -393,8 +393,8 @@ export function HomeScreen({
                   <button
                     type="button"
                     onClick={() => onSelectTariffAndBook(tariff.id)}
-                    className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 ${
-                      tariff.recommended ? 'home-btn-primary' : 'home-btn-secondary'
+                    className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 ${
+                      tariff.recommended ? 'btn-primary' : 'btn-secondary'
                     }`}
                   >
                     {t('home.bookTariff', { minutes: tariff.durationMinutes })}
@@ -570,8 +570,8 @@ export function HomeScreen({
                     <button
                       type="button"
                       onClick={() => onSelectCourse(course.id)}
-                      className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 ${
-                        course.recommended ? 'home-btn-primary' : 'home-btn-secondary'
+                      className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 ${
+                        course.recommended ? 'btn-primary' : 'btn-secondary'
                       } ${soloWide ? 'md:max-w-sm' : ''}`}
                     >
                       {course.id === 'arcani-maggiori'
@@ -720,23 +720,23 @@ export function HomeScreen({
               )}
               target="_blank"
               rel="noopener noreferrer"
-              className="cta-label px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs md:text-sm font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-2 shrink-0 transition-colors"
+              className="btn-secondary cta-label px-4 py-2.5 min-h-[44px] rounded-lg text-xs md:text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0"
             >
               <MessageCircle className="w-4 h-4 text-[#D4AF37] shrink-0" />
               {t('cta.whatsapp')}
             </a>
             <a
               href={`tel:${SITE_PHONE_TEL}`}
-              className="cta-label px-4 py-2.5 min-h-[44px] rounded-lg bg-[#12100E]/80 border border-[#D4AF37]/20 hover:border-[#D4AF37]/50 text-xs md:text-sm font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-2 shrink-0 transition-colors"
+              className="btn-secondary cta-label px-4 py-2.5 min-h-[44px] rounded-lg text-xs md:text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0"
             >
-              <Phone className="w-4 h-4 text-[#D4AF37] shrink-0" />
+              <Phone className="w-4 h-4 shrink-0" />
               {SITE_PHONE_DISPLAY}
             </a>
             <a
               href={`mailto:${SITE_EMAIL}`}
-              className="cta-label px-4 py-2.5 min-h-[44px] rounded-lg bg-[#12100E]/80 border border-[#D4AF37]/20 hover:border-[#D4AF37]/50 text-xs md:text-sm font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-2 shrink-0 transition-colors"
+              className="btn-secondary cta-label px-4 py-2.5 min-h-[44px] rounded-lg text-xs md:text-sm font-medium inline-flex items-center justify-center gap-2 shrink-0"
             >
-              <Mail className="w-4 h-4 text-[#D4AF37] shrink-0" />
+              <Mail className="w-4 h-4 shrink-0" />
               {SITE_EMAIL}
             </a>
             <button

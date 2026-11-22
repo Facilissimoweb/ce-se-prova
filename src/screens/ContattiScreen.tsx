@@ -153,15 +153,15 @@ export function ContattiScreen({ onNavigate }: Props) {
               )}
               target="_blank"
               rel="noopener noreferrer"
-              className="cta-label inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-[#D4AF37]/30 bg-[#151311]/85 px-4 py-2.5 text-xs font-medium text-[#F4F1EA] transition-colors hover:border-[#D4AF37] hover:text-[#D4AF37]"
+              className="btn-secondary cta-label inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-medium"
             >
-              <MessageCircle className="h-4 w-4 text-[#D4AF37]" aria-hidden />
+              <MessageCircle className="h-4 w-4" aria-hidden />
               WhatsApp
             </a>
             <button
               type="button"
               onClick={() => onNavigate('booking')}
-              className="cta-label inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-4 py-2.5 text-xs font-semibold text-[#12100E] transition-colors hover:bg-[#E6C65C]"
+              className="btn-primary cta-label inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-semibold"
             >
               <Calendar className="h-4 w-4" aria-hidden />
               Prenota consulto

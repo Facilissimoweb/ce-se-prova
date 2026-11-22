@@ -27,7 +27,7 @@ export function NotFoundScreen({ onNavigate }: Props) {
         <button
           type="button"
           onClick={() => onNavigate('home')}
-          className="inline-flex min-h-[44px] items-center gap-2 rounded-lg bg-[#D4AF37] px-5 py-2.5 text-sm font-semibold text-[#12100E] transition-colors hover:bg-[#E6C65C]"
+          className="btn-primary inline-flex min-h-[44px] items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Torna alla Home
@@ -35,9 +35,9 @@ export function NotFoundScreen({ onNavigate }: Props) {
         <button
           type="button"
           onClick={() => onNavigate('sitemap')}
-          className="inline-flex min-h-[44px] items-center gap-2 rounded-lg border border-[#D4AF37]/30 bg-[#12100E]/60 px-5 py-2.5 text-sm font-medium text-[#F4F1EA] transition-colors hover:border-[#D4AF37] hover:text-[#D4AF37]"
+          className="btn-secondary inline-flex min-h-[44px] items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium"
         >
-          <Compass className="h-4 w-4 text-[#D4AF37]" aria-hidden="true" />
+          <Compass className="h-4 w-4" aria-hidden="true" />
           Mappa del sito
         </button>
       </div>
