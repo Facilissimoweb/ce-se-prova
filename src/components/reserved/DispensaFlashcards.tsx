@@ -170,42 +170,45 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
         </button>
       </GtSafeBoundary>
 
-      {/* Mobile-first toolbar: 2×2 grid (template for other courses’ flashcard UI) */}
+      {/*
+        ENN-214 — stack full-label controls on small screens (2×2 cramped /
+        overlapping). Desktop keeps a single horizontal row.
+      */}
       <div
-        className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-2.5"
+        className="grid grid-cols-1 gap-2 md:grid-cols-4 md:gap-2.5"
         role="toolbar"
         aria-label={tIt('sigillo.toolbarAria')}
       >
         <button
           type="button"
           onClick={() => go(-1)}
-          className="btn-secondary min-h-[44px] w-full px-3 py-2.5 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-1.5"
+          className="btn-secondary min-h-[44px] w-full px-3 py-2.5 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
         >
-          <ChevronLeft className="w-3.5 h-3.5 shrink-0" />
+          <ChevronLeft className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
           {tIt('sigillo.prev')}
         </button>
         <button
           type="button"
           onClick={() => go(1)}
-          className="btn-primary min-h-[44px] w-full px-3 py-2.5 rounded-lg text-xs font-semibold inline-flex items-center justify-center gap-1.5"
+          className="btn-primary min-h-[44px] w-full px-3 py-2.5 rounded-lg text-xs font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
         >
           {tIt('sigillo.next')}
-          <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+          <ChevronRight className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
         </button>
         <button
           type="button"
           onClick={handleShuffle}
-          className="btn-secondary min-h-[44px] w-full px-3 py-2.5 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-1.5"
+          className="btn-secondary min-h-[44px] w-full px-3 py-2.5 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
         >
-          <Shuffle className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+          <Shuffle className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" aria-hidden="true" />
           {tIt('sigillo.shuffle')}
         </button>
         <button
           type="button"
           onClick={handleReset}
-          className="min-h-[44px] w-full px-3 py-2.5 rounded-lg border border-[#A39B93]/30 bg-[#151311]/60 hover:border-[#D4AF37] hover:text-[#F4F1EA] text-xs font-medium text-[#A39B93] inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+          className="min-h-[44px] w-full px-3 py-2.5 rounded-lg border border-[#A39B93]/30 bg-[#151311]/60 hover:border-[#D4AF37] hover:text-[#F4F1EA] text-xs font-medium text-[#A39B93] inline-flex items-center justify-center gap-1.5 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
         >
-          <RotateCcw className="w-3.5 h-3.5 shrink-0" />
+          <RotateCcw className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
           {tIt('sigillo.reset')}
         </button>
       </div>
