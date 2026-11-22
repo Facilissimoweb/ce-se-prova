@@ -193,6 +193,9 @@ export function TopBar({
       width: document.body.style.width,
     };
 
+    // ENN-229 — lift ambient layer above page chrome so the drawer bottom
+    // veil can peek the real sanctuary animation (not page cards).
+    document.documentElement.classList.add('ti-mobile-menu-open');
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.top = `-${scrollY}px`;
@@ -200,6 +203,7 @@ export function TopBar({
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
+      document.documentElement.classList.remove('ti-mobile-menu-open');
       document.body.style.overflow = previous.overflow;
       document.body.style.position = previous.position;
       document.body.style.top = previous.top;
@@ -345,10 +349,11 @@ export function TopBar({
           role="dialog"
           aria-modal="true"
           aria-label={t('nav.mobileDialog')}
-          className={`md:hidden fixed inset-x-0 bottom-0 ${HEADER_OFFSET_TOP} z-50 bg-[#12100E]/96 backdrop-blur-xl border-t border-[#D4AF37]/20 overflow-y-auto`}
+          className={`mobile-hamburger-drawer md:hidden fixed inset-x-0 bottom-0 ${HEADER_OFFSET_TOP} z-50 border-t border-[#D4AF37]/20 overflow-y-auto`}
         >
           {/* ENN-228 — pack from top (no min-h/justify-between stretch) so Area personale→Dialoga stay a prima vista */}
-          <div className="px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-col gap-2 max-w-lg mx-auto">
+          {/* ENN-229 — soft ambient peek only in the drawer footer zone (veil is CSS ::before) */}
+          <div className="relative z-[1] px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-col gap-2 max-w-lg mx-auto">
             <div className="space-y-2">
               {/* ENN-221 — Top strip: Area personale + Prenotazione (was Menù title) */}
               <div className="mobile-menu-cta-strip">
