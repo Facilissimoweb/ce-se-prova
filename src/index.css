@@ -177,25 +177,31 @@ html.a11y-reduce-motion .foglio-smeraldo {
   filter: brightness(1.06);
 }
 
+/**
+ * ENN-222 — Soft gold glass for Corsi/Dialogo in the mobile menu strip only.
+ * Same family as crystal secondary: light border, blur, no 3D plastic relief.
+ */
 .mobile-menu-cta-gold {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 230, 100, 0.85),
-    rgba(217, 119, 6, 0.85)
-  );
+  background: rgba(255, 230, 150, 0.1);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
   border-radius: 12px;
-  border-top: 2px solid #ffffff;
-  border-bottom: 3px solid #78350f;
-  border-left: none;
-  border-right: none;
-  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.55);
-  color: #140d02;
-  font-weight: 800;
-  transition: filter 150ms ease;
+  border: 1.5px solid rgba(235, 192, 82, 0.55);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.28),
+    inset 0 0 14px rgba(229, 184, 75, 0.12);
+  color: #f6d574;
+  font-weight: 600;
+  transition:
+    filter 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease;
 }
 
 .mobile-menu-cta-gold:hover {
-  filter: brightness(1.05);
+  filter: brightness(1.06);
+  color: #ffffff;
+  border-color: rgba(255, 232, 158, 0.75);
 }
 
 .input-inset {
