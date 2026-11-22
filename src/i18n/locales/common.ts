@@ -69,6 +69,9 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'lang.switcherAria': 'Seleziona lingua del sito',
     'lang.current': 'Lingua corrente: {{label}}',
     'home.bookTariff': 'Scegli e Prenota ({{minutes}}m)',
+    'consult.trustLineLead': 'Nessun call center anonimo, nessun turno:',
+    'consult.trustLinePresence':
+      'ci sono io, Teresa, con metodo, preparazione e presenza.',
     'home.chooseReading': 'Scegli il Consulto',
     'home.openDialogue': 'Apri Dialogo Tarot',
     'home.exploreConsulti': 'Esplora area Consulti',
@@ -185,6 +188,9 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'lang.switcherAria': 'Select site language',
     'lang.current': 'Current language: {{label}}',
     'home.bookTariff': 'Choose & Book ({{minutes}}m)',
+    'consult.trustLineLead': 'No anonymous call center, no shift rotation:',
+    'consult.trustLinePresence':
+      'it is me, Teresa, with method, preparation, and presence.',
     'home.chooseReading': 'Choose a Reading',
     'home.openDialogue': 'Open Tarot Dialogue',
     'home.exploreConsulti': 'Explore Readings',
@@ -300,6 +306,9 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'lang.switcherAria': 'Seleccionar idioma del sitio',
     'lang.current': 'Idioma actual: {{label}}',
     'home.bookTariff': 'Elegir y reservar ({{minutes}}m)',
+    'consult.trustLineLead': 'Ningún call center anónimo, ningún turno:',
+    'consult.trustLinePresence':
+      'estoy yo, Teresa, con método, preparación y presencia.',
     'home.chooseReading': 'Elige la consulta',
     'home.openDialogue': 'Abrir Diálogo Tarot',
     'home.exploreConsulti': 'Explorar área Consultas',
@@ -415,6 +424,9 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'lang.switcherAria': 'Choisir la langue du site',
     'lang.current': 'Langue actuelle : {{label}}',
     'home.bookTariff': 'Choisir et réserver ({{minutes}}m)',
+    'consult.trustLineLead': 'Pas de call center anonyme, pas de rotation:',
+    'consult.trustLinePresence':
+      'c’est moi, Teresa, avec méthode, préparation et présence.',
     'home.chooseReading': 'Choisir la consultation',
     'home.openDialogue': 'Ouvrir le Dialogue Tarot',
     'home.exploreConsulti': 'Explorer les consultations',
@@ -530,6 +542,9 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'lang.switcherAria': 'Seitensprache wählen',
     'lang.current': 'Aktuelle Sprache: {{label}}',
     'home.bookTariff': 'Wählen & buchen ({{minutes}}m)',
+    'consult.trustLineLead': 'Kein anonymes Callcenter, keine Schichtrotation:',
+    'consult.trustLinePresence':
+      'ich bin da, Teresa — mit Methode, Vorbereitung und Präsenz.',
     'home.chooseReading': 'Beratung wählen',
     'home.openDialogue': 'Tarot-Dialog öffnen',
     'home.exploreConsulti': 'Beratungsbereich erkunden',

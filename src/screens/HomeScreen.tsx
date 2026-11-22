@@ -24,6 +24,7 @@ import {
   CourseOfferPrice,
   PaymentTrustCues,
 } from '../components/PaymentTrustCues';
+import { ConsultTrustLine } from '../components/ConsultTrustLine';
 import { COURSE_SECTION_IMAGES, TARIFF_SECTION_IMAGES } from '../data/sectionImages';
 import { CONSULTATION_STRIPE_ENABLED } from '../lib/bookingCheckoutMode';
 import {
@@ -385,6 +386,7 @@ export function HomeScreen({
                 </div>
 
                 <div className="space-y-3 pt-2">
+                  <ConsultTrustLine />
                   <button
                     type="button"
                     onClick={() => onSelectTariffAndBook(tariff.id)}
