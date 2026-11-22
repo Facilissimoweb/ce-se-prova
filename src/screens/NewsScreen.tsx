@@ -462,7 +462,7 @@ function BlogCta({
         <button
           type="button"
           onClick={() => onNavigate('booking')}
-          className="inline-flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-lg bg-[#D4AF37] px-5 py-3 text-sm font-semibold text-[#12100E] transition-all hover:bg-[#E6C65C]"
+          className="btn-primary inline-flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-lg px-5 py-3 text-sm font-semibold"
         >
           Prenota consulto
           <ArrowRight className="h-4 w-4" />
@@ -470,7 +470,7 @@ function BlogCta({
         <button
           type="button"
           onClick={() => onNavigate('chat')}
-          className="inline-flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-lg border border-[#D4AF37]/30 px-5 py-3 text-sm font-medium text-[#F4F1EA] transition-colors hover:border-[#D4AF37]"
+          className="btn-secondary inline-flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-lg px-5 py-3 text-sm font-medium"
         >
           Parla con Maria Teresa
         </button>

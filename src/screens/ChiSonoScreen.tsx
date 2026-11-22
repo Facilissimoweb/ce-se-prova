@@ -267,7 +267,7 @@ export function ChiSonoScreen({ showCmsKeys, onNavigate }: ChiSonoScreenProps) {
           <button
             type="button"
             onClick={() => onNavigate('booking')}
-            className="px-5 py-3 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap transition-all"
+            className="btn-primary px-5 py-3 min-h-[44px] rounded-lg text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap"
           >
             Prenota un Consulto
             <ArrowRight className="w-4 h-4" />
@@ -275,9 +275,9 @@ export function ChiSonoScreen({ showCmsKeys, onNavigate }: ChiSonoScreenProps) {
           <button
             type="button"
             onClick={() => onNavigate('corsi')}
-            className="px-5 py-3 min-h-[44px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-sm font-medium text-[#F4F1EA] inline-flex items-center gap-2 whitespace-nowrap transition-colors"
+            className="btn-secondary px-5 py-3 min-h-[44px] rounded-lg text-sm font-medium inline-flex items-center gap-2 whitespace-nowrap"
           >
-            <BookOpen className="w-4 h-4 text-[#D4AF37]" />
+            <BookOpen className="w-4 h-4" />
             Vai ai Percorsi Didattici
           </button>
         </div>

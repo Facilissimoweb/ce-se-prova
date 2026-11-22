@@ -230,11 +230,13 @@
 }
 
 /**
- * ENN-209 — Home-only glass CTA trial (Maria).
- * Scoped under .home-page so Consulti/Corsi/Prenota/Area personale stay unchanged.
- * ENN-211 — secondary: magenta→orange glass (primary unchanged from #177).
+ * ENN-212 — Sitewide glass CTAs (Maria).
+ * Primary: green→gold (#177 / ENN-209). Secondary: magenta→orange (#179 / ENN-211).
+ * Prefer `.btn-primary` / `.btn-secondary`; `.home-btn-*` kept as aliases.
+ * Do not apply to `.google-btn` (ENN-210 pill), GT/lang, or chat send chrome.
  */
-.home-page .home-btn-primary {
+.btn-primary,
+.home-btn-primary {
   background: linear-gradient(
     135deg,
     rgba(0, 255, 163, 0.45),
@@ -247,13 +249,16 @@
     0 8px 32px rgba(0, 255, 163, 0.35),
     inset 0 1px 1px rgba(255, 255, 255, 0.6);
   color: #ffffff;
+  transition: filter 150ms ease;
 }
 
-.home-page .home-btn-primary:hover {
+.btn-primary:hover:not(:disabled),
+.home-btn-primary:hover:not(:disabled) {
   filter: brightness(1.06);
 }
 
-.home-page .home-btn-primary:focus-visible {
+.btn-primary:focus-visible,
+.home-btn-primary:focus-visible {
   outline: none;
   box-shadow:
     0 8px 32px rgba(0, 255, 163, 0.35),
@@ -261,7 +266,8 @@
     0 0 0 2px rgba(128, 255, 219, 0.85);
 }
 
-.home-page .home-btn-secondary {
+.btn-secondary,
+.home-btn-secondary {
   background: linear-gradient(
     135deg,
     rgba(255, 0, 127, 0.52),
@@ -274,13 +280,16 @@
     0 8px 32px rgba(255, 0, 127, 0.4),
     inset 0 1px 1px rgba(255, 255, 255, 0.65);
   color: #ffffff;
+  transition: filter 150ms ease;
 }
 
-.home-page .home-btn-secondary:hover {
+.btn-secondary:hover:not(:disabled),
+.home-btn-secondary:hover:not(:disabled) {
   filter: brightness(1.06);
 }
 
-.home-page .home-btn-secondary:focus-visible {
+.btn-secondary:focus-visible,
+.home-btn-secondary:focus-visible {
   outline: none;
   box-shadow:
     0 8px 32px rgba(255, 0, 127, 0.4),

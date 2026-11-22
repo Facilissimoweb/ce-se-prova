@@ -86,10 +86,10 @@ export function ReservedLoginGate({
             <button
               type="button"
               onClick={() => onNavigate('corsi')}
-              className="px-5 py-3 min-h-[46px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-sm font-medium text-[#F4F1EA] inline-flex items-center gap-2 whitespace-nowrap transition-colors"
+              className="btn-secondary px-5 py-3 min-h-[46px] rounded-lg text-sm font-medium inline-flex items-center gap-2 whitespace-nowrap"
             >
               Vedi il Percorso Arcani Maggiori
-              <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>

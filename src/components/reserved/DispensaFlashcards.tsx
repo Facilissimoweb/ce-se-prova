@@ -179,15 +179,15 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
         <button
           type="button"
           onClick={() => go(-1)}
-          className="min-h-[44px] w-full px-3 py-2.5 rounded-lg border border-[#D4AF37]/30 bg-[#151311]/80 hover:border-[#D4AF37] text-xs font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+          className="btn-secondary min-h-[44px] w-full px-3 py-2.5 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-1.5"
         >
-          <ChevronLeft className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+          <ChevronLeft className="w-3.5 h-3.5 shrink-0" />
           {tIt('sigillo.prev')}
         </button>
         <button
           type="button"
           onClick={() => go(1)}
-          className="min-h-[44px] w-full px-3 py-2.5 rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+          className="btn-primary min-h-[44px] w-full px-3 py-2.5 rounded-lg text-xs font-semibold inline-flex items-center justify-center gap-1.5"
         >
           {tIt('sigillo.next')}
           <ChevronRight className="w-3.5 h-3.5 shrink-0" />
@@ -195,7 +195,7 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
         <button
           type="button"
           onClick={handleShuffle}
-          className="min-h-[44px] w-full px-3 py-2.5 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/10 hover:border-[#D4AF37] hover:bg-[#D4AF37]/16 text-xs font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+          className="btn-secondary min-h-[44px] w-full px-3 py-2.5 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-1.5"
         >
           <Shuffle className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
           {tIt('sigillo.shuffle')}

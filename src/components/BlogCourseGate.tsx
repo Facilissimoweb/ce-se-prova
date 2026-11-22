@@ -81,7 +81,7 @@ export function BlogCourseGate({
                 focusId: SCROLL_LANDMARKS.corsiCheckout,
               })
             }
-            className="cta-label inline-flex min-h-[46px] items-center justify-center gap-2 rounded-lg bg-[#D4AF37] px-5 py-3 text-sm font-semibold text-[#12100E] transition-all hover:bg-[#E6C65C] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+            className="btn-primary cta-label inline-flex min-h-[46px] items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold"
           >
             Vai a Corsi · {courseLabel}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -95,9 +95,9 @@ export function BlogCourseGate({
                   focusId: SCROLL_LANDMARKS.corsiMaggioriPreview,
                 })
               }
-              className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-lg border border-[#D4AF37]/35 px-5 py-3 text-sm font-medium text-[#F4F1EA] transition-colors hover:border-[#D4AF37] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+              className="btn-secondary inline-flex min-h-[46px] items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-medium"
             >
-              <BookOpen className="h-4 w-4 text-[#D4AF37]" aria-hidden="true" />
+              <BookOpen className="h-4 w-4" aria-hidden="true" />
               Anteprima Modulo 01
             </button>
           )}
@@ -116,7 +116,7 @@ export function BlogCourseGate({
             <button
               type="button"
               onClick={() => onNavigate('area-riservata')}
-              className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-lg border border-[#D4AF37]/25 px-5 py-3 text-sm font-medium text-[#A39B93] transition-colors hover:border-[#D4AF37]/50 hover:text-[#F4F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+              className="btn-secondary inline-flex min-h-[46px] items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-medium"
             >
               Area Riservata
             </button>

@@ -47,7 +47,7 @@ export function ReservedNotesPanel({ getIdToken }: ReservedNotesPanelProps) {
           type="button"
           disabled={notes.saving}
           onClick={() => void notes.handleCreate()}
-          className="px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-xs md:text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap"
+          className="btn-primary px-4 py-2.5 min-h-[44px] rounded-lg disabled:opacity-60 text-xs md:text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap"
         >
           <FilePlus2 className="w-4 h-4" />
           Nuovo appunto
@@ -63,7 +63,7 @@ export function ReservedNotesPanel({ getIdToken }: ReservedNotesPanelProps) {
           <button
             type="button"
             onClick={() => void notes.loadNotes()}
-            className="px-3 py-1.5 rounded-lg bg-[#D4AF37] text-[#12100E] text-xs font-semibold shrink-0"
+            className="btn-primary px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0"
           >
             Riprova
           </button>
@@ -159,7 +159,7 @@ export function ReservedNotesPanel({ getIdToken }: ReservedNotesPanelProps) {
                       type="button"
                       disabled={notes.saving || !notes.dirty}
                       onClick={() => void notes.handleSaveNow()}
-                      className="px-4 py-2.5 min-h-[42px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-xs font-semibold inline-flex items-center gap-2 whitespace-nowrap"
+                      className="btn-primary px-4 py-2.5 min-h-[42px] rounded-lg disabled:opacity-60 text-xs font-semibold inline-flex items-center gap-2 whitespace-nowrap"
                     >
                       <Save className="w-3.5 h-3.5" />
                       {notes.saving ? 'Salvataggio…' : 'Salva ora'}

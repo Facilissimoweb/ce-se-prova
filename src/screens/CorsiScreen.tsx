@@ -411,10 +411,10 @@ export function CorsiScreen({
                   <button
                     type="button"
                     onClick={() => handleEnrollCourse(course.id)}
-                    className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C] ${
+                    className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 ${
                       isSelected || course.recommended
-                        ? 'bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] hover:shadow-[0_0_16px_rgba(212,175,55,0.3)]'
-                        : 'bg-[#D4AF37]/10 border border-[#D4AF37]/35 hover:bg-[#D4AF37] hover:text-[#12100E] text-[#F4F1EA]'
+                        ? 'btn-primary'
+                        : 'btn-secondary'
                     } ${soloWide ? 'md:max-w-sm' : ''}`}
                   >
                     Iscriviti al Percorso (€ {course.priceEur})
@@ -433,7 +433,7 @@ export function CorsiScreen({
                     <button
                       type="button"
                       onClick={handleMaggioriMattoPreview}
-                      className={`w-full min-h-[42px] px-4 py-2 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-2 border border-[#D4AF37]/40 text-[#E6C65C] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/18 hover:border-[#D4AF37]/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
+                      className={`btn-secondary cta-label w-full min-h-[42px] px-4 py-2 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-2 ${
                         soloWide ? 'md:max-w-sm' : ''
                       }`}
                     >
@@ -786,7 +786,7 @@ export function CorsiScreen({
               <button
                 type="button"
                 onClick={onOpenChat}
-                className="px-4 py-2.5 min-h-[44px] rounded-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] text-xs md:text-sm font-medium text-[#F4F1EA]"
+                className="btn-secondary px-4 py-2.5 min-h-[44px] rounded-lg text-xs md:text-sm font-medium"
               >
                 Chiedi nel Dialogo Tarot
               </button>
@@ -800,7 +800,7 @@ export function CorsiScreen({
             <button
               type="submit"
               disabled={enrolling}
-              className="cta-label px-6 py-3 min-h-[46px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-sm font-semibold inline-flex items-center gap-2 transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+              className="btn-primary cta-label px-6 py-3 min-h-[46px] rounded-lg disabled:opacity-60 text-sm font-semibold inline-flex items-center gap-2"
             >
               <CreditCard className="w-4 h-4" />
               {enrolling
@@ -845,7 +845,7 @@ export function CorsiScreen({
                 <button
                   type="button"
                   onClick={onOpenReservedArea}
-                  className="cta-label px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-xs font-semibold text-[#12100E] inline-flex items-center gap-2"
+                  className="btn-primary cta-label px-4 py-2.5 min-h-[44px] rounded-lg text-xs font-semibold inline-flex items-center gap-2"
                 >
                   Apri Area Riservata e Dispense
                   <ArrowRight className="w-4 h-4" />
@@ -856,7 +856,7 @@ export function CorsiScreen({
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="cta-label px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37]/12 border border-[#D4AF37]/35 hover:border-[#D4AF37] text-xs font-semibold text-[#F4F1EA] inline-flex items-center justify-center gap-2"
+                  className="btn-secondary cta-label px-4 py-2.5 min-h-[44px] rounded-lg text-xs font-semibold inline-flex items-center justify-center gap-2"
                 >
                   <MessageCircle className="w-4 h-4 text-[#D4AF37] shrink-0" />
                   Invia Iscrizione su WhatsApp

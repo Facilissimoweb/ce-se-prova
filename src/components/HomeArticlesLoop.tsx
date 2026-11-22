@@ -97,10 +97,10 @@ export function HomeArticlesLoop({ onNavigate }: Props) {
             <button
               type="button"
               onClick={() => onNavigate('news')}
-              className="cta-label inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-4 py-2.5 text-xs font-medium text-[#F4F1EA] hover:border-[#D4AF37]"
+              className="btn-secondary cta-label inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-medium"
             >
               Apri pagina News
-              <ArrowRight className="h-3.5 w-3.5 text-[#D4AF37]" />
+              <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
         )}

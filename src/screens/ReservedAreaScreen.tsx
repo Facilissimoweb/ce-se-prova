@@ -418,7 +418,7 @@ export function ReservedAreaScreen({
           <button
             type="button"
             onClick={loadOverview}
-            className="px-3 py-1.5 rounded-lg bg-[#D4AF37] text-[#12100E] text-xs font-semibold shrink-0"
+            className="btn-primary px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0"
           >
             Riprova
           </button>
@@ -439,7 +439,7 @@ export function ReservedAreaScreen({
           <button
             type="button"
             onClick={loadOverview}
-            className="px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37] text-[#12100E] text-xs font-semibold"
+            className="btn-primary px-4 py-2.5 min-h-[44px] rounded-lg text-xs font-semibold"
           >
             Ricarica Area Riservata
           </button>
@@ -791,7 +791,7 @@ export function ReservedAreaScreen({
                           type="button"
                           disabled={savingNotes}
                           onClick={() => handleSaveProgress(activeDispensa)}
-                          className="px-4 py-2.5 min-h-[42px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-xs font-semibold inline-flex items-center gap-2 whitespace-nowrap"
+                          className="btn-primary px-4 py-2.5 min-h-[42px] rounded-lg disabled:opacity-60 text-xs font-semibold inline-flex items-center gap-2 whitespace-nowrap"
                         >
                           <Save className="w-3.5 h-3.5" />
                           {savingNotes ? 'Salvataggio...' : 'Salva Appunti'}
@@ -812,7 +812,7 @@ export function ReservedAreaScreen({
                         <button
                           type="button"
                           onClick={goToNextDispensa}
-                          className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+                          className="btn-primary w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap"
                         >
                           Prosegui a dispensa {nextDispensa.moduleNumber}
                           <ArrowRight className="w-4 h-4 shrink-0" />
@@ -821,10 +821,10 @@ export function ReservedAreaScreen({
                         <button
                           type="button"
                           onClick={returnToPercorsi}
-                          className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-lg border border-[#D4AF37]/35 bg-[#D4AF37]/10 hover:border-[#D4AF37] hover:bg-[#D4AF37]/18 text-[#F4F1EA] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                          className="btn-secondary w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap"
                         >
                           Torna ai percorsi
-                          <ArrowRight className="w-4 h-4 shrink-0 text-[#D4AF37]" />
+                          <ArrowRight className="w-4 h-4 shrink-0" />
                         </button>
                       )}
                     </div>
@@ -943,7 +943,7 @@ export function ReservedAreaScreen({
                   <button
                     type="submit"
                     disabled={enrolling}
-                    className="w-full min-h-[46px] px-5 py-3 rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] disabled:opacity-60 text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap transition-all"
+                    className="btn-primary w-full min-h-[46px] px-5 py-3 rounded-lg disabled:opacity-60 text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap"
                   >
                     {enrolling
                       ? 'Preparazione checkout...'
@@ -959,7 +959,7 @@ export function ReservedAreaScreen({
                   <button
                     type="button"
                     onClick={() => onSelectCourse(activeCourse.slug)}
-                    className="w-full min-h-[42px] px-4 py-2 rounded-lg border border-[#D4AF37]/25 hover:border-[#D4AF37] text-xs font-medium text-[#A39B93] hover:text-[#F4F1EA]"
+                    className="btn-secondary w-full min-h-[42px] px-4 py-2 rounded-lg text-xs font-medium"
                   >
                     Torna alla scheda pubblica del corso
                   </button>
@@ -983,7 +983,7 @@ export function ReservedAreaScreen({
             <button
               type="button"
               onClick={() => onNavigate('booking')}
-              className="px-4 py-2.5 min-h-[44px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs md:text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap"
+              className="btn-primary px-4 py-2.5 min-h-[44px] rounded-lg text-xs md:text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap"
             >
               Prenota Nuovo Consulto
               <ArrowRight className="w-4 h-4" />

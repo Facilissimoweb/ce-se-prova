@@ -243,7 +243,7 @@ export function TopBar({
               type="button"
               data-nowrap-keep
               onClick={() => handleMobileSelect('booking')}
-              className="hidden md:inline-flex px-4 py-2 min-h-[40px] rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold whitespace-nowrap shrink-0 items-center transition-all duration-150 hover:shadow-[0_0_16px_rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+              className="btn-primary hidden md:inline-flex px-4 py-2 min-h-[40px] rounded-lg text-sm font-semibold whitespace-nowrap shrink-0 items-center"
             >
               <GtCriticalLabel uiKey="bookConsult" />
             </button>
@@ -356,7 +356,7 @@ export function TopBar({
                 <button
                   type="button"
                   onClick={() => handleMobileSelect('booking')}
-                  className="w-full min-h-[48px] px-5 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
+                  className="btn-primary w-full min-h-[48px] px-5 py-3 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2"
                 >
                   <Calendar className="w-4 h-4" aria-hidden="true" />
                   {t('nav.bookings')}
