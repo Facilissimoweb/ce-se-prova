@@ -83,7 +83,7 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'nina.subtitleAvailable':
       'Assistente di accoglienza & studio',
     'nina.subtitleStudio':
-      'Nina Studio · studio dei tarocchi (Maggiori e Minori)',
+      'Nina Studio · ti accompagna in tutto il mondo dei tarocchi',
     'nina.subtitleUnavailable':
       'Nina non è attiva. Usa Parla con Maria Teresa qui sotto.',
     'nina.errorOffline':
@@ -95,15 +95,15 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'nina.errorRephrase':
       'Non sono sicura di aver colto bene la tua domanda. Puoi **riformularla** o **specificare l’Arcano** / il tema? Così ti rispondo con più precisione.',
     'nina.welcome':
-      'Ciao, sono **Nina**, l’assistente di **accoglienza** di Tarot Italia.\n\nTi oriento su **prezzi**, prenotazione **WhatsApp**, mappa del sito e **Chi sono**.\n\nLo studio dei tarocchi (Maggiori e Minori) è in **Nina Studio**. Per un consulto autentico usa **Parla con Maria Teresa** qui sotto.',
+      'Ciao, sono **Nina**, l’assistente di **accoglienza** di Tarot Italia.\n\nTi oriento su **prezzi**, prenotazione **WhatsApp**, mappa del sito e **Chi sono**.\n\nPer svelare **tutto il mondo dei tarocchi** (Maggiori e Minori) apri **Nina Studio**. Per un consulto autentico usa **Parla con Maria Teresa** qui sotto.',
     'nina.welcomeStudio':
-      'Ciao, sono **Nina Studio** — compagnia di studio dei **tarocchi** (Arcani Maggiori e Minori).\n\nPossiamo esplorare simbologia, senso, luce/ombra e pratica sulle carte. Le schede ufficiali Maggiori del corso restano disponibili; per i Minori uso le schede didattiche di Studio.\n\nIl Dialogo Tarot resta un percorso separato. Per un consulto con Maria Teresa usa la sezione qui sotto.',
+      'Ciao, sono **Nina Studio** — ti accompagno a svelare **tutto il mondo dei tarocchi**.\n\nInsieme esploriamo simbologia, senso, luce/ombra e pratica su Maggiori e Minori. Le schede didattiche restano disponibili quando servono.\n\nIl Dialogo Tarot resta un percorso separato. Per un consulto con Maria Teresa usa la sezione qui sotto.',
     'nina.modeWelcome': 'Accoglienza',
     'nina.modeStudio': 'Nina Studio',
     'nina.modeAria': 'Modalità chat Nina',
     'nina.studioLockedHint':
-      'Nina Studio (studio Maggiori e Minori) è inclusa nel corso Arcani Maggiori.',
-    'nina.studioCta': 'Apri Corsi Maggiori',
+      'Nina Studio ti accompagna in tutto il mondo dei tarocchi. Si sblocca dai Corsi.',
+    'nina.studioCta': 'Apri Corsi',
     'nina.fabTitleWelcome': 'Chat Nina · Accoglienza',
     'nina.fabTitleStudio': 'Nina Studio · Tarocchi',
     'nina.listening': 'Nina sta ascoltando…',
