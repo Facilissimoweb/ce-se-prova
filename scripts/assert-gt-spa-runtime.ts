@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { GT_ENABLED } from '../src/lib/googleTranslateEnabled.ts';
 import {
   isGoogtransHash,
   readGoogTransLang,
@@ -87,18 +88,30 @@ assert(
     /fromHash\s*&&\s*fromHash\s*!==\s*GT_PAGE_LANG/.test(runtime),
   'readGoogTransLang prefers non-IT hash over cookie'
 );
-// ENN-185 launch freeze: live reads stay Italian even with leftover googtrans.
+// ENN-185 freeze vs ENN-203/204 live: when enabled, googtrans must be readable.
 withGoogtransDom('googtrans=/it/it', '#googtrans(it|ja)', () => {
   assert(
-    readGoogTransLang() === 'it',
-    'freeze: stale cookie + ja hash → it (ENN-185)'
+    readGoogTransLang() === (GT_ENABLED ? 'ja' : 'it'),
+    GT_ENABLED
+      ? 'live: stale cookie + ja hash → ja (ENN-180/204)'
+      : 'freeze: stale cookie + ja hash → it (ENN-185)'
   );
 });
 withGoogtransDom('googtrans=/it/en', '', () => {
-  assert(readGoogTransLang() === 'it', 'freeze: cookie-only en → it (ENN-185)');
+  assert(
+    readGoogTransLang() === (GT_ENABLED ? 'en' : 'it'),
+    GT_ENABLED
+      ? 'live: cookie-only en → en (ENN-204)'
+      : 'freeze: cookie-only en → it (ENN-185)'
+  );
 });
 withGoogtransDom('', '#googtrans(it|zh-CN)', () => {
-  assert(readGoogTransLang() === 'it', 'freeze: hash-only zh-CN → it (ENN-185)');
+  assert(
+    readGoogTransLang() === (GT_ENABLED ? 'zh-CN' : 'it'),
+    GT_ENABLED
+      ? 'live: hash-only zh-CN → zh-CN (ENN-204)'
+      : 'freeze: hash-only zh-CN → it (ENN-185)'
+  );
 });
 
 // ENN-184 — SPA lang switch harden (no non-IT location.reload).

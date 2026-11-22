@@ -6,6 +6,7 @@ import {
   RotateCcw,
   Shuffle,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { CourseModuleFlashcardDeck } from '../../data/flashcards/arcaniMaggiori';
 import { requestGoogleTranslateRefresh } from '../../lib/googleTranslateRuntime';
 import { GtSafeBoundary } from '../GtSafeBoundary';
@@ -24,6 +25,11 @@ function shuffleIds(ids: number[]): number[] {
 }
 
 export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
+  // ENN-204 / ENN-161 — Italian DOM source so Google Translate can localize;
+  // never live-locale t() (EN overlays cannot be re-translated cleanly).
+  const { i18n } = useTranslation('common');
+  const tIt = i18n.getFixedT('it', 'common');
+
   const baseOrder = useMemo(() => deck.cards.map((c) => c.id), [deck.cards]);
   const [order, setOrder] = useState<number[]>(baseOrder);
   const [index, setIndex] = useState(0);
@@ -98,22 +104,23 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
   if (!current || total === 0) return null;
 
   // ENN-157/162 — whole Sigillo (chrome + Q/A) follows selected Google Translate.
+  // Q/A bodies stay Italian in the data file; GT localizes them (no per-lang SPA bloat).
   return (
     <section
       className="space-y-4 rounded-2xl border border-[#D4AF37]/25 bg-[#12100E]/55 p-5 md:p-6"
-      aria-label="Sigillo di apprendimento con flashcard"
+      aria-label={tIt('sigillo.aria')}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1.5 max-w-xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37] inline-flex items-center gap-2">
             <Layers className="w-3.5 h-3.5" aria-hidden="true" />
-            Sigillo di apprendimento
+            {tIt('sigillo.eyebrow')}
           </p>
           <h4 className="font-body font-semibold text-lg md:text-xl text-[#F4F1EA]">
             {deck.title}
           </h4>
           <p className="text-xs md:text-sm text-[#A39B93] leading-relaxed">
-            {deck.subtitle} Tocca la carta per rivelare la risposta.
+            {deck.subtitle} {tIt('sigillo.hintReveal')}
           </p>
         </div>
         <p className="text-xs text-[#E6C65C] tabular-nums font-medium shrink-0">
@@ -136,7 +143,7 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
             onClick={() => setFaceEpoch((n) => n + 1)}
             className="w-full min-h-[200px] md:min-h-[240px] rounded-2xl border border-[#D4AF37]/35 bg-[#1A1615] px-5 py-6 text-sm text-[#E8e1dd]"
           >
-            Ricarica la carta
+            {tIt('sigillo.reload')}
           </button>
         }
       >
@@ -148,7 +155,7 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
           className="group relative w-full min-h-[200px] md:min-h-[240px] rounded-2xl border border-[#D4AF37]/35 bg-gradient-to-br from-[#1A1615] to-[#0E0C0B] px-5 py-6 text-left transition-all hover:border-[#D4AF37] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
         >
           <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]/90 mb-3">
-            {flipped ? 'Risposta' : 'Domanda'}
+            {flipped ? tIt('sigillo.answer') : tIt('sigillo.question')}
           </p>
           <h2
             className={`flashcard-body-text normal-case ${
@@ -158,9 +165,7 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
             {flipped ? current.answer : current.question}
           </h2>
           <p className="mt-5 text-[11px] text-[#A39B93] group-hover:text-[#E6C65C] transition-colors">
-            {flipped
-              ? 'Tocca per tornare alla domanda'
-              : 'Tocca per rivelare la risposta'}
+            {flipped ? tIt('sigillo.tapBack') : tIt('sigillo.tapReveal')}
           </p>
         </button>
       </GtSafeBoundary>
@@ -169,7 +174,7 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
       <div
         className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-2.5"
         role="toolbar"
-        aria-label="Controlli flashcard"
+        aria-label={tIt('sigillo.toolbarAria')}
       >
         <button
           type="button"
@@ -177,14 +182,14 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
           className="min-h-[44px] w-full px-3 py-2.5 rounded-lg border border-[#D4AF37]/30 bg-[#151311]/80 hover:border-[#D4AF37] text-xs font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
         >
           <ChevronLeft className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
-          Precedente
+          {tIt('sigillo.prev')}
         </button>
         <button
           type="button"
           onClick={() => go(1)}
           className="min-h-[44px] w-full px-3 py-2.5 rounded-lg bg-[#D4AF37] hover:bg-[#E6C65C] text-[#12100E] text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E6C65C]"
         >
-          Successiva
+          {tIt('sigillo.next')}
           <ChevronRight className="w-3.5 h-3.5 shrink-0" />
         </button>
         <button
@@ -193,7 +198,7 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
           className="min-h-[44px] w-full px-3 py-2.5 rounded-lg border border-[#D4AF37]/30 bg-[#D4AF37]/10 hover:border-[#D4AF37] hover:bg-[#D4AF37]/16 text-xs font-medium text-[#F4F1EA] inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
         >
           <Shuffle className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
-          Mescola
+          {tIt('sigillo.shuffle')}
         </button>
         <button
           type="button"
@@ -201,7 +206,7 @@ export function DispensaFlashcards({ deck }: DispensaFlashcardsProps) {
           className="min-h-[44px] w-full px-3 py-2.5 rounded-lg border border-[#A39B93]/30 bg-[#151311]/60 hover:border-[#D4AF37] hover:text-[#F4F1EA] text-xs font-medium text-[#A39B93] inline-flex items-center justify-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
         >
           <RotateCcw className="w-3.5 h-3.5 shrink-0" />
-          Dall&apos;inizio
+          {tIt('sigillo.reset')}
         </button>
       </div>
     </section>
