@@ -97,7 +97,7 @@ export function HomeArticlesLoop({ onNavigate }: Props) {
             <button
               type="button"
               onClick={() => onNavigate('news')}
-              className="btn-secondario-tarot cta-label shrink-0"
+              className="btn-secondary cta-label inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-medium"
             >
               Apri pagina News
               <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
