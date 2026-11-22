@@ -453,10 +453,8 @@ export function BookingScreen({
                       key={tariff.id}
                       type="button"
                       onClick={() => handleTariffPick(tariff.id)}
-                      className={`w-full text-left rounded-xl p-4 md:p-5 border transition-all duration-150 flex flex-col sm:flex-row sm:items-center justify-between gap-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
-                        selected
-                          ? 'bg-[#D4AF37]/12 border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.16)]'
-                          : 'bg-[#12100E]/60 border-[#D4AF37]/15 hover:border-[#D4AF37]/40'
+                      className={`foglio-smeraldo w-full text-left p-4 md:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
+                        selected ? 'ring-2 ring-[#D4AF37]/80' : ''
                       }`}
                     >
                       <div className="space-y-1">
