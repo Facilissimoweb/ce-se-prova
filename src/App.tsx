@@ -22,6 +22,7 @@ import { PrivacyCookiesWidget } from './components/PrivacyCookiesWidget';
 import { StickyContactBar } from './components/StickyContactBar';
 import { LegalNotice, type LegalKind } from './components/LegalNotice';
 import { AmbientSanctuaryBackground } from './components/AmbientSanctuaryBackground';
+import { FooterEsotericSkyline } from './components/FooterEsotericSkyline';
 import { TarotHomeHeroLogo } from './components/TarotEmblem';
 import { HomeScreen } from './screens/HomeScreen';
 import { ChiSonoScreen } from './screens/ChiSonoScreen';
@@ -523,8 +524,10 @@ export function App() {
           )}
         </main>
 
-        <footer className="border-t border-[#D4AF37]/15 py-10 pb-24 relative z-10 md:py-12">
-          <div className="max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-8 text-xs text-[#A39B93] md:space-y-10">
+        <footer className="border-t border-[#D4AF37]/15 py-10 pb-24 relative z-10 overflow-hidden md:py-12">
+          {/* ENN-230 — mystical skyline under content; decorative only */}
+          <FooterEsotericSkyline />
+          <div className="relative z-[1] max-w-6xl mx-auto px-5 md:px-8 lg:px-12 space-y-8 text-xs text-[#A39B93] md:space-y-10">
             {/*
               ENN-78: brand stack opens the footer centered on top (logo, Nina-compact
               contacts, address, CONDIVIDI). SERVIZI / INFO / LEGALE sit below as a
