@@ -4,11 +4,11 @@ import type { SiteLang } from '../types';
 export const commonTranslations: Record<SiteLang, Record<string, string>> = {
   it: {
     'nav.home': 'Home',
-    'nav.home.subtitle': 'Panoramica e Arcano del Giorno',
+    'nav.home.subtitle': 'Metodo, atmosfera e percorsi',
     'nav.chiSono': 'Chi sono',
     'nav.chiSono.subtitle': 'Formazione e percorso disciplinare',
     'nav.consulti': 'Consulti',
-    'nav.consulti.subtitle': 'Chiamata vocale online e tariffe',
+    'nav.consulti.subtitle': 'Chiamata vocale online o dal vivo',
     'nav.dialogo': 'Dialogo',
     'nav.dialogo.subtitle': 'Interagisci con i 22 Arcani Maggiori',
     'nav.dialogaCoi22Arcani': 'Dialoga Coi 22 Arcani',
@@ -17,7 +17,7 @@ export const commonTranslations: Record<SiteLang, Record<string, string>> = {
     'nav.blog': 'Blog',
     'nav.blog.subtitle': 'Articoli e riflessioni',
     'nav.contatti': 'Contatti',
-    'nav.contatti.subtitle': 'Email, telefono, mappa e parcheggi',
+    'nav.contatti.subtitle': 'Email, telefono, mappa e parcheggio',
     'nav.aria': 'Navigazione principale',
     'nav.homeAria': 'Torna alla Home di Tarot Italia',
     // ENN-159 — contextual IT source so GT does not mistranslate bare «Prenota».
