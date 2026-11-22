@@ -60,9 +60,9 @@ function applyPrefsToDocument(prefs: A11yPreferences) {
 }
 
 /**
- * Left FAB stack: directly under the cookie reopen control
- * (cookie → accessibility → chat → Torna su). Opens «Visualizzazione facilitata».
- * On mobile, only visible when «Strumenti» is open.
+ * Left tools cluster: under the cookie reopen control
+ * (cookie → accessibility → Torna su; Nina is separate — ENN-213).
+ * Opens «Visualizzazione facilitata». On mobile, only when «Strumenti» is open.
  */
 export function AccessibilityFab() {
   const panelId = useId();

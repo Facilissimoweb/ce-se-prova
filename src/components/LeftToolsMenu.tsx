@@ -87,8 +87,8 @@ const fabChrome =
   'fixed z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]';
 
 /**
- * Mobile-only «Strumenti» (+ / ×) control. Desktop keeps the full vertical stack.
- * Opens cookie, accessibility, chat, and Torna su.
+ * Mobile-only «Strumenti» (+ / ×) control. Desktop keeps the tool stack.
+ * Opens cookie, accessibility, and Torna su (ENN-213: Nina is independent).
  */
 /** Stable id for aria-controls on the expanded tool cluster. */
 export const LEFT_TOOLS_MENU_ID = 'left-tools-menu';

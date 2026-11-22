@@ -32,7 +32,7 @@ import { looksLikeNinaProviderLeak } from '../lib/ninaReplyLang';
 import { NinaMessageBody } from './chat/NinaMessageBody';
 import { GtCriticalLabel } from './GtCriticalLabel';
 import { GtSafeBoundary } from './GtSafeBoundary';
-import { useLeftToolFabVisible, useLeftToolsMenu } from './LeftToolsMenu';
+import { useLeftToolsMenu } from './LeftToolsMenu';
 
 /**
  * Thread turns. `skipGt` marks copy already localized for googtrans
@@ -96,8 +96,8 @@ const linkClass =
   'flex min-w-0 items-center justify-center gap-1.5 rounded-lg border border-[#D4AF37]/15 bg-[#12100E]/55 px-2 py-1.5 text-[11px] font-semibold leading-tight text-[#F4F1EA] transition-colors hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] sm:justify-start sm:gap-2 sm:px-2.5 sm:py-2 sm:text-xs';
 
 /**
- * Left FAB stack: under accessibility, above Torna su
- * (cookie → a11y → chat → Torna su).
+ * ENN-213: independent left FAB (always visible) — not in «Strumenti» cluster.
+ * Mobile sits above the Strumenti toggle; desktop above Torna su in the stack.
  * Live chat via server `/api/chat` (Groq / Nina) when
  * `TAROTITALIACHATGENERICAGROQ_API_KEY` is set on Vercel; otherwise contacts only.
  * ENN-137: welcome (free) vs Nina Studio (Maggiori entitlement).
@@ -105,7 +105,6 @@ const linkClass =
  * panel remount + GtSafeBoundary so Studio tab cannot blank the site under GT.
  * ENN-165: panelKey includes googtrans lang; Groq history omits Italian seed;
  * seed never gets stale notranslate; lang re-read on send.
- * On mobile, only visible when «Strumenti» is open.
  */
 export function ChatFab() {
   const { i18n } = useTranslation('common');
@@ -134,7 +133,6 @@ export function ChatFab() {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
   const [showStudioCta, setShowStudioCta] = useState(false);
-  const fabVisible = useLeftToolFabVisible();
   const { isCompact, setToolsOpen } = useLeftToolsMenu();
   const entitlement = useCourseEntitlement('arcani-maggiori');
   const { getIdToken } = useAuth();
@@ -518,22 +516,21 @@ export function ChatFab() {
 
   return (
     <>
-      {fabVisible && (
-        <button
-          type="button"
-          onClick={() => {
-            setOpen((prev) => !prev);
-            if (isCompact) setToolsOpen(false);
-          }}
-          aria-label={titleLabel}
-          aria-expanded={open}
-          aria-controls={panelId}
-          title={titleLabel}
-          className="fixed bottom-[9.5rem] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[5.75rem] md:left-6"
-        >
-          <MessageCircle className="h-4 w-4" aria-hidden="true" />
-        </button>
-      )}
+      <button
+        type="button"
+        id="nina-chat-fab"
+        onClick={() => {
+          setOpen((prev) => !prev);
+          if (isCompact) setToolsOpen(false);
+        }}
+        aria-label={titleLabel}
+        aria-expanded={open}
+        aria-controls={panelId}
+        title={titleLabel}
+        className="fixed bottom-24 left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-[#151311]/92 text-[#D4AF37] shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md transition-colors hover:border-[#D4AF37] hover:bg-[#D4AF37]/15 hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] md:bottom-[5.75rem] md:left-6"
+      >
+        <MessageCircle className="h-4 w-4" aria-hidden="true" />
+      </button>
 
       {open && (
         <div
