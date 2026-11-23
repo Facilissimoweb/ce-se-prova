@@ -72,3 +72,5 @@ Vedi `.env.example`. Sintesi:
 | `ALLOW_DIRECT_UNLOCK=true` | Solo non-prod |
 
 La config client Firebase è in `firebase-applet-config.json`.
+In produzione puoi sovrascrivere solo il dominio Auth con `VITE_FIREBASE_AUTH_DOMAIN`
+(es. `auth.tarotitalia.com`, ENN-247) dopo DNS + Firebase Hosting custom domain.

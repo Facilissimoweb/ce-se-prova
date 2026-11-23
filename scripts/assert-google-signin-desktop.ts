@@ -1,6 +1,7 @@
 /**
  * Assert desktop Google sign-in prefers popup while authDomain is cross-origin
- * (firebaseapp.com vs www.tarotitalia.com). Regression guard for ENN-238 / #203.
+ * (firebaseapp.com or auth.tarotitalia.com vs www.tarotitalia.com).
+ * Regression guard for ENN-238 / #203 + ENN-247 custom auth domain.
  *
  * Usage: npx tsx scripts/assert-google-signin-desktop.ts
  */
@@ -10,6 +11,10 @@ import {
   shouldFallbackGoogleRedirect,
 } from '../src/lib/googleSignIn.ts';
 import { comingSoonCookieDomain } from '../src/lib/comingSoon.ts';
+import {
+  DEFAULT_FIREBASE_AUTH_DOMAIN,
+  resolveFirebaseAuthDomain,
+} from '../src/lib/firebaseClientConfig.ts';
 
 const failures: string[] = [];
 
@@ -26,9 +31,31 @@ assert(
 );
 
 assert(
+  canUseGoogleRedirectSafely('www.tarotitalia.com', 'auth.tarotitalia.com') ===
+    false,
+  'custom auth subdomain must NOT be redirect-safe vs www (still popup-first)'
+);
+
+assert(
   canUseGoogleRedirectSafely('www.tarotitalia.com', 'www.tarotitalia.com') ===
     true,
   'same-origin authDomain should be redirect-safe'
+);
+
+assert(
+  resolveFirebaseAuthDomain(undefined) === DEFAULT_FIREBASE_AUTH_DOMAIN,
+  'unset env must fall back to firebaseapp authDomain'
+);
+
+assert(
+  resolveFirebaseAuthDomain('auth.tarotitalia.com') === 'auth.tarotitalia.com',
+  'VITE_FIREBASE_AUTH_DOMAIN override must win'
+);
+
+assert(
+  resolveFirebaseAuthDomain('https://auth.tarotitalia.com/') ===
+    'auth.tarotitalia.com',
+  'authDomain override must strip protocol/path'
 );
 
 assert(
@@ -61,5 +88,5 @@ if (failures.length) {
 }
 
 console.log(
-  'OK: Google desktop sign-in stays popup-first while authDomain is cross-origin; Coming Soon cookie Domain hardened for www/apex.'
+  'OK: Google desktop sign-in stays popup-first while authDomain is cross-origin (firebaseapp or auth.tarotitalia.com); Coming Soon cookie Domain hardened for www/apex.'
 );
