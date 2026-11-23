@@ -178,6 +178,38 @@ html.a11y-reduce-motion .foglio-smeraldo {
 }
 
 /**
+ * ENN-240 — Desktop nav «Area personale» (compact amber glass).
+ * Distinct from green-gold Prenota; quieter than the mobile menu strip CTA.
+ */
+.desktop-nav-area-personale {
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.28),
+    rgba(234, 88, 12, 0.28)
+  );
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(253, 186, 116, 0.55);
+  box-shadow:
+    0 4px 16px rgba(234, 88, 12, 0.22),
+    inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  color: #fff7ed;
+  transition: filter 150ms ease;
+}
+
+.desktop-nav-area-personale:hover {
+  filter: brightness(1.08);
+}
+
+.desktop-nav-area-personale[aria-current='page'] {
+  border-color: rgba(253, 186, 116, 0.9);
+  box-shadow:
+    0 4px 16px rgba(234, 88, 12, 0.28),
+    inset 0 1px 1px rgba(255, 255, 255, 0.45),
+    0 0 0 1px rgba(253, 186, 116, 0.35);
+}
+
+/**
  * ENN-222 — Soft gold glass for Corsi/Dialogo in the mobile menu strip only.
  * Same family as crystal secondary: light border, blur, no 3D plastic relief.
  */

@@ -11,7 +11,6 @@ import {
   Menu,
   MessageCircle,
   Newspaper,
-  PhoneCall,
   ShieldCheck,
   Sparkles,
   User,
@@ -22,7 +21,6 @@ import type { ScreenId } from '../types/handoff';
 import { BLOG_CATEGORIES, type BlogCategory } from '../lib/blogPosts';
 import { blogCategorySearchParam } from '../lib/appPaths';
 import { afterNextPaint, scrollWindowTo } from '../lib/scrollNavigation';
-import { whatsappHref } from '../lib/siteContacts';
 import { GoogleTranslateWidget } from './GoogleTranslateWidget';
 import { GtCriticalLabel } from './GtCriticalLabel';
 import { TarotNavLogo } from './TarotEmblem';
@@ -39,7 +37,7 @@ interface TopBarProps {
 /** ENN-232 — exact Italian macro-area labels (nav + /news?category=). */
 const BLOG_NAV_CATEGORIES: readonly BlogCategory[] = BLOG_CATEGORIES;
 
-/** Desktop + mobile page links — Home → Contatti. Area personale stays a CTA below. */
+/** Desktop + mobile page links — Home → Contatti. Area personale is a desktop CTA + mobile strip. */
 const NAV_ITEM_DEFS: {
   id: ScreenId;
   labelKey: string;
@@ -317,9 +315,9 @@ export function TopBar({
             </span>
           </button>
 
-          {/* Zone 2: Desktop Single-Line Navigation Links */}
+          {/* Zone 2: Desktop Single-Line Navigation Links (ENN-240 — clearer weight vs Prenota) */}
           <nav
-            className="hidden md:flex items-center gap-4 lg:gap-6"
+            className="hidden md:flex items-center gap-3.5 lg:gap-6 xl:gap-7"
             aria-label={t('nav.aria')}
           >
             {navItems.map((item) => {
@@ -338,10 +336,10 @@ export function TopBar({
                       aria-haspopup="menu"
                       aria-controls="desktop-blog-submenu"
                       aria-current={isActive ? 'page' : undefined}
-                      className={`relative inline-flex items-center gap-1 py-2 text-xs lg:text-sm font-medium whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded ${
+                      className={`relative inline-flex items-center gap-1 py-2 text-[13px] lg:text-sm font-semibold tracking-[0.02em] whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded ${
                         isActive || desktopBlogOpen
                           ? 'text-[#D4AF37]'
-                          : 'text-[#A39B93] hover:text-[#F4F1EA]'
+                          : 'text-[#D4CFC7] hover:text-[#F4F1EA]'
                       }`}
                     >
                       {item.label}
@@ -353,7 +351,7 @@ export function TopBar({
                       />
                       {isActive && (
                         <span
-                          className="absolute left-0 right-0 bottom-0 h-[1.5px] bg-[#D4AF37]"
+                          className="absolute left-0 right-0 bottom-0 h-[2px] bg-[#D4AF37]"
                           aria-hidden="true"
                         />
                       )}
@@ -387,16 +385,16 @@ export function TopBar({
                   type="button"
                   onClick={() => onNavigate(item.id)}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`relative py-2 text-xs lg:text-sm font-medium whitespace-nowrap shrink-0 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded ${
+                  className={`relative py-2 text-[13px] lg:text-sm font-semibold tracking-[0.02em] whitespace-nowrap shrink-0 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded ${
                     isActive
                       ? 'text-[#D4AF37]'
-                      : 'text-[#A39B93] hover:text-[#F4F1EA]'
+                      : 'text-[#D4CFC7] hover:text-[#F4F1EA]'
                   }`}
                 >
                   {item.label}
                   {isActive && (
                     <span
-                      className="absolute left-0 right-0 bottom-0 h-[1.5px] bg-[#D4AF37]"
+                      className="absolute left-0 right-0 bottom-0 h-[2px] bg-[#D4AF37]"
                       aria-hidden="true"
                     />
                   )}
@@ -405,18 +403,31 @@ export function TopBar({
             })}
           </nav>
 
-          {/* Zone 3: Google Translate (ENN-140) + Primary CTA + Hamburger */}
+          {/* Zone 3: Google Translate (ENN-140) + Area personale + Prenota + Hamburger */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <GoogleTranslateWidget
               variant="header"
               onRequestConsent={onOpenPrivacy}
             />
+            {/* ENN-240: desktop Area personale (same route as mobile CTA); amber glass vs Prenota */}
+            <button
+              type="button"
+              data-nowrap-keep
+              onClick={() => onNavigate('area-riservata')}
+              aria-current={
+                activeScreen === 'area-riservata' ? 'page' : undefined
+              }
+              className="desktop-nav-area-personale hidden md:inline-flex px-2.5 lg:px-3 py-2 min-h-[40px] rounded-lg text-[13px] lg:text-sm font-semibold whitespace-nowrap shrink-0 items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FDBA74]"
+            >
+              <Lock className="w-3.5 h-3.5" aria-hidden="true" />
+              {t('nav.areaPersonale')}
+            </button>
             {/* ENN-160: text Prenota only from md+; mobile uses BookSessionFab */}
             <button
               type="button"
               data-nowrap-keep
               onClick={() => handleMobileSelect('booking')}
-              className="btn-primary hidden md:inline-flex px-4 py-2 min-h-[40px] rounded-lg text-sm font-semibold whitespace-nowrap shrink-0 items-center"
+              className="btn-primary hidden md:inline-flex px-3 lg:px-3.5 py-2 min-h-[40px] rounded-lg text-[13px] lg:text-sm font-semibold whitespace-nowrap shrink-0 items-center"
             >
               <GtCriticalLabel uiKey="bookConsult" />
             </button>
@@ -613,6 +624,11 @@ interface FloatingSideRailProps {
   showCmsKeys?: boolean;
 }
 
+/**
+ * ENN-240 — Desktop (xl+) quick tools only: booking + dialogo + privacy.
+ * Contacts live in StickyContactBar; Area personale lives in the top nav.
+ * Owner handoff stays gated (#204).
+ */
 export function FloatingSideRail({
   onNavigate,
   onOpenPrivacy,
@@ -637,15 +653,6 @@ export function FloatingSideRail({
       </button>
       <button
         type="button"
-        onClick={() => onNavigate('area-riservata')}
-        title={t('rail.reserved')}
-        aria-label={t('rail.reserved')}
-        className="w-11 h-11 rounded-full flex items-center justify-center text-[#F4F1EA] hover:text-[#D4AF37] hover:bg-[#D4AF37]/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
-      >
-        <Lock className="w-4 h-4" />
-      </button>
-      <button
-        type="button"
         onClick={() => onNavigate('chat')}
         title={t('rail.dialogo')}
         aria-label={t('rail.dialogo')}
@@ -653,18 +660,6 @@ export function FloatingSideRail({
       >
         <MessageCircle className="w-5 h-5" />
       </button>
-      <a
-        href={whatsappHref(
-          'Buongiorno Maria Teresa, desidero informazioni su un consulto Tarot Italia.'
-        )}
-        target="_blank"
-        rel="noopener noreferrer"
-        title={t('rail.whatsapp')}
-        aria-label={t('rail.whatsapp')}
-        className="w-11 h-11 rounded-full flex items-center justify-center text-[#A39B93] hover:text-[#D4AF37] hover:bg-[#D4AF37]/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
-      >
-        <PhoneCall className="w-4 h-4" />
-      </a>
       <div className="w-6 h-px bg-[#D4AF37]/25 my-0.5" aria-hidden="true" />
       <button
         type="button"

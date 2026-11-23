@@ -29,6 +29,11 @@ import { occupiedKey, type OccupiedSlot } from '../lib/bookingSlots.ts';
 import { fulfillConfirmedBooking } from '../lib/bookingFulfillment.ts';
 import { filterPublicPresentedBySlug } from '../lib/coursePresentation.ts';
 import { fetchGoogleBusySlotKeys } from '../lib/googleCalendar.ts';
+import {
+  isOwnerCourseAccessEmail,
+  ownerHasComplimentaryCourseAccess,
+} from '../lib/ownerCourseAccess.ts';
+import { MAGGIORI_PURCHASE_COURSE_SLUG } from '../lib/maggioriPurchaseMode.ts';
 import { ensureCatalogSeeded } from './courseCatalog.ts';
 
 export async function getOrCreateUser(
@@ -95,7 +100,18 @@ export async function getReservedAreaOverview(
         )
       );
 
-    const unlockedCourseIds = userPurchases.map((p) => p.courseId);
+    // ENN-240 — owner complimentary Maggiori unlock (no Stripe / purchase hold).
+    const ownerMaggioriUnlock = isOwnerCourseAccessEmail(email);
+    const maggioriCourse = ownerMaggioriUnlock
+      ? allCourses.find((c) => c.slug === MAGGIORI_PURCHASE_COURSE_SLUG)
+      : null;
+
+    const unlockedCourseIds = Array.from(
+      new Set([
+        ...userPurchases.map((p) => p.courseId),
+        ...(maggioriCourse ? [maggioriCourse.id] : []),
+      ])
+    );
 
     const allOutlineDispense = await db
       .select({
@@ -156,7 +172,9 @@ export async function getReservedAreaOverview(
       courses: filterPublicPresentedBySlug(
         allCourses.map((course) => {
           const purchase = userPurchases.find((p) => p.courseId === course.id);
-          const isUnlocked = Boolean(purchase);
+          const isUnlocked =
+            Boolean(purchase) ||
+            ownerHasComplimentaryCourseAccess(email, course.slug);
           const outline = allOutlineDispense.filter(
             (d) => d.courseId === course.id
           );
@@ -219,7 +237,8 @@ export async function findCourseBySlug(courseSlug: string) {
 
 /**
  * True when the Firebase user has an active `course_purchases` row for the slug
- * (same unlock signal as Area Riservata `isUnlocked` / gated blog).
+ * (same unlock signal as Area Riservata `isUnlocked` / gated blog),
+ * or owner complimentary Maggiori access (ENN-240).
  */
 export async function userOwnsCourse(params: {
   uid: string;
@@ -227,6 +246,9 @@ export async function userOwnsCourse(params: {
   courseSlug: string;
   displayName?: string | null;
 }): Promise<boolean> {
+  if (ownerHasComplimentaryCourseAccess(params.email, params.courseSlug)) {
+    return true;
+  }
   await ensureCatalogSeeded();
   const course = await findCourseBySlug(params.courseSlug);
   if (!course) return false;
@@ -561,21 +583,34 @@ export async function updateDispensaProgress(params: {
       throw new Error('Dispensa non trovata.');
     }
 
-    // Verifica possesso attivo del corso collegato
-    const purchaseRows = await db
-      .select()
-      .from(coursePurchases)
-      .where(
-        and(
-          eq(coursePurchases.userId, dbUser.id),
-          eq(coursePurchases.courseId, targetDispensa.courseId),
-          eq(coursePurchases.status, 'active')
-        )
-      )
+    // Verifica possesso attivo del corso collegato (o owner Maggiori — ENN-240)
+    const courseRows = await db
+      .select({ slug: courses.slug })
+      .from(courses)
+      .where(eq(courses.id, targetDispensa.courseId))
       .limit(1);
+    const courseSlug = courseRows[0]?.slug ?? '';
+    const ownerBypass = ownerHasComplimentaryCourseAccess(
+      params.email,
+      courseSlug
+    );
 
-    if (!purchaseRows[0]) {
-      throw new Error('Acquisto richiesto per accedere a questa dispensa.');
+    if (!ownerBypass) {
+      const purchaseRows = await db
+        .select()
+        .from(coursePurchases)
+        .where(
+          and(
+            eq(coursePurchases.userId, dbUser.id),
+            eq(coursePurchases.courseId, targetDispensa.courseId),
+            eq(coursePurchases.status, 'active')
+          )
+        )
+        .limit(1);
+
+      if (!purchaseRows[0]) {
+        throw new Error('Acquisto richiesto per accedere a questa dispensa.');
+      }
     }
 
     const existingRows = await db
