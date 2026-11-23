@@ -7,12 +7,19 @@ import React, {
   useState,
 } from 'react';
 import {
+  getRedirectResult,
   onAuthStateChanged,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
   type User,
 } from 'firebase/auth';
 import { auth, googleAuthProvider } from '../lib/firebase';
+import {
+  googleSignInErrorMessage,
+  preferGoogleRedirectSignIn,
+  shouldFallbackGoogleRedirect,
+} from '../lib/googleSignIn';
 import {
   RESERVED_DEMO_UID,
   isReservedDemoRequested,
@@ -63,6 +70,13 @@ function buildReservedDemoAuthUser(): User {
   } as User;
 }
 
+function authErrorCode(err: unknown): string {
+  if (typeof err === 'object' && err !== null && 'code' in err) {
+    return String((err as { code?: string }).code || '');
+  }
+  return '';
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -75,13 +89,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    let cancelled = false;
+
+    // Complete desktop redirect return (ENN-238) before/alongside auth listener.
+    void getRedirectResult(auth)
+      .then((result) => {
+        if (cancelled || !result?.user) return;
+        setUser(result.user);
+        notifyGoogleTranslateRefresh();
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        const code = authErrorCode(err);
+        if (code && code !== 'auth/popup-closed-by-user') {
+          setAuthError(googleSignInErrorMessage(code));
+        }
+      });
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
       // Post-login React mounts (Area Personale / corsi) need a GT re-scan (ENN-148).
       notifyGoogleTranslateRefresh();
     });
-    return () => unsubscribe();
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
   }, []);
 
   const clearAuthError = useCallback(() => {
@@ -91,26 +125,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = useCallback(async (): Promise<User | null> => {
     setAuthError(null);
     try {
+      // Desktop: full-page redirect avoids popup blockers / partitioned cookies.
+      if (preferGoogleRedirectSignIn()) {
+        await signInWithRedirect(auth, googleAuthProvider);
+        return null;
+      }
+
       const result = await signInWithPopup(auth, googleAuthProvider);
       setUser(result.user);
       notifyGoogleTranslateRefresh();
       return result.user;
     } catch (err: unknown) {
-      const code =
-        typeof err === 'object' && err !== null && 'code' in err
-          ? String((err as { code?: string }).code)
-          : '';
-      if (code === 'auth/popup-closed-by-user') {
-        setAuthError('Accesso annullato prima del completamento.');
-      } else if (code === 'auth/popup-blocked') {
-        setAuthError(
-          'Il browser ha bloccato la finestra di accesso. Consenti i popup per accedere con Google.'
-        );
-      } else {
-        setAuthError(
-          'Impossibile completare l’accesso con Google. Riprova tra qualche istante.'
-        );
+      const code = authErrorCode(err);
+
+      if (shouldFallbackGoogleRedirect(code)) {
+        try {
+          await signInWithRedirect(auth, googleAuthProvider);
+          return null;
+        } catch (redirectErr: unknown) {
+          setAuthError(googleSignInErrorMessage(authErrorCode(redirectErr) || code));
+          return null;
+        }
       }
+
+      setAuthError(googleSignInErrorMessage(code));
       return null;
     }
   }, []);

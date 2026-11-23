@@ -193,7 +193,7 @@ function cookieSigningMaterial(env) {
   if (env.password) return `pwd:${env.password}`;
   if (env.passwordHash) return `hash:${env.passwordHash}`;
   if (env.unlockToken) return `tok:${env.unlockToken}`;
-  const saRaw = process.env.FIREBASE_SERVICE_ACCOUNT || "";
+  const saRaw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim() || process.env.FIREBASE_SERVICE_ACCOUNT || "";
   if (saRaw) {
     try {
       const sa = JSON.parse(saRaw);
@@ -357,7 +357,7 @@ async function postComingSoonUnlockWithGoogle(input) {
     return {
       status: 503,
       body: {
-        error: "Impossibile creare la sessione di anteprima. Controlla FIREBASE_SERVICE_ACCOUNT su Vercel."
+        error: "Impossibile creare la sessione di anteprima. Controlla FIREBASE_SERVICE_ACCOUNT_JSON su Vercel."
       }
     };
   }

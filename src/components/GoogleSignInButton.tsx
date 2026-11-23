@@ -45,7 +45,7 @@ type GoogleSignInButtonProps = {
 /**
  * ENN-210 — Maria’s glass pill Google OAuth CTA (not gold, not rect 4px).
  * Light frosted glass + official G; readable on dark Tarot Italia UI.
- * Auth wiring stays with the caller (Firebase `signInWithPopup`).
+ * Auth wiring stays with the caller (Firebase popup / desktop redirect).
  */
 export function GoogleSignInButton({
   onClick,

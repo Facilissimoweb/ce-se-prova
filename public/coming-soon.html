@@ -675,13 +675,15 @@
       })();
     </script>
 
-    <!-- Owner Google unlock (ENN-95): Firebase client from CDN + existing applet config -->
+    <!-- Owner Google unlock (ENN-95 / ENN-238): Firebase + desktop redirect -->
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
       import {
         getAuth,
+        getRedirectResult,
         GoogleAuthProvider,
         signInWithPopup,
+        signInWithRedirect,
       } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
 
       const firebaseConfig = {
@@ -700,6 +702,67 @@
 
       const btn = document.getElementById('google-unlock');
       const errEl = document.getElementById('google-error');
+
+      function preferRedirect() {
+        try {
+          return !window.matchMedia('(pointer: coarse)').matches;
+        } catch {
+          return true;
+        }
+      }
+
+      function shouldFallbackRedirect(code) {
+        return (
+          code === 'auth/popup-blocked' ||
+          code === 'auth/cancelled-popup-request' ||
+          code === 'auth/operation-not-supported-in-this-environment' ||
+          code === 'auth/internal-error'
+        );
+      }
+
+      async function completeUnlock(idToken) {
+        const res = await fetch('/api/coming-soon/unlock', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          credentials: 'same-origin',
+          body: JSON.stringify({ idToken }),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (res.ok && body && body.ok) {
+          window.location.href = body.redirect || '/';
+          return true;
+        }
+        if (errEl) {
+          errEl.textContent =
+            (body && body.error) ||
+            'Accesso non autorizzato. Usa l’account Google dell’atelier.';
+        }
+        return false;
+      }
+
+      // Desktop redirect return: finish unlock after Google comes back.
+      try {
+        const redirectResult = await getRedirectResult(auth);
+        if (redirectResult && redirectResult.user) {
+          if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Accesso Google…';
+          }
+          const idToken = await redirectResult.user.getIdToken();
+          await completeUnlock(idToken);
+          if (btn) btn.disabled = false;
+        }
+      } catch (err) {
+        console.error('[coming-soon] Google redirect result failed', err);
+        if (errEl) {
+          errEl.textContent =
+            'Impossibile completare l’accesso Google. Riprova.';
+        }
+      }
+
       if (btn) {
         const labelHtml = btn.innerHTML;
         btn.addEventListener('click', async () => {
@@ -707,31 +770,31 @@
           btn.disabled = true;
           btn.textContent = 'Accesso Google…';
           try {
-            const result = await signInWithPopup(auth, provider);
-            const idToken = await result.user.getIdToken();
-            const res = await fetch('/api/coming-soon/unlock', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-              },
-              credentials: 'same-origin',
-              body: JSON.stringify({ idToken }),
-            });
-            const body = await res.json().catch(() => ({}));
-            if (res.ok && body && body.ok) {
-              window.location.href = body.redirect || '/';
+            if (preferRedirect()) {
+              await signInWithRedirect(auth, provider);
               return;
             }
-            if (errEl) {
-              errEl.textContent =
-                (body && body.error) ||
-                'Accesso non autorizzato. Usa l’account Google dell’atelier.';
-            }
+            const result = await signInWithPopup(auth, provider);
+            const idToken = await result.user.getIdToken();
+            await completeUnlock(idToken);
           } catch (err) {
             const code = err && err.code ? String(err.code) : '';
+            if (shouldFallbackRedirect(code)) {
+              try {
+                await signInWithRedirect(auth, provider);
+                return;
+              } catch (redirectErr) {
+                console.error(
+                  '[coming-soon] Google redirect fallback failed',
+                  redirectErr
+                );
+              }
+            }
             if (errEl) {
-              if (
+              if (code === 'auth/unauthorized-domain') {
+                errEl.textContent =
+                  'Dominio non autorizzato in Firebase. Aggiungi tarotitalia.com e www.tarotitalia.com.';
+              } else if (
                 code === 'auth/popup-closed-by-user' ||
                 code === 'auth/cancelled-popup-request'
               ) {
