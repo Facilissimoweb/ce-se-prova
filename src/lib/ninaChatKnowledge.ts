@@ -6,8 +6,10 @@
  * Minori cards: compiled FROM Maria’s packs (ENN-200 luce/ombra + ENN-201 domande) —
  * content/nina/arcani-minori-luce-ombra.md + arcani-minori-domande.md —
  * Studio companion only; public Minori catalog stays hidden.
- * Inject only matched cards per request (ENN-138 / ENN-200 / ENN-201). When knowledge changes:
- * `npx tsx scripts/build-nina-maggiori-cards.ts` / `build-nina-minori-cards.ts` then `npm run build:api`.
+ * Blog pack: compiled FROM content/blog draft:false posts (ENN-233) — Studio only;
+ * gated Maggiori bodies included because Studio unlock = Maggiori entitlement.
+ * Inject only matched cards/posts per request (ENN-138 / ENN-200 / ENN-201 / ENN-233).
+ * When knowledge changes: `npm run build:blog` + nina card/blog scripts, then `npm run build:api`.
  */
 
 import {
@@ -15,6 +17,11 @@ import {
   formatConsultTariffsMarkdownDetails,
   formatConsultTariffsMarkdownList,
 } from '../data/consultationTariffs.ts';
+import {
+  NINA_BLOG_CATALOG,
+  NINA_BLOG_POSTS_GENERATED,
+  type NinaBlogPostGenerated,
+} from '../data/ninaBlogPosts.generated.ts';
 import { NINA_MAGGIORI_CARDS_GENERATED } from '../data/ninaMaggioriCards.generated.ts';
 import {
   NINA_MINORI_CARDS_GENERATED,
@@ -434,4 +441,151 @@ export function looksLikeDeepMinoriStudy(params: {
   if (!hay.trim()) return false;
   if (selectMinoriCardsForText(hay).length > 0) return true;
   return DEEP_MINORI_CUES.test(hay);
+}
+
+/* -------------------------------------------------------------------------- */
+/* ENN-233 — Blog articles (published draft:false) for Nina Studio             */
+/* -------------------------------------------------------------------------- */
+
+export type NinaBlogPost = NinaBlogPostGenerated;
+
+export const NINA_BLOG_POSTS: readonly NinaBlogPost[] =
+  NINA_BLOG_POSTS_GENERATED;
+
+function formatBlogCatalogIndex(): string {
+  if (NINA_BLOG_CATALOG.length === 0) {
+    return '(Nessun articolo blog pubblicato in pack.)';
+  }
+  return NINA_BLOG_CATALOG.map((entry) => {
+    const cat = entry.category ? ` · ${entry.category}` : '';
+    const gate = entry.gated ? ' · Maggiori' : '';
+    return `- **${entry.title}**${cat}${gate} — ${entry.cite}`;
+  }).join('\n');
+}
+
+/** Always-on blog framing + catalog (titles/paths only). Bodies on-demand. */
+export const NINA_CHAT_BLOG_FRAME = `## Blog Tarot Italia — articoli pubblicati (Studio)
+
+Fonte: \`content/blog/\` compilato a build (\`draft: false\` only). Gli articoli **gated** Maggiori sono inclusi perché Nina Studio è sbloccata con l’acquisto Maggiori. Il Blog **estende** la dispensa, non la sostituisce.
+
+Usa SOLO i pezzi iniettati sotto (se presenti) e il catalogo titoli. **Cita** titolo + path \`/news/…\`. Non inventare fatti storici, date, biografie o iconografia assenti dal pack. Se manca il pezzo, invita a nominare titolo/categoria o a leggere l’articolo sul Blog.
+
+Catalogo (titolo · categoria · path):
+${formatBlogCatalogIndex()}`;
+
+/** Blog is denser than cards — inject at most 2 compact bodies per turn. */
+const MAX_INJECTED_BLOG = 2;
+
+const BLOG_STUDY_CUES =
+  /\b(blog|articolo|articoli|approfondiment\w*|pixie|pamela|colman\s+smith|rider[\s-]?waite|origine\s+segreta|golden\s+dawn|news\/)/;
+
+/** Single-token arcana names Maggiori cards already cover — need blog cue or stronger alias. */
+const WEAK_ARCANA_ALIAS = new Set([
+  'matto',
+  'bagatto',
+  'mago',
+  'giustizia',
+  'papessa',
+  'imperatrice',
+  'imperatore',
+  'papa',
+  'amanti',
+  'carro',
+  'eremita',
+  'diavolo',
+  'torre',
+  'luna',
+  'sole',
+  'mondo',
+]);
+
+/**
+ * Match published blog posts by title/slug/tag aliases + light study cues.
+ * Caps at MAX_INJECTED_BLOG. Weak single-token Maggiori overlaps alone do not inject
+ * (schede Maggiori remain primary for «com’è il Matto?»); blog cue or stronger alias does.
+ */
+export function selectBlogPostsForText(text: string): NinaBlogPost[] {
+  const hay = normalizeForMatch(text);
+  if (!hay.trim()) return [];
+  const blogCue = BLOG_STUDY_CUES.test(hay);
+
+  const scored: Array<{ post: NinaBlogPost; score: number; strong: boolean }> =
+    [];
+  for (const post of NINA_BLOG_POSTS) {
+    let score = 0;
+    let strong = false;
+    for (const alias of post.aliases) {
+      const needle = normalizeForMatch(alias);
+      if (!needle || needle.length < 3) continue;
+      let hit = false;
+      if (needle.includes(' ') || needle.includes('-')) {
+        hit = hay.includes(needle.replace(/-/g, ' ')) || hay.includes(needle);
+      } else {
+        hit = new RegExp(
+          `(?:^|[^a-z0-9])${escapeRegExp(needle)}(?:[^a-z0-9]|$)`
+        ).test(hay);
+      }
+      if (!hit) continue;
+      score += Math.min(needle.length, 24);
+      const isWeakArcana =
+        !needle.includes(' ') &&
+        !needle.includes('-') &&
+        WEAK_ARCANA_ALIAS.has(needle);
+      if (!isWeakArcana) strong = true;
+    }
+    if (score <= 0) continue;
+    // Drop Maggiori-only weak hits unless the user asked for blog/approfondimento.
+    if (!strong && !blogCue) continue;
+    scored.push({ post, score, strong });
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+  let picked = scored.slice(0, MAX_INJECTED_BLOG).map((s) => s.post);
+
+  // Category-only ask («parlami degli articoli Autori / Storia») when no title hit.
+  if (picked.length === 0 && blogCue) {
+    const byCategory = NINA_BLOG_POSTS.filter((p) => {
+      if (!p.category) return false;
+      const cat = normalizeForMatch(p.category);
+      return cat.length >= 4 && hay.includes(cat);
+    });
+    picked = byCategory.slice(0, MAX_INJECTED_BLOG);
+  }
+
+  return picked;
+}
+
+export function formatBlogKnowledgeForPosts(
+  posts: readonly NinaBlogPost[]
+): string {
+  if (posts.length === 0) {
+    return `${NINA_CHAT_BLOG_FRAME}
+
+(Nessun corpo articolo iniettato in questo turno: se chiedono un pezzo del Blog, invita a nominare titolo, categoria o path \`/news/…\` e usa solo il catalogo — senza inventare.)`;
+  }
+  const bodies = posts
+    .map(
+      (p) =>
+        `### ${p.title}\n- **Fonte**: Blog · ${p.cite}${p.gated ? ' (Maggiori)' : ''}\n- **Sintesi pack**: ${p.body}`
+    )
+    .join('\n\n');
+  return `${NINA_CHAT_BLOG_FRAME}
+
+### Articoli iniettati per questa conversazione
+${bodies}`;
+}
+
+export function buildBlogKnowledgeForMessages(params: {
+  message: string;
+  history?: Array<{ role: string; content: string }>;
+}): string {
+  const parts = [params.message];
+  const history = params.history ?? [];
+  for (const turn of history.slice(-6)) {
+    if (typeof turn.content === 'string' && turn.content.trim()) {
+      parts.push(turn.content);
+    }
+  }
+  const posts = selectBlogPostsForText(parts.join('\n'));
+  return formatBlogKnowledgeForPosts(posts);
 }

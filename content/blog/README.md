@@ -69,8 +69,9 @@ Lo slug promo ENN-131 `primo-settenario-mappa-identita` reindirizza al pezzo Mat
 5. In locale: `npm run build:blog` (anche automatico in `npm run build` / Vite). Poi commit di:
    - `content/blog/il-mio-titolo.md`
    - `src/data/blogPosts.generated.ts` (rigenerato)
-   - `api/news.js` se hai lanciato `npm run build:api`
-6. Dopo il merge su `main`, Vercel fa redeploy: il pezzo è live.
+   - `src/data/ninaBlogPosts.generated.ts` se hai lanciato `npm run build:nina-blog` / `build:api` (pack Nina Studio)
+   - `api/news.js` / `api/chat.js` se hai lanciato `npm run build:api`
+6. Dopo il merge su `main`, Vercel fa redeploy: il pezzo è live **e** Nina Studio aggiorna la conoscenza blog (nessun re-ingest manuale). Dettaglio: nota Project `docs/nina-studio-blog-knowledge.md`.
 
 ## Alias URL
 
