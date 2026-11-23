@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { pathForScreen } from '../lib/appPaths';
 import { getSiteOrigin, pageTitleForScreen } from '../lib/seo';
+import { toPublicAbsoluteUrl } from '../lib/siteOrigin';
 import type { ScreenId } from '../types/handoff';
 
 type Props = {
@@ -89,10 +90,10 @@ export function SocialShareButtons({
     const origin = getSiteOrigin();
     let path = '/';
     if (urlProp) {
-      // absolute or path
+      // absolute or path — rewrite *.vercel.app to brand origin (ENN-244)
       try {
-        const parsed = new URL(urlProp, origin || 'https://example.invalid');
-        path = parsed.pathname + parsed.search;
+        const parsed = new URL(urlProp, origin || 'https://tarotitalia.com');
+        path = parsed.pathname + parsed.search + parsed.hash;
       } catch {
         path = urlProp.startsWith('/') ? urlProp : `/${urlProp}`;
       }
@@ -107,12 +108,8 @@ export function SocialShareButtons({
       path = window.location.pathname;
     }
 
-    const url =
-      urlProp && /^https?:\/\//i.test(urlProp)
-        ? urlProp
-        : origin
-          ? `${origin}${path}`
-          : path;
+    // Always build from getSiteOrigin() so WA/TG/FB never share *.vercel.app.
+    const url = toPublicAbsoluteUrl(urlProp || path, origin);
     const title =
       titleProp ||
       (activeScreen ? pageTitleForScreen(activeScreen) : 'Tarot Italia');

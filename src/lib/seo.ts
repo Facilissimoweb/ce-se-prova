@@ -18,6 +18,14 @@ import {
 import { isCoursePubliclyPresented } from './coursePresentation';
 import { GT_ENABLED } from './googleTranslateEnabled';
 import { SITE_EMAIL, SITE_PHONE_E164, SITE_PIVA } from './siteContacts';
+import { resolveClientSiteOrigin, toPublicAbsoluteUrl } from './siteOrigin';
+
+export {
+  PRODUCTION_SITE_ORIGIN,
+  isVercelAppOrigin,
+  resolveClientSiteOrigin,
+  toPublicAbsoluteUrl,
+} from './siteOrigin';
 
 /** Default brand strings (also used as index.html fallbacks). */
 export const SEO_SITE_NAME = 'Tarot Italia';
@@ -176,45 +184,23 @@ export function pageTitleForScreen(screen: ScreenId): string {
   return pageSeoForScreen(screen).title;
 }
 
-/** Production canonical (ENN-198). Never bake *.vercel.app into public SEO. */
-export const PRODUCTION_SITE_ORIGIN = 'https://tarotitalia.com';
-
-function isVercelAppOrigin(value: string): boolean {
-  try {
-    const host = new URL(
-      value.includes('://') ? value : `https://${value}`
-    ).hostname.toLowerCase();
-    return host === 'vercel.app' || host.endsWith('.vercel.app');
-  } catch {
-    return /\.vercel\.app$/i.test(value.replace(/\/$/, ''));
-  }
-}
-
 /**
- * Public origin for absolute SEO URLs (canonical, OG).
+ * Public origin for absolute SEO / share URLs (canonical, OG, WA/TG/FB).
  * Prefer `VITE_SITE_ORIGIN` when it is the brand host (not *.vercel.app).
- * Runtime fallback: `window.location.origin` on the custom domain; ignore a
- * mis-set VITE_SITE_ORIGIN that still points at ce-se-prova.vercel.app.
+ * Runtime fallback: custom domain / localhost — never *.vercel.app (ENN-244).
  */
 export function getSiteOrigin(): string {
-  const fromEnv = import.meta.env.VITE_SITE_ORIGIN?.trim();
-  if (fromEnv && !isVercelAppOrigin(fromEnv)) {
-    try {
-      return new URL(fromEnv).origin;
-    } catch {
-      return fromEnv.replace(/\/$/, '');
-    }
-  }
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return window.location.origin;
-  }
-  return PRODUCTION_SITE_ORIGIN;
+  return resolveClientSiteOrigin({
+    envOrigin: import.meta.env.VITE_SITE_ORIGIN,
+    windowOrigin:
+      typeof window !== 'undefined' ? window.location?.origin : undefined,
+  });
 }
 
 export function absoluteUrl(path: string, origin = getSiteOrigin()): string {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   if (!origin) return normalizedPath;
-  return `${origin.replace(/\/$/, '')}${normalizedPath}`;
+  return toPublicAbsoluteUrl(normalizedPath, origin);
 }
 
 export function canonicalPathForScreen(screen: ScreenId): string {
