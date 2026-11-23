@@ -46,7 +46,7 @@ var init_consultationTariffs = __esm({
       tariffWithParagraphs({
         id: "20m",
         durationMinutes: 20,
-        priceEur: 19,
+        priceEur: 22,
         stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_20M",
         cmsKeyTitle: "[COPY: tariffa.placeholder.0.title]",
         title: "Consulto Breve",
@@ -67,7 +67,7 @@ var init_consultationTariffs = __esm({
       tariffWithParagraphs({
         id: "45m",
         durationMinutes: 45,
-        priceEur: 50,
+        priceEur: 49,
         stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_45M",
         cmsKeyTitle: "[COPY: tariffa.placeholder.1.title]",
         title: "Consulto Essenziale",
@@ -87,7 +87,7 @@ var init_consultationTariffs = __esm({
       tariffWithParagraphs({
         id: "60m",
         durationMinutes: 60,
-        priceEur: 75,
+        priceEur: 79,
         stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_60M",
         cmsKeyTitle: "[COPY: tariffa.placeholder.2.title]",
         title: "Consulto Evolutivo Completo",
@@ -108,7 +108,7 @@ var init_consultationTariffs = __esm({
       tariffWithParagraphs({
         id: "90m",
         durationMinutes: 90,
-        priceEur: 90,
+        priceEur: 99,
         stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_90M",
         cmsKeyTitle: "[COPY: tariffa.placeholder.3.title]",
         title: "Sessione Integrata",
@@ -10202,6 +10202,42 @@ var init_coursePresentation = __esm({
   }
 });
 
+// src/lib/maggioriPurchaseMode.ts
+var MAGGIORI_PURCHASE_COURSE_SLUG;
+var init_maggioriPurchaseMode = __esm({
+  "src/lib/maggioriPurchaseMode.ts"() {
+    MAGGIORI_PURCHASE_COURSE_SLUG = "arcani-maggiori";
+  }
+});
+
+// src/lib/ownerCourseAccess.ts
+function parseOwnerEmailExtras(raw) {
+  if (!raw?.trim()) return [];
+  return raw.split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+}
+function isOwnerCourseAccessEmail(email, env = process.env) {
+  const normalized = (email || "").trim().toLowerCase();
+  if (!normalized) return false;
+  if (OWNER_COURSE_ACCESS_EMAILS.includes(normalized)) {
+    return true;
+  }
+  return parseOwnerEmailExtras(env.COMING_SOON_OWNER_EMAILS).includes(
+    normalized
+  );
+}
+function ownerHasComplimentaryCourseAccess(email, courseSlug, env = process.env) {
+  return isOwnerCourseAccessEmail(email, env) && courseSlug === MAGGIORI_PURCHASE_COURSE_SLUG;
+}
+var OWNER_COURSE_ACCESS_EMAILS;
+var init_ownerCourseAccess = __esm({
+  "src/lib/ownerCourseAccess.ts"() {
+    init_maggioriPurchaseMode();
+    OWNER_COURSE_ACCESS_EMAILS = [
+      "mariateresarogani@gmail.com"
+    ];
+  }
+});
+
 // src/db/repository.ts
 var repository_exports = {};
 __export(repository_exports, {
@@ -10270,7 +10306,14 @@ async function getReservedAreaOverview(uid, email, displayName) {
         eq(coursePurchases.status, "active")
       )
     );
-    const unlockedCourseIds = userPurchases.map((p) => p.courseId);
+    const ownerMaggioriUnlock = isOwnerCourseAccessEmail(email);
+    const maggioriCourse = ownerMaggioriUnlock ? allCourses.find((c) => c.slug === MAGGIORI_PURCHASE_COURSE_SLUG) : null;
+    const unlockedCourseIds = Array.from(
+      /* @__PURE__ */ new Set([
+        ...userPurchases.map((p) => p.courseId),
+        ...maggioriCourse ? [maggioriCourse.id] : []
+      ])
+    );
     const allOutlineDispense = await db.select({
       id: dispense.id,
       courseId: dispense.courseId,
@@ -10300,7 +10343,7 @@ async function getReservedAreaOverview(uid, email, displayName) {
       courses: filterPublicPresentedBySlug(
         allCourses.map((course) => {
           const purchase = userPurchases.find((p) => p.courseId === course.id);
-          const isUnlocked = Boolean(purchase);
+          const isUnlocked = Boolean(purchase) || ownerHasComplimentaryCourseAccess(email, course.slug);
           const outline = allOutlineDispense.filter(
             (d) => d.courseId === course.id
           );
@@ -10353,6 +10396,9 @@ async function findCourseBySlug(courseSlug) {
   return courseRows[0] ?? null;
 }
 async function userOwnsCourse(params) {
+  if (ownerHasComplimentaryCourseAccess(params.email, params.courseSlug)) {
+    return true;
+  }
   await ensureCatalogSeeded();
   const course = await findCourseBySlug(params.courseSlug);
   if (!course) return false;
@@ -10563,15 +10609,23 @@ async function updateDispensaProgress(params) {
     if (!targetDispensa) {
       throw new Error("Dispensa non trovata.");
     }
-    const purchaseRows = await db.select().from(coursePurchases).where(
-      and(
-        eq(coursePurchases.userId, dbUser.id),
-        eq(coursePurchases.courseId, targetDispensa.courseId),
-        eq(coursePurchases.status, "active")
-      )
-    ).limit(1);
-    if (!purchaseRows[0]) {
-      throw new Error("Acquisto richiesto per accedere a questa dispensa.");
+    const courseRows = await db.select({ slug: courses.slug }).from(courses).where(eq(courses.id, targetDispensa.courseId)).limit(1);
+    const courseSlug = courseRows[0]?.slug ?? "";
+    const ownerBypass = ownerHasComplimentaryCourseAccess(
+      params.email,
+      courseSlug
+    );
+    if (!ownerBypass) {
+      const purchaseRows = await db.select().from(coursePurchases).where(
+        and(
+          eq(coursePurchases.userId, dbUser.id),
+          eq(coursePurchases.courseId, targetDispensa.courseId),
+          eq(coursePurchases.status, "active")
+        )
+      ).limit(1);
+      if (!purchaseRows[0]) {
+        throw new Error("Acquisto richiesto per accedere a questa dispensa.");
+      }
     }
     const existingRows = await db.select().from(dispensaProgress).where(
       and(
@@ -10964,6 +11018,8 @@ var init_repository = __esm({
     init_bookingFulfillment();
     init_coursePresentation();
     init_googleCalendar();
+    init_ownerCourseAccess();
+    init_maggioriPurchaseMode();
     init_courseCatalog();
     FREE_TRIAL_SECONDS = 300;
     DIALOGUE_PACK_CATALOG = {

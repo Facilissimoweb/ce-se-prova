@@ -17,15 +17,15 @@ function tariffWithParagraphs(
 }
 
 /**
- * Canon listino consulti (ENN-192) — unica fonte per UI, booking catalog, SEO e Nina.
- * Fonte copy: Nuovi prezzi per consulti.pdf (Maria Teresa Rogani).
+ * Canon listino consulti — unica fonte per UI, booking catalog, SEO e Nina.
+ * Soft scale (option 2): Breve €22 · Essenziale €49 · Evolutivo €79 · Integrata €99 (IVA inclusa).
  * ENN-195: lead copy as short paragraphs for readable package cards.
  */
 export const consultationTariffs: ConsultationTariff[] = [
   tariffWithParagraphs({
     id: '20m',
     durationMinutes: 20,
-    priceEur: 19,
+    priceEur: 22,
     stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_20M',
     cmsKeyTitle: '[COPY: tariffa.placeholder.0.title]',
     title: 'Consulto Breve',
@@ -46,7 +46,7 @@ export const consultationTariffs: ConsultationTariff[] = [
   tariffWithParagraphs({
     id: '45m',
     durationMinutes: 45,
-    priceEur: 50,
+    priceEur: 49,
     stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_45M',
     cmsKeyTitle: '[COPY: tariffa.placeholder.1.title]',
     title: 'Consulto Essenziale',
@@ -66,7 +66,7 @@ export const consultationTariffs: ConsultationTariff[] = [
   tariffWithParagraphs({
     id: '60m',
     durationMinutes: 60,
-    priceEur: 75,
+    priceEur: 79,
     stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_60M',
     cmsKeyTitle: '[COPY: tariffa.placeholder.2.title]',
     title: 'Consulto Evolutivo Completo',
@@ -87,7 +87,7 @@ export const consultationTariffs: ConsultationTariff[] = [
   tariffWithParagraphs({
     id: '90m',
     durationMinutes: 90,
-    priceEur: 90,
+    priceEur: 99,
     stripePriceIdAnnotation: 'STRIPE_PRICE_ID_CONSULTO_90M',
     cmsKeyTitle: '[COPY: tariffa.placeholder.3.title]',
     title: 'Sessione Integrata',

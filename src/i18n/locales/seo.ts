@@ -20,9 +20,9 @@ const en: Partial<Record<ScreenId, PageSeoStrings>> = {
       'Training and path of Maria Teresa Rogani, Holistic Practitioner: symbolic and evolutive Tarot method, ethics and listening.',
   },
   consulti: {
-    title: 'Readings — Tarot Italia · €19 / €50 / €75 / €90',
+    title: 'Readings — Tarot Italia · €22 / €49 / €79 / €99',
     description:
-      'Readings with Maria Teresa Rogani (VAT included): Short 20′ €19 (online only), Essential 45′ €50, Evolutive 60′ €75, Integrated 90′ €90. Major and Minor Arcana in every session. Book with Stripe on site; live reading on WhatsApp voice.',
+      'Readings with Maria Teresa Rogani (VAT included): Short 20′ €22 (online only), Essential 45′ €49, Evolutive 60′ €79, Integrated 90′ €99. Major and Minor Arcana in every session. Book with Stripe on site; live reading on WhatsApp voice.',
   },
   corsi: {
     title: 'Courses — Tarot Italia · Major Arcana',
@@ -32,7 +32,7 @@ const en: Partial<Record<ScreenId, PageSeoStrings>> = {
   booking: {
     title: 'Book a Reading — Tarot Italia',
     description:
-      'Choose duration (€19 / €50 / €75 / €90 VAT included), day and time; pay with Stripe Checkout on the site. Live reading on WhatsApp voice, or in person in Macerata (Via Crispi 37; from 19:00 online only).',
+      'Choose duration (€22 / €49 / €79 / €99 VAT included), day and time; pay with Stripe Checkout on the site. Live reading on WhatsApp voice, or in person in Macerata (Via Crispi 37; from 19:00 online only).',
   },
   chat: {
     title: 'Tarot Dialogue — Tarot Italia',
@@ -67,9 +67,9 @@ const es: Partial<Record<ScreenId, PageSeoStrings>> = {
       'Tarot Italia de Maria Teresa Rogani, operadora holística. Consultas simbólicas, evolutivas y previsionales de Tarot para leer presente y futuro respetando el código deontológico.',
   },
   consulti: {
-    title: 'Consultas — Tarot Italia · €19 / €50 / €75 / €90',
+    title: 'Consultas — Tarot Italia · €22 / €49 / €79 / €99',
     description:
-      'Consultas con Maria Teresa Rogani (IVA incluida): Breve 20′ €19 (solo en línea), Esencial 45′ €50, Evolutiva 60′ €75, Integrada 90′ €90. Arcanos Mayores y Menores en cada sesión. Reserva con Stripe en el sitio; lectura en voz por WhatsApp.',
+      'Consultas con Maria Teresa Rogani (IVA incluida): Breve 20′ €22 (solo en línea), Esencial 45′ €49, Evolutiva 60′ €79, Integrada 90′ €99. Arcanos Mayores y Menores en cada sesión. Reserva con Stripe en el sitio; lectura en voz por WhatsApp.',
   },
   corsi: {
     title: 'Cursos — Tarot Italia · Arcanos Mayores',
@@ -79,7 +79,7 @@ const es: Partial<Record<ScreenId, PageSeoStrings>> = {
   booking: {
     title: 'Reservar consulta — Tarot Italia',
     description:
-      'Elige duración (€19 / €50 / €75 / €90 IVA incluida), día y hora; paga con Stripe Checkout en el sitio. Lectura en voz por WhatsApp o en persona en Macerata (Via Crispi 37; desde las 19:00 solo en línea).',
+      'Elige duración (€22 / €49 / €79 / €99 IVA incluida), día y hora; paga con Stripe Checkout en el sitio. Lectura en voz por WhatsApp o en persona en Macerata (Via Crispi 37; desde las 19:00 solo en línea).',
   },
 };
 
@@ -90,9 +90,9 @@ const fr: Partial<Record<ScreenId, PageSeoStrings>> = {
       'Tarot Italia de Maria Teresa Rogani, opératrice holistique. Consultations symboliques, évolutives et prévisionnelles du Tarot pour lire présent et futur dans le respect du code déontologique.',
   },
   consulti: {
-    title: 'Consultations — Tarot Italia · €19 / €50 / €75 / €90',
+    title: 'Consultations — Tarot Italia · €22 / €49 / €79 / €99',
     description:
-      'Consultations avec Maria Teresa Rogani (TVA incluse) : Brève 20′ €19 (uniquement en ligne), Essentielle 45′ €50, Évolutive 60′ €75, Intégrée 90′ €90. Arcanes Majeurs et Mineurs à chaque séance. Réservation Stripe sur le site ; lecture en voix WhatsApp.',
+      'Consultations avec Maria Teresa Rogani (TVA incluse) : Brève 20′ €22 (uniquement en ligne), Essentielle 45′ €49, Évolutive 60′ €79, Intégrée 90′ €99. Arcanes Majeurs et Mineurs à chaque séance. Réservation Stripe sur le site ; lecture en voix WhatsApp.',
   },
   corsi: {
     title: 'Cours — Tarot Italia · Arcanes Majeurs',
@@ -102,7 +102,7 @@ const fr: Partial<Record<ScreenId, PageSeoStrings>> = {
   booking: {
     title: 'Réserver une consultation — Tarot Italia',
     description:
-      'Choisissez durée (€19 / €50 / €75 / €90 TVA incluse), jour et horaire ; payez avec Stripe Checkout sur le site. Lecture en voix WhatsApp ou en personne à Macerata (Via Crispi 37 ; à partir de 19:00 uniquement en ligne).',
+      'Choisissez durée (€22 / €49 / €79 / €99 TVA incluse), jour et horaire ; payez avec Stripe Checkout sur le site. Lecture en voix WhatsApp ou en personne à Macerata (Via Crispi 37 ; à partir de 19:00 uniquement en ligne).',
   },
 };
 
@@ -113,9 +113,9 @@ const de: Partial<Record<ScreenId, PageSeoStrings>> = {
       'Tarot Italia von Maria Teresa Rogani, holistische Praktikerin. Symbolische, evolutive und vorausschauende Tarot-Beratung, um Gegenwart und Zukunft unter Achtung des berufsethischen Kodex zu lesen.',
   },
   consulti: {
-    title: 'Beratungen — Tarot Italia · €19 / €50 / €75 / €90',
+    title: 'Beratungen — Tarot Italia · €22 / €49 / €79 / €99',
     description:
-      'Beratungen mit Maria Teresa Rogani (inkl. MwSt.): Kurz 20′ €19 (nur online), Essenziell 45′ €50, Evolutiv 60′ €75, Integriert 90′ €90. Große und Kleine Arkana in jeder Sitzung. Buchung per Stripe auf der Website; Live-Reading per WhatsApp-Sprachanruf.',
+      'Beratungen mit Maria Teresa Rogani (inkl. MwSt.): Kurz 20′ €22 (nur online), Essenziell 45′ €49, Evolutiv 60′ €79, Integriert 90′ €99. Große und Kleine Arkana in jeder Sitzung. Buchung per Stripe auf der Website; Live-Reading per WhatsApp-Sprachanruf.',
   },
   corsi: {
     title: 'Kurse — Tarot Italia · Große Arkana',
@@ -125,7 +125,7 @@ const de: Partial<Record<ScreenId, PageSeoStrings>> = {
   booking: {
     title: 'Beratung buchen — Tarot Italia',
     description:
-      'Wählen Sie Dauer (€19 / €50 / €75 / €90 inkl. MwSt.), Tag und Uhrzeit; zahlen Sie per Stripe Checkout auf der Website. Live-Reading per WhatsApp-Sprachanruf oder vor Ort in Macerata (Via Crispi 37; ab 19:00 nur online).',
+      'Wählen Sie Dauer (€22 / €49 / €79 / €99 inkl. MwSt.), Tag und Uhrzeit; zahlen Sie per Stripe Checkout auf der Website. Live-Reading per WhatsApp-Sprachanruf oder vor Ort in Macerata (Via Crispi 37; ab 19:00 nur online).',
   },
 };
 

@@ -34,7 +34,7 @@ assert(
   'welcome prices prompt has no Matto card body'
 );
 assert(
-  welcomePrices.includes('€19') && welcomePrices.includes('WhatsApp'),
+  welcomePrices.includes('€22') && welcomePrices.includes('WhatsApp'),
   'welcome keeps prices + WhatsApp'
 );
 assert(
