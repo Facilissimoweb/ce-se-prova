@@ -44,12 +44,55 @@
     /* Keep content clear of notch / home-indicator without shifting layout */
     padding-left: env(safe-area-inset-left, 0px);
     padding-right: env(safe-area-inset-right, 0px);
+    /* ENN-245 — raise the bar on casual text copy (forms re-enabled below) */
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   #root {
     overflow-x: clip;
     max-width: 100%;
     min-height: 100dvh;
+  }
+
+  /*
+   * ENN-245 — allow selection/typing in real form controls and explicit opt-ins.
+   * Booking, login, chat, notes, Dialogo inputs must keep normal paste/edit.
+   */
+  input,
+  textarea,
+  select,
+  [contenteditable='true'],
+  [contenteditable=''],
+  .ti-allow-select {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* ENN-245 — discourage image drag-save; JS also sets draggable=false */
+  img,
+  picture,
+  video {
+    -webkit-user-drag: none;
+    user-drag: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /*
+   * Optional media guard: wrap hero/product media when a transparent hit layer
+   * is useful. Does not replace CSS/JS protections; keeps clicks on the parent.
+   */
+  .ti-media-guard {
+    position: relative;
+    display: block;
+  }
+
+  .ti-media-guard > .ti-media-guard-hit {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: transparent;
   }
 }
 

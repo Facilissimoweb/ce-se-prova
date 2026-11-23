@@ -46,6 +46,7 @@ export function ResilientImage({
     <img
       src={src}
       alt={alt}
+      draggable={false}
       referrerPolicy="no-referrer"
       onError={() => setHasError(true)}
       className={className}

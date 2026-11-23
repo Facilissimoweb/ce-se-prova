@@ -122,6 +122,7 @@ export function HomeArticlesLoop({ onNavigate }: Props) {
                     <img
                       src={current.imageUrl}
                       alt=""
+                      draggable={false}
                       className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                       loading="lazy"
                     />
