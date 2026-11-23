@@ -35,6 +35,7 @@ import {
 } from '../lib/ownerCourseAccess.ts';
 import { MAGGIORI_PURCHASE_COURSE_SLUG } from '../lib/maggioriPurchaseMode.ts';
 import { ensureCatalogSeeded } from './courseCatalog.ts';
+import { notifyAdminOfNewSignup } from '../lib/signupNotify.ts';
 
 export async function getOrCreateUser(
   uid: string,
@@ -42,24 +43,50 @@ export async function getOrCreateUser(
   displayName?: string | null
 ) {
   try {
-    const result = await db
+    // ENN-250 — insert-first so we know when a uid is brand-new (one notify).
+    // Concurrent first hits: only the winning insert returns a row.
+    const inserted = await db
       .insert(users)
       .values({
         uid,
         email,
         displayName: displayName ?? null,
       })
-      .onConflictDoUpdate({
-        target: users.uid,
-        set: {
-          email,
-          ...(displayName ? { displayName } : {}),
-          updatedAt: new Date(),
-        },
-      })
+      .onConflictDoNothing({ target: users.uid })
       .returning();
 
-    return result[0];
+    if (inserted[0]) {
+      void notifyAdminOfNewSignup(inserted[0]).catch((error) => {
+        console.error('signup notify (post-insert)', error);
+      });
+      return inserted[0];
+    }
+
+    const updated = await db
+      .update(users)
+      .set({
+        email,
+        ...(displayName ? { displayName } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(users.uid, uid))
+      .returning();
+
+    if (updated[0]) {
+      return updated[0];
+    }
+
+    // Rare race: conflict then row missing — fall back to select.
+    const existing = await db
+      .select()
+      .from(users)
+      .where(eq(users.uid, uid))
+      .limit(1);
+    if (existing[0]) {
+      return existing[0];
+    }
+
+    throw new Error('Utente non trovato dopo upsert.');
   } catch (error) {
     if (isDbConnectionFailure(error)) {
       // Spotty Vercel↔Supabase connects: drop the poisoned pool so the next
