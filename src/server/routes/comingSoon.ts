@@ -153,7 +153,7 @@ export async function postComingSoonUnlockWithGoogle(input: {
       status: 503,
       body: {
         error:
-          'Impossibile creare la sessione di anteprima. Controlla FIREBASE_SERVICE_ACCOUNT su Vercel.',
+          'Impossibile creare la sessione di anteprima. Controlla FIREBASE_SERVICE_ACCOUNT_JSON su Vercel.',
       },
     };
   }

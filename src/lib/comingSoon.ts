@@ -251,7 +251,11 @@ function cookieSigningMaterial(env: ComingSoonEnv): string | null {
   if (env.password) return `pwd:${env.password}`;
   if (env.passwordHash) return `hash:${env.passwordHash}`;
   if (env.unlockToken) return `tok:${env.unlockToken}`;
-  const saRaw = process.env.FIREBASE_SERVICE_ACCOUNT || '';
+  // Prefer the same secret Area Riservata uses; keep legacy FIREBASE_SERVICE_ACCOUNT.
+  const saRaw =
+    process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim() ||
+    process.env.FIREBASE_SERVICE_ACCOUNT ||
+    '';
   if (saRaw) {
     try {
       const sa = JSON.parse(saRaw) as {
