@@ -11,6 +11,11 @@ interface ImportMetaEnv {
    * Set `true` + server `MAGGIORI_PURCHASE_ENABLED=true` → Redeploy to re-enable.
    */
   readonly VITE_MAGGIORI_PURCHASE_ENABLED?: string;
+  /**
+   * ENN-247 — Firebase Auth custom domain (e.g. auth.tarotitalia.com).
+   * Set only after Hosting DNS Connected + OAuth redirect URI; else leave unset.
+   */
+  readonly VITE_FIREBASE_AUTH_DOMAIN?: string;
 }
 
 interface ImportMeta {

@@ -7,8 +7,9 @@ import {
   initializeAuth,
   type Auth,
 } from 'firebase/auth';
-import firebaseConfig from '../../firebase-applet-config.json';
+import { getFirebaseWebConfig } from './firebaseClientConfig';
 
+const firebaseConfig = getFirebaseWebConfig();
 const app = initializeApp(firebaseConfig);
 
 /**

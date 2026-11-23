@@ -1,9 +1,48 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import fs from 'fs';
 import path from 'path';
 import {defineConfig, type Plugin} from 'vite';
 import {buildBlogPosts} from './scripts/build-blog.mjs';
 import {generateSeoAssets} from './scripts/generate-seo-assets.mjs';
+
+const DEFAULT_FIREBASE_AUTH_DOMAIN =
+  'gen-lang-client-0853491667.firebaseapp.com';
+
+/**
+ * ENN-247: rewrite Coming Soon static authDomain when
+ * VITE_FIREBASE_AUTH_DOMAIN is set (public/ HTML is not Vite-transformed).
+ */
+function firebaseAuthDomainPlugin(): Plugin {
+  return {
+    name: 'tarot-italia-firebase-auth-domain',
+    closeBundle() {
+      const raw = String(process.env.VITE_FIREBASE_AUTH_DOMAIN || '')
+        .trim()
+        .toLowerCase()
+        .replace(/^https?:\/\//, '')
+        .replace(/\/.*$/, '');
+      if (!raw || raw === DEFAULT_FIREBASE_AUTH_DOMAIN) return;
+
+      const target = path.resolve(import.meta.dirname, 'dist/coming-soon.html');
+      if (!fs.existsSync(target)) return;
+
+      const before = fs.readFileSync(target, 'utf8');
+      const after = before.replace(
+        /authDomain:\s*'gen-lang-client-0853491667\.firebaseapp\.com'/,
+        `authDomain: '${raw}'`
+      );
+      if (after === before) {
+        console.warn(
+          `[firebase-auth-domain] could not patch authDomain in ${target}`
+        );
+        return;
+      }
+      fs.writeFileSync(target, after);
+      console.log(`[firebase-auth-domain] coming-soon.html → authDomain=${raw}`);
+    },
+  };
+}
 
 /** Compile content/blog → src/data/blogPosts.generated.ts before SPA/API consumers load. */
 function blogPostsPlugin(): Plugin {
@@ -45,7 +84,13 @@ function seoAssetsPlugin(): Plugin {
 
 export default defineConfig(() => {
   return {
-    plugins: [react(), tailwindcss(), blogPostsPlugin(), seoAssetsPlugin()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      blogPostsPlugin(),
+      seoAssetsPlugin(),
+      firebaseAuthDomainPlugin(),
+    ],
     resolve: {
       alias: {
         '@': path.resolve(import.meta.dirname, '.'),

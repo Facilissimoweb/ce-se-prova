@@ -5,7 +5,8 @@
  * ---------------------------------------------
  * PR #203 preferred `signInWithRedirect` on fine-pointer (desktop). The app is
  * hosted on Vercel (`www.tarotitalia.com`) while `authDomain` remains
- * `gen-lang-client-0853491667.firebaseapp.com`. Chrome M115+ (and Safari /
+ * cross-origin (`*.firebaseapp.com`, or later `auth.tarotitalia.com` via
+ * ENN-247 / `VITE_FIREBASE_AUTH_DOMAIN`). Chrome M115+ (and Safari /
  * Firefox) partition third-party storage, so the Firebase Auth helper iframe
  * cannot hand the redirect session back → `getRedirectResult()` is null and
  * the user appears still logged out. Firebase documents this as requiring
@@ -13,16 +14,14 @@
  *
  * Immediate fix: prefer **popup** (Option 2). Redirect only when auth helper
  * is same-origin (Vercel `/__/auth` proxy + `authDomain` = site host) — see
- * `canUseGoogleRedirectSafely`. Until Maria adds OAuth redirect URIs for
- * `https://www.tarotitalia.com/__/auth/handler`, keep `authDomain` on
- * `*.firebaseapp.com` and do **not** force redirect on desktop.
+ * `canUseGoogleRedirectSafely`. Custom auth host `auth.tarotitalia.com` is
+ * still cross-origin vs www → keep popup-first. Do **not** force redirect
+ * on desktop while authDomain ≠ location.hostname.
  */
 
-import firebaseConfig from '../../firebase-applet-config.json';
+import { getFirebaseAuthDomain } from './firebaseClientConfig';
 
-const FIREBASE_AUTH_DOMAIN = String(
-  (firebaseConfig as { authDomain?: string }).authDomain || ''
-);
+const FIREBASE_AUTH_DOMAIN = getFirebaseAuthDomain();
 
 /** Hosts where Vercel rewrites `/__/auth` → firebaseapp.com (Option 3 prep). */
 export function isProductionSiteHost(hostname: string): boolean {

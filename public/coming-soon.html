@@ -688,6 +688,8 @@
         signInWithRedirect,
       } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
 
+      // authDomain: build may rewrite via VITE_FIREBASE_AUTH_DOMAIN (ENN-247).
+      // Fallback keeps login working until auth.tarotitalia.com DNS is live.
       const firebaseConfig = {
         projectId: 'gen-lang-client-0853491667',
         appId: '1:9386426759:web:a7195d3ae0e62315771322',
