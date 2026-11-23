@@ -95,10 +95,10 @@ assert(
   'multi-match still finds Diavolo + Torre within cap'
 );
 
-// Payload discipline: studio single-card should stay well under prior full dump (~28k).
+// Payload discipline (ENN-235): slim site + on-demand Maggiori ≪ prior FAQ dump.
 assert(
-  studioDiavolo.length < 22000,
-  `studio Diavolo prompt under 22k chars (got ${studioDiavolo.length})`
+  studioDiavolo.length < 16_000,
+  `studio Diavolo prompt under 16k chars (got ${studioDiavolo.length})`
 );
 
 const studioEn = buildNinaSystemPrompt({

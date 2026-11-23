@@ -178,8 +178,8 @@ assert(
 );
 
 assert(
-  studioAsso.length < 30000,
-  'studio single-Minori prompt stays under soft payload budget'
+  studioAsso.length < 16_000,
+  `studio single-Minori prompt under 16k chars (got ${studioAsso.length})`
 );
 
 if (failed > 0) {

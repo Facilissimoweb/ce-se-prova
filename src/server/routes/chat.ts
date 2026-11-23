@@ -1,8 +1,11 @@
 import {
   buildNinaSystemPrompt,
   createGroqChatCompletion,
+  estimateGroqChatPayloadBytes,
+  GROQ_CHAT_PAYLOAD_JSON_CEILING,
   isGroqChatConfigured,
   resolveGroqChatModel,
+  trimMessagesToPayloadCeiling,
   type GroqChatFailureCode,
   type GroqChatMessage,
   type NinaChatMode,
@@ -22,7 +25,12 @@ import { verifyBearerToken } from '../authToken.ts';
 import { json, type ApiResult } from '../http.ts';
 
 const MAX_MESSAGE_CHARS = 2000;
-const MAX_HISTORY_TURNS = 12;
+/** Welcome Accoglienza — keep light; last-N (not first-N). */
+const MAX_HISTORY_TURNS_WELCOME = 8;
+const MAX_HISTORY_CHARS_WELCOME = 1200;
+/** Studio — tighter so Maggiori/blog inject + history stay under Groq 413 (ENN-235). */
+const MAX_HISTORY_TURNS_STUDIO = 6;
+const MAX_HISTORY_CHARS_STUDIO = 900;
 const MAGGIORI_COURSE_SLUG = 'arcani-maggiori';
 /** Mirrors `RESERVED_DEMO_UID` / demo token in reservedDemo (client-only module). */
 const DEMO_RESERVED_UID = 'demo-reserved-enn103';
@@ -50,10 +58,11 @@ export function getChatStatus(): ApiResult {
 }
 
 function asHistory(
-  raw: unknown
+  raw: unknown,
+  opts: { maxTurns: number; maxChars: number }
 ): Array<{ role: 'user' | 'assistant'; content: string }> {
   if (!Array.isArray(raw)) return [];
-  const out: Array<{ role: 'user' | 'assistant'; content: string }> = [];
+  const parsed: Array<{ role: 'user' | 'assistant'; content: string }> = [];
   for (const item of raw) {
     if (!item || typeof item !== 'object') continue;
     const role = (item as { role?: unknown }).role;
@@ -63,11 +72,14 @@ function asHistory(
       typeof content === 'string' &&
       content.trim()
     ) {
-      out.push({ role, content: content.trim().slice(0, MAX_MESSAGE_CHARS) });
+      parsed.push({
+        role,
+        content: content.trim().slice(0, opts.maxChars),
+      });
     }
-    if (out.length >= MAX_HISTORY_TURNS) break;
   }
-  return out;
+  // Prefer recent turns (client may still send 12); matches FAB `.slice(-N)`.
+  return parsed.slice(-opts.maxTurns);
 }
 
 function parseMode(raw: unknown): NinaChatMode {
@@ -170,7 +182,7 @@ async function assertNinaStudioAccess(
  * Provider detail stays in console.error for Maria’s logs only.
  *
  * - empty/confused → 200 reply asking to rephrase (unclear intent)
- * - payload too large → soft “riformula / specifica un Arcano”
+ * - payload too large → soft temporary retry (ENN-236: do not nudge “domanda più breve”)
  * - real outage (key/auth/model/upstream) → short soft message
  */
 function chatFailureResponse(
@@ -248,7 +260,12 @@ export async function postChatMessage(params: {
   }
 
   const mode = parseMode(body.mode);
-  const history = asHistory(body.history);
+  const history = asHistory(body.history, {
+    maxTurns:
+      mode === 'studio' ? MAX_HISTORY_TURNS_STUDIO : MAX_HISTORY_TURNS_WELCOME,
+    maxChars:
+      mode === 'studio' ? MAX_HISTORY_CHARS_STUDIO : MAX_HISTORY_CHARS_WELCOME,
+  });
   // ENN-188: force Italian — ignore client/googtrans lang (do not re-enable GT).
   const lang = 'it';
 
@@ -282,11 +299,28 @@ export async function postChatMessage(params: {
     lang,
     mode,
   });
-  const messages: GroqChatMessage[] = [
+  let messages: GroqChatMessage[] = [
     { role: 'system', content: systemPrompt },
     ...history,
     { role: 'user', content: message },
   ];
+  messages = trimMessagesToPayloadCeiling(
+    messages,
+    GROQ_CHAT_PAYLOAD_JSON_CEILING
+  );
+
+  // Preflight: if still oversized after trim, fail soft without hitting Groq 413.
+  if (
+    estimateGroqChatPayloadBytes({ messages }) > GROQ_CHAT_PAYLOAD_JSON_CEILING
+  ) {
+    console.error(
+      'Nina chat payload preflight over ceiling:',
+      estimateGroqChatPayloadBytes({ messages }),
+      'limit',
+      GROQ_CHAT_PAYLOAD_JSON_CEILING
+    );
+    return chatFailureResponse('GROQ_CHAT_PAYLOAD', lang);
+  }
 
   try {
     const reply = await createGroqChatCompletion({ messages });

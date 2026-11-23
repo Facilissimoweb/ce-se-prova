@@ -133,6 +133,69 @@ Maria Teresa Rogani · Operatore Olistico (L. 4/2013). Formazione in comunicazio
 - Quando serve un consulto autentico, una prenotazione o un dubbio personale, invita a **Parla con Maria Teresa** (sezione fissa sotto la chat: Prenota, WhatsApp, Telegram, email).
 - Non aggiungere blocchi CTA markdown né elenchi di bottoni nel messaggio.`;
 
+/**
+ * Slim site stub for Nina Studio (ENN-235): prices + booking + CTA only.
+ * Full FAQ (~12k) is injected only when the ask looks like site/prezzi/FAQ.
+ */
+export const NINA_CHAT_SITE_KNOWLEDGE_STUDIO_SLIM = `Conoscenza ufficiale del sito (sintesi Studio — usa SOLO questi fatti; per FAQ lunghe rinvia alle pagine pubbliche):
+
+## Tariffe consulti (EUR, IVA inclusa)
+In ogni sessione Maria Teresa legge Arcani Maggiori e Minori. Elenco markdown, una riga per voce:
+
+${formatConsultTariffsMarkdownList()}
+
+- Online = chiamata vocale WhatsApp; di persona Via Crispi 37, Macerata (Breve solo online).
+- Pagamento consulti: Stripe Checkout sul sito; WhatsApp = canale del consulto, non del pagamento.
+- Contatti: 379 103 82 53 · info@tarotitalia.com.
+
+## Corsi
+Arcani Maggiori in offerta pubblica (€69 / listino €149) include Nina Studio a vita. Minori/Metodi nascosti (in preparazione). Link: **/corsi**.
+
+## Orientamento
+Dialogo Tarot ≠ Nina Studio ≠ chat di accoglienza. CTA: **Parla con Maria Teresa** sotto la chat (niente elenchi di bottoni nel messaggio).`;
+
+function normalizeForMatch(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '');
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+const SITE_FAQ_ASK_CUES =
+  /\b(prezz\w*|tariff\w*|cost\w*|euro|faq|domande?\s+frequent|prenot\w*|orari|pagamento|stripe|whatsapp|telegram|consult\w*|chi\s+sono|etica|riservatezz\w*|macerata|via\s+crispi|corsi?\b|klarna)\b/;
+
+/** True when Studio should load the full public FAQ instead of the slim stub. */
+export function looksLikeSiteFaqAsk(params: {
+  message: string;
+  history?: Array<{ role: string; content: string }>;
+}): boolean {
+  const parts = [params.message];
+  for (const turn of (params.history ?? []).slice(-2)) {
+    if (typeof turn.content === 'string' && turn.content.trim()) {
+      parts.push(turn.content);
+    }
+  }
+  return SITE_FAQ_ASK_CUES.test(normalizeForMatch(parts.join('\n')));
+}
+
+/** Site knowledge block for the current Studio turn (slim by default). */
+export function selectSiteKnowledgeForStudio(params: {
+  message: string;
+  history?: Array<{ role: string; content: string }>;
+}): string {
+  return looksLikeSiteFaqAsk(params)
+    ? NINA_CHAT_SITE_KNOWLEDGE
+    : NINA_CHAT_SITE_KNOWLEDGE_STUDIO_SLIM;
+}
+
+/** One-liner when no Maggiori/Minori/blog pack is loaded this turn (ENN-235). */
+const NINA_STUDIO_ON_DEMAND_HINT = `## Materiale Studio (on-demand)
+Schede **Maggiori** (0–XXI), **Minori** (luce/ombra + domanda) e pezzi **Blog** (\`/news/…\`) si caricano nominando carta, seme+grado o articolo. Non inventare Waite o fatti assenti dal contesto.`;
+
 export type NinaMaggioriCard = {
   id: number;
   roman: string;
@@ -166,7 +229,10 @@ Architettura: 22 lame (0–XXI). Primo (0–VII) identità; Secondo (VIII–XIV)
 Elenco: 0 Matto · I Bagatto · II Papessa · III Imperatrice · IV Imperatore · V Papa · VI Amanti · VII Carro · VIII Giustizia · IX Eremita · X Ruota · XI Forza · XII Appeso · XIII Morte · XIV Temperanza · XV Diavolo · XVI Torre · XVII Stelle · XVIII Luna · XIX Sole · XX Giudizio · XXI Mondo.
 Se manca la scheda dettagliata nel contesto, chiedi quale Trionfo (0–XXI) e non inventare dettagli Waite.`;
 
+/** Soft default; Studio budget may tighten further when blog also hits. */
 const MAX_INJECTED_CARDS = 3;
+/** Hard Studio ceiling when Maggiori + blog/minori compete for tokens (ENN-235). */
+const MAX_INJECTED_CARDS_BUDGETED = 2;
 
 /**
  * Soft-lock copy when welcome chat asks for deep Maggiori study (ENN-137).
@@ -176,28 +242,21 @@ export const NINA_STUDIO_SOFT_LOCK_REPLY = ninaStudioSoftLockReply('it');
 
 export { ninaStudioSoftLockReply };
 
-function normalizeForMatch(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/\p{M}/gu, '');
-}
-
 const DEEP_STUDY_CUES =
   /\b(simbolog\w*|iconograf\w*|waite|smith|luce\s*\/?\s*ombra|ombra|prevision\w*|senso\s+profond|significat\w*|scheda\s+visiv|trionf\w*|arcano\s+maggior|maggiori\s+didatt)/;
 
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 /**
  * Match Trionfi mentioned in user/history text (aliases + roman/id cues).
- * Caps at MAX_INJECTED_CARDS to keep Groq payload under limit.
+ * Caps at MAX_INJECTED_CARDS (or `maxCards`) to keep Groq payload under limit.
  * Aliases use word-ish boundaries so «papa» does not match «papessa».
  */
-export function selectMaggioriCardsForText(text: string): NinaMaggioriCard[] {
+export function selectMaggioriCardsForText(
+  text: string,
+  maxCards: number = MAX_INJECTED_CARDS
+): NinaMaggioriCard[] {
   const hay = normalizeForMatch(text);
   if (!hay.trim()) return [];
+  const cap = Math.max(1, Math.min(maxCards, MAX_INJECTED_CARDS));
 
   const matched: NinaMaggioriCard[] = [];
   for (const card of NINA_MAGGIORI_CARDS) {
@@ -218,7 +277,7 @@ export function selectMaggioriCardsForText(text: string): NinaMaggioriCard[] {
     if (hit || romanCue.test(hay)) {
       matched.push(card);
     }
-    if (matched.length >= MAX_INJECTED_CARDS) break;
+    if (matched.length >= cap) break;
   }
   return matched;
 }
@@ -473,8 +532,9 @@ Usa SOLO i pezzi iniettati sotto (se presenti) e il catalogo titoli. **Cita** ti
 Catalogo (titolo · categoria · path):
 ${formatBlogCatalogIndex()}`;
 
-/** Blog is denser than cards — inject at most 2 compact bodies per turn. */
+/** Blog is denser than cards — inject at most 2 compact bodies; often 1 under budget. */
 const MAX_INJECTED_BLOG = 2;
+const MAX_INJECTED_BLOG_BUDGETED = 1;
 
 const BLOG_STUDY_CUES =
   /\b(blog|articolo|articoli|approfondiment\w*|pixie|pamela|colman\s+smith|rider[\s-]?waite|origine\s+segreta|golden\s+dawn|news\/)/;
@@ -504,10 +564,14 @@ const WEAK_ARCANA_ALIAS = new Set([
  * Caps at MAX_INJECTED_BLOG. Weak single-token Maggiori overlaps alone do not inject
  * (schede Maggiori remain primary for «com’è il Matto?»); blog cue or stronger alias does.
  */
-export function selectBlogPostsForText(text: string): NinaBlogPost[] {
+export function selectBlogPostsForText(
+  text: string,
+  maxPosts: number = MAX_INJECTED_BLOG
+): NinaBlogPost[] {
   const hay = normalizeForMatch(text);
   if (!hay.trim()) return [];
   const blogCue = BLOG_STUDY_CUES.test(hay);
+  const cap = Math.max(1, Math.min(maxPosts, MAX_INJECTED_BLOG));
 
   const scored: Array<{ post: NinaBlogPost; score: number; strong: boolean }> =
     [];
@@ -540,7 +604,7 @@ export function selectBlogPostsForText(text: string): NinaBlogPost[] {
   }
 
   scored.sort((a, b) => b.score - a.score);
-  let picked = scored.slice(0, MAX_INJECTED_BLOG).map((s) => s.post);
+  let picked = scored.slice(0, cap).map((s) => s.post);
 
   // Category-only ask («parlami degli articoli Autori / Storia») when no title hit.
   if (picked.length === 0 && blogCue) {
@@ -549,7 +613,7 @@ export function selectBlogPostsForText(text: string): NinaBlogPost[] {
       const cat = normalizeForMatch(p.category);
       return cat.length >= 4 && hay.includes(cat);
     });
-    picked = byCategory.slice(0, MAX_INJECTED_BLOG);
+    picked = byCategory.slice(0, cap);
   }
 
   return picked;
@@ -588,4 +652,88 @@ export function buildBlogKnowledgeForMessages(params: {
   }
   const posts = selectBlogPostsForText(parts.join('\n'));
   return formatBlogKnowledgeForPosts(posts);
+}
+
+function collectRecentHay(params: {
+  message: string;
+  history?: Array<{ role: string; content: string }>;
+  historyWindow?: number;
+}): string {
+  const parts = [params.message];
+  const history = params.history ?? [];
+  const window = params.historyWindow ?? 4;
+  for (const turn of history.slice(-window)) {
+    if (typeof turn.content === 'string' && turn.content.trim()) {
+      parts.push(turn.content);
+    }
+  }
+  return parts.join('\n');
+}
+
+/**
+ * Coordinated Studio knowledge for one Groq turn (ENN-235 / ENN-236).
+ * - Slim site FAQ by default; full FAQ only on prezzi/FAQ cues.
+ * - Maggiori / Minori / Blog frames only when relevant (no triple empty dump).
+ * - Prefer card bodies over blog; blog max 1 excerpt when cards also hit.
+ */
+export function buildStudioKnowledgeForMessages(params: {
+  message: string;
+  history?: Array<{ role: string; content: string }>;
+}): string {
+  const hay = collectRecentHay(params);
+  const hayNorm = normalizeForMatch(hay);
+
+  const blogCue = BLOG_STUDY_CUES.test(hayNorm);
+  // Frame cues omit bare «waite/smith» so Autori/Pixie blog asks do not pull Maggiori frame.
+  const maggioriFrameCue =
+    /\b(simbolog\w*|iconograf\w*|luce\s*\/?\s*ombra|prevision\w*|trionf\w*|arcano\s+maggior|arcani?\s+maggior|maggiori|matto|bagatto|papessa|imperatr|imperator|papa|amanti|carro|giustizia|eremita|ruota|forza|appeso|morte|temperanza|diavolo|torre|stelle|luna|sole|giudizio|mondo)\b/.test(
+      hayNorm
+    );
+  const minoriCue =
+    DEEP_MINORI_CUES.test(hayNorm) ||
+    /\b(minori|bastoni|coppe|spade|denari|pentacol|asso|fante|cavallo|regina)\b/.test(
+      hayNorm
+    );
+
+  let maggioriCards = selectMaggioriCardsForText(hay);
+  const minoriCards = selectMinoriCardsForText(hay);
+  const minoriSuits = selectMinoriSuitFramesForText(hay);
+  const hasCardBodies =
+    maggioriCards.length > 0 ||
+    minoriCards.length > 0 ||
+    minoriSuits.length > 0;
+
+  const blogCap = hasCardBodies
+    ? MAX_INJECTED_BLOG_BUDGETED
+    : MAX_INJECTED_BLOG;
+  const blogPosts = selectBlogPostsForText(hay, blogCap);
+
+  if (blogPosts.length > 0 && maggioriCards.length > MAX_INJECTED_CARDS_BUDGETED) {
+    maggioriCards = selectMaggioriCardsForText(
+      hay,
+      MAX_INJECTED_CARDS_BUDGETED
+    );
+  }
+
+  const wantMaggiori = maggioriCards.length > 0 || maggioriFrameCue;
+  const wantMinori =
+    minoriCards.length > 0 || minoriSuits.length > 0 || minoriCue;
+  const wantBlog = blogPosts.length > 0 || blogCue;
+
+  const blocks: string[] = [selectSiteKnowledgeForStudio(params)];
+
+  if (wantMaggiori) {
+    blocks.push(formatMaggioriKnowledgeForCards(maggioriCards));
+  }
+  if (wantMinori) {
+    blocks.push(formatMinoriKnowledgeForCards(minoriCards, minoriSuits));
+  }
+  if (wantBlog) {
+    blocks.push(formatBlogKnowledgeForPosts(blogPosts));
+  }
+  if (!wantMaggiori && !wantMinori && !wantBlog) {
+    blocks.push(NINA_STUDIO_ON_DEMAND_HINT);
+  }
+
+  return blocks.join('\n\n');
 }

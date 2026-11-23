@@ -51,8 +51,9 @@ async function main() {
   assertNoProviderLeak(outage.temporary, 'outage.temporary');
   assertNoProviderLeak(outage.tooBroad, 'outage.tooBroad');
   assert(
-    /riformul/i.test(outage.tooBroad) || /Arcano/i.test(outage.tooBroad),
-    'tooBroad nudges rephrase/Arcano'
+    /Riprova|WhatsApp|Arcano/i.test(outage.tooBroad) &&
+      !/più breve|troppo ampia/i.test(outage.tooBroad),
+    'tooBroad soft-retry without shorter-question nudge (ENN-236)'
   );
 
   assert(looksLikeNinaProviderLeak('problema con Groq'), 'detect Groq leak');
