@@ -3,13 +3,12 @@ import { Mail, Phone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ConsultationTariff, CourseId, ScreenId } from './types/handoff';
 import { isCourseSlugPubliclyPresented } from './lib/coursePresentation';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import {
   FloatingSideRail,
   TopBar,
 } from './components/NavigationChrome';
 import { HandoffDrawer } from './components/HandoffDrawer';
-import { canShowOwnerDebugUi } from './lib/ownerDebugUi';
 import { AccessibilityFab } from './components/AccessibilityFab';
 import { BackToTopFab } from './components/BackToTopFab';
 import { BookSessionFab } from './components/BookSessionFab';
@@ -112,8 +111,8 @@ export function App() {
 }
 
 function AppBody() {
-  const { user } = useAuth();
-  const ownerDebugUi = canShowOwnerDebugUi(user?.email);
+  // ENN-243 — literal DEV gate so Vite DCE drops Handoff/CMS from production.
+  const devDebugUi = import.meta.env.DEV;
   const { t } = useTranslation('common');
   const footerMenuGroups: FooterMenuGroup[] = useMemo(
     () => [
@@ -423,14 +422,14 @@ function AppBody() {
       ? 'area-riservata'
       : activeScreen;
 
-  const cmsKeysVisible = ownerDebugUi && showCmsKeys;
+  const cmsKeysVisible = devDebugUi && showCmsKeys;
 
   useEffect(() => {
-    if (!ownerDebugUi) {
+    if (!devDebugUi) {
       setShowCmsKeys(false);
       setIsHandoffOpen(false);
     }
-  }, [ownerDebugUi]);
+  }, [devDebugUi]);
 
   return (
       <LeftToolsMenuProvider>
@@ -680,7 +679,7 @@ function AppBody() {
               <p className="text-[11px] text-[#A39B93]/80">
                 © {new Date().getFullYear()} Tarot Italia · Maria Teresa Rogani
               </p>
-              {ownerDebugUi ? (
+              {import.meta.env.DEV ? (
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                   <button
                     type="button"
@@ -708,12 +707,14 @@ function AppBody() {
           onNavigate={handleNavigate}
           onOpenPrivacy={() => setIsPrivacyOpen(true)}
           onOpenHandoff={
-            ownerDebugUi ? () => setIsHandoffOpen(true) : undefined
+            import.meta.env.DEV
+              ? () => setIsHandoffOpen(true)
+              : undefined
           }
           showCmsKeys={cmsKeysVisible}
         />
 
-        {ownerDebugUi ? (
+        {import.meta.env.DEV ? (
           <HandoffDrawer
             isOpen={isHandoffOpen}
             onClose={() => setIsHandoffOpen(false)}
