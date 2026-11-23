@@ -361,8 +361,9 @@ const OUTAGE_IT: SoftOutageCopy = {
     'Nina non è attiva in questo momento. Puoi scrivere a Maria Teresa su WhatsApp, Telegram o email.',
   temporary:
     'In questo momento non riesco a risponderti con serenità. Riprova tra poco oppure usa WhatsApp, Telegram o email.',
+  // ENN-236: rare fallback after payload hard-caps — do not nudge “domanda più breve”.
   tooBroad:
-    'La domanda è un po’ troppo ampia per questa chat. Prova a **riformularla** in modo più breve, o **specifica un solo Arcano** / un tema, poi riprova. Nel frattempo puoi usare WhatsApp, Telegram o email.',
+    'In questo momento non riesco a elaborare la risposta con serenità. **Riprova tra poco** oppure usa WhatsApp, Telegram o email. Se vuoi, puoi anche nominare un Arcano o un tema preciso.',
 };
 
 const OUTAGE_EN: SoftOutageCopy = {

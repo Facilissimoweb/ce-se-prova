@@ -8,12 +8,19 @@
 
 import { consultationTariffs } from '../data/consultationTariffs.ts';
 import {
-  buildBlogKnowledgeForMessages,
-  buildMaggioriKnowledgeForMessages,
-  buildMinoriKnowledgeForMessages,
+  buildStudioKnowledgeForMessages,
   NINA_CHAT_SITE_KNOWLEDGE,
 } from './ninaChatKnowledge.ts';
 // ENN-188: Nina is Italian-only — no googtrans / reply-lang suffix.
+
+/**
+ * Hard ceilings so Studio never trips Groq HTTP 413 (ENN-235).
+ * Measured pre-fix worst JSON ≈ 53 KB; keep well under typical request caps.
+ */
+export const STUDIO_SYSTEM_CHAR_CEILING = 16_000;
+export const WELCOME_SYSTEM_CHAR_CEILING = 18_000;
+/** UTF-8 JSON body for `{ model, messages, … }` — soft preflight before Groq. */
+export const GROQ_CHAT_PAYLOAD_JSON_CEILING = 28_000;
 
 export const GROQ_CHAT_ENV_KEY = 'TAROTITALIACHATGENERICAGROQ_API_KEY';
 export const GROQ_CHAT_DEFAULT_MODEL = 'openai/gpt-oss-20b'; // was llama-3.1-8b-instant (retired 2026-08-16)
@@ -90,11 +97,12 @@ Limiti (obbligatori):
 - Non promuovere un destinazione Maggiori-only: se serve un link corsi, usa **Corsi** (/corsi).
 - Non sostituisci pareri medici, psicologici, legali o finanziari.
 - Non inventare prezzi o promozioni oltre la conoscenza ufficiale.
-- Se la domanda è confusa o non capisci l’intento: chiedi di **riformulare** o di **specificare l’Arcano** (Maggiori 0–XXI o Minore «grado + seme») o il pezzo Blog — mai citare fornitori tecnici, API, Groq/Grok o messaggi di errore.
+- Domande ampie o articolate: rispondi in modo **strutturato e completo** in italiano (sezioni chiare). **NON** chiedere di fare una domanda più breve o più secca se l’intento è comprensibile — usa le schede/blog iniettati e ragiona sul tema.
+- Solo se il messaggio è vuoto di senso o davvero incomprensibile: chiedi di **riformulare** o di **specificare** Maggiori (0–XXI), Minore («grado + seme») o pezzo Blog — mai citare fornitori tecnici, API, Groq/Grok o messaggi di errore.
 - Etica ferma: rifiuta violenza, abusi, contenuti illeciti.
 
 Formato messaggio (obbligatorio — mobile-friendly):
-- Paragrafi brevi; per Maggiori i quattro campi didattici; per Minori senso + luce/ombra + domanda di pratica in forma breve; per Blog cita la fonte.
+- Risposte composte: paragrafi chiari; per Maggiori i quattro campi didattici; per Minori senso + luce/ombra + domanda di pratica; per Blog cita titolo + path \`/news/…\`.
 - Prezzi e opzioni: elenco markdown con **una voce per riga** (\`- **…** · …\`).
 - **Grassetto** con moderazione. Niente HTML. CTA contatto → sezione **Parla con Maria Teresa** sotto la chat.
 
@@ -103,9 +111,21 @@ Formato messaggio (obbligatorio — mobile-friendly):
 I nomi «Tarot Italia», «Maria Teresa Rogani», «Nina», «Nina Studio», «Arcani Maggiori», «Arcani Minori», «Dialogo Tarot», «Parla con Maria Teresa» e i prezzi in EUR restano invariati.`;
 
 /**
+ * Soft-trim oversized system prompts (prefer keeping the head: persona + site + first packs).
+ */
+export function clipSystemPromptToCeiling(
+  prompt: string,
+  ceiling: number
+): string {
+  if (prompt.length <= ceiling) return prompt;
+  const cut = prompt.slice(0, Math.max(0, ceiling - 80)).trimEnd();
+  return `${cut}\n\n[…contesto Studio ridotto per limite payload…]`;
+}
+
+/**
  * Build Nina system prompt for one turn.
- * - welcome: site FAQ only — no Maggiori/Minori/blog inject (ENN-137 / ENN-200 / ENN-233)
- * - studio: FAQ + on-demand Maggiori (ENN-138) + Minori (ENN-200 / ENN-201) + Blog (ENN-233)
+ * - welcome: full site FAQ only — no Maggiori/Minori/blog inject (ENN-137 / ENN-200 / ENN-233)
+ * - studio: slim site by default + relevance-gated Maggiori/Minori/Blog (ENN-235 / ENN-236)
  * - ENN-188: Italian-only — `lang` is ignored (kept for API compat).
  */
 export function buildNinaSystemPrompt(params: {
@@ -120,32 +140,60 @@ export function buildNinaSystemPrompt(params: {
     mode === 'studio' ? NINA_STUDIO_PERSONA : NINA_WELCOME_PERSONA;
 
   if (mode === 'welcome') {
-    return `${persona}
+    return clipSystemPromptToCeiling(
+      `${persona}
 
-${NINA_CHAT_SITE_KNOWLEDGE}`;
+${NINA_CHAT_SITE_KNOWLEDGE}`,
+      WELCOME_SYSTEM_CHAR_CEILING
+    );
   }
 
-  const maggiori = buildMaggioriKnowledgeForMessages({
+  const knowledge = buildStudioKnowledgeForMessages({
     message: params.message,
     history: params.history,
   });
-  const minori = buildMinoriKnowledgeForMessages({
-    message: params.message,
-    history: params.history,
+  return clipSystemPromptToCeiling(
+    `${persona}
+
+${knowledge}`,
+    STUDIO_SYSTEM_CHAR_CEILING
+  );
+}
+
+/** Estimate JSON body size for a Groq chat completions request. */
+export function estimateGroqChatPayloadBytes(params: {
+  messages: GroqChatMessage[];
+  model?: string;
+  maxTokens?: number;
+}): number {
+  const body = JSON.stringify({
+    model: params.model || resolveGroqChatModel(),
+    messages: params.messages,
+    temperature: 0.6,
+    max_tokens: params.maxTokens ?? 1024,
+    stream: false,
   });
-  const blog = buildBlogKnowledgeForMessages({
-    message: params.message,
-    history: params.history,
-  });
-  return `${persona}
+  return body.length;
+}
 
-${NINA_CHAT_SITE_KNOWLEDGE}
-
-${maggiori}
-
-${minori}
-
-${blog}`;
+/**
+ * Drop oldest history turns until the request JSON fits under the ceiling.
+ * Keeps system + latest user message intact.
+ */
+export function trimMessagesToPayloadCeiling(
+  messages: GroqChatMessage[],
+  ceiling: number = GROQ_CHAT_PAYLOAD_JSON_CEILING
+): GroqChatMessage[] {
+  if (messages.length <= 2) return messages;
+  const fitted = [...messages];
+  while (
+    fitted.length > 2 &&
+    estimateGroqChatPayloadBytes({ messages: fitted }) > ceiling
+  ) {
+    // messages[0] = system, messages[last] = current user — drop oldest history.
+    fitted.splice(1, 1);
+  }
+  return fitted;
 }
 
 /**

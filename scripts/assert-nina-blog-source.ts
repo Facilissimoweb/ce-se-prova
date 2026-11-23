@@ -131,10 +131,14 @@ assert(
   'studio blog Matto ask cites Matto article'
 );
 
-// Payload budget smoke: single-topic Studio ask stays sane with Maggiori+blog frames.
+// Payload budget (ENN-235): slim site + blog body, no full FAQ dump.
 assert(
-  studioPamela.length < 28_000,
-  `studio Pamela prompt under soft budget (got ${studioPamela.length})`
+  studioPamela.length < 16_000,
+  `studio Pamela prompt under 16k chars (got ${studioPamela.length})`
+);
+assert(
+  !studioPamela.includes('## FAQ Home'),
+  'studio Pamela ask uses slim site (no full FAQ)'
 );
 
 const generated = readFileSync(

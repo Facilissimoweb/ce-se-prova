@@ -14310,7 +14310,8 @@ function ninaUnclearIntentReply(_lang) {
 var OUTAGE_IT = {
   unavailable: "Nina non \xE8 attiva in questo momento. Puoi scrivere a Maria Teresa su WhatsApp, Telegram o email.",
   temporary: "In questo momento non riesco a risponderti con serenit\xE0. Riprova tra poco oppure usa WhatsApp, Telegram o email.",
-  tooBroad: "La domanda \xE8 un po\u2019 troppo ampia per questa chat. Prova a **riformularla** in modo pi\xF9 breve, o **specifica un solo Arcano** / un tema, poi riprova. Nel frattempo puoi usare WhatsApp, Telegram o email."
+  // ENN-236: rare fallback after payload hard-caps — do not nudge “domanda più breve”.
+  tooBroad: "In questo momento non riesco a elaborare la risposta con serenit\xE0. **Riprova tra poco** oppure usa WhatsApp, Telegram o email. Se vuoi, puoi anche nominare un Arcano o un tema preciso."
 };
 function ninaSoftOutageCopy(_lang) {
   void _lang;
@@ -14418,6 +14419,43 @@ Maria Teresa Rogani \xB7 Operatore Olistico (L. 4/2013). Formazione in comunicaz
 ## CTA
 - Quando serve un consulto autentico, una prenotazione o un dubbio personale, invita a **Parla con Maria Teresa** (sezione fissa sotto la chat: Prenota, WhatsApp, Telegram, email).
 - Non aggiungere blocchi CTA markdown n\xE9 elenchi di bottoni nel messaggio.`;
+var NINA_CHAT_SITE_KNOWLEDGE_STUDIO_SLIM = `Conoscenza ufficiale del sito (sintesi Studio \u2014 usa SOLO questi fatti; per FAQ lunghe rinvia alle pagine pubbliche):
+
+## Tariffe consulti (EUR, IVA inclusa)
+In ogni sessione Maria Teresa legge Arcani Maggiori e Minori. Elenco markdown, una riga per voce:
+
+${formatConsultTariffsMarkdownList()}
+
+- Online = chiamata vocale WhatsApp; di persona Via Crispi 37, Macerata (Breve solo online).
+- Pagamento consulti: Stripe Checkout sul sito; WhatsApp = canale del consulto, non del pagamento.
+- Contatti: 379 103 82 53 \xB7 info@tarotitalia.com.
+
+## Corsi
+Arcani Maggiori in offerta pubblica (\u20AC69 / listino \u20AC149) include Nina Studio a vita. Minori/Metodi nascosti (in preparazione). Link: **/corsi**.
+
+## Orientamento
+Dialogo Tarot \u2260 Nina Studio \u2260 chat di accoglienza. CTA: **Parla con Maria Teresa** sotto la chat (niente elenchi di bottoni nel messaggio).`;
+function normalizeForMatch(text2) {
+  return text2.toLowerCase().normalize("NFD").replace(new RegExp("\\p{M}", "gu"), "");
+}
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+var SITE_FAQ_ASK_CUES = /\b(prezz\w*|tariff\w*|cost\w*|euro|faq|domande?\s+frequent|prenot\w*|orari|pagamento|stripe|whatsapp|telegram|consult\w*|chi\s+sono|etica|riservatezz\w*|macerata|via\s+crispi|corsi?\b|klarna)\b/;
+function looksLikeSiteFaqAsk(params) {
+  const parts = [params.message];
+  for (const turn of (params.history ?? []).slice(-2)) {
+    if (typeof turn.content === "string" && turn.content.trim()) {
+      parts.push(turn.content);
+    }
+  }
+  return SITE_FAQ_ASK_CUES.test(normalizeForMatch(parts.join("\n")));
+}
+function selectSiteKnowledgeForStudio(params) {
+  return looksLikeSiteFaqAsk(params) ? NINA_CHAT_SITE_KNOWLEDGE : NINA_CHAT_SITE_KNOWLEDGE_STUDIO_SLIM;
+}
+var NINA_STUDIO_ON_DEMAND_HINT = `## Materiale Studio (on-demand)
+Schede **Maggiori** (0\u2013XXI), **Minori** (luce/ombra + domanda) e pezzi **Blog** (\`/news/\u2026\`) si caricano nominando carta, seme+grado o articolo. Non inventare Waite o fatti assenti dal contesto.`;
 var NINA_MAGGIORI_CARDS = NINA_MAGGIORI_CARDS_GENERATED;
 var NINA_CHAT_MAGGIORI_FRAME = `## Arcani Maggiori \u2014 schede didattiche ufficiali (Trionfi 0\u2013XXI)
 
@@ -14434,17 +14472,13 @@ Architettura: 22 lame (0\u2013XXI). Primo (0\u2013VII) identit\xE0; Secondo (VII
 Elenco: 0 Matto \xB7 I Bagatto \xB7 II Papessa \xB7 III Imperatrice \xB7 IV Imperatore \xB7 V Papa \xB7 VI Amanti \xB7 VII Carro \xB7 VIII Giustizia \xB7 IX Eremita \xB7 X Ruota \xB7 XI Forza \xB7 XII Appeso \xB7 XIII Morte \xB7 XIV Temperanza \xB7 XV Diavolo \xB7 XVI Torre \xB7 XVII Stelle \xB7 XVIII Luna \xB7 XIX Sole \xB7 XX Giudizio \xB7 XXI Mondo.
 Se manca la scheda dettagliata nel contesto, chiedi quale Trionfo (0\u2013XXI) e non inventare dettagli Waite.`;
 var MAX_INJECTED_CARDS = 3;
+var MAX_INJECTED_CARDS_BUDGETED = 2;
 var NINA_STUDIO_SOFT_LOCK_REPLY = ninaStudioSoftLockReply("it");
-function normalizeForMatch(text2) {
-  return text2.toLowerCase().normalize("NFD").replace(new RegExp("\\p{M}", "gu"), "");
-}
 var DEEP_STUDY_CUES = /\b(simbolog\w*|iconograf\w*|waite|smith|luce\s*\/?\s*ombra|ombra|prevision\w*|senso\s+profond|significat\w*|scheda\s+visiv|trionf\w*|arcano\s+maggior|maggiori\s+didatt)/;
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-function selectMaggioriCardsForText(text2) {
+function selectMaggioriCardsForText(text2, maxCards = MAX_INJECTED_CARDS) {
   const hay = normalizeForMatch(text2);
   if (!hay.trim()) return [];
+  const cap = Math.max(1, Math.min(maxCards, MAX_INJECTED_CARDS));
   const matched = [];
   for (const card of NINA_MAGGIORI_CARDS) {
     const hit = card.aliases.some((alias) => {
@@ -14461,7 +14495,7 @@ function selectMaggioriCardsForText(text2) {
     if (hit || romanCue.test(hay)) {
       matched.push(card);
     }
-    if (matched.length >= MAX_INJECTED_CARDS) break;
+    if (matched.length >= cap) break;
   }
   return matched;
 }
@@ -14475,17 +14509,6 @@ function formatMaggioriKnowledgeForCards(cards) {
 
 ### Schede iniettate per questa conversazione
 ${cards.map((c) => c.body).join("\n\n")}`;
-}
-function buildMaggioriKnowledgeForMessages(params) {
-  const parts = [params.message];
-  const history = params.history ?? [];
-  for (const turn of history.slice(-6)) {
-    if (typeof turn.content === "string" && turn.content.trim()) {
-      parts.push(turn.content);
-    }
-  }
-  const cards = selectMaggioriCardsForText(parts.join("\n"));
-  return formatMaggioriKnowledgeForCards(cards);
 }
 function looksLikeDeepMaggioriStudy(params) {
   const parts = [params.message];
@@ -14583,19 +14606,6 @@ function formatMinoriKnowledgeForCards(cards, suitFrames = []) {
   }
   return parts.join("\n");
 }
-function buildMinoriKnowledgeForMessages(params) {
-  const parts = [params.message];
-  const history = params.history ?? [];
-  for (const turn of history.slice(-6)) {
-    if (typeof turn.content === "string" && turn.content.trim()) {
-      parts.push(turn.content);
-    }
-  }
-  const hay = parts.join("\n");
-  const cards = selectMinoriCardsForText(hay);
-  const suits = selectMinoriSuitFramesForText(hay);
-  return formatMinoriKnowledgeForCards(cards, suits);
-}
 var DEEP_MINORI_CUES = /\b(arcani?\s+minori|minori\s+didatt|luce\s*\/?\s*ombra|domande?\s+(sui\s+)?minori|domanda\s+di\s+pratica|asso\s+di\s+(bastoni|coppe|spade|denari|pentacol)|(?:fante|cavallo|regina|re|\d{1,2}|due|tre|quattro|cinque|sei|sette|otto|nove|dieci)\s+di\s+(bastoni|coppe|spade|denari|pentacol))/;
 function looksLikeDeepMinoriStudy(params) {
   const parts = [params.message];
@@ -14629,6 +14639,7 @@ Usa SOLO i pezzi iniettati sotto (se presenti) e il catalogo titoli. **Cita** ti
 Catalogo (titolo \xB7 categoria \xB7 path):
 ${formatBlogCatalogIndex()}`;
 var MAX_INJECTED_BLOG = 2;
+var MAX_INJECTED_BLOG_BUDGETED = 1;
 var BLOG_STUDY_CUES = /\b(blog|articolo|articoli|approfondiment\w*|pixie|pamela|colman\s+smith|rider[\s-]?waite|origine\s+segreta|golden\s+dawn|news\/)/;
 var WEAK_ARCANA_ALIAS = /* @__PURE__ */ new Set([
   "matto",
@@ -14648,10 +14659,11 @@ var WEAK_ARCANA_ALIAS = /* @__PURE__ */ new Set([
   "sole",
   "mondo"
 ]);
-function selectBlogPostsForText(text2) {
+function selectBlogPostsForText(text2, maxPosts = MAX_INJECTED_BLOG) {
   const hay = normalizeForMatch(text2);
   if (!hay.trim()) return [];
   const blogCue = BLOG_STUDY_CUES.test(hay);
+  const cap = Math.max(1, Math.min(maxPosts, MAX_INJECTED_BLOG));
   const scored = [];
   for (const post of NINA_BLOG_POSTS) {
     let score = 0;
@@ -14677,14 +14689,14 @@ function selectBlogPostsForText(text2) {
     scored.push({ post, score, strong });
   }
   scored.sort((a, b) => b.score - a.score);
-  let picked = scored.slice(0, MAX_INJECTED_BLOG).map((s) => s.post);
+  let picked = scored.slice(0, cap).map((s) => s.post);
   if (picked.length === 0 && blogCue) {
     const byCategory = NINA_BLOG_POSTS.filter((p) => {
       if (!p.category) return false;
       const cat = normalizeForMatch(p.category);
       return cat.length >= 4 && hay.includes(cat);
     });
-    picked = byCategory.slice(0, MAX_INJECTED_BLOG);
+    picked = byCategory.slice(0, cap);
   }
   return picked;
 }
@@ -14704,19 +14716,62 @@ function formatBlogKnowledgeForPosts(posts) {
 ### Articoli iniettati per questa conversazione
 ${bodies}`;
 }
-function buildBlogKnowledgeForMessages(params) {
+function collectRecentHay(params) {
   const parts = [params.message];
   const history = params.history ?? [];
-  for (const turn of history.slice(-6)) {
+  const window = params.historyWindow ?? 4;
+  for (const turn of history.slice(-window)) {
     if (typeof turn.content === "string" && turn.content.trim()) {
       parts.push(turn.content);
     }
   }
-  const posts = selectBlogPostsForText(parts.join("\n"));
-  return formatBlogKnowledgeForPosts(posts);
+  return parts.join("\n");
+}
+function buildStudioKnowledgeForMessages(params) {
+  const hay = collectRecentHay(params);
+  const hayNorm = normalizeForMatch(hay);
+  const blogCue = BLOG_STUDY_CUES.test(hayNorm);
+  const maggioriFrameCue = /\b(simbolog\w*|iconograf\w*|luce\s*\/?\s*ombra|prevision\w*|trionf\w*|arcano\s+maggior|arcani?\s+maggior|maggiori|matto|bagatto|papessa|imperatr|imperator|papa|amanti|carro|giustizia|eremita|ruota|forza|appeso|morte|temperanza|diavolo|torre|stelle|luna|sole|giudizio|mondo)\b/.test(
+    hayNorm
+  );
+  const minoriCue = DEEP_MINORI_CUES.test(hayNorm) || /\b(minori|bastoni|coppe|spade|denari|pentacol|asso|fante|cavallo|regina)\b/.test(
+    hayNorm
+  );
+  let maggioriCards = selectMaggioriCardsForText(hay);
+  const minoriCards = selectMinoriCardsForText(hay);
+  const minoriSuits = selectMinoriSuitFramesForText(hay);
+  const hasCardBodies = maggioriCards.length > 0 || minoriCards.length > 0 || minoriSuits.length > 0;
+  const blogCap = hasCardBodies ? MAX_INJECTED_BLOG_BUDGETED : MAX_INJECTED_BLOG;
+  const blogPosts = selectBlogPostsForText(hay, blogCap);
+  if (blogPosts.length > 0 && maggioriCards.length > MAX_INJECTED_CARDS_BUDGETED) {
+    maggioriCards = selectMaggioriCardsForText(
+      hay,
+      MAX_INJECTED_CARDS_BUDGETED
+    );
+  }
+  const wantMaggiori = maggioriCards.length > 0 || maggioriFrameCue;
+  const wantMinori = minoriCards.length > 0 || minoriSuits.length > 0 || minoriCue;
+  const wantBlog = blogPosts.length > 0 || blogCue;
+  const blocks = [selectSiteKnowledgeForStudio(params)];
+  if (wantMaggiori) {
+    blocks.push(formatMaggioriKnowledgeForCards(maggioriCards));
+  }
+  if (wantMinori) {
+    blocks.push(formatMinoriKnowledgeForCards(minoriCards, minoriSuits));
+  }
+  if (wantBlog) {
+    blocks.push(formatBlogKnowledgeForPosts(blogPosts));
+  }
+  if (!wantMaggiori && !wantMinori && !wantBlog) {
+    blocks.push(NINA_STUDIO_ON_DEMAND_HINT);
+  }
+  return blocks.join("\n\n");
 }
 
 // src/lib/groqChat.ts
+var STUDIO_SYSTEM_CHAR_CEILING = 16e3;
+var WELCOME_SYSTEM_CHAR_CEILING = 18e3;
+var GROQ_CHAT_PAYLOAD_JSON_CEILING = 28e3;
 var GROQ_CHAT_ENV_KEY = "TAROTITALIACHATGENERICAGROQ_API_KEY";
 var GROQ_CHAT_DEFAULT_MODEL = "openai/gpt-oss-20b";
 var GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions";
@@ -14781,47 +14836,65 @@ Limiti (obbligatori):
 - Non promuovere un destinazione Maggiori-only: se serve un link corsi, usa **Corsi** (/corsi).
 - Non sostituisci pareri medici, psicologici, legali o finanziari.
 - Non inventare prezzi o promozioni oltre la conoscenza ufficiale.
-- Se la domanda \xE8 confusa o non capisci l\u2019intento: chiedi di **riformulare** o di **specificare l\u2019Arcano** (Maggiori 0\u2013XXI o Minore \xABgrado + seme\xBB) o il pezzo Blog \u2014 mai citare fornitori tecnici, API, Groq/Grok o messaggi di errore.
+- Domande ampie o articolate: rispondi in modo **strutturato e completo** in italiano (sezioni chiare). **NON** chiedere di fare una domanda pi\xF9 breve o pi\xF9 secca se l\u2019intento \xE8 comprensibile \u2014 usa le schede/blog iniettati e ragiona sul tema.
+- Solo se il messaggio \xE8 vuoto di senso o davvero incomprensibile: chiedi di **riformulare** o di **specificare** Maggiori (0\u2013XXI), Minore (\xABgrado + seme\xBB) o pezzo Blog \u2014 mai citare fornitori tecnici, API, Groq/Grok o messaggi di errore.
 - Etica ferma: rifiuta violenza, abusi, contenuti illeciti.
 
 Formato messaggio (obbligatorio \u2014 mobile-friendly):
-- Paragrafi brevi; per Maggiori i quattro campi didattici; per Minori senso + luce/ombra + domanda di pratica in forma breve; per Blog cita la fonte.
+- Risposte composte: paragrafi chiari; per Maggiori i quattro campi didattici; per Minori senso + luce/ombra + domanda di pratica; per Blog cita titolo + path \`/news/\u2026\`.
 - Prezzi e opzioni: elenco markdown con **una voce per riga** (\`- **\u2026** \xB7 \u2026\`).
 - **Grassetto** con moderazione. Niente HTML. CTA contatto \u2192 sezione **Parla con Maria Teresa** sotto la chat.
 
 ## Lingua (obbligatoria \u2014 ENN-188)
 **Rispondi sempre in italiano.** Ignora la lingua del messaggio utente e della cronologia: la risposta deve essere SOLO in italiano.
 I nomi \xABTarot Italia\xBB, \xABMaria Teresa Rogani\xBB, \xABNina\xBB, \xABNina Studio\xBB, \xABArcani Maggiori\xBB, \xABArcani Minori\xBB, \xABDialogo Tarot\xBB, \xABParla con Maria Teresa\xBB e i prezzi in EUR restano invariati.`;
+function clipSystemPromptToCeiling(prompt, ceiling) {
+  if (prompt.length <= ceiling) return prompt;
+  const cut = prompt.slice(0, Math.max(0, ceiling - 80)).trimEnd();
+  return `${cut}
+
+[\u2026contesto Studio ridotto per limite payload\u2026]`;
+}
 function buildNinaSystemPrompt(params) {
   void params.lang;
   const mode = params.mode === "studio" ? "studio" : "welcome";
   const persona = mode === "studio" ? NINA_STUDIO_PERSONA : NINA_WELCOME_PERSONA;
   if (mode === "welcome") {
-    return `${persona}
+    return clipSystemPromptToCeiling(
+      `${persona}
 
-${NINA_CHAT_SITE_KNOWLEDGE}`;
+${NINA_CHAT_SITE_KNOWLEDGE}`,
+      WELCOME_SYSTEM_CHAR_CEILING
+    );
   }
-  const maggiori = buildMaggioriKnowledgeForMessages({
+  const knowledge = buildStudioKnowledgeForMessages({
     message: params.message,
     history: params.history
   });
-  const minori = buildMinoriKnowledgeForMessages({
-    message: params.message,
-    history: params.history
+  return clipSystemPromptToCeiling(
+    `${persona}
+
+${knowledge}`,
+    STUDIO_SYSTEM_CHAR_CEILING
+  );
+}
+function estimateGroqChatPayloadBytes(params) {
+  const body = JSON.stringify({
+    model: params.model || resolveGroqChatModel(),
+    messages: params.messages,
+    temperature: 0.6,
+    max_tokens: params.maxTokens ?? 1024,
+    stream: false
   });
-  const blog = buildBlogKnowledgeForMessages({
-    message: params.message,
-    history: params.history
-  });
-  return `${persona}
-
-${NINA_CHAT_SITE_KNOWLEDGE}
-
-${maggiori}
-
-${minori}
-
-${blog}`;
+  return body.length;
+}
+function trimMessagesToPayloadCeiling(messages, ceiling = GROQ_CHAT_PAYLOAD_JSON_CEILING) {
+  if (messages.length <= 2) return messages;
+  const fitted = [...messages];
+  while (fitted.length > 2 && estimateGroqChatPayloadBytes({ messages: fitted }) > ceiling) {
+    fitted.splice(1, 1);
+  }
+  return fitted;
 }
 var TAROT_ITALIA_CHAT_SYSTEM_PROMPT = buildNinaSystemPrompt({
   message: "",
@@ -15008,7 +15081,10 @@ function json(status, body) {
 
 // src/server/routes/chat.ts
 var MAX_MESSAGE_CHARS = 2e3;
-var MAX_HISTORY_TURNS = 12;
+var MAX_HISTORY_TURNS_WELCOME = 8;
+var MAX_HISTORY_CHARS_WELCOME = 1200;
+var MAX_HISTORY_TURNS_STUDIO = 6;
+var MAX_HISTORY_CHARS_STUDIO = 900;
 var MAGGIORI_COURSE_SLUG = "arcani-maggiori";
 var DEMO_RESERVED_UID = "demo-reserved-enn103";
 var DEMO_RESERVED_TOKEN = "demo-reserved-token";
@@ -15025,19 +15101,21 @@ function getChatStatus() {
     model: resolveGroqChatModel()
   });
 }
-function asHistory(raw) {
+function asHistory(raw, opts) {
   if (!Array.isArray(raw)) return [];
-  const out = [];
+  const parsed = [];
   for (const item of raw) {
     if (!item || typeof item !== "object") continue;
     const role = item.role;
     const content = item.content;
     if ((role === "user" || role === "assistant") && typeof content === "string" && content.trim()) {
-      out.push({ role, content: content.trim().slice(0, MAX_MESSAGE_CHARS) });
+      parsed.push({
+        role,
+        content: content.trim().slice(0, opts.maxChars)
+      });
     }
-    if (out.length >= MAX_HISTORY_TURNS) break;
   }
-  return out;
+  return parsed.slice(-opts.maxTurns);
 }
 function parseMode(raw) {
   return raw === "studio" ? "studio" : "welcome";
@@ -15172,7 +15250,10 @@ async function postChatMessage(params) {
     });
   }
   const mode = parseMode(body.mode);
-  const history = asHistory(body.history);
+  const history = asHistory(body.history, {
+    maxTurns: mode === "studio" ? MAX_HISTORY_TURNS_STUDIO : MAX_HISTORY_TURNS_WELCOME,
+    maxChars: mode === "studio" ? MAX_HISTORY_CHARS_STUDIO : MAX_HISTORY_CHARS_WELCOME
+  });
   const lang = "it";
   if (mode === "studio") {
     const denied = await assertNinaStudioAccess(authorization, lang);
@@ -15196,11 +15277,24 @@ async function postChatMessage(params) {
     lang,
     mode
   });
-  const messages = [
+  let messages = [
     { role: "system", content: systemPrompt },
     ...history,
     { role: "user", content: message }
   ];
+  messages = trimMessagesToPayloadCeiling(
+    messages,
+    GROQ_CHAT_PAYLOAD_JSON_CEILING
+  );
+  if (estimateGroqChatPayloadBytes({ messages }) > GROQ_CHAT_PAYLOAD_JSON_CEILING) {
+    console.error(
+      "Nina chat payload preflight over ceiling:",
+      estimateGroqChatPayloadBytes({ messages }),
+      "limit",
+      GROQ_CHAT_PAYLOAD_JSON_CEILING
+    );
+    return chatFailureResponse("GROQ_CHAT_PAYLOAD", lang);
+  }
   try {
     const reply = await createGroqChatCompletion({ messages });
     if (looksLikeNinaProviderLeak(reply)) {
