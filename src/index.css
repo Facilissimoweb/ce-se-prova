@@ -35,6 +35,19 @@
     }
   }
 
+  /*
+   * ENN-245 / ENN-246 — raise the bar on casual text copy.
+   * Apply on html + body + #root so wrappers cannot re-enable selection
+   * via inheritance gaps; forms re-enabled below.
+   */
+  html,
+  body,
+  #root {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
   body {
     background-color: #12100e;
     color: #f4f1ea;
@@ -44,9 +57,6 @@
     /* Keep content clear of notch / home-indicator without shifting layout */
     padding-left: env(safe-area-inset-left, 0px);
     padding-right: env(safe-area-inset-right, 0px);
-    /* ENN-245 — raise the bar on casual text copy (forms re-enabled below) */
-    -webkit-user-select: none;
-    user-select: none;
   }
 
   #root {
@@ -56,27 +66,44 @@
   }
 
   /*
-   * ENN-245 — allow selection/typing in real form controls and explicit opt-ins.
-   * Booking, login, chat, notes, Dialogo inputs must keep normal paste/edit.
+   * ENN-246 — force non-select on SPA descendants. Tailwind utilities or
+   * injected nodes (e.g. Translate <font>) otherwise leave easy select-all
+   * paths for casual users. Forms / .ti-allow-select win below.
+   */
+  #root *,
+  #root *::before,
+  #root *::after {
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-touch-callout: none;
+  }
+
+  /*
+   * ENN-245 / ENN-246 — allow selection/typing in real form controls and
+   * explicit opt-ins. Booking, login, chat Nina, notes, Dialogo stay editable.
    */
   input,
   textarea,
   select,
   [contenteditable='true'],
   [contenteditable=''],
-  .ti-allow-select {
-    -webkit-user-select: text;
-    user-select: text;
+  .ti-allow-select,
+  .ti-allow-select * {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+    -webkit-touch-callout: default;
   }
 
   /* ENN-245 — discourage image drag-save; JS also sets draggable=false */
   img,
   picture,
-  video {
+  video,
+  canvas {
     -webkit-user-drag: none;
     user-drag: none;
-    -webkit-user-select: none;
-    user-select: none;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-touch-callout: none;
   }
 
   /*
