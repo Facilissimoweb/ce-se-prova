@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Eye, EyeOff, Database, CreditCard, MessageSquare, Server } from 'lucide-react';
-import { handoffArchitectureSpec } from '../data/siteContent';
+import { handoffArchitectureSpec } from '../data/handoffArchitectureSpec';
 
 interface HandoffDrawerProps {
   isOpen: boolean;

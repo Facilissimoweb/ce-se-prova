@@ -1,32 +1,23 @@
 /**
- * ENN-239 — Owner-only CMS / Handoff debug UI.
- * Public visitors must never see Handoff Tecnico, Ispeziona Chiavi, env lists, etc.
+ * ENN-243 — Handoff / CMS debug UI is local Vite DEV only.
  *
- * Enabled when:
- * - signed-in email is in the owner allowlist, or
- * - `VITE_OWNER_DEBUG_UI=true` (local / Maria preview builds only).
+ * Production builds must never expose Handoff Tecnico, Ispeziona Chiavi,
+ * env dumps, Stripe Checkout Handoff docs, or WhatsApp webhook specs in the SPA.
+ * Owner-email gates are intentionally unused: they still showed those surfaces
+ * to Maria when signed in on www.
+ *
+ * Call sites should prefer a literal `import.meta.env.DEV` branch so Vite can
+ * dead-code-eliminate the drawer and related strings from production bundles.
  */
 
-/** Same default owner as Coming Soon (ENN-95). Keep in sync. */
-export const OWNER_DEBUG_EMAILS = [
-  'mariateresarogani@gmail.com',
-] as const;
-
-export function isOwnerDebugEmail(
-  email: string | null | undefined
-): boolean {
-  if (!email) return false;
-  const normalized = email.trim().toLowerCase();
-  return (OWNER_DEBUG_EMAILS as readonly string[]).includes(normalized);
+/** True only in `vite` / `npm run dev` — always false after `vite build`. */
+export function canShowDevDebugUi(): boolean {
+  return import.meta.env.DEV;
 }
 
-/** Build-time opt-in for local owner tools without Google sign-in. */
-export function isOwnerDebugUiEnvEnabled(): boolean {
-  return import.meta.env.VITE_OWNER_DEBUG_UI === 'true';
-}
-
+/** @deprecated Use canShowDevDebugUi / import.meta.env.DEV (ENN-243). */
 export function canShowOwnerDebugUi(
-  email: string | null | undefined
+  _email?: string | null
 ): boolean {
-  return isOwnerDebugUiEnvEnabled() || isOwnerDebugEmail(email);
+  return canShowDevDebugUi();
 }

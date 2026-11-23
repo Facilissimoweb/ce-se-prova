@@ -11,11 +11,6 @@ interface ImportMetaEnv {
    * Set `true` + server `MAGGIORI_PURCHASE_ENABLED=true` → Redeploy to re-enable.
    */
   readonly VITE_MAGGIORI_PURCHASE_ENABLED?: string;
-  /**
-   * ENN-239 — Show Handoff/CMS debug UI without owner Google sign-in.
-   * Never set `true` on Production public builds.
-   */
-  readonly VITE_OWNER_DEBUG_UI?: string;
 }
 
 interface ImportMeta {

@@ -5,13 +5,13 @@
  * full access when signed in as the owner Google account: Area Riservata,
  * dispense, gated blog, Nina Studio — no Stripe paywall.
  *
- * Allowlist matches Coming Soon / owner debug (mariateresarogani@gmail.com).
+ * Allowlist matches Coming Soon owner email (mariateresarogani@gmail.com).
  * Server may add COMING_SOON_OWNER_EMAILS extras.
  */
 
 import { MAGGIORI_PURCHASE_COURSE_SLUG } from './maggioriPurchaseMode';
 
-/** Hardcoded owner emails — keep in sync with Coming Soon / ownerDebugUi. */
+/** Hardcoded owner emails — keep in sync with Coming Soon. */
 export const OWNER_COURSE_ACCESS_EMAILS = [
   'mariateresarogani@gmail.com',
 ] as const;

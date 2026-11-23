@@ -115,15 +115,20 @@ assert(
 
 const app = readFileSync(path.join(root, 'src/App.tsx'), 'utf8');
 assert(
-  app.includes('canShowOwnerDebugUi') &&
-    app.includes('ownerDebugUi') &&
-    /ownerDebugUi\s*\?\s*\(/.test(app),
-  'App gates Handoff/CMS footer + drawer behind ownerDebugUi'
+  app.includes('import.meta.env.DEV') &&
+    /import\.meta\.env\.DEV\s*\?\s*\(/.test(app) &&
+    app.includes('HandoffDrawer'),
+  'App gates Handoff/CMS footer + drawer behind import.meta.env.DEV (ENN-243)'
 );
 assert(
-  !/onOpenHandoff=\{\(\)\s*=>\s*setIsHandoffOpen\(true\)\}/.test(app) ||
-    app.includes('ownerDebugUi ? () => setIsHandoffOpen(true)'),
-  'FloatingSideRail handoff only wired when ownerDebugUi'
+  app.includes('import.meta.env.DEV') &&
+    app.includes('setIsHandoffOpen(true)'),
+  'FloatingSideRail handoff only wired when import.meta.env.DEV'
+);
+assert(
+  !app.includes('canShowOwnerDebugUi') &&
+    !app.includes('ownerDebugUi'),
+  'App no longer uses owner-email debug gate (ENN-243)'
 );
 
 const ownerDebug = readFileSync(
@@ -131,9 +136,10 @@ const ownerDebug = readFileSync(
   'utf8'
 );
 assert(
-  ownerDebug.includes('mariateresarogani@gmail.com') &&
-    ownerDebug.includes('VITE_OWNER_DEBUG_UI'),
-  'ownerDebugUi allowlists Maria + env opt-in'
+  ownerDebug.includes('import.meta.env.DEV') &&
+    !ownerDebug.includes('mariateresarogani@gmail.com') &&
+    !ownerDebug.includes('VITE_OWNER_DEBUG_UI'),
+  'ownerDebugUi is DEV-only (no owner email / env opt-in)'
 );
 
 const consulti = readFileSync(

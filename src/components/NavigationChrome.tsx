@@ -619,7 +619,7 @@ export function TopBar({
 interface FloatingSideRailProps {
   onNavigate: (screen: ScreenId) => void;
   onOpenPrivacy: () => void;
-  /** ENN-239 — owner-only; omit for public visitors */
+  /** ENN-243 — Vite DEV only; omit in production (dead-code eliminated). */
   onOpenHandoff?: () => void;
   showCmsKeys?: boolean;
 }
@@ -627,7 +627,7 @@ interface FloatingSideRailProps {
 /**
  * ENN-240 — Desktop (xl+) quick tools only: booking + dialogo + privacy.
  * Contacts live in StickyContactBar; Area personale lives in the top nav.
- * Owner handoff stays gated (#204).
+ * Handoff/CMS Code button is DEV-only (ENN-243) — never on production builds.
  */
 export function FloatingSideRail({
   onNavigate,
@@ -636,7 +636,6 @@ export function FloatingSideRail({
   showCmsKeys = false,
 }: FloatingSideRailProps) {
   const { t } = useTranslation('common');
-  const showOwnerHandoff = typeof onOpenHandoff === 'function';
   return (
     <aside
       className="ti-rail-side hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 p-2 rounded-full glass-tier-2"
@@ -670,12 +669,12 @@ export function FloatingSideRail({
       >
         <ShieldCheck className="w-4 h-4" />
       </button>
-      {showOwnerHandoff ? (
+      {import.meta.env.DEV && typeof onOpenHandoff === 'function' ? (
         <button
           type="button"
           onClick={onOpenHandoff}
-          title={t('rail.handoff')}
-          aria-label={t('rail.handoff')}
+          title="Apri specifiche CMS e Handoff (solo DEV)"
+          aria-label="Apri specifiche CMS e Handoff (solo DEV)"
           className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
             showCmsKeys
               ? 'bg-[#D4AF37] text-[#12100E]'
