@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight,
   BookOpen,
   Calendar,
+  ChevronDown,
   Code2,
   Compass,
   Lock,
@@ -18,6 +19,8 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ScreenId } from '../types/handoff';
+import { BLOG_CATEGORIES, type BlogCategory } from '../lib/blogPosts';
+import { blogCategorySearchParam } from '../lib/appPaths';
 import { afterNextPaint, scrollWindowTo } from '../lib/scrollNavigation';
 import { whatsappHref } from '../lib/siteContacts';
 import { GoogleTranslateWidget } from './GoogleTranslateWidget';
@@ -26,9 +29,15 @@ import { TarotNavLogo } from './TarotEmblem';
 
 interface TopBarProps {
   activeScreen: ScreenId;
-  onNavigate: (screen: ScreenId) => void;
+  onNavigate: (
+    screen: ScreenId,
+    options?: { focusId?: string; search?: string }
+  ) => void;
   onOpenPrivacy: () => void;
 }
+
+/** ENN-232 — exact Italian macro-area labels (nav + /news?category=). */
+const BLOG_NAV_CATEGORIES: readonly BlogCategory[] = BLOG_CATEGORIES;
 
 /** Desktop + mobile page links — Home → Contatti. Area personale stays a CTA below. */
 const NAV_ITEM_DEFS: {
@@ -163,6 +172,9 @@ export function TopBar({
     [t]
   );
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [desktopBlogOpen, setDesktopBlogOpen] = useState(false);
+  const [mobileBlogOpen, setMobileBlogOpen] = useState(false);
+  const desktopBlogRef = useRef<HTMLDivElement>(null);
   /** When true, closing the drawer must not restore mid-page scroll (route change → top). */
   const skipScrollRestoreRef = React.useRef(false);
   /** Capture scrollY before React reflow from opening the fixed header. */
@@ -171,9 +183,43 @@ export function TopBar({
   const setMobileMenuOpen = (open: boolean) => {
     if (open) {
       lockedScrollYRef.current = window.scrollY;
+    } else {
+      setMobileBlogOpen(false);
     }
     setIsMobileMenuOpen(open);
   };
+
+  const goBlogCategory = (category: BlogCategory) => {
+    setDesktopBlogOpen(false);
+    setMobileBlogOpen(false);
+    if (isMobileMenuOpen) {
+      skipScrollRestoreRef.current = true;
+    }
+    setMobileMenuOpen(false);
+    onNavigate('news', { search: blogCategorySearchParam(category) });
+  };
+
+  // ENN-232 — desktop Blog submenu: click-outside + Escape
+  useEffect(() => {
+    if (!desktopBlogOpen) return;
+    const handlePointer = (event: MouseEvent) => {
+      if (
+        desktopBlogRef.current &&
+        !desktopBlogRef.current.contains(event.target as Node)
+      ) {
+        setDesktopBlogOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setDesktopBlogOpen(false);
+    };
+    document.addEventListener('mousedown', handlePointer);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointer);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [desktopBlogOpen]);
 
   // Close on Escape; lock scroll without losing the top navbar mid-page
   useEffect(() => {
@@ -181,6 +227,10 @@ export function TopBar({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        if (mobileBlogOpen) {
+          setMobileBlogOpen(false);
+          return;
+        }
         setMobileMenuOpen(false);
       }
     };
@@ -219,13 +269,14 @@ export function TopBar({
       afterNextPaint(() => scrollWindowTo(targetY, 'auto'));
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, mobileBlogOpen]);
 
   // Ensure drawer closes if viewport resizes to desktop
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
         setMobileMenuOpen(false);
+        setDesktopBlogOpen(false);
       }
     };
     window.addEventListener('resize', handleResize);
@@ -273,6 +324,63 @@ export function TopBar({
           >
             {navItems.map((item) => {
               const isActive = activeScreen === item.id;
+              if (item.id === 'news') {
+                return (
+                  <div
+                    key={item.id}
+                    ref={desktopBlogRef}
+                    className="relative shrink-0"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setDesktopBlogOpen((open) => !open)}
+                      aria-expanded={desktopBlogOpen}
+                      aria-haspopup="menu"
+                      aria-controls="desktop-blog-submenu"
+                      aria-current={isActive ? 'page' : undefined}
+                      className={`relative inline-flex items-center gap-1 py-2 text-xs lg:text-sm font-medium whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded ${
+                        isActive || desktopBlogOpen
+                          ? 'text-[#D4AF37]'
+                          : 'text-[#A39B93] hover:text-[#F4F1EA]'
+                      }`}
+                    >
+                      {item.label}
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                          desktopBlogOpen ? 'rotate-180' : ''
+                        }`}
+                        aria-hidden="true"
+                      />
+                      {isActive && (
+                        <span
+                          className="absolute left-0 right-0 bottom-0 h-[1.5px] bg-[#D4AF37]"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </button>
+                    {desktopBlogOpen && (
+                      <div
+                        id="desktop-blog-submenu"
+                        role="menu"
+                        aria-label={item.label}
+                        className="ti-blog-submenu-desktop absolute left-1/2 top-full z-50 mt-2 min-w-[10.5rem] -translate-x-1/2 py-1.5"
+                      >
+                        {BLOG_NAV_CATEGORIES.map((category) => (
+                          <button
+                            key={category}
+                            type="button"
+                            role="menuitem"
+                            onClick={() => goBlogCategory(category)}
+                            className="ti-blog-submenu-item w-full px-3.5 py-2 text-left text-xs font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#D4AF37]"
+                          >
+                            {category}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
               return (
                 <button
                   key={item.id}
@@ -378,11 +486,66 @@ export function TopBar({
               </div>
 
               {/* ENN-224 — Maria ti-menu-list (icon boxes + title/sub + arrow) */}
+              {/* ENN-232 — Blog expands in-place (compact) so density stays a prima vista when closed */}
               <nav aria-label={t('nav.pagesAria')} className="ti-menu-list">
                 {navItems
                   .filter((item) => item.id !== 'corsi' && item.id !== 'chat')
                   .map((item) => {
                     const isActive = activeScreen === item.id;
+                    if (item.id === 'news') {
+                      return (
+                        <div key={item.id} className="ti-blog-mobile-block">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setMobileBlogOpen((open) => !open)
+                            }
+                            aria-expanded={mobileBlogOpen}
+                            aria-controls="mobile-blog-submenu"
+                            aria-current={isActive ? 'page' : undefined}
+                            className="ti-menu-item focus-visible:ring-2 focus-visible:ring-[#E2BE48]/60"
+                          >
+                            <div className="ti-menu-left">
+                              <div className="ti-icon-box">
+                                <TiMenuIcon id={item.id} />
+                              </div>
+                              <div className="min-w-0">
+                                <h3 className="ti-title truncate">
+                                  {item.label}
+                                </h3>
+                                <p className="ti-sub">{item.subtitle}</p>
+                              </div>
+                            </div>
+                            <ChevronDown
+                              className={`ti-arrow w-[13px] h-[13px] transition-transform duration-200 ${
+                                mobileBlogOpen ? 'rotate-180' : ''
+                              }`}
+                              aria-hidden="true"
+                            />
+                          </button>
+                          {mobileBlogOpen && (
+                            <div
+                              id="mobile-blog-submenu"
+                              role="menu"
+                              aria-label={item.label}
+                              className="ti-blog-submenu-mobile"
+                            >
+                              {BLOG_NAV_CATEGORIES.map((category) => (
+                                <button
+                                  key={category}
+                                  type="button"
+                                  role="menuitem"
+                                  onClick={() => goBlogCategory(category)}
+                                  className="ti-blog-submenu-mobile-item focus-visible:ring-2 focus-visible:ring-[#E2BE48]/60"
+                                >
+                                  {category}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
                     return (
                       <button
                         key={item.id}

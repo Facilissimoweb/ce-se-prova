@@ -17,35 +17,61 @@ import {
 } from '../lib/blogPosts';
 import { formatArticleDate } from '../lib/newsFeed';
 import {
+  blogCategoryFromSearch,
   blogSlugFromPath,
   navigateBlogPost,
   navigatePath,
   PATH_CHANGE_EVENT,
   pathForBlogPost,
 } from '../lib/appPaths';
+import { preservedGoogtransHash } from '../lib/googleTranslateRuntime';
 import { absoluteUrl, getSiteOrigin } from '../lib/seo';
 
 type Props = {
   onNavigate: (
     screen: ScreenId,
-    options?: { focusId?: string }
+    options?: { focusId?: string; search?: string }
   ) => void;
 };
 
 type CategoryFilter = (typeof BLOG_CATEGORIES)[number] | 'Tutti';
 
+function categoryFromLocation(): CategoryFilter {
+  const matched = blogCategoryFromSearch(
+    window.location.search,
+    BLOG_CATEGORIES
+  );
+  return (matched as CategoryFilter | null) ?? 'Tutti';
+}
+
+/** Keep `?category=` in sync without dropping googtrans hash / lang. */
+function replaceBlogListSearch(category: CategoryFilter) {
+  const params = new URLSearchParams(window.location.search);
+  if (category === 'Tutti') {
+    params.delete('category');
+  } else {
+    params.set('category', category);
+  }
+  const qs = params.toString();
+  const url = `/news${qs ? `?${qs}` : ''}${preservedGoogtransHash()}`;
+  window.history.replaceState({}, '', url);
+}
+
 export function NewsScreen({ onNavigate }: Props) {
   const [slug, setSlug] = useState<string | null>(() =>
     blogSlugFromPath(window.location.pathname)
   );
-  const [category, setCategory] = useState<CategoryFilter>('Tutti');
+  const [category, setCategory] = useState<CategoryFilter>(() =>
+    categoryFromLocation()
+  );
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
   useEffect(() => {
-    const syncSlug = () => {
+    const syncFromLocation = () => {
       const fromPath = blogSlugFromPath(window.location.pathname);
       if (!fromPath) {
         setSlug(null);
+        setCategory(categoryFromLocation());
         return;
       }
       const resolved = resolveBlogSlug(fromPath);
@@ -55,12 +81,12 @@ export function NewsScreen({ onNavigate }: Props) {
       }
       setSlug(resolved);
     };
-    syncSlug();
-    window.addEventListener('popstate', syncSlug);
-    window.addEventListener(PATH_CHANGE_EVENT, syncSlug);
+    syncFromLocation();
+    window.addEventListener('popstate', syncFromLocation);
+    window.addEventListener(PATH_CHANGE_EVENT, syncFromLocation);
     return () => {
-      window.removeEventListener('popstate', syncSlug);
-      window.removeEventListener(PATH_CHANGE_EVENT, syncSlug);
+      window.removeEventListener('popstate', syncFromLocation);
+      window.removeEventListener(PATH_CHANGE_EVENT, syncFromLocation);
     };
   }, []);
 
@@ -172,6 +198,7 @@ export function NewsScreen({ onNavigate }: Props) {
                 onClick={() => {
                   setCategory(item);
                   setActiveTag(null);
+                  replaceBlogListSearch(item);
                 }}
                 className={`min-h-[40px] rounded-lg border px-3.5 py-2 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
                   selected
@@ -313,7 +340,7 @@ function ArticleDetail({
   onBack: () => void;
   onNavigate: (
     screen: ScreenId,
-    options?: { focusId?: string }
+    options?: { focusId?: string; search?: string }
   ) => void;
   onTagClick: (tag: string) => void;
 }) {
@@ -439,7 +466,7 @@ function BlogCta({
 }: {
   onNavigate: (
     screen: ScreenId,
-    options?: { focusId?: string }
+    options?: { focusId?: string; search?: string }
   ) => void;
 }) {
   return (
