@@ -8733,6 +8733,35 @@ function zohoConfigured() {
 function isZohoMailConfigured() {
   return Boolean(zohoConfigured());
 }
+async function sendZohoMail(message) {
+  const cfg = zohoConfigured();
+  if (!cfg) {
+    throw new Error("ZOHO_NOT_CONFIGURED");
+  }
+  const fromAddress = process.env.ZOHO_FROM_EMAIL?.trim() || cfg.user;
+  const fromName = process.env.ZOHO_FROM_NAME?.trim() || "Maria Teresa Rogani \xB7 Tarot Italia";
+  const transporter = nodemailer.createTransport({
+    host: cfg.host,
+    port: cfg.port,
+    secure: cfg.port === 465,
+    auth: { user: cfg.user, pass: cfg.pass },
+    connectionTimeout: 2e4,
+    greetingTimeout: 2e4,
+    socketTimeout: 3e4
+  });
+  try {
+    await transporter.sendMail({
+      from: `"${fromName}" <${fromAddress}>`,
+      replyTo: message.replyTo || fromAddress,
+      to: message.to,
+      subject: message.subject,
+      text: message.text,
+      html: message.html
+    });
+  } finally {
+    transporter.close();
+  }
+}
 async function sendZohoMails(messages) {
   const cfg = zohoConfigured();
   if (!cfg) {
@@ -8878,22 +8907,105 @@ async function sendBookingMails(row, extras) {
   await sendZohoMails(messages);
 }
 
+// src/lib/signupNotify.ts
+var DEMO_RESERVED_UID = "demo-reserved-enn103";
+var DEFAULT_ADMIN_NOTIFY_EMAIL = "mariateresarogani@gmail.com";
+function resolveAdminNotifyEmail(env = process.env) {
+  return env.ADMIN_NOTIFY_EMAIL?.trim() || env.ZOHO_STUDIO_EMAIL?.trim() || DEFAULT_ADMIN_NOTIFY_EMAIL;
+}
+function shouldNotifySignup(user, env = process.env) {
+  const uid = (user.uid || "").trim();
+  if (!uid || uid === DEMO_RESERVED_UID) return false;
+  if (env.ADMIN_SIGNUP_NOTIFY === "false") return false;
+  return true;
+}
+function formatCreatedAt(value) {
+  if (!value) return "\u2014";
+  const date2 = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date2.getTime())) return "\u2014";
+  return date2.toLocaleString("it-IT", {
+    timeZone: "Europe/Rome",
+    dateStyle: "short",
+    timeStyle: "short"
+  });
+}
+async function notifyAdminOfNewSignup(user, env = process.env) {
+  if (!shouldNotifySignup(user, env)) {
+    return "skipped";
+  }
+  if (!isZohoMailConfigured()) {
+    console.error(
+      "Missing ZOHO secrets \u2014 signup notify mail skipped (uid=%s)",
+      user.uid
+    );
+    return "skipped";
+  }
+  const to = resolveAdminNotifyEmail(env);
+  const name = (user.displayName || "").trim() || "\u2014";
+  const email = (user.email || "").trim() || "\u2014";
+  const when = formatCreatedAt(user.createdAt);
+  const site = (env.APP_URL?.trim() || env.SITE_URL?.trim() || "https://www.tarotitalia.com").replace(/\/$/, "");
+  const text2 = [
+    "Nuova iscrizione \u2014 Tarot Italia",
+    `Nome: ${name}`,
+    `Email: ${email}`,
+    `UID Firebase: ${user.uid}`,
+    `Primo accesso Area personale: ${when}`,
+    `Sito: ${site}`
+  ].join("\n");
+  const html = `<div style="font-family:Georgia,serif;color:#2B2523;background:#F9F8F6;padding:28px">
+<p style="margin:0 0 12px;font-size:18px;">Nuova iscrizione \u2014 Tarot Italia</p>
+<p style="margin:0;line-height:1.55;">
+<strong>Nome:</strong> ${escapeHtml(name)}<br>
+<strong>Email:</strong> ${escapeHtml(email)}<br>
+<strong>UID Firebase:</strong> ${escapeHtml(user.uid)}<br>
+<strong>Primo accesso Area personale:</strong> ${escapeHtml(when)}<br>
+<strong>Sito:</strong> <a href="${escapeHtml(site)}">${escapeHtml(site)}</a>
+</p>
+</div>`;
+  try {
+    await sendZohoMail({
+      to,
+      subject: `Nuova iscrizione \u2014 ${email !== "\u2014" ? email : user.uid}`,
+      text: text2,
+      html,
+      replyTo: email !== "\u2014" ? email : void 0
+    });
+    console.log("signup notify mail sent", { to, uid: user.uid });
+    return "sent";
+  } catch (error) {
+    console.error("signup notify mail", error);
+    return "failed";
+  }
+}
+
 // src/db/repository.ts
 async function getOrCreateUser(uid, email, displayName) {
   try {
-    const result = await db.insert(users).values({
+    const inserted = await db.insert(users).values({
       uid,
       email,
       displayName: displayName ?? null
-    }).onConflictDoUpdate({
-      target: users.uid,
-      set: {
-        email,
-        ...displayName ? { displayName } : {},
-        updatedAt: /* @__PURE__ */ new Date()
-      }
-    }).returning();
-    return result[0];
+    }).onConflictDoNothing({ target: users.uid }).returning();
+    if (inserted[0]) {
+      void notifyAdminOfNewSignup(inserted[0]).catch((error) => {
+        console.error("signup notify (post-insert)", error);
+      });
+      return inserted[0];
+    }
+    const updated = await db.update(users).set({
+      email,
+      ...displayName ? { displayName } : {},
+      updatedAt: /* @__PURE__ */ new Date()
+    }).where(eq(users.uid, uid)).returning();
+    if (updated[0]) {
+      return updated[0];
+    }
+    const existing = await db.select().from(users).where(eq(users.uid, uid)).limit(1);
+    if (existing[0]) {
+      return existing[0];
+    }
+    throw new Error("Utente non trovato dopo upsert.");
   } catch (error) {
     if (isDbConnectionFailure(error)) {
       resetDbPool();

@@ -230,6 +230,13 @@ async function verifyComingSoonPassword(password, env = readComingSoonEnv()) {
   }
   return false;
 }
+function comingSoonCookieDomain(hostname) {
+  const host = (hostname || "").trim().toLowerCase().replace(/:\d+$/, "");
+  if (host === "tarotitalia.com" || host === "www.tarotitalia.com") {
+    return ".tarotitalia.com";
+  }
+  return void 0;
+}
 function buildUnlockSetCookieHeader(token, opts = { secure: true }) {
   const maxAge = opts.maxAgeSec ?? COMING_SOON_COOKIE_MAX_AGE_SEC;
   const parts = [
@@ -240,9 +247,11 @@ function buildUnlockSetCookieHeader(token, opts = { secure: true }) {
     `Max-Age=${maxAge}`
   ];
   if (opts.secure) parts.push("Secure");
+  const domain = comingSoonCookieDomain(opts.hostname);
+  if (domain) parts.push(`Domain=${domain}`);
   return parts.join("; ");
 }
-function buildClearUnlockCookieHeader(secure) {
+function buildClearUnlockCookieHeader(secure, hostname) {
   const parts = [
     `${COMING_SOON_COOKIE}=`,
     "Path=/",
@@ -251,6 +260,8 @@ function buildClearUnlockCookieHeader(secure) {
     "Max-Age=0"
   ];
   if (secure) parts.push("Secure");
+  const domain = comingSoonCookieDomain(hostname);
+  if (domain) parts.push(`Domain=${domain}`);
   return parts.join("; ");
 }
 
@@ -306,11 +317,18 @@ async function postComingSoonUnlock(input) {
       body: { error: "Impossibile creare la sessione di anteprima." }
     };
   }
+  let hostname;
+  try {
+    hostname = new URL(input.origin).hostname;
+  } catch {
+    hostname = void 0;
+  }
   return {
     status: 200,
     body: { ok: true, redirect: "/", method: "password" },
     setCookie: buildUnlockSetCookieHeader(token, {
-      secure: secureCookie(input.origin)
+      secure: secureCookie(input.origin),
+      hostname
     })
   };
 }
@@ -361,6 +379,12 @@ async function postComingSoonUnlockWithGoogle(input) {
       }
     };
   }
+  let hostname;
+  try {
+    hostname = new URL(input.origin).hostname;
+  } catch {
+    hostname = void 0;
+  }
   return {
     status: 200,
     body: {
@@ -370,15 +394,25 @@ async function postComingSoonUnlockWithGoogle(input) {
       email: (email || "").toLowerCase()
     },
     setCookie: buildUnlockSetCookieHeader(token, {
-      secure: secureCookie(input.origin)
+      secure: secureCookie(input.origin),
+      hostname
     })
   };
 }
 function postComingSoonLock(input) {
+  let hostname;
+  try {
+    hostname = new URL(input.origin).hostname;
+  } catch {
+    hostname = void 0;
+  }
   return {
     status: 200,
     body: { ok: true },
-    setCookie: buildClearUnlockCookieHeader(secureCookie(input.origin))
+    setCookie: buildClearUnlockCookieHeader(
+      secureCookie(input.origin),
+      hostname
+    )
   };
 }
 
