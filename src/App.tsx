@@ -189,7 +189,7 @@ export function App() {
   const scrollByPathRef = useRef<Record<string, number>>({});
 
   const handleNavigate = useCallback(
-    (screen: ScreenId, options?: { focusId?: string }) => {
+    (screen: ScreenId, options?: { focusId?: string; search?: string }) => {
       const focusId =
         options?.focusId ??
         (screen === 'corsi'
@@ -197,10 +197,11 @@ export function App() {
           : screen === 'chat'
             ? SCROLL_LANDMARKS.dialogo
             : null);
+      const search = options?.search ?? '';
 
       // Re-tapping the active route still recenters (mobile menu / footer CTAs).
       if (screen === activeScreenRef.current) {
-        navigatePath(screen);
+        navigatePath(screen, search);
         if (focusId) {
           scrollToIdAfterPaint(focusId, { behavior: 'auto' });
         } else {
@@ -213,7 +214,7 @@ export function App() {
       navigationKindRef.current = 'push';
       pendingFocusIdRef.current = focusId;
       setActiveScreen(screen);
-      navigatePath(screen);
+      navigatePath(screen, search);
     },
     []
   );

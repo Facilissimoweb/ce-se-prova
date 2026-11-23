@@ -256,3 +256,43 @@ export function navigatePath(screen: ScreenId, search = ''): void {
   window.history.pushState({}, '', url);
   notifyPathChange();
 }
+
+/** ENN-232 — Blog macro-area query (`?category=Storia` … exact BLOG_CATEGORIES labels). */
+export function blogCategorySearchParam(category: string): string {
+  return new URLSearchParams({ category }).toString();
+}
+
+/**
+ * Resolve `?category=` against the four Blog macro areas (exact label or
+ * slug alias: storia, autori, a-maggiori, a-minori).
+ */
+export function blogCategoryFromSearch(
+  search: string,
+  categories: readonly string[]
+): string | null {
+  try {
+    const params = new URLSearchParams(
+      search.startsWith('?') ? search.slice(1) : search
+    );
+    const raw = params.get('category')?.trim();
+    if (!raw) return null;
+    if (categories.includes(raw)) return raw;
+    const slug = raw
+      .toLowerCase()
+      .replace(/\./g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+    const aliases: Record<string, string> = {
+      storia: 'Storia',
+      autori: 'Autori',
+      'a-maggiori': 'A. Maggiori',
+      amaggiori: 'A. Maggiori',
+      'a-minori': 'A. Minori',
+      aminori: 'A. Minori',
+    };
+    const mapped = aliases[slug];
+    return mapped && categories.includes(mapped) ? mapped : null;
+  } catch {
+    return null;
+  }
+}
