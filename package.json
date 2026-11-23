@@ -30,7 +30,8 @@
     "test:dispensa-pdf-html": "npx tsx scripts/assert-dispensa-branded-html.ts",
     "test:maggiori-it-source": "npx tsx scripts/assert-maggiori-it-source.ts",
     "test:maggiori-purchase-hold": "npx tsx scripts/assert-maggiori-purchase-hold.ts",
-    "test:handoff-purged": "npx tsx scripts/assert-handoff-purged-from-prod.ts"
+    "test:handoff-purged": "npx tsx scripts/assert-handoff-purged-from-prod.ts",
+    "deploy:auth-hosting": "npx --yes firebase-tools@13 deploy --only hosting --project gen-lang-client-0853491667"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

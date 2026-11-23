@@ -74,3 +74,14 @@ Vedi `.env.example`. Sintesi:
 La config client Firebase è in `firebase-applet-config.json`.
 In produzione puoi sovrascrivere solo il dominio Auth con `VITE_FIREBASE_AUTH_DOMAIN`
 (es. `auth.tarotitalia.com`, ENN-247) dopo DNS + Firebase Hosting custom domain.
+
+### Firebase Hosting (solo auth domain, ENN-248)
+
+Il sito pubblico resta su **Vercel**. La cartella `firebase-hosting/` + `firebase.json` / `.firebaserc`
+servono solo a sbloccare Hosting e collegare `auth.tarotitalia.com` (handler `/__/auth/**`).
+
+```bash
+npm run deploy:auth-hosting
+```
+
+Non usare `firebase init` né puntare l’apex a Firebase.
