@@ -1,6 +1,11 @@
 import React from 'react';
 import { ArrowRight, BookOpen, Lock } from 'lucide-react';
 import type { CourseId, ScreenId } from '../types/handoff';
+import {
+  isMaggioriPurchaseCourseSlug,
+  isMaggioriPurchaseEnabledClient,
+  MAGGIORI_PURCHASE_HOLD_MESSAGE,
+} from '../lib/maggioriPurchaseMode';
 import { SCROLL_LANDMARKS } from '../lib/scrollNavigation';
 import { GoogleSignInButton } from './GoogleSignInButton';
 
@@ -41,6 +46,9 @@ export function BlogCourseGate({
     moduleLink != null
       ? ` · legato al Modulo ${moduleLink}`
       : '';
+  const purchaseHeld =
+    isMaggioriPurchaseCourseSlug(courseSlug) &&
+    !isMaggioriPurchaseEnabledClient();
 
   return (
     <aside
@@ -53,17 +61,19 @@ export function BlogCourseGate({
         </span>
         <div className="min-w-0 space-y-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#D4AF37]">
-            Approfondimento riservato{moduleHint}
+            {purchaseHeld
+              ? `In aggiornamento${moduleHint}`
+              : `Approfondimento riservato${moduleHint}`}
           </p>
           <h2 className="font-display text-xl leading-snug text-[#F4F1EA] md:text-2xl">
-            Continua con il percorso {courseLabel}
+            {purchaseHeld
+              ? MAGGIORI_PURCHASE_HOLD_MESSAGE
+              : `Continua con il percorso ${courseLabel}`}
           </h2>
           <p className="text-sm leading-relaxed text-[#E8e1dd]/90">
-            L&apos;intro sopra è pubblica. Il corpo più profondo si sblocca se
-            hai acquistato il corso {courseLabel}
-            {moduleLink ? ` (Modulo ${moduleLink})` : ''} — lo stesso accesso
-            dell&apos;Area Riservata. Nessun acquisto per singolo articolo
-            (Phase 1).
+            {purchaseHeld
+              ? `L'intro sopra è pubblica. L'acquisto del corso ${courseLabel} riprende a breve; se hai già acquistato, accedi all'Area Riservata per il corpo completo.`
+              : `L'intro sopra è pubblica. Il corpo più profondo si sblocca se hai acquistato il corso ${courseLabel}${moduleLink ? ` (Modulo ${moduleLink})` : ''} — lo stesso accesso dell'Area Riservata. Nessun acquisto per singolo articolo (Phase 1).`}
           </p>
         </div>
       </div>
@@ -78,12 +88,16 @@ export function BlogCourseGate({
             type="button"
             onClick={() =>
               onNavigate('corsi', {
-                focusId: SCROLL_LANDMARKS.corsiCheckout,
+                focusId: purchaseHeld
+                  ? SCROLL_LANDMARKS.corsiMaggioriPreview
+                  : SCROLL_LANDMARKS.corsiCheckout,
               })
             }
             className="btn-primary cta-label inline-flex min-h-[46px] items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold"
           >
-            Vai a Corsi · {courseLabel}
+            {purchaseHeld
+              ? `Vai a Corsi · anteprima`
+              : `Vai a Corsi · ${courseLabel}`}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </button>
 

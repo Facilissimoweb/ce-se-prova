@@ -8,7 +8,6 @@ import {
   Eye,
   Layers,
   Lock,
-  MessageCircle,
   ShieldCheck,
 } from 'lucide-react';
 import type { CourseId, StripeCheckoutHandoffPayload } from '../types/handoff';
@@ -35,7 +34,12 @@ import {
   scrollToElement,
   scrollToIdAfterPaint,
 } from '../lib/scrollNavigation';
-import { whatsappHref } from '../lib/siteContacts';
+import {
+  isMaggioriPurchaseCourseSlug,
+  isMaggioriPurchaseEnabledClient,
+  MAGGIORI_PURCHASE_HOLD_DETAIL,
+  MAGGIORI_PURCHASE_HOLD_MESSAGE,
+} from '../lib/maggioriPurchaseMode';
 
 interface CorsiScreenProps {
   showCmsKeys: boolean;
@@ -63,6 +67,9 @@ export function CorsiScreen({
   const activeCourse =
     educationalCourses.find((c) => c.id === selectedCourseId) ??
     educationalCourses[0];
+  const maggioriPurchaseEnabled = isMaggioriPurchaseEnabledClient();
+  const activeCoursePurchaseHeld =
+    isMaggioriPurchaseCourseSlug(activeCourse.id) && !maggioriPurchaseEnabled;
 
   // ENN-174 — if selection points at a frozen course, snap to first public one
   useEffect(() => {
@@ -128,6 +135,13 @@ export function CorsiScreen({
 
   const handlePrepareCourseCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (
+      isMaggioriPurchaseCourseSlug(activeCourse.id) &&
+      !isMaggioriPurchaseEnabledClient()
+    ) {
+      setEnrollError(MAGGIORI_PURCHASE_HOLD_MESSAGE);
+      return;
+    }
     const errors: Record<string, string> = {};
 
     if (!isValidFullName(fullName)) {
@@ -408,20 +422,41 @@ export function CorsiScreen({
                 </div>
 
                 <div className="space-y-2.5 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => handleEnrollCourse(course.id)}
-                    className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 ${
-                      isSelected || course.recommended
-                        ? 'btn-primary'
-                        : 'btn-secondary'
-                    } ${soloWide ? 'md:max-w-sm' : ''}`}
-                  >
-                    Iscriviti al Percorso (€ {course.priceEur})
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+                  {course.id === 'arcani-maggiori' &&
+                  !maggioriPurchaseEnabled ? (
+                    <div
+                      className={`rounded-xl border border-[#D4AF37]/35 bg-[#D4AF37]/10 px-4 py-3 space-y-1 ${
+                        soloWide ? 'md:max-w-sm' : ''
+                      }`}
+                      role="status"
+                    >
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                        In aggiornamento
+                      </p>
+                      <p className="text-sm font-medium text-[#F4F1EA]">
+                        {MAGGIORI_PURCHASE_HOLD_MESSAGE}
+                      </p>
+                      <p className="text-xs leading-relaxed text-[#A39B93]">
+                        {MAGGIORI_PURCHASE_HOLD_DETAIL}
+                      </p>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleEnrollCourse(course.id)}
+                      className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 ${
+                        isSelected || course.recommended
+                          ? 'btn-primary'
+                          : 'btn-secondary'
+                      } ${soloWide ? 'md:max-w-sm' : ''}`}
+                    >
+                      Iscriviti al Percorso (€ {course.priceEur})
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  )}
 
-                  {course.id === 'arcani-maggiori' ? (
+                  {course.id === 'arcani-maggiori' &&
+                  maggioriPurchaseEnabled ? (
                     <PaymentTrustCues
                       compact
                       prominent
@@ -600,19 +635,66 @@ export function CorsiScreen({
         >
           <div className="space-y-1.5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-              Iscrizione &amp; Pagamento Sicuro
+              {activeCoursePurchaseHeld
+                ? 'In aggiornamento'
+                : 'Iscrizione & Pagamento Sicuro'}
             </p>
             <h2
               id="course-checkout-heading"
               className="font-body font-semibold tracking-[-0.02em] text-xl md:text-2xl text-[#F4F1EA]"
             >
-              Acquista il Percorso: {activeCourse.title}
+              {activeCoursePurchaseHeld
+                ? `${activeCourse.title} · aggiornamento in corso`
+                : `Acquista il Percorso: ${activeCourse.title}`}
             </h2>
             <p className="text-sm text-[#A39B93]">
-              Inserisci i tuoi dati per generare la sessione Stripe Checkout e attivare il tuo profilo corsista (Firebase Auth + Postgres).
+              {activeCoursePurchaseHeld
+                ? MAGGIORI_PURCHASE_HOLD_DETAIL
+                : 'Inserisci i tuoi dati per generare la sessione Stripe Checkout e attivare il tuo profilo corsista (Firebase Auth + Postgres).'}
             </p>
           </div>
 
+          {activeCoursePurchaseHeld ? (
+            <div className="space-y-4">
+              <div
+                className="rounded-xl border border-[#D4AF37]/35 bg-[#D4AF37]/10 px-4 py-4 space-y-2"
+                role="status"
+              >
+                <p className="text-sm font-semibold text-[#F4F1EA]">
+                  {MAGGIORI_PURCHASE_HOLD_MESSAGE}
+                </p>
+                <p className="text-xs leading-relaxed text-[#A39B93]">
+                  Anteprima e contenuti pubblici restano consultabili. Chi ha già
+                  acquistato conserva l’accesso in Area Riservata e Nina Studio.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={handleMaggioriMattoPreview}
+                  className="btn-secondary cta-label inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-semibold"
+                >
+                  <Eye className="w-4 h-4" aria-hidden="true" />
+                  Anteprima gratuita · Modulo 01
+                </button>
+                <button
+                  type="button"
+                  onClick={onOpenChat}
+                  className="btn-secondary px-4 py-2.5 min-h-[44px] rounded-lg text-xs font-medium"
+                >
+                  Chiedi nel Dialogo Tarot
+                </button>
+                <button
+                  type="button"
+                  onClick={onOpenReservedArea}
+                  className="btn-secondary px-4 py-2.5 min-h-[44px] rounded-lg text-xs font-medium"
+                >
+                  Area Riservata
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
           {/* Quick switcher inside checkout */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             {educationalCourses.map((course, idx) => {
@@ -817,30 +899,20 @@ export function CorsiScreen({
             <PaymentTrustCues />
           )}
 
-          {checkoutPayload && (
+          {checkoutPayload && enrolledSuccess && (
             <div className="mt-4 rounded-xl bg-[#12100E]/90 border border-[#D4AF37]/45 p-5 space-y-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
-                  {enrolledSuccess
-                    ? 'Percorso Sbloccato nella Tua Area Riservata'
-                    : 'Payload Iscrizione Stripe Checkout Pronto'}
+                  Percorso Sbloccato nella Tua Area Riservata
                 </p>
                 <h3 className="font-display text-lg text-[#F4F1EA] mt-1">
-                  {enrolledSuccess
-                    ? `${activeCourse.title} attivo per ${fullName}`
-                    : `Handoff per ${fullName} · ${activeCourse.title}`}
+                  {activeCourse.title} attivo per {fullName}
                 </h3>
               </div>
               <p className="text-xs md:text-sm text-[#A39B93] leading-relaxed">
-                {enrolledSuccess
-                  ? 'Le 4 dispense formulate di questo percorso sono ora disponibili nel tuo spazio personale protetto.'
-                  : 'Accedi con Google sopra oppure completa il checkout per attivare l’accesso permanente alle 4 dispense nell’Area Riservata.'}
+                Le 4 dispense formulate di questo percorso sono ora disponibili
+                nel tuo spazio personale protetto.
               </p>
-              {!enrolledSuccess && (
-                <pre className="p-3.5 rounded-lg bg-[#151311] border border-[#D4AF37]/15 text-[11px] font-mono text-[#E6C65C] overflow-x-auto">
-                  {JSON.stringify(checkoutPayload, null, 2)}
-                </pre>
-              )}
               <div className="flex flex-wrap gap-3">
                 <button
                   type="button"
@@ -850,19 +922,10 @@ export function CorsiScreen({
                   Apri Area Riservata e Dispense
                   <ArrowRight className="w-4 h-4" />
                 </button>
-                <a
-                  href={whatsappHref(
-                    `Buongiorno Maria Teresa, desidero iscrivermi al percorso didattico "${activeCourse.title}" (€ ${activeCourse.priceEur}). Nome: ${fullName}, Email: ${email}.`
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-secondary cta-label px-4 py-2.5 min-h-[44px] rounded-lg text-xs font-semibold inline-flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="w-4 h-4 text-[#D4AF37] shrink-0" />
-                  Invia Iscrizione su WhatsApp
-                </a>
               </div>
             </div>
+          )}
+            </>
           )}
         </form>
 
