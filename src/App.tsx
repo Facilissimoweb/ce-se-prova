@@ -3,12 +3,13 @@ import { Mail, Phone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ConsultationTariff, CourseId, ScreenId } from './types/handoff';
 import { isCourseSlugPubliclyPresented } from './lib/coursePresentation';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import {
   FloatingSideRail,
   TopBar,
 } from './components/NavigationChrome';
 import { HandoffDrawer } from './components/HandoffDrawer';
+import { canShowOwnerDebugUi } from './lib/ownerDebugUi';
 import { AccessibilityFab } from './components/AccessibilityFab';
 import { BackToTopFab } from './components/BackToTopFab';
 import { BookSessionFab } from './components/BookSessionFab';
@@ -103,6 +104,16 @@ const FOOTER_LINK_CLASS =
   'text-left text-[13px] leading-snug text-[#A39B93] hover:text-[#D4AF37] transition-colors';
 
 export function App() {
+  return (
+    <AuthProvider>
+      <AppBody />
+    </AuthProvider>
+  );
+}
+
+function AppBody() {
+  const { user } = useAuth();
+  const ownerDebugUi = canShowOwnerDebugUi(user?.email);
   const { t } = useTranslation('common');
   const footerMenuGroups: FooterMenuGroup[] = useMemo(
     () => [
@@ -412,8 +423,16 @@ export function App() {
       ? 'area-riservata'
       : activeScreen;
 
+  const cmsKeysVisible = ownerDebugUi && showCmsKeys;
+
+  useEffect(() => {
+    if (!ownerDebugUi) {
+      setShowCmsKeys(false);
+      setIsHandoffOpen(false);
+    }
+  }, [ownerDebugUi]);
+
   return (
-    <AuthProvider>
       <LeftToolsMenuProvider>
       <div className="min-h-screen min-h-[100dvh] w-full max-w-[100%] overflow-x-clip bg-[#12100E] text-[#F4F1EA] flex flex-col relative">
         <DocumentSeo activeScreen={activeScreen} />
@@ -428,25 +447,24 @@ export function App() {
         <main className="flex-1 w-full max-w-6xl mx-auto px-5 md:px-8 lg:px-12 pb-[max(6rem,env(safe-area-inset-bottom))] relative z-10">
           {activeScreen === 'home' && (
             <HomeScreen
-              showCmsKeys={showCmsKeys}
+              showCmsKeys={cmsKeysVisible}
               onNavigate={handleNavigate}
               onSelectTariffAndBook={handleSelectTariffAndBook}
               onSelectCourse={handleSelectCourseAndNavigate}
-              onOpenHandoff={() => setIsHandoffOpen(true)}
               onOpenPrivacy={() => setIsPrivacyOpen(true)}
             />
           )}
 
           {activeScreen === 'chi-sono' && (
             <ChiSonoScreen
-              showCmsKeys={showCmsKeys}
+              showCmsKeys={cmsKeysVisible}
               onNavigate={handleNavigate}
             />
           )}
 
           {activeScreen === 'consulti' && (
             <ConsultiScreen
-              showCmsKeys={showCmsKeys}
+              showCmsKeys={cmsKeysVisible}
               selectedTariffId={selectedTariffId}
               onSelectTariffAndBook={handleSelectTariffAndBook}
             />
@@ -454,7 +472,7 @@ export function App() {
 
           {activeScreen === 'corsi' && (
             <CorsiScreen
-              showCmsKeys={showCmsKeys}
+              showCmsKeys={cmsKeysVisible}
               selectedCourseId={selectedCourseId}
               onChangeCourseId={setSelectedCourseId}
               onOpenChat={() => handleNavigate('chat')}
@@ -482,7 +500,7 @@ export function App() {
 
           {activeScreen === 'booking' && (
             <BookingScreen
-              showCmsKeys={showCmsKeys}
+              showCmsKeys={cmsKeysVisible}
               selectedTariffId={selectedTariffId}
               onChangeTariffId={setSelectedTariffId}
               onOpenChat={() => handleNavigate('chat')}
@@ -491,7 +509,7 @@ export function App() {
 
           {activeScreen === 'chat' && (
             <ChatScreen
-              showCmsKeys={showCmsKeys}
+              showCmsKeys={cmsKeysVisible}
               onBookConsult={() => handleNavigate('booking')}
             />
           )}
@@ -662,39 +680,47 @@ export function App() {
               <p className="text-[11px] text-[#A39B93]/80">
                 © {new Date().getFullYear()} Tarot Italia · Maria Teresa Rogani
               </p>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <button
-                  type="button"
-                  onClick={() => setShowCmsKeys((prev) => !prev)}
-                  className="hover:text-[#D4AF37] transition-colors"
-                >
-                  {showCmsKeys ? 'Mostra Testi Live' : 'Ispeziona Chiavi [COPY]'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsHandoffOpen(true)}
-                  className="hover:text-[#D4AF37] transition-colors"
-                >
-                  Specifiche Handoff &amp; CMS
-                </button>
-              </div>
+              {ownerDebugUi ? (
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowCmsKeys((prev) => !prev)}
+                    className="hover:text-[#D4AF37] transition-colors"
+                  >
+                    {showCmsKeys
+                      ? 'Mostra Testi Live'
+                      : 'Ispeziona Chiavi [COPY]'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsHandoffOpen(true)}
+                    className="hover:text-[#D4AF37] transition-colors"
+                  >
+                    Specifiche Handoff &amp; CMS
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
         </footer>
 
         <FloatingSideRail
           onNavigate={handleNavigate}
-          onOpenHandoff={() => setIsHandoffOpen(true)}
           onOpenPrivacy={() => setIsPrivacyOpen(true)}
-          showCmsKeys={showCmsKeys}
+          onOpenHandoff={
+            ownerDebugUi ? () => setIsHandoffOpen(true) : undefined
+          }
+          showCmsKeys={cmsKeysVisible}
         />
 
-        <HandoffDrawer
-          isOpen={isHandoffOpen}
-          onClose={() => setIsHandoffOpen(false)}
-          showCmsKeys={showCmsKeys}
-          onToggleCmsKeys={() => setShowCmsKeys((prev) => !prev)}
-        />
+        {ownerDebugUi ? (
+          <HandoffDrawer
+            isOpen={isHandoffOpen}
+            onClose={() => setIsHandoffOpen(false)}
+            showCmsKeys={cmsKeysVisible}
+            onToggleCmsKeys={() => setShowCmsKeys((prev) => !prev)}
+          />
+        ) : null}
 
         <StickyContactBar />
 
@@ -710,7 +736,7 @@ export function App() {
           <BackToTopFab />
           <AccessibilityFab />
           <PrivacyCookiesWidget
-            showCmsKeys={showCmsKeys}
+            showCmsKeys={cmsKeysVisible}
             isModalOpen={isPrivacyOpen}
             onOpenModal={() => setIsPrivacyOpen(true)}
             onCloseModal={() => setIsPrivacyOpen(false)}
@@ -720,7 +746,6 @@ export function App() {
         <LegalNotice kind={legalNotice} onClose={() => setLegalNotice(null)} />
       </div>
       </LeftToolsMenuProvider>
-    </AuthProvider>
   );
 }
 

@@ -45,6 +45,10 @@ import {
   filterPublicPresentedBySlug,
   isCourseSlugPubliclyPresented,
 } from '../../lib/coursePresentation.ts';
+import {
+  MAGGIORI_PURCHASE_HOLD_MESSAGE,
+  shouldBlockMaggioriPurchase,
+} from '../../lib/maggioriPurchaseMode.ts';
 import { activateCourseFromPaidSession } from '../activations.ts';
 import {
   json,
@@ -190,6 +194,15 @@ export async function postReservedEnroll(params: {
       return json(404, {
         error:
           'Questo percorso non è ancora in offerta. Disponibile a breve: Arcani Maggiori.',
+      });
+    }
+
+    // ENN-239 — Maggiori purchase hold: block new checkout only.
+    // Existing buyers / confirm-stripe / webhook activation stay intact.
+    if (!stripeSessionId && shouldBlockMaggioriPurchase(course.slug)) {
+      return json(503, {
+        error: MAGGIORI_PURCHASE_HOLD_MESSAGE,
+        code: 'MAGGIORI_PURCHASE_HOLD',
       });
     }
 

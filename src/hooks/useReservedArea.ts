@@ -8,6 +8,10 @@ import { stripDispensaEmbedMarkers } from '../lib/stripDispensaEmbeds';
 import { readJsonResponse } from '../lib/readJsonResponse';
 import { filterPublicPresentedBySlug } from '../lib/coursePresentation';
 import {
+  isMaggioriPurchaseEnabledClient,
+  MAGGIORI_PURCHASE_HOLD_MESSAGE,
+} from '../lib/maggioriPurchaseMode';
+import {
   RESERVED_DEMO_UID,
   buildReservedDemoOverview,
 } from '../lib/reservedDemo';
@@ -358,6 +362,14 @@ export function useReservedArea({ user, getIdToken }: UseReservedAreaParams) {
   const handleUnlockCourse = async (e: FormEvent) => {
     e.preventDefault();
     if (!activeCourse || !user) return;
+    // ENN-239 — Maggiori purchase hold (client mirror; API also enforces).
+    if (
+      activeCourse.slug === 'arcani-maggiori' &&
+      !isMaggioriPurchaseEnabledClient()
+    ) {
+      setEnrollMessage(MAGGIORI_PURCHASE_HOLD_MESSAGE);
+      return;
+    }
     if (checkoutInFlightRef.current) return;
     checkoutInFlightRef.current = true;
     setEnrolling(true);

@@ -27,7 +27,8 @@
     "lint": "npm run build:blog && tsc --noEmit",
     "test:dialogue-domain": "npx tsx scripts/assert-dialogue-domain-distinct.ts",
     "test:dispensa-pdf-html": "npx tsx scripts/assert-dispensa-branded-html.ts",
-    "test:maggiori-it-source": "npx tsx scripts/assert-maggiori-it-source.ts"
+    "test:maggiori-it-source": "npx tsx scripts/assert-maggiori-it-source.ts",
+    "test:maggiori-purchase-hold": "npx tsx scripts/assert-maggiori-purchase-hold.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

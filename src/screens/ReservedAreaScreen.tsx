@@ -42,6 +42,12 @@ import {
 } from '../data/maggioriGatedBlog';
 import { openNinaChat } from '../lib/ninaChatOpen';
 import {
+  isMaggioriPurchaseCourseSlug,
+  isMaggioriPurchaseEnabledClient,
+  MAGGIORI_PURCHASE_HOLD_DETAIL,
+  MAGGIORI_PURCHASE_HOLD_MESSAGE,
+} from '../lib/maggioriPurchaseMode';
+import {
   GT_PAGE_LANG,
   GT_REFRESH_EVENT,
   readGoogTransLang,
@@ -890,6 +896,42 @@ export function ReservedAreaScreen({
                 onSubmit={handleUnlockCourse}
                 className="lg:col-span-5 glass-tier-2 rounded-2xl p-6 md:p-7 space-y-5"
               >
+                {isMaggioriPurchaseCourseSlug(activeCourse.slug) &&
+                !isMaggioriPurchaseEnabledClient() ? (
+                  <>
+                    <div className="space-y-1">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                        In aggiornamento
+                      </p>
+                      <h3 className="font-display text-xl text-[#F4F1EA]">
+                        {activeCourse.title}
+                      </h3>
+                      <p className="text-xs text-[#A39B93] leading-relaxed">
+                        {MAGGIORI_PURCHASE_HOLD_DETAIL}
+                      </p>
+                    </div>
+                    <div
+                      className="rounded-xl border border-[#D4AF37]/35 bg-[#D4AF37]/10 px-4 py-3 space-y-1"
+                      role="status"
+                    >
+                      <p className="text-sm font-semibold text-[#F4F1EA]">
+                        {MAGGIORI_PURCHASE_HOLD_MESSAGE}
+                      </p>
+                      <p className="text-xs text-[#A39B93] leading-relaxed">
+                        Se hai già acquistato, il tuo accesso resta attivo qui e
+                        in Nina Studio.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => onSelectCourse(activeCourse.slug)}
+                      className="btn-secondary w-full min-h-[42px] px-4 py-2 rounded-lg text-xs font-medium"
+                    >
+                      Torna alla scheda pubblica del corso
+                    </button>
+                  </>
+                ) : (
+                  <>
                 <div className="space-y-1">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
                     Sblocca Accesso Formativo
@@ -964,6 +1006,8 @@ export function ReservedAreaScreen({
                     Torna alla scheda pubblica del corso
                   </button>
                 </div>
+                  </>
+                )}
               </form>
             </div>
           )}

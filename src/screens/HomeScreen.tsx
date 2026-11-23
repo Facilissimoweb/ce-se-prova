@@ -28,6 +28,10 @@ import { ConsultTrustLine } from '../components/ConsultTrustLine';
 import { COURSE_SECTION_IMAGES, TARIFF_SECTION_IMAGES } from '../data/sectionImages';
 import { CONSULTATION_STRIPE_ENABLED } from '../lib/bookingCheckoutMode';
 import {
+  isMaggioriPurchaseEnabledClient,
+  MAGGIORI_PURCHASE_HOLD_MESSAGE,
+} from '../lib/maggioriPurchaseMode';
+import {
   SITE_ADDRESS,
   SITE_EMAIL,
   SITE_PHONE_DISPLAY,
@@ -51,7 +55,6 @@ interface HomeScreenProps {
   onNavigate: (screen: ScreenId) => void;
   onSelectTariffAndBook: (tariffId: ConsultationTariff['id']) => void;
   onSelectCourse: (courseId: CourseId) => void;
-  onOpenHandoff: () => void;
   onOpenPrivacy: () => void;
 }
 
@@ -60,12 +63,12 @@ export function HomeScreen({
   onNavigate,
   onSelectTariffAndBook,
   onSelectCourse,
-  onOpenHandoff,
   onOpenPrivacy,
 }: HomeScreenProps) {
   const { t } = useTranslation('common');
   const consultationTariffs = useLocalizedTariffs();
   const educationalCourses = useLocalizedCourses();
+  const maggioriPurchaseEnabled = isMaggioriPurchaseEnabledClient();
   const holisticFaqs = useLocalizedHolisticFaqs();
   const [openFaqId, setOpenFaqId] = useState<string | null>(holisticFaqs[0]?.id ?? null);
   const atmosferaVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -564,19 +567,45 @@ export function HomeScreen({
                   </div>
 
                   <div className="space-y-2.5 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => onSelectCourse(course.id)}
-                      className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 ${
-                        course.recommended ? 'btn-primary' : 'btn-secondary'
-                      } ${soloWide ? 'md:max-w-sm' : ''}`}
-                    >
-                      {course.id === 'arcani-maggiori'
-                        ? `Iscriviti (€ ${course.priceEur})`
-                        : 'Scopri il percorso'}
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                    {course.id === 'arcani-maggiori' ? (
+                    {course.id === 'arcani-maggiori' &&
+                    !maggioriPurchaseEnabled ? (
+                      <div
+                        className={`rounded-xl border border-[#D4AF37]/35 bg-[#D4AF37]/10 px-4 py-3 space-y-2 ${
+                          soloWide ? 'md:max-w-sm' : ''
+                        }`}
+                        role="status"
+                      >
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#D4AF37]">
+                          In aggiornamento
+                        </p>
+                        <p className="text-sm font-medium text-[#F4F1EA]">
+                          {MAGGIORI_PURCHASE_HOLD_MESSAGE}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => onSelectCourse(course.id)}
+                          className="btn-secondary cta-label w-full min-h-[42px] px-4 py-2 rounded-lg text-xs font-semibold inline-flex items-center justify-center gap-2"
+                        >
+                          Scopri il percorso
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => onSelectCourse(course.id)}
+                        className={`cta-label w-full min-h-[46px] px-5 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2 ${
+                          course.recommended ? 'btn-primary' : 'btn-secondary'
+                        } ${soloWide ? 'md:max-w-sm' : ''}`}
+                      >
+                        {course.id === 'arcani-maggiori'
+                          ? `Iscriviti (€ ${course.priceEur})`
+                          : 'Scopri il percorso'}
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    )}
+                    {course.id === 'arcani-maggiori' &&
+                    maggioriPurchaseEnabled ? (
                       <PaymentTrustCues
                         compact
                         prominent

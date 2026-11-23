@@ -607,18 +607,20 @@ export function TopBar({
 
 interface FloatingSideRailProps {
   onNavigate: (screen: ScreenId) => void;
-  onOpenHandoff: () => void;
   onOpenPrivacy: () => void;
-  showCmsKeys: boolean;
+  /** ENN-239 — owner-only; omit for public visitors */
+  onOpenHandoff?: () => void;
+  showCmsKeys?: boolean;
 }
 
 export function FloatingSideRail({
   onNavigate,
-  onOpenHandoff,
   onOpenPrivacy,
-  showCmsKeys,
+  onOpenHandoff,
+  showCmsKeys = false,
 }: FloatingSideRailProps) {
   const { t } = useTranslation('common');
+  const showOwnerHandoff = typeof onOpenHandoff === 'function';
   return (
     <aside
       className="ti-rail-side hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 p-2 rounded-full glass-tier-2"
@@ -673,19 +675,21 @@ export function FloatingSideRail({
       >
         <ShieldCheck className="w-4 h-4" />
       </button>
-      <button
-        type="button"
-        onClick={onOpenHandoff}
-        title={t('rail.handoff')}
-        aria-label={t('rail.handoff')}
-        className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
-          showCmsKeys
-            ? 'bg-[#D4AF37] text-[#12100E]'
-            : 'text-[#A39B93] hover:text-[#D4AF37] hover:bg-[#D4AF37]/15'
-        }`}
-      >
-        <Code2 className="w-4 h-4" />
-      </button>
+      {showOwnerHandoff ? (
+        <button
+          type="button"
+          onClick={onOpenHandoff}
+          title={t('rail.handoff')}
+          aria-label={t('rail.handoff')}
+          className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${
+            showCmsKeys
+              ? 'bg-[#D4AF37] text-[#12100E]'
+              : 'text-[#A39B93] hover:text-[#D4AF37] hover:bg-[#D4AF37]/15'
+          }`}
+        >
+          <Code2 className="w-4 h-4" />
+        </button>
+      ) : null}
     </aside>
   );
 }
