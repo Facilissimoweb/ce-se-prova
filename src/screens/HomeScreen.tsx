@@ -139,6 +139,7 @@ export function HomeScreen({
             alt="Tarot Italia"
             width={1024}
             height={1024}
+            draggable={false}
             decoding="async"
             fetchPriority="high"
             className="h-auto w-[min(68vw,236px)] object-contain object-center md:w-[min(34vw,268px)] animate-hero-mark-rise"

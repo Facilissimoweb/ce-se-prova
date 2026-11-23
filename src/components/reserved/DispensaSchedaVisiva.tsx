@@ -121,6 +121,7 @@ export function DispensaSchedaVisiva({ content }: DispensaSchedaVisivaProps) {
           <img
             src={content.imageSrc}
             alt={content.imageAlt}
+            draggable={false}
             className="w-full h-auto rounded-xl object-contain"
             loading="lazy"
             decoding="async"

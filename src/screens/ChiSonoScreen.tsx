@@ -113,6 +113,7 @@ export function ChiSonoScreen({ showCmsKeys, onNavigate }: ChiSonoScreenProps) {
               alt="Logo e firma: occhio nel triangolo con nebulosa verde e firma M. Teresa Rogani"
               width={800}
               height={800}
+              draggable={false}
               className="w-full max-w-[200px] md:max-w-[240px] h-auto select-none bg-transparent"
               decoding="async"
             />

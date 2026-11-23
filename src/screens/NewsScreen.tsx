@@ -274,6 +274,7 @@ export function NewsScreen({ onNavigate }: Props) {
                     <img
                       src={post.cover}
                       alt=""
+                      draggable={false}
                       className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                       loading="lazy"
                     />
@@ -413,6 +414,7 @@ function ArticleDetail({
           <img
             src={post.cover}
             alt=""
+            draggable={false}
             className="aspect-[21/9] w-full object-cover"
             loading="eager"
           />
