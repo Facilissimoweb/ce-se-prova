@@ -39,6 +39,16 @@ console.log(
   `[blog] ${blog.published}/${blog.count} post(s) → ${path.relative(root, blog.outFile)}`
 );
 
+/** ENN-233 — compile Nina Studio blog pack from published posts (after blog catalog). */
+const ninaBlog = spawnSync(
+  'npx',
+  ['tsx', 'scripts/build-nina-blog-pack.ts'],
+  { cwd: root, stdio: 'inherit', shell: false }
+);
+if (ninaBlog.status !== 0) {
+  process.exit(ninaBlog.status ?? 1);
+}
+
 /** Output basename under api/ → source file under apiEntries/ */
 const entries = {
   courses: 'courses.ts',
