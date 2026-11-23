@@ -16,7 +16,9 @@ import {
 } from 'firebase/auth';
 import { auth, googleAuthProvider } from '../lib/firebase';
 import {
+  consumeGoogleRedirectPending,
   googleSignInErrorMessage,
+  markGoogleRedirectPending,
   preferGoogleRedirectSignIn,
   shouldFallbackGoogleRedirect,
 } from '../lib/googleSignIn';
@@ -90,25 +92,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     let cancelled = false;
+    const redirectPending = consumeGoogleRedirectPending();
+    let redirectSettled = !redirectPending;
+    let authStateSettled = false;
 
-    // Complete desktop redirect return (ENN-238) before/alongside auth listener.
+    const maybeFinishLoading = () => {
+      if (!cancelled && redirectSettled && authStateSettled) {
+        setLoading(false);
+      }
+    };
+
+    // Complete redirect return when used (same-origin authDomain only).
+    // Hold `loading` until this settles so /area-riservata does not flash the
+    // login invite before Firebase restores the session.
     void getRedirectResult(auth)
       .then((result) => {
-        if (cancelled || !result?.user) return;
-        setUser(result.user);
-        notifyGoogleTranslateRefresh();
+        if (cancelled) return;
+        if (result?.user) {
+          setUser(result.user);
+          notifyGoogleTranslateRefresh();
+          return;
+        }
+        // Cross-origin redirect often returns null with no throw (ENN-238).
+        if (redirectPending) {
+          setAuthError(
+            googleSignInErrorMessage('auth/redirect-storage-blocked')
+          );
+        }
       })
       .catch((err: unknown) => {
         if (cancelled) return;
         const code = authErrorCode(err);
         if (code && code !== 'auth/popup-closed-by-user') {
           setAuthError(googleSignInErrorMessage(code));
+        } else if (redirectPending) {
+          setAuthError(
+            googleSignInErrorMessage('auth/redirect-storage-blocked')
+          );
         }
+      })
+      .finally(() => {
+        redirectSettled = true;
+        maybeFinishLoading();
       });
 
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (cancelled) return;
       setUser(firebaseUser);
-      setLoading(false);
+      authStateSettled = true;
+      maybeFinishLoading();
       // Post-login React mounts (Area Personale / corsi) need a GT re-scan (ENN-148).
       notifyGoogleTranslateRefresh();
     });
@@ -125,8 +157,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = useCallback(async (): Promise<User | null> => {
     setAuthError(null);
     try {
-      // Desktop: full-page redirect avoids popup blockers / partitioned cookies.
+      // Popup-first (Firebase Option 2). Redirect only if authDomain is same-origin.
       if (preferGoogleRedirectSignIn()) {
+        markGoogleRedirectPending();
         await signInWithRedirect(auth, googleAuthProvider);
         return null;
       }
@@ -140,6 +173,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (shouldFallbackGoogleRedirect(code)) {
         try {
+          markGoogleRedirectPending();
           await signInWithRedirect(auth, googleAuthProvider);
           return null;
         } catch (redirectErr: unknown) {

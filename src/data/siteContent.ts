@@ -844,9 +844,9 @@ export const dialogueTimePacks: DialoguePack[] = [
     durationMinutes: 10,
     priceEur: 5,
     stripePriceIdAnnotation: 'STRIPE_PRICE_ID_DIALOGO_10M',
-    focusLabel: 'Più scelto · Stesa a 3 carte',
+    focusLabel: 'Più scelto · Lettura guidata',
     description:
-      'Dieci minuti continui per esplorare passato, presente e linee future su amore, scelte o lavoro.',
+      'Dieci minuti continui per esplorare un Arcano su amore, scelte o lavoro con domande guidate.',
     recommended: true,
   },
   {
@@ -863,21 +863,14 @@ export const dialogueTimePacks: DialoguePack[] = [
 
 export const arcanoDelGiorno: ArcanaCard = MAJOR_ARCANA[9];
 
+/** Messaggi legacy (thread chat Dialogo rimosso: sola lettura del resoconto). */
 export const initialChatMessages: ChatMessage[] = [
   {
     id: 'msg-1',
     sender: 'practitioner',
     authorName: 'Tarot Italia IA',
     timestamp: '09:30',
-    text: 'Benvenuto nello spazio di dialogo di Tarot Italia IA. Qui puoi estrarre o scegliere qualsiasi dei 22 Arcani Maggiori per leggere il presente, esplorare le tendenze future e riflettere con consapevolezza.',
-  },
-  {
-    id: 'msg-2',
-    sender: 'practitioner',
-    authorName: 'Tarot Italia IA',
-    timestamp: '09:31',
-    text: "Partiamo dall'Arcano del Giorno — L'Eremita (IX) — oppure clicca su «Estrai Arcano» o «Stesa 3 Carte» per interrogare tutto il mazzo.",
-    arcanaRef: "L'Eremita · IX",
+    text: 'Concentrati su una domanda e ascolta il resoconto. Estrai un Arcano o aprilo dal Mazzo (22 Lame).',
   },
 ];
 

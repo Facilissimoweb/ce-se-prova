@@ -85,11 +85,19 @@ export async function postComingSoonUnlock(input: {
     };
   }
 
+  let hostname: string | undefined;
+  try {
+    hostname = new URL(input.origin).hostname;
+  } catch {
+    hostname = undefined;
+  }
+
   return {
     status: 200,
     body: { ok: true, redirect: '/', method: 'password' },
     setCookie: buildUnlockSetCookieHeader(token, {
       secure: secureCookie(input.origin),
+      hostname,
     }),
   };
 }
@@ -158,6 +166,13 @@ export async function postComingSoonUnlockWithGoogle(input: {
     };
   }
 
+  let hostname: string | undefined;
+  try {
+    hostname = new URL(input.origin).hostname;
+  } catch {
+    hostname = undefined;
+  }
+
   return {
     status: 200,
     body: {
@@ -168,6 +183,7 @@ export async function postComingSoonUnlockWithGoogle(input: {
     },
     setCookie: buildUnlockSetCookieHeader(token, {
       secure: secureCookie(input.origin),
+      hostname,
     }),
   };
 }
@@ -175,9 +191,18 @@ export async function postComingSoonUnlockWithGoogle(input: {
 export function postComingSoonLock(input: {
   origin: string;
 }): ComingSoonRouteResult {
+  let hostname: string | undefined;
+  try {
+    hostname = new URL(input.origin).hostname;
+  } catch {
+    hostname = undefined;
+  }
   return {
     status: 200,
     body: { ok: true },
-    setCookie: buildClearUnlockCookieHeader(secureCookie(input.origin)),
+    setCookie: buildClearUnlockCookieHeader(
+      secureCookie(input.origin),
+      hostname
+    ),
   };
 }
