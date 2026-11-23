@@ -17,7 +17,9 @@
     />
     <meta name="author" content="Maria Teresa Rogani" />
     <meta name="theme-color" content="#12100E" />
-    <!-- Canonical / og:url are injected client-side from VITE_SITE_ORIGIN (Production: https://tarotitalia.com) or window.location.origin. Never bake *.vercel.app. -->
+    <!-- Static brand canonical/og:url for crawlers (WA/FB) that do not run SPA JS. Client SEO still refreshes per-route from getSiteOrigin(). Never *.vercel.app. -->
+    <link rel="canonical" href="https://tarotitalia.com/" />
+    <meta property="og:url" content="https://tarotitalia.com/" />
     <meta property="og:title" content="Tarot Italia — Maria Teresa Rogani · Operatore Olistico" />
     <meta
       property="og:description"
