@@ -93,11 +93,16 @@ export function createComingSoonGate(comingSoonHtmlPath: string) {
             Boolean(req.secure) ||
             String(req.headers['x-forwarded-proto'] || '') === 'https' ||
             process.env.VERCEL === '1';
+          const hostname = String(req.hostname || '');
           res.setHeader(
             'Set-Cookie',
-            buildUnlockSetCookieHeader(cookieToken, { secure })
+            buildUnlockSetCookieHeader(cookieToken, { secure, hostname })
           );
-          return res.redirect(302, '/');
+          const redirectTo =
+            hostname.toLowerCase() === 'tarotitalia.com'
+              ? 'https://www.tarotitalia.com/'
+              : '/';
+          return res.redirect(302, redirectTo);
         }
       }
       return sendComingSoonHtml(res, comingSoonHtmlPath, true);

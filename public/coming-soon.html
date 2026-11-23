@@ -675,13 +675,15 @@
       })();
     </script>
 
-    <!-- Owner Google unlock (ENN-95 / ENN-238): Firebase + desktop redirect -->
+    <!-- Owner Google unlock (ENN-95): popup-first — redirect broken cross-origin (ENN-238) -->
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
       import {
-        getAuth,
-        getRedirectResult,
         GoogleAuthProvider,
+        browserLocalPersistence,
+        browserPopupRedirectResolver,
+        getRedirectResult,
+        initializeAuth,
         signInWithPopup,
         signInWithRedirect,
       } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
@@ -695,23 +697,32 @@
         messagingSenderId: '9386426759',
       };
 
+      const REDIRECT_PENDING_KEY = 'ti.googleRedirectPending';
       const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
+      const auth = initializeAuth(app, {
+        persistence: browserLocalPersistence,
+        popupRedirectResolver: browserPopupRedirectResolver,
+      });
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
 
       const btn = document.getElementById('google-unlock');
       const errEl = document.getElementById('google-error');
 
-      function preferRedirect() {
+      /** Redirect only if authDomain is same-origin (Vercel /__/auth proxy + Console URI). */
+      function canUseRedirectSafely() {
         try {
-          return !window.matchMedia('(pointer: coarse)').matches;
+          return (
+            window.location.hostname.toLowerCase() ===
+            String(firebaseConfig.authDomain || '').toLowerCase()
+          );
         } catch {
-          return true;
+          return false;
         }
       }
 
       function shouldFallbackRedirect(code) {
+        if (!canUseRedirectSafely()) return false;
         return (
           code === 'auth/popup-blocked' ||
           code === 'auth/cancelled-popup-request' ||
@@ -732,7 +743,9 @@
         });
         const body = await res.json().catch(() => ({}));
         if (res.ok && body && body.ok) {
-          window.location.href = body.redirect || '/';
+          // Prefer www canonical host so unlock cookie sticks (apex → www 308).
+          const redirect = body.redirect || '/';
+          window.location.href = redirect;
           return true;
         }
         if (errEl) {
@@ -743,7 +756,14 @@
         return false;
       }
 
-      // Desktop redirect return: finish unlock after Google comes back.
+      let redirectPending = false;
+      try {
+        redirectPending = sessionStorage.getItem(REDIRECT_PENDING_KEY) === '1';
+        sessionStorage.removeItem(REDIRECT_PENDING_KEY);
+      } catch {
+        /* private mode */
+      }
+
       try {
         const redirectResult = await getRedirectResult(auth);
         if (redirectResult && redirectResult.user) {
@@ -754,12 +774,15 @@
           const idToken = await redirectResult.user.getIdToken();
           await completeUnlock(idToken);
           if (btn) btn.disabled = false;
+        } else if (redirectPending && errEl) {
+          errEl.textContent =
+            'Il browser ha bloccato la sessione di reindirizzamento Google. Riprova: useremo una finestra popup.';
         }
       } catch (err) {
         console.error('[coming-soon] Google redirect result failed', err);
         if (errEl) {
           errEl.textContent =
-            'Impossibile completare l’accesso Google. Riprova.';
+            'Impossibile completare l’accesso Google. Riprova con il pulsante (popup).';
         }
       }
 
@@ -770,10 +793,7 @@
           btn.disabled = true;
           btn.textContent = 'Accesso Google…';
           try {
-            if (preferRedirect()) {
-              await signInWithRedirect(auth, provider);
-              return;
-            }
+            // Popup-first: completes in-page so Firebase session sticks on /area-riservata.
             const result = await signInWithPopup(auth, provider);
             const idToken = await result.user.getIdToken();
             await completeUnlock(idToken);
@@ -781,6 +801,7 @@
             const code = err && err.code ? String(err.code) : '';
             if (shouldFallbackRedirect(code)) {
               try {
+                sessionStorage.setItem(REDIRECT_PENDING_KEY, '1');
                 await signInWithRedirect(auth, provider);
                 return;
               } catch (redirectErr) {
@@ -794,6 +815,9 @@
               if (code === 'auth/unauthorized-domain') {
                 errEl.textContent =
                   'Dominio non autorizzato in Firebase. Aggiungi tarotitalia.com e www.tarotitalia.com.';
+              } else if (code === 'auth/popup-blocked') {
+                errEl.textContent =
+                  'Il browser ha bloccato la finestra Google. Consenti i popup per www.tarotitalia.com e riprova.';
               } else if (
                 code === 'auth/popup-closed-by-user' ||
                 code === 'auth/cancelled-popup-request'

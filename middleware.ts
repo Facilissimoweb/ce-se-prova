@@ -94,6 +94,8 @@ function isAllowlisted(pathname: string): boolean {
   const path = normalizePath(pathname);
   if (path === '/coming-soon.html') return true;
   if (path.startsWith('/api')) return true;
+  // Firebase Auth helper proxy (Vercel → firebaseapp.com); must not hit Coming Soon HTML.
+  if (path.startsWith('/__/auth') || path.startsWith('/__/firebase')) return true;
   if (path.startsWith('/brand')) return true;
   if (path.startsWith('/assets')) return true;
   if (
@@ -227,8 +229,31 @@ function unlockRedirect(request: Request, cookie: string): Response {
     `Max-Age=${COOKIE_MAX_AGE_SEC}`,
   ];
   if (secure) parts.push('Secure');
+  // Share across apex ↔ www (host-only cookies break after 308 to www).
+  try {
+    const host = new URL(request.url).hostname.toLowerCase();
+    if (host === 'tarotitalia.com' || host === 'www.tarotitalia.com') {
+      parts.push('Domain=.tarotitalia.com');
+    }
+  } catch {
+    /* ignore */
+  }
   const headers = new Headers();
-  headers.set('Location', new URL('/', request.url).toString());
+  // Canonicalize to www so the browser keeps one host for SPA + cookie.
+  let location = new URL('/', request.url).toString();
+  try {
+    const u = new URL(request.url);
+    if (u.hostname.toLowerCase() === 'tarotitalia.com') {
+      u.hostname = 'www.tarotitalia.com';
+      u.pathname = '/';
+      u.search = '';
+      u.hash = '';
+      location = u.toString();
+    }
+  } catch {
+    /* keep same-origin / */
+  }
+  headers.set('Location', location);
   headers.set('Set-Cookie', parts.join('; '));
   headers.set('Cache-Control', 'no-store');
   return new Response(null, { status: 302, headers });

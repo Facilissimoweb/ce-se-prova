@@ -7,14 +7,12 @@ import { MajorArcanaArtwork } from '../MajorArcanaArtwork';
 
 interface DeckGalleryProps {
   activeCardId: string;
-  hasActiveSpread: boolean;
   onClose: () => void;
   onSelectCard: (card: ArcanaCard) => void;
 }
 
 export function DeckGallery({
   activeCardId,
-  hasActiveSpread,
   onClose,
   onSelectCard,
 }: DeckGalleryProps) {
@@ -30,7 +28,7 @@ export function DeckGallery({
             Mazzo Completo · 0 – XXI
           </p>
           <h2 className="font-body font-semibold tracking-[-0.015em] text-base md:text-lg text-[#F4F1EA]">
-            Scegli un Arcano Maggiore con cui dialogare
+            Scegli una delle 22 lame del mazzo
           </h2>
         </div>
         <button
@@ -45,7 +43,7 @@ export function DeckGallery({
 
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-2.5">
         {MAJOR_ARCANA.map((card) => {
-          const isSelected = activeCardId === card.id && !hasActiveSpread;
+          const isSelected = activeCardId === card.id;
           const displayName = maggioriNameFor(lang, card.id, card.name);
           return (
             <button

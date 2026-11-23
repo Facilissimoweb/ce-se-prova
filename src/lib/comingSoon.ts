@@ -151,6 +151,8 @@ export function isComingSoonAllowlistedPath(pathname: string): boolean {
   const path = normalizePath(pathname);
   if (path === '/coming-soon.html') return true;
   if (path.startsWith('/api')) return true;
+  // Firebase Auth helper proxy (must not be rewritten to Coming Soon HTML).
+  if (path.startsWith('/__/auth') || path.startsWith('/__/firebase')) return true;
   if (path.startsWith('/brand')) return true;
   if (path.startsWith('/assets')) return true;
   // Vite / tooling (local npm run dev) — never gate HMR or module graph
@@ -312,9 +314,27 @@ export async function verifyComingSoonPassword(
   return false;
 }
 
+/**
+ * Share unlock cookie across apex ↔ www (Vercel 308 apex → www).
+ * Host-only cookies set on tarotitalia.com are invisible on www.tarotitalia.com.
+ */
+export function comingSoonCookieDomain(
+  hostname?: string | null
+): string | undefined {
+  const host = (hostname || '').trim().toLowerCase().replace(/:\d+$/, '');
+  if (host === 'tarotitalia.com' || host === 'www.tarotitalia.com') {
+    return '.tarotitalia.com';
+  }
+  return undefined;
+}
+
 export function buildUnlockSetCookieHeader(
   token: string,
-  opts: { secure: boolean; maxAgeSec?: number } = { secure: true }
+  opts: {
+    secure: boolean;
+    maxAgeSec?: number;
+    hostname?: string | null;
+  } = { secure: true }
 ): string {
   const maxAge = opts.maxAgeSec ?? COMING_SOON_COOKIE_MAX_AGE_SEC;
   const parts = [
@@ -325,10 +345,15 @@ export function buildUnlockSetCookieHeader(
     `Max-Age=${maxAge}`,
   ];
   if (opts.secure) parts.push('Secure');
+  const domain = comingSoonCookieDomain(opts.hostname);
+  if (domain) parts.push(`Domain=${domain}`);
   return parts.join('; ');
 }
 
-export function buildClearUnlockCookieHeader(secure: boolean): string {
+export function buildClearUnlockCookieHeader(
+  secure: boolean,
+  hostname?: string | null
+): string {
   const parts = [
     `${COMING_SOON_COOKIE}=`,
     'Path=/',
@@ -337,5 +362,7 @@ export function buildClearUnlockCookieHeader(secure: boolean): string {
     'Max-Age=0',
   ];
   if (secure) parts.push('Secure');
+  const domain = comingSoonCookieDomain(hostname);
+  if (domain) parts.push(`Domain=${domain}`);
   return parts.join('; ');
 }

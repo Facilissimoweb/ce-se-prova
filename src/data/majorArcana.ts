@@ -878,6 +878,10 @@ export function loveAndWorkRepliesDiffer(card: ArcanaCard): boolean {
   );
 }
 
+/**
+ * Stesa a 3 carte — helper tenuto per un redesign futuro.
+ * La UI Dialogo non espone più «Stesa 3 Carte» (risposte senza sintesi reale).
+ */
 export function buildSpreadSynthesisReply(spread: SpreadDrawItem[]): string {
   const [past, present, future] = spread;
   return [
