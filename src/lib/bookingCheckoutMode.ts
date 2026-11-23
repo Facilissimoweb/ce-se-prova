@@ -1,7 +1,7 @@
 /**
  * Consulti booking checkout mode.
  *
- * Live Stripe Checkout for consult products (€19/50/75/90). WhatsApp remains the
+ * Live Stripe Checkout for consult products (€22/49/79/99). WhatsApp remains the
  * channel for the reading itself (and the ENN-166 non-IT written-chat notice),
  * not the payment path. Flip to false only for an emergency soft-freeze.
  */

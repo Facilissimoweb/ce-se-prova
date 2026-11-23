@@ -36,11 +36,11 @@ assert(
   'no googtrans / ENN-143 reply-lang suffix'
 );
 assert(
-  prompt.includes('€19') &&
-    prompt.includes('€50') &&
-    prompt.includes('€75') &&
-    prompt.includes('€90'),
-  'keeps consult prices €19/50/75/90'
+  prompt.includes('€22') &&
+    prompt.includes('€49') &&
+    prompt.includes('€79') &&
+    prompt.includes('€99'),
+  'keeps consult prices €22/49/79/99'
 );
 assert(
   /solo online/i.test(prompt) && /Breve/.test(prompt),
@@ -65,10 +65,10 @@ assert(
 
 const newlineList = parseNinaMessageBlocks(`Ecco i prezzi:
 
-- **Consulto Breve** · 20 min · **€19** (solo online)
-- **Consulto Essenziale** · 45 min · **€50**
-- **Consulto Evolutivo Completo** · 60 min · **€75**
-- **Sessione Integrata** · 90 min · **€90**
+- **Consulto Breve** · 20 min · **€22** (solo online)
+- **Consulto Essenziale** · 45 min · **€49**
+- **Consulto Evolutivo Completo** · 60 min · **€79**
+- **Sessione Integrata** · 90 min · **€99**
 
 In ogni sessione Maggiori e Minori.`);
 assert(newlineList.length === 3, 'newline list → intro + ul + outro');
@@ -82,8 +82,8 @@ assert(
 );
 assert(
   newlineList[1]?.type === 'list' &&
-    newlineList[1].items[0].includes('€19') &&
-    newlineList[1].items[3].includes('€90'),
+    newlineList[1].items[0].includes('€22') &&
+    newlineList[1].items[3].includes('€99'),
   'list items preserve prices'
 );
 
@@ -107,7 +107,7 @@ assert(
 );
 
 const dense = parseNinaMessageBlocks(
-  'consult prices with Maria Teresa: - **Consulto Breve** - 20 min, **€19** (solo online) - **Consulto Essenziale** - 45 min, **€50** (online o di persona) - **Consulto Evolutivo Completo** - 60 min, **€75** (online o di persona) - **Sessione Integrata** - 90 min, **€90** (online o di persona)'
+  'consult prices with Maria Teresa: - **Consulto Breve** - 20 min, **€22** (solo online) - **Consulto Essenziale** - 45 min, **€49** (online o di persona) - **Consulto Evolutivo Completo** - 60 min, **€79** (online o di persona) - **Sessione Integrata** - 90 min, **€99** (online o di persona)'
 );
 assert(
   dense.some((b) => b.type === 'list' && b.items.length === 4),

@@ -8119,7 +8119,7 @@ var consultationTariffs = [
   tariffWithParagraphs({
     id: "20m",
     durationMinutes: 20,
-    priceEur: 19,
+    priceEur: 22,
     stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_20M",
     cmsKeyTitle: "[COPY: tariffa.placeholder.0.title]",
     title: "Consulto Breve",
@@ -8140,7 +8140,7 @@ var consultationTariffs = [
   tariffWithParagraphs({
     id: "45m",
     durationMinutes: 45,
-    priceEur: 50,
+    priceEur: 49,
     stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_45M",
     cmsKeyTitle: "[COPY: tariffa.placeholder.1.title]",
     title: "Consulto Essenziale",
@@ -8160,7 +8160,7 @@ var consultationTariffs = [
   tariffWithParagraphs({
     id: "60m",
     durationMinutes: 60,
-    priceEur: 75,
+    priceEur: 79,
     stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_60M",
     cmsKeyTitle: "[COPY: tariffa.placeholder.2.title]",
     title: "Consulto Evolutivo Completo",
@@ -8181,7 +8181,7 @@ var consultationTariffs = [
   tariffWithParagraphs({
     id: "90m",
     durationMinutes: 90,
-    priceEur: 90,
+    priceEur: 99,
     stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_90M",
     cmsKeyTitle: "[COPY: tariffa.placeholder.3.title]",
     title: "Sessione Integrata",

@@ -8308,7 +8308,7 @@ var consultationTariffs = [
   tariffWithParagraphs({
     id: "20m",
     durationMinutes: 20,
-    priceEur: 19,
+    priceEur: 22,
     stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_20M",
     cmsKeyTitle: "[COPY: tariffa.placeholder.0.title]",
     title: "Consulto Breve",
@@ -8329,7 +8329,7 @@ var consultationTariffs = [
   tariffWithParagraphs({
     id: "45m",
     durationMinutes: 45,
-    priceEur: 50,
+    priceEur: 49,
     stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_45M",
     cmsKeyTitle: "[COPY: tariffa.placeholder.1.title]",
     title: "Consulto Essenziale",
@@ -8349,7 +8349,7 @@ var consultationTariffs = [
   tariffWithParagraphs({
     id: "60m",
     durationMinutes: 60,
-    priceEur: 75,
+    priceEur: 79,
     stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_60M",
     cmsKeyTitle: "[COPY: tariffa.placeholder.2.title]",
     title: "Consulto Evolutivo Completo",
@@ -8370,7 +8370,7 @@ var consultationTariffs = [
   tariffWithParagraphs({
     id: "90m",
     durationMinutes: 90,
-    priceEur: 90,
+    priceEur: 99,
     stripePriceIdAnnotation: "STRIPE_PRICE_ID_CONSULTO_90M",
     cmsKeyTitle: "[COPY: tariffa.placeholder.3.title]",
     title: "Sessione Integrata",
@@ -8436,6 +8436,41 @@ function filterPublicPresentedBySlug(courses2) {
   return courses2.filter((c) => isCourseSlugPubliclyPresented(c.slug));
 }
 
+// src/lib/maggioriPurchaseMode.ts
+var MAGGIORI_PURCHASE_COURSE_SLUG = "arcani-maggiori";
+var MAGGIORI_PURCHASE_HOLD_MESSAGE = "Corso in aggiornamento \u2014 presto di nuovo disponibile";
+function isMaggioriPurchaseCourseSlug(slug) {
+  return slug === MAGGIORI_PURCHASE_COURSE_SLUG;
+}
+function isMaggioriPurchaseEnabledFromEnv(env = process.env) {
+  return env.MAGGIORI_PURCHASE_ENABLED === "true" || env.VITE_MAGGIORI_PURCHASE_ENABLED === "true";
+}
+function shouldBlockMaggioriPurchase(slug, env = process.env) {
+  return isMaggioriPurchaseCourseSlug(slug) && !isMaggioriPurchaseEnabledFromEnv(env);
+}
+
+// src/lib/ownerCourseAccess.ts
+var OWNER_COURSE_ACCESS_EMAILS = [
+  "mariateresarogani@gmail.com"
+];
+function parseOwnerEmailExtras(raw) {
+  if (!raw?.trim()) return [];
+  return raw.split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+}
+function isOwnerCourseAccessEmail(email, env = process.env) {
+  const normalized = (email || "").trim().toLowerCase();
+  if (!normalized) return false;
+  if (OWNER_COURSE_ACCESS_EMAILS.includes(normalized)) {
+    return true;
+  }
+  return parseOwnerEmailExtras(env.COMING_SOON_OWNER_EMAILS).includes(
+    normalized
+  );
+}
+function ownerHasComplimentaryCourseAccess(email, courseSlug, env = process.env) {
+  return isOwnerCourseAccessEmail(email, env) && courseSlug === MAGGIORI_PURCHASE_COURSE_SLUG;
+}
+
 // src/db/repository.ts
 async function getOrCreateUser(uid, email, displayName) {
   try {
@@ -8475,7 +8510,14 @@ async function getReservedAreaOverview(uid, email, displayName) {
         eq(coursePurchases.status, "active")
       )
     );
-    const unlockedCourseIds = userPurchases.map((p) => p.courseId);
+    const ownerMaggioriUnlock = isOwnerCourseAccessEmail(email);
+    const maggioriCourse = ownerMaggioriUnlock ? allCourses.find((c) => c.slug === MAGGIORI_PURCHASE_COURSE_SLUG) : null;
+    const unlockedCourseIds = Array.from(
+      /* @__PURE__ */ new Set([
+        ...userPurchases.map((p) => p.courseId),
+        ...maggioriCourse ? [maggioriCourse.id] : []
+      ])
+    );
     const allOutlineDispense = await db.select({
       id: dispense.id,
       courseId: dispense.courseId,
@@ -8505,7 +8547,7 @@ async function getReservedAreaOverview(uid, email, displayName) {
       courses: filterPublicPresentedBySlug(
         allCourses.map((course) => {
           const purchase = userPurchases.find((p) => p.courseId === course.id);
-          const isUnlocked = Boolean(purchase);
+          const isUnlocked = Boolean(purchase) || ownerHasComplimentaryCourseAccess(email, course.slug);
           const outline = allOutlineDispense.filter(
             (d) => d.courseId === course.id
           );
@@ -8750,15 +8792,23 @@ async function updateDispensaProgress(params) {
     if (!targetDispensa) {
       throw new Error("Dispensa non trovata.");
     }
-    const purchaseRows = await db.select().from(coursePurchases).where(
-      and(
-        eq(coursePurchases.userId, dbUser.id),
-        eq(coursePurchases.courseId, targetDispensa.courseId),
-        eq(coursePurchases.status, "active")
-      )
-    ).limit(1);
-    if (!purchaseRows[0]) {
-      throw new Error("Acquisto richiesto per accedere a questa dispensa.");
+    const courseRows = await db.select({ slug: courses.slug }).from(courses).where(eq(courses.id, targetDispensa.courseId)).limit(1);
+    const courseSlug = courseRows[0]?.slug ?? "";
+    const ownerBypass = ownerHasComplimentaryCourseAccess(
+      params.email,
+      courseSlug
+    );
+    if (!ownerBypass) {
+      const purchaseRows = await db.select().from(coursePurchases).where(
+        and(
+          eq(coursePurchases.userId, dbUser.id),
+          eq(coursePurchases.courseId, targetDispensa.courseId),
+          eq(coursePurchases.status, "active")
+        )
+      ).limit(1);
+      if (!purchaseRows[0]) {
+        throw new Error("Acquisto richiesto per accedere a questa dispensa.");
+      }
     }
     const existingRows = await db.select().from(dispensaProgress).where(
       and(
@@ -9555,33 +9605,24 @@ function isDevDemoReservedAuth(authorization) {
 }
 var OVERVIEW_DEGRADED_NOTICE = "Area Riservata in modalit\xE0 ridotta: non riusciamo a sincronizzare corsi e prenotazioni con il database in questo momento. Puoi restare autenticata; riprova tra poco.";
 function degradedOverviewFromSeed(user) {
+  const email = user.email || "";
   return {
     user: {
       id: 0,
       uid: user.uid,
-      email: user.email || "",
+      email,
       displayName: user.name ?? null,
       phoneWhatsapp: null
     },
     // ENN-175 — same Maggiori-only filter as live overview / public catalog.
+    // ENN-240 — owner still gets Maggiori unlocked from seed when DB is down.
     courses: filterPublicPresentedBySlug(
-      COURSE_SEED_CATALOG.map((course, index2) => ({
-        id: -(index2 + 1),
-        slug: course.slug,
-        title: course.title,
-        subtitle: course.subtitle,
-        description: course.description,
-        priceEur: course.priceEur,
-        stripePriceId: course.stripePriceId,
-        lessonsCount: course.lessonsCount,
-        totalHours: course.totalHours,
-        levelLabel: course.levelLabel,
-        sortOrder: course.sortOrder,
-        isUnlocked: false,
-        purchasedAt: null,
-        amountPaidEur: null,
-        dispenseCount: course.dispense.length,
-        dispenseOutline: course.dispense.map((d, i) => ({
+      COURSE_SEED_CATALOG.map((course, index2) => {
+        const ownerUnlocked = ownerHasComplimentaryCourseAccess(
+          email,
+          course.slug
+        );
+        const outline = course.dispense.map((d, i) => ({
           id: -(index2 * 100 + i + 1),
           courseId: -(index2 + 1),
           moduleNumber: d.moduleNumber,
@@ -9590,9 +9631,40 @@ function degradedOverviewFromSeed(user) {
           format: d.format,
           readingMinutes: d.readingMinutes,
           sortOrder: i + 1
-        })),
-        unlockedDispense: []
-      }))
+        }));
+        return {
+          id: -(index2 + 1),
+          slug: course.slug,
+          title: course.title,
+          subtitle: course.subtitle,
+          description: course.description,
+          priceEur: course.priceEur,
+          stripePriceId: course.stripePriceId,
+          lessonsCount: course.lessonsCount,
+          totalHours: course.totalHours,
+          levelLabel: course.levelLabel,
+          sortOrder: course.sortOrder,
+          isUnlocked: ownerUnlocked,
+          purchasedAt: null,
+          amountPaidEur: null,
+          dispenseCount: course.dispense.length,
+          dispenseOutline: outline,
+          unlockedDispense: ownerUnlocked ? course.dispense.map((d, i) => ({
+            id: -(index2 * 100 + i + 1),
+            courseId: -(index2 + 1),
+            moduleNumber: d.moduleNumber,
+            title: d.title,
+            subtitle: d.subtitle,
+            format: d.format,
+            readingMinutes: d.readingMinutes,
+            sortOrder: i + 1,
+            contentMarkdown: d.contentMarkdown,
+            keyTakeaways: d.keyTakeaways,
+            completed: false,
+            personalNotes: ""
+          })) : []
+        };
+      })
     ),
     bookings: [],
     dialoguePasses: [],
@@ -9650,6 +9722,12 @@ async function postReservedEnroll(params) {
     if (!stripeSessionId && !isCourseSlugPubliclyPresented(course.slug)) {
       return json2(404, {
         error: "Questo percorso non \xE8 ancora in offerta. Disponibile a breve: Arcani Maggiori."
+      });
+    }
+    if (!stripeSessionId && shouldBlockMaggioriPurchase(course.slug)) {
+      return json2(503, {
+        error: MAGGIORI_PURCHASE_HOLD_MESSAGE,
+        code: "MAGGIORI_PURCHASE_HOLD"
       });
     }
     if (stripeSessionId) {
@@ -9809,22 +9887,25 @@ async function getDispensaPdf(params) {
           error: "Acquisto richiesto per accedere a questa dispensa."
         });
       }
-      const dbUser = await getOrCreateUser(
-        user.uid,
-        user.email || "",
-        user.name ?? null
-      );
-      const purchaseRows = await db.select({ id: coursePurchases.id }).from(coursePurchases).where(
-        and(
-          eq(coursePurchases.userId, dbUser.id),
-          eq(coursePurchases.courseId, row.courseId),
-          eq(coursePurchases.status, "active")
-        )
-      ).limit(1);
-      if (!purchaseRows[0]) {
-        return json2(403, {
-          error: "Acquisto richiesto per accedere a questa dispensa."
-        });
+      const email = user.email || "";
+      if (!ownerHasComplimentaryCourseAccess(email, row.courseSlug)) {
+        const dbUser = await getOrCreateUser(
+          user.uid,
+          email,
+          user.name ?? null
+        );
+        const purchaseRows = await db.select({ id: coursePurchases.id }).from(coursePurchases).where(
+          and(
+            eq(coursePurchases.userId, dbUser.id),
+            eq(coursePurchases.courseId, row.courseId),
+            eq(coursePurchases.status, "active")
+          )
+        ).limit(1);
+        if (!purchaseRows[0]) {
+          return json2(403, {
+            error: "Acquisto richiesto per accedere a questa dispensa."
+          });
+        }
       }
     }
     const lang = normalizeNinaLang(params.lang);

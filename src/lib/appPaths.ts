@@ -79,7 +79,7 @@ export const SITEMAP_ENTRIES: {
     path: '/consulti',
     label: 'Consulti',
     description:
-      'Quattro pacchetti (€19 / €50 / €75 / €90 IVA inclusa) · WhatsApp vocale o Macerata',
+      'Quattro pacchetti (€22 / €49 / €79 / €99 IVA inclusa) · WhatsApp vocale o Macerata',
   },
   {
     screen: 'corsi',

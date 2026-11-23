@@ -60,7 +60,7 @@ async function main() {
   assert(looksLikeNinaProviderLeak('Grok rate limit'), 'detect Grok leak');
   assert(looksLikeNinaProviderLeak(''), 'empty is leak/confused');
   assert(
-    !looksLikeNinaProviderLeak('I consulti costano €19, €50, €75 e €90.'),
+    !looksLikeNinaProviderLeak('I consulti costano €22, €49, €79 e €99.'),
     'normal FAQ reply is not a leak'
   );
 
