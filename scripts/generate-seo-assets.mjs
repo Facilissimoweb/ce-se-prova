@@ -98,6 +98,15 @@ export function resolveSiteOrigin(env = process.env) {
   return '';
 }
 
+/** Match `scripts/build-blog.mjs` slugFromFilename (ENN-251). */
+function slugFromBlogFilename(filename) {
+  return filename
+    .replace(/\.(md|mdx)$/i, '')
+    .trim()
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-');
+}
+
 function loadBlogPostPaths() {
   const blogDir = path.join(root, 'content', 'blog');
   if (!fs.existsSync(blogDir)) return [];
@@ -110,8 +119,17 @@ function loadBlogPostPaths() {
     .map((name) => {
       const raw = fs.readFileSync(path.join(blogDir, name), 'utf8');
       if (/^draft:\s*true\b/m.test(raw.replace(/^\uFEFF/, ''))) return null;
-      const slug = name.replace(/\.(md|mdx)$/i, '');
-      return { path: `/news/${slug}`, changefreq: 'monthly', priority: '0.6' };
+      const slug = slugFromBlogFilename(name);
+      // Encode path segments so spaces / unicode never break <loc> XML.
+      const encoded = slug
+        .split('/')
+        .map((part) => encodeURIComponent(part))
+        .join('/');
+      return {
+        path: `/news/${encoded}`,
+        changefreq: 'monthly',
+        priority: '0.6',
+      };
     })
     .filter(Boolean);
 }

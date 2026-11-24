@@ -18,6 +18,21 @@
       "source": "/articoli/primo-settenario-mappa-identita",
       "destination": "/news/il-coraggio-di-iniziare-il-matto",
       "permanent": true
+    },
+    {
+      "source": "/news/Giustizia%20Articolo",
+      "destination": "/news/la-giustizia-equilibrio-e-numerazione",
+      "permanent": true
+    },
+    {
+      "source": "/news/Giustizia Articolo",
+      "destination": "/news/la-giustizia-equilibrio-e-numerazione",
+      "permanent": true
+    },
+    {
+      "source": "/news/giustizia-articolo",
+      "destination": "/news/la-giustizia-equilibrio-e-numerazione",
+      "permanent": true
     }
   ],
   "rewrites": [

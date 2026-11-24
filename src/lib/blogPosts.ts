@@ -20,15 +20,37 @@ export function listPublishedBlogPosts(): BlogPost[] {
   return BLOG_POSTS.filter((post) => !post.draft);
 }
 
+/** ENN-251 — former spaced filename for La Giustizia article. */
+const GIUSTIZIA_LEGACY_SLUGS = [
+  'giustizia articolo',
+  'giustizia-articolo',
+  'Giustizia Articolo',
+] as const;
+
+const GIUSTIZIA_BLOG_SLUG = 'la-giustizia-equilibrio-e-numerazione';
+
 /** Resolve legacy Modulo 01 promo slug → current Matto article (ENN-132). */
 export function resolveBlogSlug(slug: string): string {
+  const trimmed = slug.trim();
+  const spaced = trimmed.replace(/-/g, ' ').toLowerCase();
+  const kebab = trimmed.replace(/\s+/g, '-').toLowerCase();
+  if (
+    (GIUSTIZIA_LEGACY_SLUGS as readonly string[]).some(
+      (legacy) =>
+        legacy.toLowerCase() === trimmed.toLowerCase() ||
+        legacy.toLowerCase() === spaced ||
+        legacy.toLowerCase() === kebab
+    )
+  ) {
+    return GIUSTIZIA_BLOG_SLUG;
+  }
   return resolveMaggioriModulo01BlogSlug(slug);
 }
 
 export function getBlogPostBySlug(slug: string): BlogPost | undefined {
   const normalized = resolveBlogSlug(slug);
   return listPublishedBlogPosts().find(
-    (post) => post.slug.toLowerCase() === normalized
+    (post) => post.slug.toLowerCase() === normalized.toLowerCase()
   );
 }
 

@@ -3,91 +3,103 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://tarotitalia.com/</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/chi-sono</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/consulti</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/dialogo</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/corsi</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/news</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/contatti</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/prenota</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/privacy</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/termini-di-servizio</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/disclaimer</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/sitemap</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/news/il-coraggio-di-iniziare-il-matto</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tarotitalia.com/news/la-giustizia-equilibrio-e-numerazione</loc>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/news/la-scintilla-del-talento-il-bagatto</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://tarotitalia.com/news/origine-segreta-mazzo-rider-waite-smith</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tarotitalia.com/news/pamela-colman-smith-artista</loc>
+    <lastmod>2026-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
