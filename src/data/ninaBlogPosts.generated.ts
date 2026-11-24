@@ -32,7 +32,7 @@ export const NINA_BLOG_CATALOG: readonly NinaBlogCatalogEntry[] = [
     "title": "La Giustizia: l'equilibrio, la responsabilità e il mistero della numerazione",
     "category": "A. Maggiori",
     "gated": false,
-    "cite": "/news/Giustizia Articolo",
+    "cite": "/news/la-giustizia-equilibrio-e-numerazione",
     "summary": "Un'analisi approfondita della carta della Giustizia tra equilibrio interiore, conseguenza delle azioni e il passaggio numerico tra VIII e XI nelle diverse tradizioni tarologiche."
   },
   {
@@ -67,8 +67,8 @@ export const NINA_BLOG_CATALOG: readonly NinaBlogCatalogEntry[] = [
 
 export const NINA_BLOG_POSTS_GENERATED: readonly NinaBlogPostGenerated[] = [
   {
-    "id": "Giustizia Articolo",
-    "slug": "Giustizia Articolo",
+    "id": "la-giustizia-equilibrio-e-numerazione",
+    "slug": "la-giustizia-equilibrio-e-numerazione",
     "title": "La Giustizia: l'equilibrio, la responsabilità e il mistero della numerazione",
     "category": "A. Maggiori",
     "tags": [
@@ -81,8 +81,8 @@ export const NINA_BLOG_POSTS_GENERATED: readonly NinaBlogPostGenerated[] = [
     ],
     "gated": false,
     "aliases": [
-      "giustizia articolo",
-      "giustizia-articolo",
+      "la giustizia equilibrio e numerazione",
+      "la-giustizia-equilibrio-e-numerazione",
       "giustizia",
       "arcani maggiori",
       "numerazione",
@@ -101,7 +101,7 @@ export const NINA_BLOG_POSTS_GENERATED: readonly NinaBlogPostGenerated[] = [
     ],
     "summary": "Un'analisi approfondita della carta della Giustizia tra equilibrio interiore, conseguenza delle azioni e il passaggio numerico tra VIII e XI nelle diverse tradizioni tarologiche.",
     "body": "Un'analisi approfondita della carta della Giustizia tra equilibrio interiore, conseguenza delle azioni e il passaggio numerico tra VIII e XI nelle diverse tradizioni tarologiche. **C'è un momento, in ogni percorso autentico, in cui la spinta vitale del movimento e il fascino delle promesse devono fare i conti con la realtà delle conseguenze. La carta della **Giustizia** non arriva come una condanna teatrale né come una formula rassicurante da manuale: arriva come uno specchio nitido, a volte severo, spesso liberatorio. Davanti a questo archetipo non conta ciò che abbiamo sperato a parole o immaginato in astratto, ma ciò che si è effettivamente consolidato attraverso le nostre scelte, i nostri silenzi e il modo in cui abbiamo abitato il tempo.**: Nel lavoro di ricerca e di lettura, la Giustizia chiede sempre una sosta lucida. Non serve affrettarsi a difendere la propria versione dei fatti: serve osservare dove pende il piatto della bilancia e quali azioni hanno prodotto quel peso. **Il…",
-    "cite": "/news/Giustizia Articolo"
+    "cite": "/news/la-giustizia-equilibrio-e-numerazione"
   },
   {
     "id": "pamela-colman-smith-artista",

@@ -257,6 +257,7 @@ function organizationJsonLd(origin: string) {
   return {
     '@context': 'https://schema.org',
     '@type': ['Organization', 'LocalBusiness', 'ProfessionalService'],
+    '@id': url ? `${url}/#organization` : undefined,
     name: 'Tarot Italia',
     alternateName: 'Tarot Italia — Maria Teresa Rogani',
     description: SEO_DEFAULT_DESCRIPTION,
@@ -282,6 +283,26 @@ function organizationJsonLd(origin: string) {
     },
     sameAs: ['https://tarotitalia.substack.com/'],
     inLanguage: 'it-IT',
+  };
+}
+
+/**
+ * WebSite node for brand SERP / Knowledge signals (ENN-251).
+ * No SearchAction — the site has no public site-search URL; fake ones are ignored.
+ */
+function websiteJsonLd(origin: string) {
+  const url = origin || undefined;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': url ? `${url}/#website` : undefined,
+    name: SEO_SITE_NAME,
+    alternateName: 'Tarot Italia — Maria Teresa Rogani',
+    url: url || undefined,
+    inLanguage: 'it-IT',
+    publisher: url
+      ? { '@id': `${url}/#organization` }
+      : { '@type': 'Organization', name: SEO_SITE_NAME },
   };
 }
 
@@ -464,6 +485,7 @@ function applySeoPayload(options: {
   upsertMeta({ attr: 'name', key: 'twitter:image' }, image);
 
   upsertJsonLd('json-ld-organization', organizationJsonLd(origin));
+  upsertJsonLd('json-ld-website', websiteJsonLd(origin));
 
   if (options.article) {
     upsertJsonLd(

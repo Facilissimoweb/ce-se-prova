@@ -36,6 +36,46 @@
       content="Consulenze dei Tarocchi per leggere il presente, prevedere le evoluzioni future e orientare le tue scelte con consapevolezza."
     />
     <meta name="twitter:image" content="/brand/tarot-italia-nav.png" />
+    <!-- Static Organization + WebSite for crawlers that skip SPA JS (ENN-251). No SearchAction — no site search. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": ["Organization", "LocalBusiness", "ProfessionalService"],
+            "@id": "https://tarotitalia.com/#organization",
+            "name": "Tarot Italia",
+            "alternateName": "Tarot Italia — Maria Teresa Rogani",
+            "url": "https://tarotitalia.com/",
+            "email": "info@tarotitalia.com",
+            "telephone": "+393791038253",
+            "logo": "https://tarotitalia.com/brand/tarot-italia-logo.png",
+            "image": "https://tarotitalia.com/brand/tarot-italia-nav.png",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Via Crispi 37",
+              "addressLocality": "Macerata",
+              "postalCode": "62100",
+              "addressCountry": "IT"
+            },
+            "founder": {
+              "@type": "Person",
+              "name": "Maria Teresa Rogani",
+              "jobTitle": "Operatore Olistico"
+            },
+            "sameAs": ["https://tarotitalia.substack.com/"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://tarotitalia.com/#website",
+            "name": "Tarot Italia",
+            "url": "https://tarotitalia.com/",
+            "inLanguage": "it-IT",
+            "publisher": { "@id": "https://tarotitalia.com/#organization" }
+          }
+        ]
+      }
+    </script>
     <link rel="icon" href="/brand/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/brand/favicon-16.png" />

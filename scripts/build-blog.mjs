@@ -100,8 +100,16 @@ function parseFrontmatter(raw) {
   return { data, body: body.trim() };
 }
 
+/**
+ * URL slug from filename. Prefer kebab filenames; spaces / underscores
+ * become hyphens so sitemap locs never ship broken paths (ENN-251).
+ */
 function slugFromFilename(filename) {
-  return filename.replace(/\.(md|mdx)$/i, '');
+  return filename
+    .replace(/\.(md|mdx)$/i, '')
+    .trim()
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-');
 }
 
 /** Course slugs that may unlock gated blog bodies (ENN-131). */
