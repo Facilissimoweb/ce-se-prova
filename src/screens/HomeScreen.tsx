@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Check, ChevronDown, Mail, MapPin, MessageCircle, Phone, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Check, ChevronDown, Mail, MapPin, MessageCircle, Phone, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ConsultationTariff, CourseId, ScreenId } from '../types/handoff';
 import { siteContent } from '../data/siteContent';
@@ -33,6 +33,7 @@ import {
 } from '../lib/maggioriPurchaseMode';
 import {
   SITE_ADDRESS,
+  SITE_BUSINESS_PROFILE_URL,
   SITE_EMAIL,
   SITE_PHONE_DISPLAY,
   SITE_PHONE_TEL,
@@ -636,6 +637,18 @@ export function HomeScreen({
         </div>
 
         <HomeTestimonialsCarousel showCmsKeys={showCmsKeys} />
+
+        <p className="pt-1">
+          <a
+            href={SITE_BUSINESS_PROFILE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm text-[#D4AF37] transition-colors hover:text-[#E6C65C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+          >
+            Vedi tutte le recensioni su Google
+            <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+          </a>
+        </p>
       </section>
 
       {/* Holistic & Ethical FAQ Accordion */}
